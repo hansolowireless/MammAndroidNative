@@ -1,0 +1,81 @@
+package com.mamm.mammapps.ui.component
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import com.mamm.mammapps.ui.component.common.ContentEntityHorizontal
+import com.mamm.mammapps.ui.model.ContentEntityUI
+import com.mamm.mammapps.ui.theme.Dimensions
+
+@Composable
+fun RowOfContent(
+    modifier: Modifier = Modifier,
+    contentList: List<ContentEntityUI>,
+    onContentEntityClick: (ContentEntityUI, Int) -> Unit = { _, _ -> }
+) {
+    LazyRow(
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(horizontal = Dimensions.paddingMedium),
+        horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall)
+    ) {
+        itemsIndexed(contentList) { index, contentEntity ->
+            ContentEntityHorizontal(
+                contentEntityUI = contentEntity,
+                onContentEntityClick = { onContentEntityClick(contentEntity, index) }
+            )
+        }
+    }
+}
+
+// Preview con datos de ejemplo
+@Preview(showBackground = true)
+@Composable
+fun RowOfContentPreview() {
+    val sampleContent = listOf(
+        ContentEntityUI(
+            title = "Película 1",
+            subtitle = "Acción",
+            imageUrl = "https://picsum.photos/400/300?random=1"
+        ),
+        ContentEntityUI(
+            title = "Película 2",
+            subtitle = "Drama",
+            imageUrl = "https://picsum.photos/400/300?random=2"
+        ),
+        ContentEntityUI(
+            title = "Película 3",
+            subtitle = "Comedia",
+            imageUrl = "https://picsum.photos/400/300?random=3"
+        ),
+        ContentEntityUI(
+            title = "Película 4",
+            subtitle = "Terror",
+            imageUrl = "https://picsum.photos/400/300?random=4"
+        ),
+        ContentEntityUI(
+            title = "Película 5",
+            subtitle = "Ciencia Ficción",
+            imageUrl = "https://picsum.photos/400/300?random=5"
+        )
+    )
+
+    CompositionLocalProvider {
+        Column {
+            RowOfContent(
+                contentList = sampleContent,
+                onContentEntityClick = { contentEntity, index ->
+                    // Manejar click
+                    println("Clicked on: ${contentEntity.title}")
+                }
+            )
+        }
+    }
+}
+
