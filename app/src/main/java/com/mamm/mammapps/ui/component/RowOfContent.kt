@@ -4,35 +4,65 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.mamm.mammapps.ui.component.common.ContentEntityHorizontal
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.theme.Dimensions
+import androidx.compose.runtime.derivedStateOf
 
 @Composable
 fun RowOfContent(
     modifier: Modifier = Modifier,
     contentList: List<ContentEntityUI>,
+    lazyListState: LazyListState,
     onContentEntityClick: (ContentEntityUI, Int) -> Unit = { _, _ -> }
 ) {
+    if (contentList.isEmpty()) {
+        return
+    }
+
+    // Estado para guardar el índice del elemento enfocado
+    var focusedItemIndex by remember { mutableIntStateOf(0) }
+
+    // Efecto para desplazar al foco
+    LaunchedEffect(key1 = focusedItemIndex) {
+        lazyListState.animateScrollToItem(focusedItemIndex)
+    }
+
     LazyRow(
         modifier = modifier.fillMaxWidth(),
+        state = lazyListState,
         contentPadding = PaddingValues(horizontal = Dimensions.paddingMedium),
-        horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall)
+        horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
     ) {
-        itemsIndexed(contentList) { index, contentEntity ->
+        itemsIndexed(
+            contentList) { index, contentEntity ->
             ContentEntityHorizontal(
                 contentEntityUI = contentEntity,
-                onContentEntityClick = { onContentEntityClick(contentEntity, index) }
+                onTap = { onContentEntityClick(contentEntity, index) },
+                onFocusChanged = { isFocused ->
+                    if (isFocused) {
+                        focusedItemIndex = index
+                    }
+                }
             )
         }
     }
 }
+
+
 
 // Preview con datos de ejemplo
 @Preview(showBackground = true)
@@ -73,7 +103,8 @@ fun RowOfContentPreview() {
                 onContentEntityClick = { contentEntity, index ->
                     // Manejar click
                     println("Clicked on: ${contentEntity.title}")
-                }
+                },
+                lazyListState = rememberLazyListState()
             )
         }
     }
