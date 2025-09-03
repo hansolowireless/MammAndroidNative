@@ -1,9 +1,11 @@
 package com.mamm.mammapps.ui.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -15,12 +17,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import com.mamm.mammapps.ui.component.common.ContentEntityHorizontal
+import com.mamm.mammapps.ui.component.common.ContentEntity
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.theme.Dimensions
-import androidx.compose.runtime.derivedStateOf
 
 @Composable
 fun RowOfContent(
@@ -42,14 +45,15 @@ fun RowOfContent(
     }
 
     LazyRow(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().wrapContentHeight().background(Color.Red),
+        verticalAlignment = Alignment.CenterVertically,
         state = lazyListState,
         contentPadding = PaddingValues(horizontal = Dimensions.paddingMedium),
-        horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
+        horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)
     ) {
         itemsIndexed(
             contentList) { index, contentEntity ->
-            ContentEntityHorizontal(
+            ContentEntity(
                 contentEntityUI = contentEntity,
                 onTap = { onContentEntityClick(contentEntity, index) },
                 onFocusChanged = { isFocused ->

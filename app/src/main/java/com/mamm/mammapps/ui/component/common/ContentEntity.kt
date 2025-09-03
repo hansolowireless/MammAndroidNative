@@ -6,7 +6,6 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -15,8 +14,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -34,7 +33,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
@@ -43,10 +41,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.mamm.mammapps.ui.model.ContentEntityUI
+import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.util.AppConstants.Companion.HORIZONTAL_ASPECT_RATIO
 
 @Composable
-fun ContentEntityHorizontal(
+fun ContentEntity(
     modifier: Modifier = Modifier,
     contentEntityUI: ContentEntityUI,
     onTap: () -> Unit,
@@ -59,7 +58,7 @@ fun ContentEntityHorizontal(
     val transition = updateTransition(isFocused, label = "focusTransition")
 
     val scale by transition.animateFloat(
-        transitionSpec = { spring(dampingRatio = Spring.DampingRatioMediumBouncy) },
+        transitionSpec = { spring(dampingRatio = Spring.DampingRatioLowBouncy) },
         label = "scale"
     ) { focused -> if (focused && isTv) 1.1f else 1f }
 
@@ -70,8 +69,8 @@ fun ContentEntityHorizontal(
 
     Surface(
         modifier = modifier
-            .width(180.dp)
-            .aspectRatio(HORIZONTAL_ASPECT_RATIO)
+            .height(contentEntityUI.height)
+            .aspectRatio(contentEntityUI.aspectRatio)
             .scale(scale)
             .focusRequester(focusRequester)
             .onFocusChanged { focusState ->
@@ -98,16 +97,16 @@ fun ContentEntityHorizontal(
                 contentScale = ContentScale.Crop,
             )
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
-                            startY = 0.5f
-                        )
-                    )
-            )
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .background(
+//                        Brush.verticalGradient(
+//                            listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
+//                            startY = 0.5f
+//                        )
+//                    )
+//            )
 
             Column(
                 modifier = Modifier
@@ -143,7 +142,7 @@ fun ContentEntityHorizontal(
 @Composable
 fun ContentEntityHorizontalPreview() {
     CompositionLocalProvider {
-        ContentEntityHorizontal(
+        ContentEntity(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),

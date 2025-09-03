@@ -1,8 +1,11 @@
 package com.mamm.mammapps.ui.viewmodel
 
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mamm.mammapps.domain.usecases.GetHomeContentUseCase
@@ -22,6 +25,17 @@ class HomeViewModel @Inject constructor(
 
     var homeContent by mutableStateOf<List<ContentRowUI>>(emptyList())
         private set
+
+    // Map to hold the LazyListState for each row.
+    // The key is the row's index or ID.
+    val rowScrollStates: SnapshotStateMap<Int, LazyListState> = mutableStateMapOf()
+
+    // Function to get or create the LazyListState for a specific row.
+    fun getOrCreateScrollState(rowIndex: Int): LazyListState {
+        return rowScrollStates.getOrPut(rowIndex) {
+            LazyListState()
+        }
+    }
 
     fun getHomeContent() {
         homeContentState = UIState.Loading

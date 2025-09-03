@@ -6,23 +6,29 @@ import com.mamm.mammapps.data.model.Event
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentRowUI
+import com.mamm.mammapps.ui.theme.Dimensions
+import com.mamm.mammapps.util.AppConstants.Companion.VERTICAL_ASPECT_RATIO
 
 fun Channel.toContentEntityUI() = ContentEntityUI(
-    imageUrl = logoURL ?: "",
-    title = name ?: "",
-    subtitle = description
+    imageUrl = logoURL?.replace(".png", "_viewer.png")?.replace(".jpg", "_viewer.jpg") ?: "",
+    title = "",
+    subtitle = ""
 )
 
 fun Content.toContentEntityUI() = ContentEntityUI(
-    imageUrl = logoURL ?: "",
+    imageUrl = posterURL ?: "",
     title = title ?: "",
-    subtitle = shortDesc
+    subtitle = shortDesc,
+    aspectRatio = VERTICAL_ASPECT_RATIO,
+    height = Dimensions.contentEntityHeight
 )
 
 fun Event.toContentEntityUI() = ContentEntityUI(
     imageUrl = logoURL ?: "",
     title = title ?: "",
-    subtitle = subtitle
+    subtitle = subtitle,
+    aspectRatio = VERTICAL_ASPECT_RATIO,
+    height = Dimensions.contentEntityHeight
 )
 
 fun GetHomeContentResponse.toContentRows(): List<ContentRowUI> {
@@ -39,7 +45,7 @@ fun GetHomeContentResponse.toContentRows(): List<ContentRowUI> {
         if (items.isNotEmpty()) {
             ContentRowUI(
                 categoryName = category.name ?: "",
-                items = items
+                items = items.plus(items).plus(items)
             )
         } else null
     } ?: emptyList()

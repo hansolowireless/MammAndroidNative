@@ -1,7 +1,10 @@
 package com.mamm.mammapps.util
 
+import androidx.compose.ui.unit.dp
+
 class AppConstants {
     companion object {
         const val HORIZONTAL_ASPECT_RATIO = 16f / 9f
+        const val VERTICAL_ASPECT_RATIO = 10f / 16f
     }
 }
