@@ -6,64 +6,48 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.mamm.mammapps.ui.component.common.ContentEntity
+import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
 import com.mamm.mammapps.ui.model.ContentEntityUI
+import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.theme.Dimensions
 
 @Composable
 fun RowOfContent(
     modifier: Modifier = Modifier,
     contentList: List<ContentEntityUI>,
-    lazyListState: LazyListState,
-    onContentEntityClick: (ContentEntityUI, Int) -> Unit = { _, _ -> }
+    onContentClick: (ContentEntityUI) -> Unit
 ) {
     if (contentList.isEmpty()) {
         return
     }
 
-    // Estado para guardar el índice del elemento enfocado
-    var focusedItemIndex by remember { mutableIntStateOf(0) }
+    ProvideLazyListPivotOffset (parentFraction = 0.01f) {
+        LazyRow (
+            modifier = modifier.fillMaxWidth().wrapContentHeight().background(Color.Red),
+            verticalAlignment = Alignment.CenterVertically,
+            contentPadding = PaddingValues(horizontal = Dimensions.paddingMediumLarge),
+            horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)
+        ) {
+            itemsIndexed(
+                contentList) { index, contentEntity ->
 
-    // Efecto para desplazar al foco
-    LaunchedEffect(key1 = focusedItemIndex) {
-        lazyListState.animateScrollToItem(focusedItemIndex)
-    }
-
-    LazyRow(
-        modifier = modifier.fillMaxWidth().wrapContentHeight().background(Color.Red),
-        verticalAlignment = Alignment.CenterVertically,
-        state = lazyListState,
-        contentPadding = PaddingValues(horizontal = Dimensions.paddingMedium),
-        horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)
-    ) {
-        itemsIndexed(
-            contentList) { index, contentEntity ->
-            ContentEntity(
-                contentEntityUI = contentEntity,
-                onTap = { onContentEntityClick(contentEntity, index) },
-                onFocusChanged = { isFocused ->
-                    if (isFocused) {
-                        focusedItemIndex = index
-                    }
-                }
-            )
+                ContentEntity(
+                    contentEntityUI = contentEntity,
+                    onClick = { onContentClick(contentEntity) }
+                )
+            }
         }
     }
+
 }
 
 
@@ -76,27 +60,32 @@ fun RowOfContentPreview() {
         ContentEntityUI(
             title = "Película 1",
             subtitle = "Acción",
-            imageUrl = "https://picsum.photos/400/300?random=1"
+            imageUrl = "https://picsum.photos/400/300?random=1",
+            identifier = ContentIdentifier.VoD("1")
         ),
         ContentEntityUI(
             title = "Película 2",
             subtitle = "Drama",
-            imageUrl = "https://picsum.photos/400/300?random=2"
+            imageUrl = "https://picsum.photos/400/300?random=2",
+            identifier = ContentIdentifier.VoD("1")
         ),
         ContentEntityUI(
             title = "Película 3",
             subtitle = "Comedia",
-            imageUrl = "https://picsum.photos/400/300?random=3"
+            imageUrl = "https://picsum.photos/400/300?random=3",
+            identifier = ContentIdentifier.VoD("1")
         ),
         ContentEntityUI(
             title = "Película 4",
             subtitle = "Terror",
-            imageUrl = "https://picsum.photos/400/300?random=4"
+            imageUrl = "https://picsum.photos/400/300?random=4",
+            identifier = ContentIdentifier.VoD("1")
         ),
         ContentEntityUI(
             title = "Película 5",
             subtitle = "Ciencia Ficción",
-            imageUrl = "https://picsum.photos/400/300?random=5"
+            imageUrl = "https://picsum.photos/400/300?random=5",
+            identifier = ContentIdentifier.VoD("1")
         )
     )
 
@@ -104,11 +93,9 @@ fun RowOfContentPreview() {
         Column {
             RowOfContent(
                 contentList = sampleContent,
-                onContentEntityClick = { contentEntity, index ->
-                    // Manejar click
+                onContentClick = { contentEntity ->
                     println("Clicked on: ${contentEntity.title}")
-                },
-                lazyListState = rememberLazyListState()
+                }
             )
         }
     }

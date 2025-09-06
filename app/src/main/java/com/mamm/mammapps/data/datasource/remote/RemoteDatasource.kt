@@ -49,8 +49,7 @@ class RemoteDatasource @Inject constructor(
                 throw HttpException(Response.error<Any>(response.code, errorBody))
             }
 
-            val responseBody = response.body?.string()
-                ?: throw Exception("Empty response body")
+            val responseBody = response.body.string()
 
             Gson().fromJson(responseBody, GetHomeContentResponse::class.java)
         }

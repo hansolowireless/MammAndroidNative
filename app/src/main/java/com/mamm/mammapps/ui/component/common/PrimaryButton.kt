@@ -10,23 +10,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
+import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.theme.Primary
 
 @Composable
 fun PrimaryButton(
     text: String,
     onClick: () -> Unit,
-    isTV: Boolean
 ) {
     Button(
         shape = RectangleShape,
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .height(if (isTV) 80.dp else 48.dp),
+            .height(if (LocalIsTV.current) 80.dp else 48.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Primary,
-            contentColor = Color.Black          // Color del texto
+            contentColor = Color.Black
         )
     ) {
         Text(text)

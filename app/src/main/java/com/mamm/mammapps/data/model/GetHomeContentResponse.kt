@@ -1,17 +1,28 @@
 package com.mamm.mammapps.data.model
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
 data class GetHomeContentResponse(
     @SerializedName("timeGenerated") val timeGenerated: String? = null,
     @SerializedName("featured") val featured: List<FeaturedItem>? = null,
     @SerializedName("channels") val channels: List<Channel>? = null,
-    @SerializedName("contents") val contents: List<Content>? = null,
+    @SerializedName("contents") val contents: List<VoD>? = null,
     @SerializedName("genres") val genres: List<Genre>? = null,
     @SerializedName("categories") val categories: List<Category>? = null,
     @SerializedName("events") val events: List<Event>? = null,
     @SerializedName("series") val series: List<Series>? = null
-)
+) {
+    companion object {
+        fun fillMissingFields(response: GetHomeContentResponse) {
+            response.contents?.forEach { item ->
+                item.metadata = Metadata.fromTbContentItems(
+                    item.tbContentItems ?: emptyList())
+            }
+        }
+    }
+}
 
 data class FeaturedItem(
     @SerializedName("subgenreById") val subgenreById: Any? = null,
@@ -36,9 +47,10 @@ data class FeaturedItem(
     @SerializedName("parental") val parental: Any? = null
 )
 
+@Parcelize
 data class LogoTransition(
     @SerializedName("url") val url: String? = null
-)
+) : Parcelable
 
 data class Channel(
     @SerializedName("freeaccess") val freeaccess: Int? = null,
@@ -54,7 +66,7 @@ data class Channel(
     @SerializedName("timeshift") val timeshift: Boolean? = null,
     @SerializedName("fingerprint") val fingerprint: Boolean? = null,
     @SerializedName("fingerprintPosition") val fingerprintPosition: Any? = null,
-    @SerializedName("deliveryURL") val deliveryURL: String? = null,
+    @SerializedName("deliveryURL") var deliveryURL: String? = null,
     @SerializedName("id") val id: Int? = null,
     @SerializedName("catchup_hours") val catchupHours: Int? = null,
     @SerializedName("drmProvider") val drmProvider: Any? = null,
@@ -72,10 +84,11 @@ data class Channel(
     @SerializedName("fingerprintDuration") val fingerprintDuration: Any? = null
 )
 
-data class Content(
+@Parcelize
+data class VoD(
     @SerializedName("content_logo") val contentLogo: String? = null,
     @SerializedName("content_logo_tilte") val contentLogoTilte: String? = null,
-    @SerializedName("subgenreById") val subgenreById: Any? = null,
+    @SerializedName("subgenreById") val subgenreById: Int? = null,
     @SerializedName("tbContentItems") val tbContentItems: List<TbContentItem>? = null,
     @SerializedName("logoTransitions") val logoTransitions: List<LogoTransition>? = null,
     @SerializedName("title") val title: String? = null,
@@ -90,15 +103,17 @@ data class Content(
     @SerializedName("content_logo_500") val contentLogo500: String? = null,
     @SerializedName("longDesc") val longDesc: String? = null,
     @SerializedName("startDate") val startDate: String? = null,
-    @SerializedName("parental") val parental: Int? = null
-)
+    @SerializedName("parental") val parental: Int? = null,
+    var metadata: Metadata? = null
+): Parcelable
 
+@Parcelize
 data class TbContentItem(
     @SerializedName("id_content") val idContent: Int? = null,
     @SerializedName("item_ds") val itemDs: String? = null,
     @SerializedName("id_content_item") val idContentItem: Int? = null,
     @SerializedName("item_value") val itemValue: String? = null
-)
+): Parcelable
 
 data class Genre(
     @SerializedName("subgenres") val subgenres: List<Subgenre>? = null,
@@ -129,24 +144,25 @@ data class OrderItem(
     @SerializedName("type") val type: String? = null
 )
 
+@Parcelize
 data class Event(
-    @SerializedName("subgenreById") val subgenreById: Any? = null,
+    @SerializedName("subgenreById") val subgenreById: Int? = null,
     @SerializedName("featured") val featured: Int? = null,
     @SerializedName("logoTransitions") val logoTransitions: List<LogoTransition>? = null,
     @SerializedName("description") val description: String? = null,
     @SerializedName("title") val title: String? = null,
     @SerializedName("fcIni") val fcIni: String? = null,
     @SerializedName("logoURL") val logoURL: String? = null,
-    @SerializedName("duration") val duration: Any? = null,
-    @SerializedName("idPpal") val idPpal: Any? = null,
+    @SerializedName("duration") val duration: Int? = null,
+    @SerializedName("idPpal") val idPpal: Int? = null,
     @SerializedName("fcEnd") val fcEnd: String? = null,
     @SerializedName("subtitle") val subtitle: String? = null,
     @SerializedName("deliveryURL") val deliveryURL: String? = null,
     @SerializedName("channelById") val channelById: Int? = null,
     @SerializedName("id") val id: Int? = null,
     @SerializedName("items") val items: String? = null,
-    @SerializedName("parental") val parental: Any? = null
-)
+    @SerializedName("parental") val parental: Int? = null
+) : Parcelable
 
 data class Series(
     @SerializedName("subgenreById") val subgenreById: Int? = null,

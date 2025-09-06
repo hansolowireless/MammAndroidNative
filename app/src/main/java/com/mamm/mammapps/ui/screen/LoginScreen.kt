@@ -20,9 +20,7 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
 
-    val isTV = LocalWindowInfo.current.containerSize.height >= 720
     val loginState = viewModel.loginState
-    val TAG = "LoginScreen"
 
     LaunchedEffect (Unit) {
         viewModel.trytoAutoLogin()
@@ -31,11 +29,10 @@ fun LoginScreen(
     LaunchedEffect(loginState) {
         when (loginState) {
             is UIState.Success<*> -> {
-                Log.d(TAG, "Login successful")
                 onNavigateToHome()
             }
             is UIState.Error -> {
-                Log.e(TAG, "Login failed")
+
             }
             else -> {
                 // Handle loading state
@@ -46,13 +43,12 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(deviceAdaptivePadding(isTV))
+            .padding(deviceAdaptivePadding())
     ) {
         LoginForm(
             onLogin = { email, password ->
                 viewModel.login(email, password)
-            },
-            isTV = true
+            }
         )
     }
 }

@@ -12,20 +12,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.common.PrimaryButton
 import com.mamm.mammapps.ui.component.common.TextInput
 
 
 @Composable
 fun LoginForm(
-    onLogin: (email: String, password: String) -> Unit,
-    isTV: Boolean
+    onLogin: (email: String, password: String) -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(if (isTV) 32.dp else 16.dp),
+        verticalArrangement = Arrangement.spacedBy(if (LocalIsTV.current) 32.dp else 16.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
         TextInput(
@@ -43,8 +43,7 @@ fun LoginForm(
         )
         PrimaryButton(
             text = "Login",
-            onClick = { onLogin(email, password) },
-            isTV = isTV
+            onClick = { onLogin(email, password) }
         )
     }
 }
@@ -55,7 +54,6 @@ fun LoginFormTVPreview() {
     LoginForm(
         onLogin = { email, password ->
             // Preview action - no actual login
-        },
-        isTV = true
+        }
     )
 }

@@ -19,15 +19,15 @@ class SecurePreferencesManager @Inject constructor(
 
     private val encryptedPrefs: SharedPreferences = EncryptedSharedPreferences.create(
         context,
-        "mamm_secure_prefs",
+        "preferences",
         masterKey,
         EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
 
     companion object {
-        private const val KEY_USERNAME = "username"
-        private const val KEY_PASSWORD = "password"
+        private const val KEY_USERNAME = "uE"
+        private const val KEY_PASSWORD = "uP"
     }
 
     // Guardar credenciales
