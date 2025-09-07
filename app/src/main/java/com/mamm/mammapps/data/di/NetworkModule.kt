@@ -27,6 +27,14 @@ annotation class SearchApi
 @Retention(AnnotationRetention.BINARY)
 annotation class LocatorApi
 
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class EPGApi
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class HomeContentApi
+
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
@@ -83,6 +91,29 @@ object NetworkModule {
             .build()
     }
 
+    @EPGApi
+    @Provides
+    @Singleton
+    fun provideEPGRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(Config.baseUrl)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    // Nueva instancia de Retrofit sin baseUrl para HomeContent
+    @HomeContentApi
+    @Provides
+    @Singleton
+    fun provideHomeContentRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://example.com/") // URL dummy requerida por Retrofit
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
     @IdmApi
     @Provides
     @Singleton
@@ -104,4 +135,18 @@ object NetworkModule {
         return retrofit.create(ApiService::class.java)
     }
 
+    @EPGApi
+    @Provides
+    @Singleton
+    fun provideEPGApi(@EPGApi retrofit: Retrofit): ApiService {
+        return retrofit.create(ApiService::class.java)
+    }
+
+    // Nuevo provider para HomeContentApi
+    @HomeContentApi
+    @Provides
+    @Singleton
+    fun provideHomeContentApi(@HomeContentApi retrofit: Retrofit): ApiService {
+        return retrofit.create(ApiService::class.java)
+    }
 }

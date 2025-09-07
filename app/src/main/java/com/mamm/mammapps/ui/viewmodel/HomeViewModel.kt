@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.usecases.FindContentEntityUseCase
+import com.mamm.mammapps.domain.usecases.GetEPGContentUseCase
 import com.mamm.mammapps.domain.usecases.GetHomeContentUseCase
 import com.mamm.mammapps.ui.common.UIState
 import com.mamm.mammapps.ui.mapper.toContentRows
@@ -18,11 +19,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getHomeContentUseCase: GetHomeContentUseCase,
+    private val getEPGContentUseCase: GetEPGContentUseCase,
     private val findContentEntityUseCase: FindContentEntityUseCase,
     private val logger: Logger
 ) : ViewModel() {
@@ -40,6 +43,7 @@ class HomeViewModel @Inject constructor(
     private val _clickedContent = MutableStateFlow<Any?>(null)
     val clickedContent: StateFlow<Any?> = _clickedContent.asStateFlow()
 
+
     fun getHomeContent() {
         homeContentUIState = UIState.Loading
         viewModelScope.launch {
@@ -51,6 +55,8 @@ class HomeViewModel @Inject constructor(
                 .onFailure { exception ->
                     homeContentUIState = UIState.Error(exception.message ?: "Unknown error occurred")
                 }
+
+            getEPGContentUseCase(LocalDate.now())
         }
     }
 
@@ -61,7 +67,8 @@ class HomeViewModel @Inject constructor(
     }
 
     fun clearClickedContent() {
-        _clickedContent.value = null
+        _clickedContent.update { null }
     }
+
 
 }

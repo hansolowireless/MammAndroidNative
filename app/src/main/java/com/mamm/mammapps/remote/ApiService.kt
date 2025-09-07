@@ -1,8 +1,11 @@
 package com.mamm.mammapps.remote
 
+import com.mamm.mammapps.data.model.GetEPGResponse
+import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.LocatorResponse
 import com.mamm.mammapps.data.model.LoginRequest
 import com.mamm.mammapps.data.model.LoginResponse
+import retrofit2.Response
 import retrofit2.http.*
 
 interface ApiService {
@@ -27,6 +30,23 @@ interface ApiService {
         @Query("login") userName: String
     ): LocatorResponse
 
+    @GET
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getHomeContent(@Url url: String): Response<GetHomeContentResponse>
+
+    // ---------- EPG ----------
+    @GET("epg_files/EPG_{channelID}_{date}")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getEPG(
+        @Path("channelID") channelID: Int,
+        @Path("date") date: String
+    ): Response<GetEPGResponse>
 
 
 //    // ---------- Bookmarks ----------

@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -70,7 +71,10 @@ fun DetailScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                   Color.Black.copy(alpha = 0.4f)
+                    brush = Brush.horizontalGradient(
+                        0.0f to Color.Black,
+                        1.0f to Color.Transparent
+                    )
                 )
         )
 
@@ -81,14 +85,14 @@ fun DetailScreen(
                 .fillMaxWidth(0.5f)
                 .padding(Dimensions.paddingLarge)
                 .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.Top
+            verticalArrangement = Arrangement.spacedBy(Dimensions.paddingXSmall)
         ) {
 
             // Título
             Text(
                 text = content.title,
                 color = Color.White,
-                modifier = Modifier.padding(bottom = Dimensions.paddingXSmall)
+                style = MaterialTheme.typography.headlineLarge,
             )
 
             // Metadata principal
@@ -125,7 +129,6 @@ fun DetailScreen(
 
                 // Director y género
                 Row(
-                    modifier = Modifier.padding(bottom = Dimensions.paddingXSmall),
                     horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingXSmall)
                 ) {
                     Text(
@@ -148,16 +151,14 @@ fun DetailScreen(
                 if (metadata.originalTitle.isNotEmpty() && metadata.originalTitle != content.title) {
                     Text(
                         text = stringResource(R.string.original_title_label, metadata.originalTitle),
-                        color = Color.White.copy(alpha = 0.8f),
-                        modifier = Modifier.padding(bottom = Dimensions.paddingXSmall)
+                        color = Color.White.copy(alpha = 0.8f)
                     )
                 }
 
                 // Disponible hasta (si hay fecha)
                 Text(
                     text = stringResource(R.string.available_until_label, "01-01-2026"),
-                    color = Color.White.copy(alpha = 0.8f),
-                    modifier = Modifier.padding(bottom = Dimensions.paddingMedium)
+                    color = Color.White.copy(alpha = 0.8f)
                 )
             }
 
@@ -166,7 +167,7 @@ fun DetailScreen(
                 Text(
                     text = description,
                     color = Color.White,
-                    modifier = Modifier.padding(bottom = Dimensions.paddingLarge)
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
 
@@ -174,8 +175,7 @@ fun DetailScreen(
             Button(
                 onClick = onPlayClick,
                 modifier = Modifier
-                    .width(200.dp)
-                    .padding(bottom = Dimensions.paddingMedium),
+                    .width(200.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF1976D2)
                 )

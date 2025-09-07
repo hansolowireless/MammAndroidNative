@@ -7,6 +7,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,66 +29,76 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.size.Dimension
+import com.mamm.mammapps.ui.component.LocalIsTV
+import com.mamm.mammapps.ui.extension.glow
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
+import com.mamm.mammapps.ui.theme.Dimensions
+import com.mamm.mammapps.ui.theme.Primary
 
 @Composable
 fun ContentEntity(
     modifier: Modifier = Modifier,
     contentEntityUI: ContentEntityUI,
-    onClick: () -> Unit,
-    isTv: Boolean = true
+    onClick: () -> Unit
 ) {
     var isFocused by remember { mutableStateOf(false) }
 
     val transition = updateTransition(isFocused, label = "focusTransition")
 
-    val scale by transition.animateFloat(
-        transitionSpec = { spring(dampingRatio = Spring.DampingRatioLowBouncy) },
-        label = "scale"
-    ) { focused -> if (focused && isTv) 1.00f else 0.95f }
-
-    val elevation by transition.animateDp(
+    val glowAlpha by transition.animateFloat(
         transitionSpec = { tween(200) },
-        label = "elevation"
-    ) { focused -> if (focused && isTv) 16.dp else 0.dp }
+        label = "glowAlpha"
+    ) { focused -> if (focused && LocalIsTV.current) 0.8f else 0f }
 
     Surface(
         modifier = modifier
             .height(contentEntityUI.height)
             .aspectRatio(contentEntityUI.aspectRatio)
-            .scale(scale)
+            .graphicsLayer {
+                scaleX = if (isFocused) 0.98f else 0.92f
+                scaleY = if (isFocused) 0.98f else 0.92f
+            }
+            .glow(enabled = isFocused, alpha = glowAlpha)
             .onFocusChanged { focusState ->
                 isFocused = focusState.isFocused
             }
-            .focusable(enabled = isTv)
+            .focusable(enabled = LocalIsTV.current)
             .onKeyEvent {
-                if (it.key == Key.DirectionCenter) {
+                if (it.key == Key.DirectionCenter && it.type == KeyEventType.KeyDown) {
                     onClick()
                     return@onKeyEvent true
                 }
                 false
             },
-        shape = RoundedCornerShape(10.dp),
-        tonalElevation = elevation,
-        shadowElevation = elevation,
+        shape = RoundedCornerShape(Dimensions.cornerRadius),
         color = Color.Transparent
     ) {
         Box(
-            modifier = Modifier.clip(RoundedCornerShape(10.dp))
+            modifier = Modifier.clip(RoundedCornerShape(Dimensions.cornerRadius))
         ) {
             AsyncImage(
                 model = contentEntityUI.imageUrl,
@@ -111,7 +122,7 @@ fun ContentEntity(
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(16.dp),
+                    .padding(Dimensions.paddingMedium),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(

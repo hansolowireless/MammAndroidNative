@@ -10,6 +10,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -20,6 +24,7 @@ import com.mamm.mammapps.ui.component.HomeGridBottom
 import com.mamm.mammapps.ui.component.HomeGridTop
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.viewmodel.HomeViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -29,19 +34,33 @@ fun HomeScreen(
     val homeContentState = viewModel.homeContentUIState
     val homeContent = viewModel.homeContentUI
     val clickedContent by viewModel.clickedContent.collectAsStateWithLifecycle()
+    val hasNavigated = remember { mutableStateOf(false) }
 
     val columnListState = rememberLazyListState()
-    val context = LocalContext.current
+
+    var lastClickedItemIndex by remember { mutableStateOf<Int?>(null) }
+
 
     LaunchedEffect(Unit) {
         viewModel.getHomeContent()
     }
 
+    LaunchedEffect(lastClickedItemIndex) {
+        lastClickedItemIndex?.let { index ->
+            if (index >= 0 && index < homeContent.size) {
+                columnListState.scrollToItem(index)
+            }
+        }
+    }
+
     LaunchedEffect(clickedContent) {
-        clickedContent?.let {
-            onContentClicked(it)
-            viewModel.clearClickedContent()
-        } ?: Toast.makeText(context, "Content not found", Toast.LENGTH_SHORT).show()
+        clickedContent?.let { content ->
+            if (!hasNavigated.value) {
+                onContentClicked(content)
+                hasNavigated.value = true
+                viewModel.clearClickedContent()
+            }
+        }
     }
 
     Box(
@@ -70,7 +89,8 @@ fun HomeScreen(
                     HomeGridBottom(
                         content = homeContent,
                         columnListState = columnListState,
-                        onContentClicked = { entityUI ->
+                        onContentClicked = { index, entityUI ->
+                            lastClickedItemIndex = index
                             viewModel.findContent(entityUI)
                         }
                     )

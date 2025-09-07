@@ -8,6 +8,7 @@ object Dimensions {
     val paddingMedium = 16.dp
     val paddingMediumLarge = 20.dp
     val paddingLarge = 24.dp
-    val contentEntityHeight = 180.dp
+    val contentEntityHeight = 190.dp
     val channelEntityHeight = 140.dp
+    val cornerRadius = 10.dp
 }

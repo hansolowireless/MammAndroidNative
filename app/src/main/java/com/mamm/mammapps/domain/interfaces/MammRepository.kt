@@ -11,6 +11,5 @@ interface MammRepository {
     suspend fun saveUserCredentials(username: String, password: String) : Result<Unit>
     suspend fun getUserCredentials(): Result<Pair<String?, String?>>
     suspend fun getHomeContent(url: String) : Result<GetHomeContentResponse>
-    fun getCachedHomeContent(): GetHomeContentResponse?
     fun findContent(identifier: ContentIdentifier): Result<Any>?
 }

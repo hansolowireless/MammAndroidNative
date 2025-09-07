@@ -1,6 +1,5 @@
 package com.mamm.mammapps.ui.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.mamm.mammapps.ui.component.common.ContentEntity
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
@@ -32,10 +30,10 @@ fun RowOfContent(
 
     ProvideLazyListPivotOffset (parentFraction = 0.01f) {
         LazyRow (
-            modifier = modifier.fillMaxWidth().wrapContentHeight().background(Color.Red),
+            modifier = modifier.fillMaxWidth().wrapContentHeight(),
             verticalAlignment = Alignment.CenterVertically,
             contentPadding = PaddingValues(horizontal = Dimensions.paddingMediumLarge),
-            horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)
+            horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
         ) {
             itemsIndexed(
                 contentList) { index, contentEntity ->

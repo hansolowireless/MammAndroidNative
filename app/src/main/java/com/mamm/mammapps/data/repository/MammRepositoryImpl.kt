@@ -21,8 +21,6 @@ class MammRepositoryImpl @Inject constructor (
         private const val TAG = "MammRepositoryImpl"
     }
 
-    private var homeContent: GetHomeContentResponse? = null
-
     override suspend fun login(username: String, password: String): Result<LoginResponse> {
         return runCatching {
             remoteDatasource.login(username, password)
@@ -57,20 +55,15 @@ class MammRepositoryImpl @Inject constructor (
             remoteDatasource.getHomeContent(url).transformData()
         }.onSuccess { response ->
             logger.debug(TAG, "getHomeContent Received and saved successful response")
-            homeContent = response
         }
-    }
-
-    override fun getCachedHomeContent(): GetHomeContentResponse? {
-        return homeContent
     }
 
     override fun findContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
-            is ContentIdentifier.Channel -> homeContent?.channels?.find { it.id.toString() == identifier.id }
-            is ContentIdentifier.VoD -> homeContent?.contents?.find { it.id.toString() == identifier.id }
-            is ContentIdentifier.Event -> homeContent?.events?.find { it.id.toString() == identifier.id }
-            is ContentIdentifier.Serie -> homeContent?.series?.find { it.id.toString() == identifier.id }
+            is ContentIdentifier.Channel -> remoteDatasource.getCachedHomeContent()?.channels?.find { it.id.toString() == identifier.id }
+            is ContentIdentifier.VoD -> remoteDatasource.getCachedHomeContent()?.contents?.find { it.id.toString() == identifier.id }
+            is ContentIdentifier.Event -> remoteDatasource.getCachedHomeContent()?.events?.find { it.id.toString() == identifier.id }
+            is ContentIdentifier.Serie -> remoteDatasource.getCachedHomeContent()?.series?.find { it.id.toString() == identifier.id }
         }
 
         return content?.let { Result.success(it) }
