@@ -22,7 +22,8 @@ import com.mamm.mammapps.ui.theme.Dimensions
 fun RowOfContent(
     modifier: Modifier = Modifier,
     contentList: List<ContentEntityUI>,
-    onContentClick: (ContentEntityUI) -> Unit
+    onContentClick: (ContentEntityUI) -> Unit,
+    onFocus: (ContentEntityUI) -> Unit = {}
 ) {
     if (contentList.isEmpty()) {
         return
@@ -36,11 +37,12 @@ fun RowOfContent(
             horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
         ) {
             itemsIndexed(
-                contentList) { index, contentEntity ->
+                contentList) { _, contentEntity ->
 
                 ContentEntity(
                     contentEntityUI = contentEntity,
-                    onClick = { onContentClick(contentEntity) }
+                    onClick = { onContentClick(contentEntity) },
+                    onFocus = { onFocus(contentEntity) }
                 )
             }
         }

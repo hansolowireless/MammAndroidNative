@@ -29,5 +29,20 @@ data class Metadata(
                 originalTitle = itemMap["original_title"] ?: ""
             )
         }
+
+        fun fromTbEventItems(items: List<TbEventItem>): Metadata {
+            val itemMap = items.associate { it.itemDs to it.itemValue }
+
+            return Metadata(
+                actors = itemMap["cast"]?.let { Actor.fromItemValue(it) } ?: emptyList(),
+                director = itemMap["director"]?.split("|")?.firstOrNull() ?: "",
+                year = itemMap["year"] ?: "",
+                country = itemMap["country"] ?: "",
+                durationMin = itemMap["duration"] ?: "",
+                ratingURL = itemMap["rating_icon"],
+                genres = itemMap["genres"] ?: "",
+                originalTitle = itemMap["original_title"] ?: ""
+            )
+        }
     }
 }

@@ -20,7 +20,8 @@ import com.mamm.mammapps.ui.theme.Dimensions
 fun HomeGridBottom(
     content: List<ContentRowUI>,
     columnListState: LazyListState,
-    onContentClicked: (Int, ContentEntityUI) -> Unit
+    onContentClicked: (Int, ContentEntityUI) -> Unit,
+    onFocus: (ContentEntityUI) -> Unit = {}
 ) {
     ProvideLazyListPivotOffset(parentFraction = 0.249f) {
         LazyColumn(
@@ -52,6 +53,9 @@ fun HomeGridBottom(
                         contentList = contentRow.items,
                         onContentClick = { content ->
                             onContentClicked(index, content)
+                        },
+                        onFocus = { content ->
+                            onFocus(content)
                         }
                     )
                 }

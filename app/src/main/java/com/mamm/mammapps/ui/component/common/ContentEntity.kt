@@ -54,6 +54,7 @@ import coil.compose.AsyncImage
 import coil.size.Dimension
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.extension.glow
+import com.mamm.mammapps.ui.extension.onTap
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.theme.Dimensions
@@ -63,7 +64,8 @@ import com.mamm.mammapps.ui.theme.Primary
 fun ContentEntity(
     modifier: Modifier = Modifier,
     contentEntityUI: ContentEntityUI,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onFocus: () -> Unit = {}
 ) {
     var isFocused by remember { mutableStateOf(false) }
 
@@ -85,15 +87,10 @@ fun ContentEntity(
             .glow(enabled = isFocused, alpha = glowAlpha)
             .onFocusChanged { focusState ->
                 isFocused = focusState.isFocused
+                if (isFocused) onFocus()
             }
             .focusable(enabled = LocalIsTV.current)
-            .onKeyEvent {
-                if (it.key == Key.DirectionCenter && it.type == KeyEventType.KeyDown) {
-                    onClick()
-                    return@onKeyEvent true
-                }
-                false
-            },
+            .onTap { onClick() },
         shape = RoundedCornerShape(Dimensions.cornerRadius),
         color = Color.Transparent
     ) {

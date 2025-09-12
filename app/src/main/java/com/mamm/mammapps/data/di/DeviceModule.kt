@@ -1,8 +1,6 @@
 package com.mamm.mammapps.data.di
 
-import android.app.UiModeManager
 import android.content.Context
-import android.content.res.Configuration
 import android.provider.Settings
 import com.mamm.mammapps.util.isAndroidTV
 import dagger.Module
@@ -21,6 +19,10 @@ annotation class DeviceTypeQualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class DeviceSerialQualifier
 
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class DeviceModelQualifier
+
 @Module
 @InstallIn(SingletonComponent::class)
 object DeviceModule {
@@ -38,6 +40,12 @@ object DeviceModule {
             context.contentResolver,
             Settings.Secure.ANDROID_ID
         ) ?: "unknown_device"
+    }
+
+    @Provides
+    @DeviceModelQualifier
+    fun provideDeviceModel(): String {
+        return android.os.Build.MODEL
     }
 
 }

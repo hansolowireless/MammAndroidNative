@@ -1,13 +1,12 @@
 package com.mamm.mammapps.data.model
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
-data class GetEPGResponse(
-    @SerializedName("events")
-    val events: List<EPGEvent>? = null
-)
-
-data class EPGEvent(
+// Assuming Vod has similar structure to Event, but you may need to adjust based on actual structure
+@Parcelize
+data class SectionVod(
     @SerializedName("featured")
     val featured: String? = null,
 
@@ -18,7 +17,7 @@ data class EPGEvent(
     val eventLogoUrl500: String? = null,
 
     @SerializedName("tbEventItems")
-    val tbEventItems: List<EventItem>? = null,
+    val tbEventItems: List<TbContentItem>? = null,
 
     @SerializedName("event_logo_title_url")
     val eventLogoTitleUrl: String? = null,
@@ -54,10 +53,10 @@ data class EPGEvent(
     val idParental: String? = null,
 
     @SerializedName("tbEventLanguages")
-    val tbEventLanguages: List<EventLanguage>? = null,
+    val tbEventLanguages: List<TbEventLanguage>? = null,
 
     @SerializedName("deliveryURL")
-    val deliveryUrl: String? = null,
+    val deliveryURL: String? = null,
 
     @SerializedName("id_event")
     val idEvent: String? = null,
@@ -66,42 +65,25 @@ data class EPGEvent(
     val urlLoop: String? = null,
 
     @SerializedName("tbEventLogoTransitions")
-    val tbEventLogoTransitions: List<Any>? = null,
+    val tbEventLogoTransitions: List<String>? = null,
 
     @SerializedName("id_subgenre")
     val idSubgenre: String? = null
-)
+) : Parcelable {
 
-data class EventItem(
-    @SerializedName("item_ds")
-    val itemDs: String? = null,
+    fun getMetadata(): Metadata {
+        return Metadata.fromTbContentItems(tbEventItems ?: emptyList())
+    }
 
-    @SerializedName("id_event_item")
-    val idEventItem: String? = null,
+    fun getTitle(): String {
+        return tbEventLanguages?.firstOrNull()?.title ?: ""
+    }
 
-    @SerializedName("id_event")
-    val idEvent: String? = null,
+    fun getDescription(): String {
+        return tbEventLanguages?.firstOrNull()?.description ?: ""
+    }
 
-    @SerializedName("item_value")
-    val itemValue: String? = null
-)
-
-data class EventLanguage(
-    @SerializedName("subtitle")
-    val subtitle: String? = null,
-
-    @SerializedName("id_language")
-    val idLanguage: String? = null,
-
-    @SerializedName("description")
-    val description: String? = null,
-
-    @SerializedName("id_event")
-    val idEvent: String? = null,
-
-    @SerializedName("title")
-    val title: String? = null,
-
-    @SerializedName("id_event_lang")
-    val idEventLang: String? = null
-)
+    fun getSubtitle(): String {
+        return tbEventLanguages?.firstOrNull()?.subtitle ?: ""
+    }
+}

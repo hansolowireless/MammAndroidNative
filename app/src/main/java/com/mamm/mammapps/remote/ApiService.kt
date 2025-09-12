@@ -1,10 +1,12 @@
 package com.mamm.mammapps.remote
 
-import com.mamm.mammapps.data.model.GetEPGResponse
+import com.mamm.mammapps.data.model.epg.GetEPGResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
-import com.mamm.mammapps.data.model.LocatorResponse
-import com.mamm.mammapps.data.model.LoginRequest
-import com.mamm.mammapps.data.model.LoginResponse
+import com.mamm.mammapps.data.model.GetOtherContentResponse
+import com.mamm.mammapps.data.model.login.LocatorResponse
+import com.mamm.mammapps.data.model.login.LoginRequest
+import com.mamm.mammapps.data.model.login.LoginResponse
+import com.mamm.mammapps.data.model.playback.CLMRequest
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -38,7 +40,7 @@ interface ApiService {
     suspend fun getHomeContent(@Url url: String): Response<GetHomeContentResponse>
 
     // ---------- EPG ----------
-    @GET("epg_files/EPG_{channelID}_{date}")
+    @GET("epg_files/EPG_{channelID}_{date}.json")
     @Headers(
         "Content-Type: application/json",
         "Accept: application/json"
@@ -47,6 +49,17 @@ interface ApiService {
         @Path("channelID") channelID: Int,
         @Path("date") date: String
     ): Response<GetEPGResponse>
+
+
+    // ---------- MOVIES ----------
+    @GET("epg_files/cine_pkg_{jsonParam}")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getMovies(
+        @Path("jsonParam") jsonParam: String
+    ): Response<GetOtherContentResponse>
 
 
 //    // ---------- Bookmarks ----------
@@ -74,4 +87,16 @@ interface ApiService {
 //    suspend fun sendQosLogs(
 //        @Body logs: QosLogRequest
 //    ): ApiResponse
+
+    // ---------- Playback ----------
+    @GET
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getUrlFromCLM(
+        @Url url: String,
+        @QueryMap request: CLMRequest
+    ): Response<String>
+
 }

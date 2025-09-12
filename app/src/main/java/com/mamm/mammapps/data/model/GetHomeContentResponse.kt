@@ -12,17 +12,8 @@ data class GetHomeContentResponse(
     @SerializedName("genres") val genres: List<Genre>? = null,
     @SerializedName("categories") val categories: List<Category>? = null,
     @SerializedName("events") val events: List<Event>? = null,
-    @SerializedName("series") val series: List<Series>? = null
-) {
-    companion object {
-        fun fillMissingFields(response: GetHomeContentResponse) {
-            response.contents?.forEach { item ->
-                item.metadata = Metadata.fromTbContentItems(
-                    item.tbContentItems ?: emptyList())
-            }
-        }
-    }
-}
+    @SerializedName("series") val series: List<Serie>? = null
+)
 
 data class FeaturedItem(
     @SerializedName("subgenreById") val subgenreById: Any? = null,
@@ -81,7 +72,8 @@ data class Channel(
     @SerializedName("idPpal") val idPpal: Any? = null,
     @SerializedName("name") val name: String? = null,
     @SerializedName("logoTitleURL") val logoTitleURL: String? = null,
-    @SerializedName("fingerprintDuration") val fingerprintDuration: Any? = null
+    @SerializedName("fingerprintDuration") val fingerprintDuration: Any? = null,
+    var position : Int = 0
 )
 
 @Parcelize
@@ -105,14 +97,6 @@ data class VoD(
     @SerializedName("startDate") val startDate: String? = null,
     @SerializedName("parental") val parental: Int? = null,
     var metadata: Metadata? = null
-): Parcelable
-
-@Parcelize
-data class TbContentItem(
-    @SerializedName("id_content") val idContent: Int? = null,
-    @SerializedName("item_ds") val itemDs: String? = null,
-    @SerializedName("id_content_item") val idContentItem: Int? = null,
-    @SerializedName("item_value") val itemValue: String? = null
 ): Parcelable
 
 data class Genre(
@@ -164,7 +148,7 @@ data class Event(
     @SerializedName("parental") val parental: Int? = null
 ) : Parcelable
 
-data class Series(
+data class Serie(
     @SerializedName("subgenreById") val subgenreById: Int? = null,
     @SerializedName("featured") val featured: Int? = null,
     @SerializedName("serie_logo_url") val serieLogoUrl: String? = null,

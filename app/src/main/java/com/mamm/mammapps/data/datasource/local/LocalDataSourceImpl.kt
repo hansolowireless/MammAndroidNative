@@ -16,4 +16,8 @@ class LocalDataSourceImpl @Inject constructor(
     override suspend fun getUserCredentials(): Pair<String?, String?> {
         return securePreferencesManager.getCredentials()
     }
+
+    fun clearUserCredentials() {
+        securePreferencesManager.clearCredentials()
+    }
 }

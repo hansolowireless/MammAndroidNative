@@ -6,14 +6,20 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.domain.usecases.FindContentEntityUseCase
+import com.mamm.mammapps.domain.usecases.FindHomeContentUseCase
+import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
 import com.mamm.mammapps.domain.usecases.GetEPGContentUseCase
 import com.mamm.mammapps.domain.usecases.GetHomeContentUseCase
+import com.mamm.mammapps.domain.usecases.GetMoviesUseCase
 import com.mamm.mammapps.ui.common.UIState
-import com.mamm.mammapps.ui.mapper.toContentRows
+import com.mamm.mammapps.ui.mapper.toContentEntityUI
+import com.mamm.mammapps.ui.mapper.toContentUIRows
 import com.mamm.mammapps.ui.model.ContentEntityUI
+import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.ContentRowUI
+import com.mamm.mammapps.ui.model.RouteTag
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,7 +32,9 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val getHomeContentUseCase: GetHomeContentUseCase,
     private val getEPGContentUseCase: GetEPGContentUseCase,
-    private val findContentEntityUseCase: FindContentEntityUseCase,
+    private val getmoviesUseCase: GetMoviesUseCase,
+    private val findContentEntityUseCase: FindHomeContentUseCase,
+    private val findLiveEventOnChannelUseCase: FindLiveEventOnChannelUseCase,
     private val logger: Logger
 ) : ViewModel() {
 
@@ -43,25 +51,53 @@ class HomeViewModel @Inject constructor(
     private val _clickedContent = MutableStateFlow<Any?>(null)
     val clickedContent: StateFlow<Any?> = _clickedContent.asStateFlow()
 
+    private val _focusedContent = MutableStateFlow<ContentEntityUI?>(null)
+    val focusedContent: StateFlow<ContentEntityUI?> = _focusedContent.asStateFlow()
 
-    fun getHomeContent() {
+    fun content(routeTag: RouteTag) {
+        when (routeTag) {
+            RouteTag.HOME -> getHomeContent()
+            RouteTag.MOVIES -> getMoviesContent()
+            else -> logger.debug(TAG, "Route not implemented")
+        }
+    }
+
+    private fun getHomeContent() {
         homeContentUIState = UIState.Loading
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             getHomeContentUseCase()
                 .onSuccess { response ->
-                    homeContentUI = response.toContentRows()
+                    homeContentUI = response
                     homeContentUIState = UIState.Success(homeContentUI)
                 }
                 .onFailure { exception ->
-                    homeContentUIState = UIState.Error(exception.message ?: "Unknown error occurred")
+                    homeContentUIState =
+                        UIState.Error(exception.message ?: "Unknown error occurred")
                 }
 
             getEPGContentUseCase(LocalDate.now())
         }
     }
 
-    fun findContent(entityUI: ContentEntityUI) {
-        findContentEntityUseCase(entityUI.identifier).onSuccess { entity ->
+    private fun getMoviesContent() {
+        homeContentUIState = UIState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            getmoviesUseCase().onSuccess { response ->
+                homeContentUI = response
+                homeContentUIState = UIState.Success(homeContentUI)
+            }
+                .onFailure { exception ->
+                    homeContentUIState =
+                        UIState.Error(exception.message ?: "Unknown error occurred")
+                }
+        }
+    }
+
+    fun findContent(entityUI: ContentEntityUI, routeTag: RouteTag) {
+        findContentEntityUseCase(
+            identifier = entityUI.identifier,
+            routeTag = routeTag
+        ).onSuccess { entity ->
             _clickedContent.update { entity }
         }
     }
@@ -70,5 +106,15 @@ class HomeViewModel @Inject constructor(
         _clickedContent.update { null }
     }
 
+    fun setFocusedContent(content: ContentEntityUI) {
+        when (content.identifier) {
+            is ContentIdentifier.Channel -> _focusedContent.update {
+                findLiveEventOnChannelUseCase(content.identifier.id.toInt())?.toContentEntityUI()
+                    ?: content
+            }
+
+            else -> _focusedContent.update { content }
+        }
+    }
 
 }

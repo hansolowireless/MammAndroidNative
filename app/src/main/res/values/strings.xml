@@ -9,6 +9,9 @@
     <string name="play">Play</string>
     <string name="cast">Cast</string>
 
+    <!--region EPG-->
+    <string name="no_title">Sin título</string>
+
     <!-- Content descriptions for accessibility -->
     <string name="rating_content_description">Rating</string>
     <string name="play_icon_content_description">Play icon</string>

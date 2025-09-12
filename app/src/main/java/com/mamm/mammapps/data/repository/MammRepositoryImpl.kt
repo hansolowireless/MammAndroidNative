@@ -4,9 +4,11 @@ import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.extension.transformData
 import com.mamm.mammapps.data.logger.Logger
+import com.mamm.mammapps.data.model.Genre
 import com.mamm.mammapps.data.model.GetHomeContentResponse
-import com.mamm.mammapps.data.model.LocatorResponse
-import com.mamm.mammapps.data.model.LoginResponse
+import com.mamm.mammapps.data.model.GetOtherContentResponse
+import com.mamm.mammapps.data.model.login.LocatorResponse
+import com.mamm.mammapps.data.model.login.LoginResponse
 import com.mamm.mammapps.domain.interfaces.MammRepository
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import javax.inject.Inject
@@ -50,15 +52,23 @@ class MammRepositoryImpl @Inject constructor (
         }
     }
 
-    override suspend fun getHomeContent(url: String) : Result<GetHomeContentResponse> {
+    override suspend fun getHomeContent() : Result<GetHomeContentResponse> {
         return runCatching {
-            remoteDatasource.getHomeContent(url).transformData()
+            remoteDatasource.getHomeContent().transformData()
         }.onSuccess { response ->
             logger.debug(TAG, "getHomeContent Received and saved successful response")
         }
     }
 
-    override fun findContent(identifier: ContentIdentifier): Result<Any>? {
+    override suspend fun getMovies(jsonParam: String): Result<GetOtherContentResponse> {
+        return runCatching {
+            remoteDatasource.getMovies(jsonParam)
+        }.onSuccess { response ->
+            logger.debug(TAG, "getMovies Received and saved successful response")
+        }
+    }
+
+    override fun findHomeContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
             is ContentIdentifier.Channel -> remoteDatasource.getCachedHomeContent()?.channels?.find { it.id.toString() == identifier.id }
             is ContentIdentifier.VoD -> remoteDatasource.getCachedHomeContent()?.contents?.find { it.id.toString() == identifier.id }
@@ -67,6 +77,25 @@ class MammRepositoryImpl @Inject constructor (
         }
 
         return content?.let { Result.success(it) }
+    }
+
+    override fun findMovieContent(identifier: ContentIdentifier): Result<Any>? {
+        val content: Any? = when (identifier) {
+            is ContentIdentifier.VoD -> remoteDatasource.getCachedMovies()?.vods?.find { it.idEvent == identifier.id }
+            is ContentIdentifier.Event -> remoteDatasource.getCachedMovies()?.events?.find { it.idEvent == identifier.id }
+            else -> null
+        }
+
+        return content?.let { Result.success(it) }
+    }
+
+    override fun findGenreWithId(id: Int): Result<Genre> {
+        return runCatching {
+            remoteDatasource.getCachedHomeContent()
+                ?.genres
+                ?.firstOrNull { it.id == id }
+                ?: throw NoSuchElementException("Genre with id $id not found")
+        }
     }
 
 }

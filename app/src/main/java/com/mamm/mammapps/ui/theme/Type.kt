@@ -7,6 +7,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 object FontSizes {
+    val xsmall = 8.sp
     val small = 12.sp
     val medium = 16.sp
     val large = 18.sp
@@ -17,6 +18,7 @@ object FontSizes {
 }
 
 object LineHeights {
+    val xsmall = 8.sp
     val small = 12.sp
     val medium = 16.sp
     val large = 20.sp

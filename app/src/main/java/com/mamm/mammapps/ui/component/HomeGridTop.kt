@@ -106,14 +106,14 @@ fun HomeGridTop(event: ContentEntityUI) {
                     Text(
                         text = event.title,
                         color = Color.White,
-                        style = MaterialTheme.typography.headlineLarge,
+                        style = MaterialTheme.typography.headlineMedium,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
 
                 // Separator line (only if title exists)
-                if (event.title.isNotBlank()) {
+                if (event.subtitle?.isNotBlank() == true) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(0.7f)
@@ -128,8 +128,7 @@ fun HomeGridTop(event: ContentEntityUI) {
                         Text(
                             text = subtitle,
                             color = Color.White,
-                            style = MaterialTheme.typography.headlineMedium,
-                            maxLines = 4,
+                            style = MaterialTheme.typography.bodyLarge,
                             overflow = TextOverflow.Ellipsis
                         )
                     }

@@ -1,7 +1,7 @@
 package com.mamm.mammapps.data.config
 
 import com.mamm.mammapps.BuildConfig
-import com.mamm.mammapps.data.model.LocatorResponse
+import com.mamm.mammapps.data.model.login.LocatorResponse
 
 object Config {
 
@@ -18,28 +18,28 @@ object Config {
     val shouldUseDynamicUrls: Boolean get() = BuildConfig.DYNAMIC_URLS
 
     val baseUrl: String
-        get() = if (BuildConfig.DYNAMIC_URLS && dynamicBaseUrl != null) {
+        get() = if (dynamicBaseUrl != null) {
             dynamicBaseUrl!!
         } else {
             BuildConfig.BASE_URL
         }
 
     val idmUrl: String
-        get() = if (BuildConfig.DYNAMIC_URLS && dynamicIdmUrl != null) {
+        get() = if (dynamicIdmUrl != null) {
             dynamicIdmUrl!!
         } else {
             BuildConfig.IDM_URL
         }
 
     val searchUrl: String
-        get() = if (BuildConfig.DYNAMIC_URLS && dynamicSearchUrl != null) {
+        get() = if (dynamicSearchUrl != null) {
             dynamicSearchUrl!!
         } else {
             BuildConfig.SEARCH_URL
         }
 
     val passwordRecoveryUrl: String
-        get() = if (BuildConfig.DYNAMIC_URLS && dynamicPasswordRecUrl != null) {
+        get() = if (dynamicPasswordRecUrl != null) {
             dynamicPasswordRecUrl!!
         } else {
             BuildConfig.PASSWORD_REC_URL

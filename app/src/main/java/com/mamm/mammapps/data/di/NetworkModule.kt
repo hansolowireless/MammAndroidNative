@@ -29,11 +29,15 @@ annotation class LocatorApi
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class EPGApi
+annotation class BaseUrlApi
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class HomeContentApi
+annotation class NoBaseUrlApi
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class NoBaseUrlNoRedirectApi
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -44,7 +48,7 @@ object NetworkModule {
     fun provideOkHttpClient(): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = if (BuildConfig.DEBUG) {
-                HttpLoggingInterceptor.Level.BODY
+                HttpLoggingInterceptor.Level.BASIC
             } else {
                 HttpLoggingInterceptor.Level.NONE
             }
@@ -91,10 +95,10 @@ object NetworkModule {
             .build()
     }
 
-    @EPGApi
+    @BaseUrlApi
     @Provides
     @Singleton
-    fun provideEPGRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    fun provideBaseUrlRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Config.baseUrl)
             .client(okHttpClient)
@@ -103,13 +107,29 @@ object NetworkModule {
     }
 
     // Nueva instancia de Retrofit sin baseUrl para HomeContent
-    @HomeContentApi
+    @NoBaseUrlApi
     @Provides
     @Singleton
     fun provideHomeContentRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://example.com/") // URL dummy requerida por Retrofit
             .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @NoBaseUrlNoRedirectApi
+    @Provides
+    @Singleton
+    fun provideNoRedirectContentRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        val noRedirectClient = okHttpClient.newBuilder()
+            .followRedirects(false)
+            .followSslRedirects(false)
+            .build()
+
+        return Retrofit.Builder()
+            .baseUrl("https://example.com/")
+            .client(noRedirectClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -135,18 +155,26 @@ object NetworkModule {
         return retrofit.create(ApiService::class.java)
     }
 
-    @EPGApi
+    @BaseUrlApi
     @Provides
     @Singleton
-    fun provideEPGApi(@EPGApi retrofit: Retrofit): ApiService {
+    fun provideBaseUrlApi(@BaseUrlApi retrofit: Retrofit): ApiService {
         return retrofit.create(ApiService::class.java)
     }
 
     // Nuevo provider para HomeContentApi
-    @HomeContentApi
+    @NoBaseUrlApi
     @Provides
     @Singleton
-    fun provideHomeContentApi(@HomeContentApi retrofit: Retrofit): ApiService {
+    fun provideHomeContentApi(@NoBaseUrlApi retrofit: Retrofit): ApiService {
         return retrofit.create(ApiService::class.java)
     }
+
+    @NoBaseUrlNoRedirectApi
+    @Provides
+    @Singleton
+    fun provideNoRedirectContentApi(@NoBaseUrlNoRedirectApi retrofit: Retrofit): ApiService {
+        return retrofit.create(ApiService::class.java)
+    }
+
 }

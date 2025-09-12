@@ -1,11 +1,11 @@
-package com.mamm.mammapps.data.repository
+package com.mamm.mammapps.data.session
 
-import com.mamm.mammapps.data.model.LoginData
+import com.mamm.mammapps.data.model.login.LoginData
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SessionRepository @Inject constructor() {
+class SessionManager @Inject constructor() {
 
     // Datos que vienen directamente de la API
     var loginData: LoginData? = null

@@ -1,4 +1,4 @@
-package com.mamm.mammapps.data.model
+package com.mamm.mammapps.data.model.login
 
 import com.google.gson.annotations.SerializedName
 

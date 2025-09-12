@@ -2,14 +2,13 @@ package com.mamm.mammapps.domain.usecases
 
 import com.mamm.mammapps.data.config.Config
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.repository.SessionRepository
+import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.domain.interfaces.MammRepository
-import com.mamm.mammapps.domain.usecases.LoginUseCase.Companion
 import javax.inject.Inject
 
 class AutoLoginUseCase @Inject constructor(
     private val repository: MammRepository,
-    private val session: SessionRepository,
+    private val session: SessionManager,
     private val logger: Logger
 ) {
     companion object {

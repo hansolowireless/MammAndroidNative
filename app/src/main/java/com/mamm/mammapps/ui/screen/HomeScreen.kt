@@ -1,6 +1,5 @@
 package com.mamm.mammapps.ui.screen
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,23 +11,21 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamm.mammapps.ui.common.UIState
 import com.mamm.mammapps.ui.component.HomeGridBottom
 import com.mamm.mammapps.ui.component.HomeGridTop
-import com.mamm.mammapps.ui.model.ContentEntityUI
+import com.mamm.mammapps.ui.model.RouteTag
 import com.mamm.mammapps.ui.viewmodel.HomeViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
+    routeTag: RouteTag = RouteTag.HOME,
     onContentClicked: (item: Any) -> Unit
 ) {
     val homeContentState = viewModel.homeContentUIState
@@ -40,9 +37,10 @@ fun HomeScreen(
 
     var lastClickedItemIndex by remember { mutableStateOf<Int?>(null) }
 
+    val focusedContent by viewModel.focusedContent.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.getHomeContent()
+        viewModel.content(routeTag)
     }
 
     LaunchedEffect(lastClickedItemIndex) {
@@ -82,16 +80,23 @@ fun HomeScreen(
 
             is UIState.Success -> {
                 Column {
-                    HomeGridTop(
-                        event = homeContent.first().items.first()
-                    )
-
+                    focusedContent?.let {
+                        HomeGridTop(
+                            event = it
+                        )
+                    }
                     HomeGridBottom(
                         content = homeContent,
                         columnListState = columnListState,
                         onContentClicked = { index, entityUI ->
                             lastClickedItemIndex = index
-                            viewModel.findContent(entityUI)
+                            viewModel.findContent(
+                                entityUI = entityUI,
+                                routeTag = routeTag
+                            )
+                        },
+                        onFocus = { content ->
+                            viewModel.setFocusedContent(content)
                         }
                     )
                 }
