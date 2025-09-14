@@ -6,7 +6,7 @@ import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
-import com.mamm.mammapps.data.model.playback.CLMRequest
+import com.mamm.mammapps.data.model.player.playback.CLMRequest
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -96,7 +96,8 @@ interface ApiService {
     )
     suspend fun getUrlFromCLM(
         @Url url: String,
-        @QueryMap request: CLMRequest
+        @Query("") typeOfContent: String, // Parámetro sin nombre
+        @QueryMap request: Map<String, String>
     ): Response<String>
 
 }

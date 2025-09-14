@@ -15,10 +15,11 @@ import com.mamm.mammapps.ui.model.ContentEPGUI
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.ContentRowUI
+import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.util.AppConstants.Companion.VERTICAL_ASPECT_RATIO
 
-//Home
+//--------------------Home------------------------
 fun Channel.toContentEntityUI() = ContentEntityUI(
     imageUrl = logoURL?.replace(".png", "_viewer.png")?.replace(".jpg", "_viewer.jpg") ?: "",
     title = name ?: "",
@@ -75,7 +76,7 @@ fun SectionVod.toContentEntityUI() = ContentEntityUI(
     )
 )
 
-//Details
+//------------------Details-------------------------
 fun VoD.toContentDetailUI() = ContentDetailUI(
     identifier = ContentIdentifier.VoD(id.toString()),
     title = title?: "",
@@ -111,11 +112,34 @@ fun SectionVod.toContentDetailUI() = ContentDetailUI(
     metadata = getMetadata()
 )
 
-//EPG
+//-------------------------EPG----------------------------
 fun Channel.toContentEPGUI() = ContentEPGUI(
     identifier = ContentIdentifier.Channel(id.toString()),
     title = name?: "",
     imageUrl = logoURL?.squared() ?: ""
+)
+
+
+//------------------------PLAYBACK------------------------
+fun Channel.toContentToPlayUI() = ContentToPlayUI(
+    identifier = ContentIdentifier.Channel(id.toString()),
+    deliveryURL = this.deliveryURL?: "",
+    title = name?: "",
+    imageUrl = logoURL?.squared() ?: ""
+)
+
+fun VoD.toContentToPlayUI() = ContentToPlayUI(
+    identifier = ContentIdentifier.VoD(id.toString()),
+    deliveryURL = this.deliveryURL?: "",
+    title = title?: "",
+    imageUrl = posterURL?: ""
+)
+
+fun Event.toContentToPlayUI() = ContentToPlayUI(
+    identifier = ContentIdentifier.Event(id.toString()),
+    deliveryURL = this.deliveryURL?: "",
+    title = title?: "",
+    imageUrl = logoURL?: ""
 )
 
 fun GetHomeContentResponse.toContentUIRows(): List<ContentRowUI> {

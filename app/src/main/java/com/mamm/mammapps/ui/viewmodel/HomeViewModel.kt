@@ -6,14 +6,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.domain.usecases.FindHomeContentUseCase
+import com.mamm.mammapps.domain.usecases.FindContentEntityUseCase
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
 import com.mamm.mammapps.domain.usecases.GetEPGContentUseCase
 import com.mamm.mammapps.domain.usecases.GetHomeContentUseCase
 import com.mamm.mammapps.domain.usecases.GetMoviesUseCase
 import com.mamm.mammapps.ui.common.UIState
 import com.mamm.mammapps.ui.mapper.toContentEntityUI
-import com.mamm.mammapps.ui.mapper.toContentUIRows
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.ContentRowUI
@@ -33,7 +32,7 @@ class HomeViewModel @Inject constructor(
     private val getHomeContentUseCase: GetHomeContentUseCase,
     private val getEPGContentUseCase: GetEPGContentUseCase,
     private val getmoviesUseCase: GetMoviesUseCase,
-    private val findContentEntityUseCase: FindHomeContentUseCase,
+    private val findContentEntityUseCase: FindContentEntityUseCase,
     private val findLiveEventOnChannelUseCase: FindLiveEventOnChannelUseCase,
     private val logger: Logger
 ) : ViewModel() {

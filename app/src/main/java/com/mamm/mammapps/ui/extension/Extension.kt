@@ -1,5 +1,7 @@
 package com.mamm.mammapps.ui.extension
 
+import android.view.View
+import android.widget.ImageView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,6 +25,9 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.bumptech.glide.Glide
+import com.mamm.mammapps.R
+import com.mamm.mammapps.data.model.player.WatermarkInfo
 
 fun Modifier.glow(
     enabled: Boolean = true,
@@ -91,3 +96,16 @@ fun Modifier.focusableWithColors(
 
 fun String.squared() = this.replace(".png", "_x4.png").replace(".jpg", "_x4.jpg")
 
+fun ImageView.loadWatermarkOrHide(watermarkInfo: WatermarkInfo) {
+    if (watermarkInfo.url.isNullOrEmpty()) {
+        this.visibility = View.GONE
+        return
+    }
+
+    this.visibility = if (watermarkInfo.has) View.VISIBLE else View.GONE
+    Glide.with(this.context)
+        .load(watermarkInfo.url)
+        .placeholder(null)
+        .error(R.drawable.mosca_laliga)
+        .into(this)
+}

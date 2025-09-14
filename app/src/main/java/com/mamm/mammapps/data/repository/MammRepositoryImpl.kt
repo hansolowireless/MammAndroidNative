@@ -9,6 +9,7 @@ import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginResponse
+import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.domain.interfaces.MammRepository
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import javax.inject.Inject
@@ -16,6 +17,7 @@ import javax.inject.Inject
 class MammRepositoryImpl @Inject constructor (
     private val remoteDatasource: RemoteDatasource,
     private val localDataSource: LocalDataSource,
+    private val sessionManager: SessionManager,
     private val logger: Logger
 ) : MammRepository {
 
@@ -54,7 +56,7 @@ class MammRepositoryImpl @Inject constructor (
 
     override suspend fun getHomeContent() : Result<GetHomeContentResponse> {
         return runCatching {
-            remoteDatasource.getHomeContent().transformData()
+            remoteDatasource.getHomeContent().transformData(sessionManager.channelOrder)
         }.onSuccess { response ->
             logger.debug(TAG, "getHomeContent Received and saved successful response")
         }

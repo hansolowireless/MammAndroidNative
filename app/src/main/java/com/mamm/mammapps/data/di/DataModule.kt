@@ -4,8 +4,12 @@ import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.local.LocalDataSourceImpl
 import com.mamm.mammapps.data.repository.EPGRepositoryImpl
 import com.mamm.mammapps.data.repository.MammRepositoryImpl
+import com.mamm.mammapps.data.repository.PlaybackRepositoryImpl
+import com.mamm.mammapps.data.repository.TokenRepositoryImpl
+import com.mamm.mammapps.domain.interfaces.TokenRepository
 import com.mamm.mammapps.domain.interfaces.EPGRepository
 import com.mamm.mammapps.domain.interfaces.MammRepository
+import com.mamm.mammapps.domain.interfaces.PlaybackRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -33,5 +37,17 @@ abstract class DataModule {
     abstract fun bindEPGRepository(
         impl: EPGRepositoryImpl
     ): EPGRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindPlaybackRepository(
+        impl: PlaybackRepositoryImpl
+    ): PlaybackRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindTokenRepository(
+        impl: TokenRepositoryImpl
+    ): TokenRepository
 
 }

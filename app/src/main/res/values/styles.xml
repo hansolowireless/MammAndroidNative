@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--Track selector and other dialogs-->
+    <style name="TrackSelectionDialogThemeOverlay" parent="Theme.AppCompat.Light.Dialog">
+        <item name="windowNoTitle">false</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/colorPrimaryDark</item>
+        <item name="android:textColor">@android:color/primary_text_dark</item>
+        <item name="colorAccent">@color/colorPrimaryDark</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@color/blackTransparent</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:colorBackground">@android:color/holo_green_light</item>
+    </style>
+
+    <style name="TrackSelectionListViewStyle" parent="android:style/Widget.ListView">
+        <item name="android:textColorPrimary">@color/blackTransparent</item>
+    </style>
+
+    <style name="MyBordelessButtonStyle" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:background">@drawable/playerbuttons</item>
+    </style>
+
+</resources>

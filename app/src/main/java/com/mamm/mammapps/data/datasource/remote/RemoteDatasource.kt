@@ -8,7 +8,9 @@ import com.mamm.mammapps.data.di.IdmApi
 import com.mamm.mammapps.data.di.LocatorApi
 import com.mamm.mammapps.data.di.NoBaseUrlApi
 import com.mamm.mammapps.data.di.NoBaseUrlNoRedirectApi
+import com.mamm.mammapps.data.extension.isRedirect
 import com.mamm.mammapps.data.extension.toEPGRequestDate
+import com.mamm.mammapps.data.extension.transformData
 import com.mamm.mammapps.data.local.SecurePreferencesManager
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
@@ -16,7 +18,7 @@ import com.mamm.mammapps.data.model.epg.GetEPGResponse
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
-import com.mamm.mammapps.data.model.playback.CLMRequest
+import com.mamm.mammapps.data.model.player.playback.CLMRequest
 import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.remote.ApiService
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +27,7 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
+import java.net.URL
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -78,8 +81,8 @@ class RemoteDatasource @Inject constructor(
             val homeData = response.body()
                 ?: throw IOException("Home content response body is null")
 
-            cachedHomeContent = homeData
-            homeData
+            cachedHomeContent = homeData.transformData(sessionManager.channelOrder)
+            cachedHomeContent!!
         }
     }
 
@@ -121,7 +124,7 @@ class RemoteDatasource @Inject constructor(
         return cachedMoviesContent
     }
 
-    suspend fun getUrlFromCLM(deliveryURL: String): String? {
+    suspend fun getUrlFromCLM(deliveryURL: String, typeOfContentString: String): String? {
         require(sessionManager.loginData?.skin?.operator != null
                 && sessionManager.jwToken != null
                 && securePreferencesManager.getCredentials().first != null) {
@@ -130,7 +133,7 @@ class RemoteDatasource @Inject constructor(
 
         val clmRequest = CLMRequest(
             user = securePreferencesManager.getCredentials().first!!,
-            typeOfContentString = "",
+            typeOfContentString = typeOfContentString,
             model = deviceModel,
             deviceType = deviceType,
             operator = sessionManager.loginData?.skin?.operator!!,
@@ -143,9 +146,9 @@ class RemoteDatasource @Inject constructor(
             "${deliveryURL}/manifest.mpd"
         }
 
-        val response = clmApi.getUrlFromCLM(fullUrl, clmRequest)
+        val response = clmApi.getUrlFromCLM(fullUrl, typeOfContent =  typeOfContentString, request = clmRequest.toQueryMap())
 
-        if (!response.isSuccessful) {
+        if (!response.isSuccessful && !response.isRedirect()) {
             val errorBody = response.errorBody()?.string()?.toResponseBody()
             throw HttpException(Response.error<Any>(response.code(), errorBody))
         }
@@ -155,4 +158,25 @@ class RemoteDatasource @Inject constructor(
         return locationHeader
     }
 
+
+
+    //----------GET USER IP---------//
+    suspend fun getCurrentUserIp(): String {
+        return try {
+            getPublicIp() ?: "127.0.0.1"
+        } catch (e: Exception) {
+            "127.0.0.1" // fallback
+        }
+    }
+
+    private suspend fun getPublicIp(): String? {
+        return try {
+            withContext(Dispatchers.IO) {
+                val url = URL("https://api.ipify.org?format=text")
+                url.readText().trim()
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
 }

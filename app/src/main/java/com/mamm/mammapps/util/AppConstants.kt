@@ -8,5 +8,7 @@ class AppConstants {
         const val VERTICAL_ASPECT_RATIO = 10f / 16f
 
         const val HOMEGRIDTOP_IMAGE_WIDTH_FRACTION = 0.6f
+
+        const val STOKEN_PARAM_NAME = "stoken"
     }
 }

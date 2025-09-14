@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">MammApps</string>
 
     <string name="duration_minutes">%1$s min.</string>
@@ -15,5 +15,20 @@
     <!-- Content descriptions for accessibility -->
     <string name="rating_content_description">Rating</string>
     <string name="play_icon_content_description">Play icon</string>
+
+    <!--Track selector Strings!-->
+    <string name="track_selection_title">Video Quality</string>
+    <string name="subtitle_selection_title">Subtitles</string>
+    <string name="audiotrack_selection_title">Audio</string>
+
+    <string name="error_no_decoder">This device does not provide a decoder for <xliff:g id="mime_type">%1$s</xliff:g></string>
+    <string name="error_no_secure_decoder">This device does not provide a secure decoder for <xliff:g id="mime_type">%1$s</xliff:g></string>
+    <string name="error_querying_decoders">Unable to query device decoders</string>
+    <string name="error_instantiating_decoder">Unable to instantiate decoder <xliff:g id="decoder_name">%1$s</xliff:g></string>
+    <string name="error_generic">Playback failed</string>
+
+    <!--Player Strings-->
+    <string name="live_content">Live</string>
+    <!--Left Menu for player-->
 
 </resources>

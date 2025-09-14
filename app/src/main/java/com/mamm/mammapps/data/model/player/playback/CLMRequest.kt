@@ -1,4 +1,4 @@
-package com.mamm.mammapps.data.model.playback
+package com.mamm.mammapps.data.model.player.playback
 
 import com.google.gson.annotations.SerializedName
 
@@ -12,7 +12,7 @@ data class CLMRequest(
     @field:SerializedName("model")
     val model: String,
 
-    @field:SerializedName("deviceType")
+    @field:SerializedName("type")
     val deviceType: String,
 
     @field:SerializedName("operator")
@@ -20,4 +20,14 @@ data class CLMRequest(
 
     @field:SerializedName("jwt")
     val jwt: String
-)
+) {
+    fun toQueryMap(): Map<String, String> {
+        return mapOf(
+            "user" to user,
+            "model" to model,
+            "type" to deviceType,
+            "operator" to operator,
+            "jwt" to jwt
+        )
+    }
+}

@@ -45,6 +45,9 @@ object Config {
             BuildConfig.PASSWORD_REC_URL
         }
 
+    val operatorNameDRM: String
+        get() = BuildConfig.OPERATORNAME_DRM
+
     /**
      * Método para actualizar las URLs dinámicas en caliente.
      * Solo tiene efecto si el flavor tiene `DYNAMIC_URLS = true`.

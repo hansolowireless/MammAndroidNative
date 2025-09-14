@@ -31,12 +31,16 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.EPGEvent
 import com.mamm.mammapps.data.model.Event
 import com.mamm.mammapps.data.model.VoD
 import com.mamm.mammapps.ui.component.LocalIsTV
+import com.mamm.mammapps.ui.fragment.VideoPlayerScreen
 import com.mamm.mammapps.ui.mapper.toContentDetailUI
 import com.mamm.mammapps.ui.mapper.toContentEntityUI
+import com.mamm.mammapps.ui.mapper.toContentToPlayUI
+import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.RouteTag
 import com.mamm.mammapps.ui.screen.DetailScreen
 import com.mamm.mammapps.ui.screen.EPGScreen
@@ -51,7 +55,8 @@ fun AppNavigation() {
     if (LocalIsTV.current) {
         TVNavigationLayout(navController)
     } else {
-        MobileNavigationLayout(navController)
+        //MobileNavigationLayout(navController)
+        TVNavigationLayout(navController)
     }
 }
 
@@ -157,8 +162,18 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
     composable("home") {
         HomeScreen(
             onContentClicked = { content ->
-                navController.navigate("detail") {
-                    launchSingleTop = true
+                when (content) {
+                    is VoD,
+                    is Event -> {
+                        navController.navigate("detail") {
+                            launchSingleTop = true
+                        }
+                    }
+                    is Channel -> {
+                        navController.navigate("player") {
+                            launchSingleTop = true
+                        }
+                    }
                 }
                 navController.currentBackStackEntry?.savedStateHandle?.set("content", content)
             }
@@ -197,6 +212,23 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
 
     composable("epg") {
         EPGScreen()
+    }
+
+    composable("player") { backStackEntry ->
+        val contentItem = remember(backStackEntry) {
+            backStackEntry.savedStateHandle.get<Any>("content")
+        }
+
+        contentItem?.let {
+            VideoPlayerScreen(
+                playedContent = when (it) {
+                    is VoD -> it.toContentToPlayUI()
+                    is Event -> it.toContentToPlayUI()
+                    is Channel -> it.toContentToPlayUI()
+                    else -> return@composable
+                }
+            )
+        }
     }
 
 

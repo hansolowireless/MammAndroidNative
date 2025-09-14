@@ -43,6 +43,7 @@ data class LogoTransition(
     @SerializedName("url") val url: String? = null
 ) : Parcelable
 
+@Parcelize
 data class Channel(
     @SerializedName("freeaccess") val freeaccess: Int? = null,
     @SerializedName("channel_position") val channelPosition: Int? = null,
@@ -50,31 +51,31 @@ data class Channel(
     @SerializedName("timeshiftOffset") val timeshiftOffset: Int? = null,
     @SerializedName("logoTransitions") val logoTransitions: List<LogoTransition>? = null,
     @SerializedName("description") val description: String? = null,
-    @SerializedName("drmUrl") val drmUrl: Any? = null,
+    @SerializedName("drmUrl") val drmUrl: String? = null,
     @SerializedName("radio") val radio: Int? = null,
     @SerializedName("channelGenre") val channelGenre: String? = null,
     @SerializedName("premium") val premium: Int? = null,
     @SerializedName("timeshift") val timeshift: Boolean? = null,
     @SerializedName("fingerprint") val fingerprint: Boolean? = null,
-    @SerializedName("fingerprintPosition") val fingerprintPosition: Any? = null,
+    @SerializedName("fingerprintPosition") val fingerprintPosition: String? = null,
     @SerializedName("deliveryURL") var deliveryURL: String? = null,
     @SerializedName("id") val id: Int? = null,
     @SerializedName("catchup_hours") val catchupHours: Int? = null,
-    @SerializedName("drmProvider") val drmProvider: Any? = null,
+    @SerializedName("drmProvider") val drmProvider: String? = null,
     @SerializedName("epg") val epg: Int? = null,
     @SerializedName("parental") val parental: Int? = null,
     @SerializedName("channelGenreId") val channelGenreId: Int? = null,
     @SerializedName("cutvInitOffset") val cutvInitOffset: Int? = null,
     @SerializedName("isPornChannel") val isPornChannel: Boolean? = null,
     @SerializedName("logoURL") val logoURL: String? = null,
-    @SerializedName("fingerprintFrequency") val fingerprintFrequency: Any? = null,
+    @SerializedName("fingerprintFrequency") val fingerprintFrequency: Int? = null,
     @SerializedName("cutvEndOffset") val cutvEndOffset: Int? = null,
-    @SerializedName("idPpal") val idPpal: Any? = null,
+    @SerializedName("idPpal") val idPpal: Int? = null,
     @SerializedName("name") val name: String? = null,
     @SerializedName("logoTitleURL") val logoTitleURL: String? = null,
-    @SerializedName("fingerprintDuration") val fingerprintDuration: Any? = null,
+    @SerializedName("fingerprintDuration") val fingerprintDuration: Int? = null,
     var position : Int = 0
-)
+): Parcelable
 
 @Parcelize
 data class VoD(

@@ -6,7 +6,7 @@ import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.RouteTag
 import javax.inject.Inject
 
-class FindHomeContentUseCase @Inject constructor(
+class FindContentEntityUseCase @Inject constructor(
     private val repository: MammRepository,
     private val logger: Logger
 ) {

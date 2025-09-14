@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/constraint_root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="@android:color/black"
+
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Imagen de fondo que ocupa toda la pantalla -->
+    <ImageView
+        android:id="@+id/ticker_background_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription=""
+        android:scaleType="centerCrop"
+        android:visibility="visible"
+        />
+
+    <FrameLayout
+        android:id="@+id/root"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:background="@android:color/black"
+
+        android:focusable="true"
+        android:keepScreenOn="true"
+
+        app:layout_constraintDimensionRatio="W,16:9"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@id/exo_artwork"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:visibility="visible"/>
+
+        <com.google.android.exoplayer2.ui.StyledPlayerView
+            android:id="@+id/player_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="@android:color/transparent"
+            android:focusable="true"
+            android:orientation="horizontal"
+            app:controller_layout_id="@layout/exoplayer_controls"
+            app:resize_mode="fill"
+            app:show_buffering="always"
+            android:animateLayoutChanges="true"
+            app:animation_enabled="false"
+            >
+
+        </com.google.android.exoplayer2.ui.StyledPlayerView>
+
+    </FrameLayout>
+
+    <!-- Contenedor del ticker publicitario -->
+    <FrameLayout
+        android:id="@+id/ticker_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/root"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/ticker_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:padding="12dp"
+            android:singleLine="true"
+            android:text="" />
+    </FrameLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

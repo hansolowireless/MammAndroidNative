@@ -2,6 +2,7 @@ package com.mamm.mammapps.data.extension
 
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.Metadata
+import retrofit2.Response
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -39,4 +40,8 @@ fun String.toZonedDateTimeEPG(): ZonedDateTime {
     val isoString = this.replace(" ", "T") + "Z"
     val instant = Instant.parse(isoString)
     return instant.atZone(ZoneOffset.UTC)
+}
+
+fun Response<*>.isRedirect(): Boolean {
+    return code() in 300..399
 }

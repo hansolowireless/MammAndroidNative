@@ -1,5 +1,4 @@
 import com.android.build.api.dsl.ApplicationProductFlavor
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
@@ -23,7 +22,8 @@ fun configureCustomFlavor(
     metricsUrl: String,
     searchUrl: String,
     passwordUrl: String,
-    dynamicUrls: Boolean
+    dynamicUrls: Boolean,
+    operatorNameDRM: String
 ) {
     flavors.create(name) {
         dimension = "app"
@@ -38,6 +38,7 @@ fun configureCustomFlavor(
         buildConfigField("String", "SEARCH_URL", "\"$searchUrl\"")
         buildConfigField("String", "PASSWORD_REC_URL", "\"$passwordUrl\"")
         buildConfigField("boolean", "DYNAMIC_URLS", "$dynamicUrls")
+        buildConfigField("String", "OPERATORNAME_DRM", "\"$operatorNameDRM\"")
     }
 }
 
@@ -56,7 +57,8 @@ fun configureFlavorWithMasmediaUrls(
         "https://metrics.service.openstream.es/",
         "https://indexsrv-masmediatv.service.openstream.es/",
         "https://gestionclientes.masmediatv.es/masmediatv_mngr/",
-        true
+        true,
+        "masmediatv"
     )
 }
 
@@ -123,7 +125,8 @@ android {
             "https://metrics.service.openstream.es/",
             "https://indexsrv-openstream.service.openstream.es/",
             "https://gestionclientes.openstream.es/openstream_mngr/",
-            false
+            false,
+            "openstream"
         )
 
     }
@@ -147,7 +150,28 @@ dependencies {
     implementation(libs.androidx.security.crypto)
     implementation(libs.coil.compose)
     implementation(libs.bundles.android.tv)
+    implementation(libs.bundles.video.player)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+
+    //--------TOKENS------------
+    api(libs.jjwt.api)
+    runtimeOnly(libs.jjwt.impl)
+    runtimeOnly("io.jsonwebtoken:jjwt-orgjson:0.12.6") {
+        exclude(group = "org.json", module = "json") // provided by Android natively
+    }
+    implementation(libs.bouncycastle.bcprov)
+
+    //--------PREVIEW SEEK BAR------------
+    implementation(libs.bundles.previewseekbar)
+    implementation(libs.androidxLeanback)
+    implementation(libs.androidxAnnotation)
+    implementation(libs.checkerFramework)
+
+    //--------PLAYER----------------------
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.cardview)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
