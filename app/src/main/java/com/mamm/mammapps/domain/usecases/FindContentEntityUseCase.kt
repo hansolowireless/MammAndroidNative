@@ -2,8 +2,8 @@ package com.mamm.mammapps.domain.usecases
 
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.interfaces.MammRepository
+import com.mamm.mammapps.ui.model.AppRoute
 import com.mamm.mammapps.ui.model.ContentIdentifier
-import com.mamm.mammapps.ui.model.RouteTag
 import javax.inject.Inject
 
 class FindContentEntityUseCase @Inject constructor(
@@ -15,10 +15,10 @@ class FindContentEntityUseCase @Inject constructor(
         const val TAG = "FindContentEntityUseCase"
     }
 
-    operator fun invoke(identifier: ContentIdentifier, routeTag: RouteTag = RouteTag.HOME): Result<Any> {
+    operator fun invoke(identifier: ContentIdentifier, routeTag: AppRoute = AppRoute.HOME): Result<Any> {
 
         when (routeTag) {
-            RouteTag.HOME -> {
+            AppRoute.HOME -> {
                 return repository.findHomeContent(identifier = identifier)
                     ?.onSuccess { result ->
                         logger.debug(TAG, "invoke Received content: $result")
@@ -27,7 +27,7 @@ class FindContentEntityUseCase @Inject constructor(
                         logger.debug(TAG, "invoke Failed: ${exception.message}, $exception")
                     } ?: Result.failure(Exception("Content not found"))
             }
-            RouteTag.MOVIES -> {
+            AppRoute.MOVIES -> {
                 return repository.findMovieContent(identifier = identifier)
                     ?.onSuccess { result ->
                         logger.debug(TAG, "invoke Received content: $result")

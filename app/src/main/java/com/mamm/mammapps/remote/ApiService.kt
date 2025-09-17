@@ -1,14 +1,19 @@
 package com.mamm.mammapps.remote
 
-import com.mamm.mammapps.data.model.epg.GetEPGResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
+import com.mamm.mammapps.data.model.epg.GetEPGResponse
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
-import com.mamm.mammapps.data.model.player.playback.CLMRequest
 import retrofit2.Response
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.Headers
+import retrofit2.http.POST
+import retrofit2.http.Path
+import retrofit2.http.Query
+import retrofit2.http.Url
 
 interface ApiService {
 
@@ -95,9 +100,7 @@ interface ApiService {
         "Accept: application/json"
     )
     suspend fun getUrlFromCLM(
-        @Url url: String,
-        @Query("") typeOfContent: String, // Parámetro sin nombre
-        @QueryMap request: Map<String, String>
+        @Url url: String
     ): Response<String>
 
 }

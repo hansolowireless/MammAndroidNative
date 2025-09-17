@@ -16,4 +16,5 @@ val TextPrimary = Color.White
 
 object ContentEntityColor {
     val text = Color.White
+    val glow = Color.White
 }

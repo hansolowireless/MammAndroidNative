@@ -24,4 +24,13 @@ data class ContentToPlayUI (
         }
     }
 
+    fun getCLMString() : String {
+        return when (identifier) {
+            is ContentIdentifier.Channel -> "LIVE"
+            is ContentIdentifier.VoD -> "CUTV"
+            is ContentIdentifier.Event -> "VOD"
+            is ContentIdentifier.Serie -> "SERIE"
+        }
+    }
+
 }

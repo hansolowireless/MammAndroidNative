@@ -19,13 +19,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamm.mammapps.ui.common.UIState
 import com.mamm.mammapps.ui.component.HomeGridBottom
 import com.mamm.mammapps.ui.component.HomeGridTop
-import com.mamm.mammapps.ui.model.RouteTag
+import com.mamm.mammapps.ui.model.AppRoute
 import com.mamm.mammapps.ui.viewmodel.HomeViewModel
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
-    routeTag: RouteTag = RouteTag.HOME,
+    routeTag: AppRoute = AppRoute.HOME,
     onContentClicked: (item: Any) -> Unit
 ) {
     val homeContentState = viewModel.homeContentUIState

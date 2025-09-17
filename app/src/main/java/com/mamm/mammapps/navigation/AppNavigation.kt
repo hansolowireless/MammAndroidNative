@@ -1,6 +1,11 @@
 package com.mamm.mammapps.navigation
 
-import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,18 +35,17 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.EPGEvent
 import com.mamm.mammapps.data.model.Event
 import com.mamm.mammapps.data.model.VoD
 import com.mamm.mammapps.ui.component.LocalIsTV
-import com.mamm.mammapps.ui.fragment.VideoPlayerScreen
+import com.mamm.mammapps.ui.screen.VideoPlayerScreen
 import com.mamm.mammapps.ui.mapper.toContentDetailUI
-import com.mamm.mammapps.ui.mapper.toContentEntityUI
 import com.mamm.mammapps.ui.mapper.toContentToPlayUI
-import com.mamm.mammapps.ui.model.ContentIdentifier
-import com.mamm.mammapps.ui.model.RouteTag
+import com.mamm.mammapps.ui.model.AppRoute
 import com.mamm.mammapps.ui.screen.DetailScreen
 import com.mamm.mammapps.ui.screen.EPGScreen
 import com.mamm.mammapps.ui.screen.HomeScreen
@@ -55,35 +59,59 @@ fun AppNavigation() {
     if (LocalIsTV.current) {
         TVNavigationLayout(navController)
     } else {
-        //MobileNavigationLayout(navController)
-        TVNavigationLayout(navController)
+        MobileNavigationLayout(navController)
+//        TVNavigationLayout(navController)
     }
 }
 
 @Composable
 fun TVNavigationLayout(navController: NavHostController) {
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+    val sectionsWithMenu = listOf(
+        AppRoute.HOME.route,
+        AppRoute.EPG.route,
+        AppRoute.MOVIES.route,
+        AppRoute.ADULTS.route,
+        AppRoute.DOCUMENTARIES.route,
+        AppRoute.SERIES.route,
+        AppRoute.SPORTS.route
+    )
+    val showNavigationRail = currentRoute in sectionsWithMenu
+
     Row {
-        NavigationRail(
-            modifier = Modifier.width(80.dp)
+        AnimatedVisibility(
+            visible = showNavigationRail,
+            enter = slideInHorizontally(
+                initialOffsetX = { -it },
+                animationSpec = tween(300)
+            ) + fadeIn(animationSpec = tween(300)),
+            exit = slideOutHorizontally(
+                targetOffsetX = { -it },
+                animationSpec = tween(300)
+            ) + fadeOut(animationSpec = tween(300))
         ) {
-            NavigationRailItem(
-                icon = { Icon(Icons.Default.Home, null) },
-                label = { Text("Inicio") },
-                selected = false,
-                onClick = { navController.navigate("home") }
-            )
-            NavigationRailItem(
-                icon = { Icon(Icons.Default.Person, null) },
-                label = { Text("EPG") },
-                selected = false,
-                onClick = { navController.navigate("epg") }
-            )
-            NavigationRailItem(
-                icon = { Icon(Icons.Default.Person, null) },
-                label = { Text("Cine") },
-                selected = false,
-                onClick = { navController.navigate("movies") }
-            )
+            NavigationRail(
+                modifier = Modifier.width(80.dp)
+            ) {
+                NavigationRailItem(
+                    icon = { Icon(Icons.Default.Home, null) },
+                    label = { Text("Inicio") },
+                    selected = false,
+                    onClick = { navController.navigate("home") }
+                )
+                NavigationRailItem(
+                    icon = { Icon(Icons.Default.Person, null) },
+                    label = { Text("EPG") },
+                    selected = false,
+                    onClick = { navController.navigate("epg") }
+                )
+                NavigationRailItem(
+                    icon = { Icon(Icons.Default.Person, null) },
+                    label = { Text("Cine") },
+                    selected = false,
+                    onClick = { navController.navigate("movies") }
+                )
+            }
         }
 
         NavHost(
@@ -139,7 +167,7 @@ fun MobileNavigationLayout(navController: NavHostController) {
 
             NavHost(
                 navController = navController,
-                startDestination = "login",
+                startDestination = AppRoute.LOGIN.route,
                 modifier = Modifier.fillMaxSize()
             ) {
                 navigationGraph(navController)
@@ -149,28 +177,32 @@ fun MobileNavigationLayout(navController: NavHostController) {
 }
 
 fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
-    composable("login") {
+    composable(AppRoute.LOGIN.route) {
         LoginScreen(
             onNavigateToHome = {
-                navController.navigate("home") {
-                    popUpTo("login") { inclusive = true }
+                navController.navigate(AppRoute.HOME.route) {
+                    popUpTo(AppRoute.LOGIN.route) { inclusive = true }
                 }
             }
         )
     }
 
-    composable("home") {
+    composable(AppRoute.HOME.route) {
         HomeScreen(
             onContentClicked = { content ->
                 when (content) {
                     is VoD,
                     is Event -> {
-                        navController.navigate("detail") {
+//                        navController.navigate(AppRoute.DETAIL.route) {
+//                            launchSingleTop = true
+//                        }
+                        navController.navigate(AppRoute.PLAYER.route) {
                             launchSingleTop = true
                         }
                     }
+
                     is Channel -> {
-                        navController.navigate("player") {
+                        navController.navigate(AppRoute.PLAYER.route) {
                             launchSingleTop = true
                         }
                     }
@@ -180,11 +212,11 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
         )
     }
 
-    composable("movies") {
-        HomeScreen (
-            routeTag = RouteTag.MOVIES,
+    composable(AppRoute.MOVIES.route) {
+        HomeScreen(
+            routeTag = AppRoute.MOVIES,
             onContentClicked = { content ->
-                navController.navigate("detail") {
+                navController.navigate(AppRoute.DETAIL.route) {
                     launchSingleTop = true
                 }
                 navController.currentBackStackEntry?.savedStateHandle?.set("content", content)
@@ -192,7 +224,7 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
         )
     }
 
-    composable("detail") { backStackEntry ->
+    composable(AppRoute.DETAIL.route) { backStackEntry ->
         val contentItem = remember(backStackEntry) {
             backStackEntry.savedStateHandle.get<Any>("content")
         }
@@ -205,16 +237,17 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                     is EPGEvent -> it.toContentDetailUI()
                     else -> return@composable
                 },
-                onPlayClick = { TODO() }
+                onPlayClick = { TODO()
+                }
             )
         } ?: Text("No content available")
     }
 
-    composable("epg") {
+    composable(AppRoute.EPG.route) {
         EPGScreen()
     }
 
-    composable("player") { backStackEntry ->
+    composable(AppRoute.PLAYER.route) { backStackEntry ->
         val contentItem = remember(backStackEntry) {
             backStackEntry.savedStateHandle.get<Any>("content")
         }
@@ -230,7 +263,6 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
             )
         }
     }
-
 
 
 }

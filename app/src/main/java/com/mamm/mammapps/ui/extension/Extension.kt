@@ -1,5 +1,6 @@
 package com.mamm.mammapps.ui.extension
 
+import android.content.Context
 import android.view.View
 import android.widget.ImageView
 import androidx.compose.foundation.background
@@ -28,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import com.bumptech.glide.Glide
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.player.WatermarkInfo
+import java.time.ZonedDateTime
+import java.util.Date
 
 fun Modifier.glow(
     enabled: Boolean = true,
@@ -108,4 +111,12 @@ fun ImageView.loadWatermarkOrHide(watermarkInfo: WatermarkInfo) {
         .placeholder(null)
         .error(R.drawable.mosca_laliga)
         .into(this)
+}
+
+fun Int.dpToPx(context: Context): Int {
+    return (this * context.resources.displayMetrics.density + 0.5f).toInt()
+}
+
+fun ZonedDateTime.toDate(): Date {
+    return Date(this.toInstant().toEpochMilli())
 }

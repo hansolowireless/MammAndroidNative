@@ -2,6 +2,7 @@ package com.mamm.mammapps.data.di
 
 import android.content.Context
 import com.mamm.mammapps.data.local.SecurePreferencesManager
+import com.mamm.mammapps.data.logger.Logger
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,7 +16,7 @@ object SecurePreferencesModule {
 
     @Provides
     @Singleton
-    fun provideSecurePreferencesManager(@ApplicationContext context: Context): SecurePreferencesManager {
-        return SecurePreferencesManager(context)
+    fun provideSecurePreferencesManager(@ApplicationContext context: Context, logger: Logger): SecurePreferencesManager {
+        return SecurePreferencesManager(context, logger)
     }
 }

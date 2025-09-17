@@ -13,10 +13,10 @@ import com.mamm.mammapps.domain.usecases.GetHomeContentUseCase
 import com.mamm.mammapps.domain.usecases.GetMoviesUseCase
 import com.mamm.mammapps.ui.common.UIState
 import com.mamm.mammapps.ui.mapper.toContentEntityUI
+import com.mamm.mammapps.ui.model.AppRoute
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.ContentRowUI
-import com.mamm.mammapps.ui.model.RouteTag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,10 +53,10 @@ class HomeViewModel @Inject constructor(
     private val _focusedContent = MutableStateFlow<ContentEntityUI?>(null)
     val focusedContent: StateFlow<ContentEntityUI?> = _focusedContent.asStateFlow()
 
-    fun content(routeTag: RouteTag) {
+    fun content(routeTag: AppRoute) {
         when (routeTag) {
-            RouteTag.HOME -> getHomeContent()
-            RouteTag.MOVIES -> getMoviesContent()
+            AppRoute.HOME -> getHomeContent()
+            AppRoute.MOVIES -> getMoviesContent()
             else -> logger.debug(TAG, "Route not implemented")
         }
     }
@@ -92,7 +92,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun findContent(entityUI: ContentEntityUI, routeTag: RouteTag) {
+    fun findContent(entityUI: ContentEntityUI, routeTag: AppRoute) {
         findContentEntityUseCase(
             identifier = entityUI.identifier,
             routeTag = routeTag
