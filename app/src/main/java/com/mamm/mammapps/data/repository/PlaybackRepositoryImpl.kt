@@ -43,21 +43,23 @@ class PlaybackRepositoryImpl @Inject constructor (
     override suspend fun getVideoUrlFromCLM(deliveryURL: String, typeOfContentString: String): Result<String> {
         return runCatching {
             val locationUrl = remoteDatasource.getUrlFromCLM(deliveryURL, typeOfContentString)
+            logger.debug(TAG, "getVideoUrlFromCLM - $locationUrl")
             locationUrl ?: throw Exception("Location header not found in response")
         }
     }
 
     override suspend fun getDRMUrl(content: ContentToPlayUI): Result<Pair<String, String>> {
         return runCatching {
-            val userID = localDatasource.getUserCredentials().first
+            val userName = localDatasource.getUserCredentials().first
             val token = sessionManager.loginData?.token
+            val userID = sessionManager.loginData?.userId
             val operatorName = Config.operatorNameDRM
 
             // Current date
             val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
             val nowString = dateFormat.format(ZonedDateTime.now())
 
-            val signature = "$userID|$deviceType|$deviceSerial|$nowString"
+            val signature = "$userName|$deviceType|$deviceSerial|$nowString"
             logger.debug(TAG, signature)
 
             // HMAC SHA-1
@@ -72,12 +74,12 @@ class PlaybackRepositoryImpl @Inject constructor (
 
             // AuthString JSON
             val authString = """{
-                |"deviceID":"$deviceSerial",
-                |"signature":"$digestString",
-                |"expire":"$nowString",
-                |"contentType":"${content.getDRMString()}",
-                |"deviceType":"$deviceType"
-                |}""".trimMargin()
+                "deviceID":"$deviceSerial",
+                "signature":"$digestString",
+                "expire":"$nowString",
+                "contentType":"${content.getDRMString()}",
+                "deviceType":"$deviceType"
+                }""".trimMargin()
             logger.debug(TAG, authString)
 
             // Base64 encoding
@@ -101,11 +103,11 @@ class PlaybackRepositoryImpl @Inject constructor (
 
             // Custom data JSON
             val customData = """{
-                |"UserID":"$userID",
-                |"StreamName":"$streamID",
-                |"Operator":"$operatorName",
-                |"AuthenticationString":"$encryptedString"
-                |}""".trimMargin()
+                "UserID":"$userID",
+                "StreamName":"$streamID",
+                "Operator":"$operatorName",
+                "AuthenticationString":"$encryptedString"
+                }""".trimMargin()
             logger.debug(TAG, customData)
 
             val customDataEncoded = Base64.encodeToString(
@@ -119,6 +121,8 @@ class PlaybackRepositoryImpl @Inject constructor (
                     "authenticationString=$encryptedString&" +
                     "streamName=$streamID&" +
                     "operator=$operatorName"
+
+            logger.debug(TAG, "getDRMUrl - $licenseURL")
 
             Pair(licenseURL, customDataEncoded)
         }.onFailure { exception ->
