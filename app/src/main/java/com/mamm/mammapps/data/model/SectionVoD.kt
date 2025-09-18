@@ -2,6 +2,7 @@ package com.mamm.mammapps.data.model
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 // Assuming Vod has similar structure to Event, but you may need to adjust based on actual structure
@@ -70,6 +71,9 @@ data class SectionVod(
     @SerializedName("id_subgenre")
     val idSubgenre: String? = null
 ) : Parcelable {
+
+    @IgnoredOnParcel
+    val id : Int = idEvent?.toIntOrNull() ?: idEvent.hashCode()
 
     fun getMetadata(): Metadata {
         return Metadata.fromTbContentItems(tbEventItems ?: emptyList())

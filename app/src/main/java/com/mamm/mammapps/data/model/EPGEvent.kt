@@ -3,6 +3,8 @@ package com.mamm.mammapps.data.model
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import com.mamm.mammapps.data.extension.toZonedDateTimeEPG
+import com.mamm.mammapps.util.orRandom
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.time.ZonedDateTime
 
@@ -71,6 +73,9 @@ data class EPGEvent(
     @SerializedName("id_subgenre")
     val idSubgenre: String? = null
 ) : Parcelable {
+
+    @IgnoredOnParcel
+    val id : Int = idEvent?.toIntOrNull() ?: idEvent.hashCode()
 
     // Propiedades calculadas para fechas
     private val startDateTime: ZonedDateTime?

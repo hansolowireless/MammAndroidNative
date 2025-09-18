@@ -12,6 +12,7 @@ import com.mamm.mammapps.data.extension.isRedirect
 import com.mamm.mammapps.data.extension.toEPGRequestDate
 import com.mamm.mammapps.data.extension.transformData
 import com.mamm.mammapps.data.local.SecurePreferencesManager
+import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.epg.GetEPGResponse
@@ -44,7 +45,8 @@ class RemoteDatasource @Inject constructor(
     @DeviceSerialQualifier private val deviceSerial: String,
     @DeviceModelQualifier private val deviceModel: String,
     private val sessionManager: SessionManager,
-    private val securePreferencesManager: SecurePreferencesManager
+    private val securePreferencesManager: SecurePreferencesManager,
+    private val logger: Logger
     ) {
 
     @Volatile
@@ -140,13 +142,22 @@ class RemoteDatasource @Inject constructor(
             jwt = sessionManager.jwToken!!
         )
 
-        val fullUrl = if (deliveryURL.endsWith("/")) {
-            "${deliveryURL}manifest.mpd"
+        var fullUrl = if (deliveryURL.endsWith("/")) {
+            deliveryURL
         } else {
-            "${deliveryURL}/manifest.mpd"
+            "${deliveryURL}/"
         }
 
-        val response = clmApi.getUrlFromCLM(fullUrl, typeOfContent =  typeOfContentString, request = clmRequest.toQueryMap())
+        fullUrl = fullUrl.plus("manifest.mpd")
+
+        // Construir URL con parámetro sin nombre
+        val queryParams = clmRequest.toQueryMap()
+            .entries
+            .joinToString("&") { "${it.key}=${it.value}" }
+
+        val finalUrl = "$fullUrl?$typeOfContentString&$queryParams"
+
+        val response = clmApi.getUrlFromCLM(finalUrl)
 
         if (!response.isSuccessful && !response.isRedirect()) {
             val errorBody = response.errorBody()?.string()?.toResponseBody()
@@ -157,7 +168,6 @@ class RemoteDatasource @Inject constructor(
 
         return locationHeader
     }
-
 
 
     //----------GET USER IP---------//

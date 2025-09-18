@@ -1,12 +1,12 @@
 package com.mamm.mammapps.ui.model
 
 sealed class ContentIdentifier {
-    data class Channel(val id: String) : ContentIdentifier()
-    data class VoD(val id: String) : ContentIdentifier()
-    data class Event(val id: String) : ContentIdentifier()
-    data class Serie(val id: String) : ContentIdentifier()
+    data class Channel(val id: Int) : ContentIdentifier()
+    data class VoD(val id: Int) : ContentIdentifier()
+    data class Event(val id: Int) : ContentIdentifier()
+    data class Serie(val id: Int) : ContentIdentifier()
 
-    fun getIdValue(): String {
+    fun getIdValue(): Int {
         return when (this) {
             is Channel -> this.id
             is VoD -> this.id

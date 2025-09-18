@@ -108,7 +108,7 @@ class HomeViewModel @Inject constructor(
     fun setFocusedContent(content: ContentEntityUI) {
         when (content.identifier) {
             is ContentIdentifier.Channel -> _focusedContent.update {
-                findLiveEventOnChannelUseCase(content.identifier.id.toInt())?.toContentEntityUI()
+                findLiveEventOnChannelUseCase(content.identifier.id)?.toContentEntityUI()
                     ?: content
             }
 

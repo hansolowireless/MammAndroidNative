@@ -42,8 +42,8 @@ import com.mamm.mammapps.data.model.EPGEvent
 import com.mamm.mammapps.data.model.Event
 import com.mamm.mammapps.data.model.VoD
 import com.mamm.mammapps.ui.component.LocalIsTV
+import com.mamm.mammapps.ui.mapper.toContentEntityUI
 import com.mamm.mammapps.ui.screen.VideoPlayerScreen
-import com.mamm.mammapps.ui.mapper.toContentDetailUI
 import com.mamm.mammapps.ui.mapper.toContentToPlayUI
 import com.mamm.mammapps.ui.model.AppRoute
 import com.mamm.mammapps.ui.screen.DetailScreen
@@ -232,9 +232,9 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
         contentItem?.let {
             DetailScreen(
                 content = when (it) {
-                    is VoD -> it.toContentDetailUI()
-                    is Event -> it.toContentDetailUI()
-                    is EPGEvent -> it.toContentDetailUI()
+                    is VoD -> it.toContentEntityUI()
+                    is Event -> it.toContentEntityUI()
+                    is EPGEvent -> it.toContentEntityUI()
                     else -> return@composable
                 },
                 onPlayClick = { TODO()

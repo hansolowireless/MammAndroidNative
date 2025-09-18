@@ -123,9 +123,9 @@ fun ContentEntity(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                if (!contentEntityUI.subtitle.isNullOrEmpty()) {
+                if (contentEntityUI.detailInfo?.subtitle?.isNotBlank() == true) {
                     Text(
-                        text = contentEntityUI.subtitle,
+                        text = contentEntityUI.detailInfo.subtitle,
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.White,
                         textAlign = TextAlign.Center,
@@ -149,9 +149,8 @@ fun ContentEntityHorizontalPreview() {
                 .padding(16.dp),
             contentEntityUI = ContentEntityUI(
                 title = "Título de ejemplo",
-                subtitle = "Subtítulo descriptivo",
                 imageUrl = "https://picsum.photos/400/300",
-                identifier = ContentIdentifier.VoD("2")
+                identifier = ContentIdentifier.VoD(2)
             ),
             onClick = { }
         )

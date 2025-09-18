@@ -4,6 +4,7 @@ import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.extension.transformData
 import com.mamm.mammapps.data.logger.Logger
+import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.Genre
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
@@ -72,10 +73,10 @@ class MammRepositoryImpl @Inject constructor (
 
     override fun findHomeContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
-            is ContentIdentifier.Channel -> remoteDatasource.getCachedHomeContent()?.channels?.find { it.id.toString() == identifier.id }
-            is ContentIdentifier.VoD -> remoteDatasource.getCachedHomeContent()?.contents?.find { it.id.toString() == identifier.id }
-            is ContentIdentifier.Event -> remoteDatasource.getCachedHomeContent()?.events?.find { it.id.toString() == identifier.id }
-            is ContentIdentifier.Serie -> remoteDatasource.getCachedHomeContent()?.series?.find { it.id.toString() == identifier.id }
+            is ContentIdentifier.Channel -> remoteDatasource.getCachedHomeContent()?.channels?.find { it.id == identifier.id }
+            is ContentIdentifier.VoD -> remoteDatasource.getCachedHomeContent()?.contents?.find { it.id == identifier.id }
+            is ContentIdentifier.Event -> remoteDatasource.getCachedHomeContent()?.events?.find { it.id == identifier.id }
+            is ContentIdentifier.Serie -> remoteDatasource.getCachedHomeContent()?.series?.find { it.id == identifier.id }
         }
 
         return content?.let { Result.success(it) }
@@ -83,8 +84,8 @@ class MammRepositoryImpl @Inject constructor (
 
     override fun findMovieContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
-            is ContentIdentifier.VoD -> remoteDatasource.getCachedMovies()?.vods?.find { it.idEvent == identifier.id }
-            is ContentIdentifier.Event -> remoteDatasource.getCachedMovies()?.events?.find { it.idEvent == identifier.id }
+            is ContentIdentifier.VoD -> remoteDatasource.getCachedMovies()?.vods?.find { it.id == identifier.id }
+            is ContentIdentifier.Event -> remoteDatasource.getCachedMovies()?.events?.find { it.id == identifier.id }
             else -> null
         }
 
@@ -98,6 +99,14 @@ class MammRepositoryImpl @Inject constructor (
                 ?.firstOrNull { it.id == id }
                 ?: throw NoSuchElementException("Genre with id $id not found")
         }
+    }
+
+    override fun findChannelWithId(id: Int): Result<Channel> {
+        return runCatching {
+            remoteDatasource.getCachedHomeContent()
+                ?.channels
+                ?.find { it.id == id }
+                ?: throw NoSuchElementException("Channel with id $id not found")}
     }
 
 }

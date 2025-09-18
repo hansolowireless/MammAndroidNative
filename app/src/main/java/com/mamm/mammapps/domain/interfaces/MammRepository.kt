@@ -1,5 +1,6 @@
 package com.mamm.mammapps.domain.interfaces
 
+import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.Genre
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
@@ -17,4 +18,5 @@ interface MammRepository {
     fun findHomeContent(identifier: ContentIdentifier): Result<Any>?
     fun findMovieContent(identifier: ContentIdentifier): Result<Any>?
     fun findGenreWithId(id: Int): Result<Genre>
+    fun findChannelWithId(id: Int): Result<Channel>
 }

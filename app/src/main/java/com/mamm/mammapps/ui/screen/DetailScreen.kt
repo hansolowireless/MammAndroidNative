@@ -42,12 +42,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.Actor
+import com.mamm.mammapps.ui.component.common.DurationYearRatingRow
 import com.mamm.mammapps.ui.model.ContentDetailUI
+import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.theme.Dimensions
 
 @Composable
 fun DetailScreen(
-    content: ContentDetailUI,
+    content: ContentEntityUI,
     onPlayClick: () -> Unit
 ) {
 
@@ -96,36 +98,8 @@ fun DetailScreen(
             )
 
             // Metadata principal
-            content.metadata?.let { metadata ->
-                Row(
-                    modifier = Modifier.padding(bottom = Dimensions.paddingXSmall),
-                    horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingXSmall),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(R.string.duration_minutes, metadata.durationMin),
-                        color = Color.White
-                    )
-
-                    Text(
-                        text = stringResource(R.string.separator),
-                        color = Color.White
-                    )
-
-                    Text(
-                        text = metadata.country,
-                        color = Color.White
-                    )
-
-                    // Rating icon si está disponible
-                    metadata.ratingURL?.let { ratingUrl ->
-                        AsyncImage(
-                            model = ratingUrl,
-                            contentDescription = stringResource(R.string.rating_content_description),
-                            modifier = Modifier.size(Dimensions.paddingLarge)
-                        )
-                    }
-                }
+            content.detailInfo?.metadata?.let { metadata ->
+                DurationYearRatingRow(metadata = metadata)
 
                 // Director y género
                 Row(
@@ -163,7 +137,7 @@ fun DetailScreen(
             }
 
             // Descripción
-            content.description?.let { description ->
+            content.detailInfo?.description?.let { description ->
                 Text(
                     text = description,
                     color = Color.White,
@@ -193,7 +167,7 @@ fun DetailScreen(
             }
 
             // Sección de reparto
-            content.metadata?.let { metadata ->
+            content.detailInfo?.metadata?.let { metadata ->
                 if (metadata.actors.isNotEmpty()) {
                     Text(
                         text = stringResource(R.string.cast),

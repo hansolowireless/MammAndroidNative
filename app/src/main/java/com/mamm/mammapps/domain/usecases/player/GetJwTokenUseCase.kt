@@ -11,7 +11,7 @@ class GetJwTokenUseCase @Inject constructor(
         require(content != null) {"GetJwTokenUseCase requires content to be not null"}
         return runCatching {
             tokenRepository.generateJwtToken(
-                contentID = content.identifier.getIdValue(),
+                contentID = content.identifier.getIdValue().toString(),
                 eventType = content.getDRMString())
         }
     }

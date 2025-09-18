@@ -12,3 +12,8 @@ object Dimensions {
     val channelEntityHeight = 140.dp
     val cornerRadius = 10.dp
 }
+
+object Ratios{
+    const val HORIZONTAL = 16f / 9f
+    const val VERTICAL = 10f / 16f
+}

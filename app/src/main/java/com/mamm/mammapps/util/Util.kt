@@ -4,6 +4,8 @@ import android.app.UiModeManager
 import android.content.Context
 import android.content.res.Configuration
 import android.net.Uri
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 
 fun isAndroidTV(context: Context): Boolean {
@@ -45,4 +47,9 @@ fun Uri.replaceQueryParameter(key: String, newValue: String): Uri {
         .clearQuery()
         .encodedQuery(newQuery)
         .build()
+}
+
+@OptIn(ExperimentalUuidApi::class)
+fun Int?.orRandom() : Int {
+    return this ?: Uuid.random().hashCode()
 }

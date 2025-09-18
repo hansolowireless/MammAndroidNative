@@ -33,7 +33,7 @@ import com.mamm.mammapps.ui.theme.Dimensions
 fun ChannelsColumn(
     modifier: Modifier = Modifier,
     channels: List<ContentEPGUI>,
-    selectedChannelId: String? = null,
+    selectedChannelId: Int? = null,
     onChannelSelected: (ContentEPGUI) -> Unit = {}
 ) {
     ProvideLazyListPivotOffset (parentFraction = 0.05f) {

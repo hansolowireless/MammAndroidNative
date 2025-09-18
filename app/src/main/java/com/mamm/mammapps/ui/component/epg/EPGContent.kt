@@ -46,7 +46,7 @@ fun EPGContent(epgContent: List<EPGChannelContent>) {
         Spacer(modifier = Modifier.width(Dimensions.paddingSmall))
 
         EventsColumn(
-            events = epgContent.find { it.channel.id.toString() == selectedChannel?.id }?.events ?: emptyList(),
+            events = epgContent.find { it.channel.id == selectedChannel?.id }?.events ?: emptyList(),
             modifier = Modifier.weight(2f)
         )
     }

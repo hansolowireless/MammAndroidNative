@@ -59,33 +59,28 @@ fun RowOfContentPreview() {
     val sampleContent = listOf(
         ContentEntityUI(
             title = "Película 1",
-            subtitle = "Acción",
             imageUrl = "https://picsum.photos/400/300?random=1",
-            identifier = ContentIdentifier.VoD("1")
+            identifier = ContentIdentifier.VoD(1)
         ),
         ContentEntityUI(
             title = "Película 2",
-            subtitle = "Drama",
             imageUrl = "https://picsum.photos/400/300?random=2",
-            identifier = ContentIdentifier.VoD("1")
+            identifier = ContentIdentifier.VoD(1)
         ),
         ContentEntityUI(
             title = "Película 3",
-            subtitle = "Comedia",
             imageUrl = "https://picsum.photos/400/300?random=3",
-            identifier = ContentIdentifier.VoD("1")
+            identifier = ContentIdentifier.VoD(1)
         ),
         ContentEntityUI(
             title = "Película 4",
-            subtitle = "Terror",
             imageUrl = "https://picsum.photos/400/300?random=4",
-            identifier = ContentIdentifier.VoD("1")
+            identifier = ContentIdentifier.VoD(1)
         ),
         ContentEntityUI(
             title = "Película 5",
-            subtitle = "Ciencia Ficción",
             imageUrl = "https://picsum.photos/400/300?random=5",
-            identifier = ContentIdentifier.VoD("1")
+            identifier = ContentIdentifier.VoD(1)
         )
     )
 

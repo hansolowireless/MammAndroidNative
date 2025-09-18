@@ -9,112 +9,90 @@ import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.SectionVod
 import com.mamm.mammapps.data.model.Serie
 import com.mamm.mammapps.data.model.VoD
+import com.mamm.mammapps.ui.extension.landscape
 import com.mamm.mammapps.ui.extension.squared
 import com.mamm.mammapps.ui.model.ContentDetailUI
 import com.mamm.mammapps.ui.model.ContentEPGUI
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.ContentRowUI
+import com.mamm.mammapps.ui.model.DetailInfoUI
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import com.mamm.mammapps.ui.theme.Dimensions
-import com.mamm.mammapps.util.AppConstants.Companion.VERTICAL_ASPECT_RATIO
+import com.mamm.mammapps.ui.theme.Ratios
+import com.mamm.mammapps.util.orRandom
 
 //--------------------Home------------------------
 fun Channel.toContentEntityUI() = ContentEntityUI(
-    imageUrl = logoURL?.replace(".png", "_viewer.png")?.replace(".jpg", "_viewer.jpg") ?: "",
+    imageUrl = logoURL?.landscape() ?: "",
     title = name ?: "",
-    subtitle = "",
-    identifier = ContentIdentifier.Channel(id.toString())
+    detailInfo = DetailInfoUI(squareLogo = logoURL?.squared()),
+    identifier = ContentIdentifier.Channel(id.orRandom())
 )
 
 fun VoD.toContentEntityUI() = ContentEntityUI(
     imageUrl = posterURL ?: "",
     title = title ?: "",
-    subtitle = shortDesc,
-    aspectRatio = VERTICAL_ASPECT_RATIO,
+    aspectRatio = Ratios.VERTICAL,
     height = Dimensions.contentEntityHeight,
-    identifier = ContentIdentifier.VoD(id.toString())
+    identifier = ContentIdentifier.VoD(id.orRandom()),
+    detailInfo = DetailInfoUI(
+        metadata = metadata,
+        description = longDesc.orEmpty()
+    )
 )
 
 fun Event.toContentEntityUI() = ContentEntityUI(
-    imageUrl = logoURL ?: "",
-    title = title ?: "",
-    subtitle = subtitle,
-    aspectRatio = VERTICAL_ASPECT_RATIO,
+    imageUrl = logoURL.orEmpty(),
+    title = title.orEmpty(),
+    aspectRatio = Ratios.VERTICAL,
     height = Dimensions.contentEntityHeight,
-    identifier = ContentIdentifier.Event(id.toString())
+    identifier = ContentIdentifier.Event(id.orRandom()),
+    detailInfo = DetailInfoUI(
+        subtitle = subtitle.orEmpty(),
+        description = description.orEmpty()
+    )
 )
 
 fun Serie.toContentEntityUI () = ContentEntityUI(
-    imageUrl = serieLogoUrl ?: "",
-    title = title ?: "",
-    subtitle = shortDesc,
-    aspectRatio = VERTICAL_ASPECT_RATIO,
+    imageUrl = serieLogoUrl.orEmpty(),
+    title = title.orEmpty(),
+    aspectRatio = Ratios.VERTICAL,
     height = Dimensions.contentEntityHeight,
-    identifier = ContentIdentifier.Serie(id.toString())
+    identifier = ContentIdentifier.Serie(id.orRandom())
 )
 
 fun EPGEvent.toContentEntityUI() = ContentEntityUI(
-    imageUrl = posterLogo ?: "",
-    title = tbEventLanguages?.firstOrNull()?.title ?: "",
-    subtitle = tbEventLanguages?.firstOrNull()?.description,
-    aspectRatio = VERTICAL_ASPECT_RATIO,
+    imageUrl = posterLogo.orEmpty(),
+    title = getTitle(),
+    aspectRatio = Ratios.VERTICAL,
     height = Dimensions.contentEntityHeight,
     identifier = ContentIdentifier.Event(
-        tbEventItems?.firstOrNull()?.idEvent.toString() ?: "0"
+        id
+    ),
+    detailInfo = DetailInfoUI(
+        metadata = getMetadata(),
+        description = getDescription()
     )
 )
 
 fun SectionVod.toContentEntityUI() = ContentEntityUI(
-    imageUrl = posterLogo ?: "",
-    title = tbEventLanguages?.firstOrNull()?.title ?: "",
-    subtitle = tbEventLanguages?.firstOrNull()?.description,
-    aspectRatio = VERTICAL_ASPECT_RATIO,
+    imageUrl = posterLogo.orEmpty(),
+    title = getTitle(),
+    aspectRatio = Ratios.VERTICAL,
     height = Dimensions.contentEntityHeight ,
     identifier = ContentIdentifier.VoD(
-        tbEventItems?.firstOrNull()?.idContent.toString() ?: "0"
+        id
+    ),
+    detailInfo = DetailInfoUI(
+        description = getDescription(),
+        metadata = getMetadata()
     )
-)
-
-//------------------Details-------------------------
-fun VoD.toContentDetailUI() = ContentDetailUI(
-    identifier = ContentIdentifier.VoD(id.toString()),
-    title = title?: "",
-    imageUrl = logoURL?: "",
-    description = longDesc,
-    metadata = metadata
-)
-
-fun Event.toContentDetailUI() = ContentDetailUI(
-    identifier = ContentIdentifier.Event(id.toString()),
-    title = title?: "",
-    imageUrl = logoURL?: "",
-    description = description,
-)
-
-fun EPGEvent.toContentDetailUI() = ContentDetailUI(
-    identifier = ContentIdentifier.Event(
-        tbEventItems?.firstOrNull()?.idEvent.toString() ?: "0"
-    ),
-    title = tbEventLanguages?.firstOrNull()?.title ?: "",
-    imageUrl = eventLogoUrl ?: "",
-    description = tbEventLanguages?.firstOrNull()?.description,
-    metadata = getMetadata()
-)
-
-fun SectionVod.toContentDetailUI() = ContentDetailUI(
-    identifier = ContentIdentifier.VoD(
-        tbEventItems?.firstOrNull()?.idContent.toString() ?: "0"
-    ),
-    title = tbEventLanguages?.firstOrNull()?.title ?: "",
-    imageUrl = eventLogoUrl ?: "",
-    description = tbEventLanguages?.firstOrNull()?.description,
-    metadata = getMetadata()
 )
 
 //-------------------------EPG----------------------------
 fun Channel.toContentEPGUI() = ContentEPGUI(
-    identifier = ContentIdentifier.Channel(id.toString()),
+    identifier = ContentIdentifier.Channel(id.orRandom()),
     title = name?: "",
     imageUrl = logoURL?.squared() ?: ""
 )
@@ -122,21 +100,21 @@ fun Channel.toContentEPGUI() = ContentEPGUI(
 
 //------------------------PLAYBACK------------------------
 fun Channel.toContentToPlayUI() = ContentToPlayUI(
-    identifier = ContentIdentifier.Channel(id.toString()),
+    identifier = ContentIdentifier.Channel(id.orRandom()),
     deliveryURL = this.deliveryURL?: "",
     title = name?: "",
     imageUrl = logoURL?.squared() ?: ""
 )
 
 fun VoD.toContentToPlayUI() = ContentToPlayUI(
-    identifier = ContentIdentifier.VoD(id.toString()),
+    identifier = ContentIdentifier.VoD(id.orRandom()),
     deliveryURL = this.deliveryURL?: "",
     title = title?: "",
     imageUrl = posterURL?: ""
 )
 
 fun Event.toContentToPlayUI() = ContentToPlayUI(
-    identifier = ContentIdentifier.Event(id.toString()),
+    identifier = ContentIdentifier.Event(id.orRandom()),
     deliveryURL = this.deliveryURL?: "",
     title = title?: "",
     imageUrl = logoURL?: ""

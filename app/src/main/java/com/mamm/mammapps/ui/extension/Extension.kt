@@ -98,6 +98,7 @@ fun Modifier.focusableWithColors(
 }
 
 fun String.squared() = this.replace(".png", "_x4.png").replace(".jpg", "_x4.jpg")
+fun String.landscape() = this.replace(".png", "_viewer.png")?.replace(".jpg", "_viewer.jpg")
 
 fun ImageView.loadWatermarkOrHide(watermarkInfo: WatermarkInfo) {
     if (watermarkInfo.url.isNullOrEmpty()) {
