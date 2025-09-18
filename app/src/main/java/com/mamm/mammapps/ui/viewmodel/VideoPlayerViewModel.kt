@@ -18,7 +18,6 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.util.MimeTypes
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.player.VideoPlayerUIState
-import com.mamm.mammapps.domain.interfaces.TokenRepository
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
 import com.mamm.mammapps.domain.usecases.player.GetDRMUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.GetJwTokenUseCase
@@ -102,7 +101,7 @@ class PlayerViewModel @Inject constructor(
             runCatching {
                 // Ejecutar ambas operaciones en paralelo
                 val playableUrlDeferred = async {
-                    getPlayableUrlUseCase(content.deliveryURL, content.getDRMString())
+                    getPlayableUrlUseCase(content.deliveryURL, content.getCLMString())
                 }
                 val drmUrlDeferred = async {
                     getDRMUrlUseCase(content = content)
@@ -353,7 +352,7 @@ class PlayerViewModel @Inject constructor(
             duration = _player.value?.duration ?: 0
         )
     }
-//
+
 //    // Controles del player
 //    fun togglePlayPause() {
 //        _player.value?.let {
