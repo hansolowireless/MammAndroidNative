@@ -11,7 +11,6 @@ import com.mamm.mammapps.data.model.Serie
 import com.mamm.mammapps.data.model.VoD
 import com.mamm.mammapps.ui.extension.landscape
 import com.mamm.mammapps.ui.extension.squared
-import com.mamm.mammapps.ui.model.ContentDetailUI
 import com.mamm.mammapps.ui.model.ContentEPGUI
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier

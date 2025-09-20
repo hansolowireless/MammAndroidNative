@@ -25,12 +25,10 @@ import coil.compose.AsyncImage
 import com.mamm.mammapps.data.model.Metadata
 import com.mamm.mammapps.ui.component.common.DurationYearRatingRow
 import com.mamm.mammapps.ui.constant.UIConstant
-import com.mamm.mammapps.ui.model.ContentDetailUI
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.DetailInfoUI
 import com.mamm.mammapps.ui.theme.Dimensions
-import com.mamm.mammapps.util.AppConstants
 
 @Composable
 fun HomeGridTop(event: ContentEntityUI) {
