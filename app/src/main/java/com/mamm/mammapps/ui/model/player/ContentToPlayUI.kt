@@ -1,5 +1,6 @@
 package com.mamm.mammapps.ui.model.player
 
+import com.mamm.mammapps.data.model.player.WatermarkInfo
 import com.mamm.mammapps.ui.model.ContentIdentifier
 
 data class ContentToPlayUI (
@@ -9,9 +10,12 @@ data class ContentToPlayUI (
     val subtitle: String? = null,
     val description: String? = null,
     val deliveryURL: String,
+    val isTimeshift: Boolean = false,
     val isRadio: Boolean = false,
     val initialPlayPositionMs: Long = 0,
-    val liveEventInfo: LiveEventInfoUI? = null
+    val epgEventInfo: LiveEventInfoUI? = null,
+    val fingerprintInfo: FingerPrintInfoUI? = null,
+    val watermarkInfo: WatermarkInfo? = null
 ) {
     val isLive: Boolean = this.identifier is ContentIdentifier.Channel
 

@@ -17,6 +17,8 @@ import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.ContentRowUI
 import com.mamm.mammapps.ui.model.DetailInfoUI
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
+import com.mamm.mammapps.ui.model.player.FingerPrintInfoUI
+import com.mamm.mammapps.ui.model.player.LiveEventInfoUI
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.Ratios
 import com.mamm.mammapps.util.orRandom
@@ -56,8 +58,8 @@ fun Event.toContentEntityUI() = ContentEntityUI(
 fun Serie.toContentEntityUI () = ContentEntityUI(
     imageUrl = serieLogoUrl.orEmpty(),
     title = title.orEmpty(),
-    aspectRatio = Ratios.VERTICAL,
-    height = Dimensions.contentEntityHeight,
+    aspectRatio = Ratios.HORIZONTAL,
+    height = Dimensions.channelEntityHeight,
     identifier = ContentIdentifier.Serie(id.orRandom())
 )
 
@@ -102,7 +104,16 @@ fun Channel.toContentToPlayUI() = ContentToPlayUI(
     identifier = ContentIdentifier.Channel(id.orRandom()),
     deliveryURL = this.deliveryURL?: "",
     title = name?: "",
-    imageUrl = logoURL?.squared() ?: ""
+    imageUrl = logoURL?.squared() ?: "",
+    isTimeshift = this.timeshift ?: false,
+    fingerprintInfo = FingerPrintInfoUI(
+        enabled = this.fingerprint ?: false,
+        interval = this.fingerprintFrequency,
+        duration = this.fingerprintDuration,
+        position = this.fingerprintPosition ?: "random",
+        text = "Watermark"
+    ),
+    watermarkInfo = this.watermark
 )
 
 fun VoD.toContentToPlayUI() = ContentToPlayUI(
@@ -114,9 +125,27 @@ fun VoD.toContentToPlayUI() = ContentToPlayUI(
 
 fun Event.toContentToPlayUI() = ContentToPlayUI(
     identifier = ContentIdentifier.Event(id.orRandom()),
-    deliveryURL = this.deliveryURL?: "",
+    deliveryURL = this.deliveryURL.orEmpty(),
     title = title?: "",
-    imageUrl = logoURL?: ""
+    imageUrl = logoURL?: "",
+    //It's used to get the start and end dates in order to build the catchup URL
+    epgEventInfo = this.toLiveEventInfoUI()
+)
+
+//------------------------LIVE EVENT INFO------------------------
+fun EPGEvent.toLiveEventInfoUI(): LiveEventInfoUI = LiveEventInfoUI(
+    title = this.getTitle(),
+    deliveryURL = this.deliveryUrl.orEmpty(),
+    logoURL = this.eventLogoUrl500.orEmpty(),
+    eventStart = this.startDateTime,
+    eventEnd = this.endDateTime
+)
+
+fun Event.toLiveEventInfoUI(): LiveEventInfoUI = LiveEventInfoUI(
+    title = this.title.orEmpty(),
+    logoURL = this.logoURL.orEmpty(),
+    eventStart = this.startDateTime,
+    eventEnd = this.endDateTime
 )
 
 fun GetHomeContentResponse.toContentUIRows(): List<ContentRowUI> {

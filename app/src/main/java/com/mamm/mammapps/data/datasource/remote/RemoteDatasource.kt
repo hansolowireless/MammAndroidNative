@@ -8,6 +8,7 @@ import com.mamm.mammapps.data.di.IdmApi
 import com.mamm.mammapps.data.di.LocatorApi
 import com.mamm.mammapps.data.di.NoBaseUrlApi
 import com.mamm.mammapps.data.di.NoBaseUrlNoRedirectApi
+import com.mamm.mammapps.data.extension.getCurrentDate
 import com.mamm.mammapps.data.extension.isRedirect
 import com.mamm.mammapps.data.extension.toEPGRequestDate
 import com.mamm.mammapps.data.extension.transformData
@@ -19,9 +20,11 @@ import com.mamm.mammapps.data.model.epg.GetEPGResponse
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
+import com.mamm.mammapps.data.model.player.GetTickersResponse
 import com.mamm.mammapps.data.model.player.playback.CLMRequest
 import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.remote.ApiService
+import com.mamm.mammapps.ui.extension.toDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -126,6 +129,7 @@ class RemoteDatasource @Inject constructor(
         return cachedMoviesContent
     }
 
+    //----------PLAYBACK---------//
     suspend fun getUrlFromCLM(deliveryURL: String, typeOfContentString: String): String? {
         require(sessionManager.loginData?.skin?.operator != null
                 && sessionManager.jwToken != null
@@ -170,7 +174,7 @@ class RemoteDatasource @Inject constructor(
     }
 
 
-    //----------GET USER IP---------//
+    //----------USER IP---------//
     suspend fun getCurrentUserIp(): String {
         return try {
             getPublicIp() ?: "127.0.0.1"
@@ -189,4 +193,22 @@ class RemoteDatasource @Inject constructor(
             null
         }
     }
+
+    //----------TICKERS---------//
+    suspend fun getTickers() : GetTickersResponse {
+        return withContext(Dispatchers.IO) {
+            val url = "https://mammticker.b-cdn.net/" +
+                    "${sessionManager.loginData?.userId}_tickets.json" +
+                    "?t=${getCurrentDate().toDate().time}"
+
+            val response = noBaseUrlApi.getTickers(url)
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()?.string()?.toResponseBody()
+                throw HttpException(Response.error<Any>(response.code(), errorBody))
+            }
+
+            response.body()
+        }
+    }
+
 }

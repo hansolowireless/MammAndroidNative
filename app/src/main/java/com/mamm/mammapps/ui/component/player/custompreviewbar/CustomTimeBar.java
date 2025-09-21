@@ -509,6 +509,10 @@ public class CustomTimeBar extends View implements TimeBar {
         eventTstvMode = tstvMode;
     }
 
+    public boolean isTstvMode() {
+        return eventTstvMode;
+    }
+
     public void setIsTimeshift(boolean contentIsTimeshift) {
         isTimeshift = contentIsTimeshift;
     }

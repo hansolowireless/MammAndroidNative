@@ -255,7 +255,7 @@
 
             android:layout_width="wrap_content"
             android:layout_height="60dp"
-            android:background="#995A5A5A"
+            android:backgroundTint="#995A5A5A"
             app:cardCornerRadius="5dp">
 
 
@@ -304,7 +304,7 @@
                     android:text = "Channel Title"/>
 
                 <TextView
-                    android:id="@+id/title_label"
+                    android:id="@+id/live_event_title_Label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:includeFontPadding="false"
@@ -316,7 +316,7 @@
                     android:textColor="@color/white"
                     android:textSize="14sp"
                     android:textStyle="normal"
-                    android:text = "Event Title"/>
+                    android:text = ""/>
 
             </LinearLayout>
 

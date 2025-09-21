@@ -2,7 +2,10 @@ package com.mamm.mammapps.data.model
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import com.mamm.mammapps.data.extension.toZonedDateTimeEPG
+import com.mamm.mammapps.data.model.player.WatermarkInfo
 import kotlinx.parcelize.Parcelize
+import java.time.ZonedDateTime
 
 data class GetHomeContentResponse(
     @SerializedName("timeGenerated") val timeGenerated: String? = null,
@@ -74,6 +77,7 @@ data class Channel(
     @SerializedName("name") val name: String? = null,
     @SerializedName("logoTitleURL") val logoTitleURL: String? = null,
     @SerializedName("fingerprintDuration") val fingerprintDuration: Int? = null,
+    @SerializedName("watermark") val watermark: WatermarkInfo? = null,
     var position : Int = 0
 ): Parcelable
 
@@ -147,7 +151,14 @@ data class Event(
     @SerializedName("id") val id: Int? = null,
     @SerializedName("items") val items: String? = null,
     @SerializedName("parental") val parental: Int? = null
-) : Parcelable
+) : Parcelable {
+    // Propiedades calculadas para fechas
+    val startDateTime: ZonedDateTime?
+        get() = fcIni?.toZonedDateTimeEPG()
+
+    val endDateTime: ZonedDateTime?
+        get() = fcEnd?.toZonedDateTimeEPG()
+}
 
 data class Serie(
     @SerializedName("subgenreById") val subgenreById: Int? = null,

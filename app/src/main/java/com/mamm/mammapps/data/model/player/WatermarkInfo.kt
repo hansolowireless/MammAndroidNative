@@ -1,10 +1,13 @@
 package com.mamm.mammapps.data.model.player
 
 import android.os.Parcelable
+import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class WatermarkInfo(
-    val has: Boolean = false,
+    @SerializedName("has") val hasInt: Int = 0,
     val url: String? = null
-) : Parcelable
+) : Parcelable {
+    val has: Boolean get() = hasInt == 1
+}

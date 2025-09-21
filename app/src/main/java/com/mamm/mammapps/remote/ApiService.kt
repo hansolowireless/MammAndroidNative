@@ -103,4 +103,14 @@ interface ApiService {
         @Url url: String
     ): Response<String>
 
+    // ---------- Tickers ----------
+    @GET
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getTickers(
+        @Url url: String
+    ): Response<GetTickersResponse>
+
 }

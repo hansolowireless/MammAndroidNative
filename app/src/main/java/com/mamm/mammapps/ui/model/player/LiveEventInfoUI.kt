@@ -5,6 +5,7 @@ import java.time.ZonedDateTime
 data class LiveEventInfoUI (
     val title: String,
     val logoURL: String,
-    val begin: ZonedDateTime,
-    val end: ZonedDateTime
+    val deliveryURL: String = "",
+    val eventStart: ZonedDateTime?,
+    val eventEnd: ZonedDateTime?
 )

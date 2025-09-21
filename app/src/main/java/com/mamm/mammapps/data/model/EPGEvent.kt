@@ -2,6 +2,7 @@ package com.mamm.mammapps.data.model
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import com.mamm.mammapps.data.extension.getCurrentDate
 import com.mamm.mammapps.data.extension.toZonedDateTimeEPG
 import com.mamm.mammapps.util.orRandom
 import kotlinx.parcelize.IgnoredOnParcel
@@ -78,15 +79,15 @@ data class EPGEvent(
     val id : Int = idEvent?.toIntOrNull() ?: idEvent.hashCode()
 
     // Propiedades calculadas para fechas
-    private val startDateTime: ZonedDateTime?
+    val startDateTime: ZonedDateTime?
         get() = fcIni?.toZonedDateTimeEPG()
 
-    private val endDateTime: ZonedDateTime?
+    val endDateTime: ZonedDateTime?
         get() = fcEnd?.toZonedDateTimeEPG()
 
     // Métodos para verificar estado del evento
     fun hasStarted(): Boolean {
-        return startDateTime?.let { ZonedDateTime.now().isAfter(it) || ZonedDateTime.now().isEqual(it) } ?: false
+        return startDateTime?.let { getCurrentDate().isAfter(it) || getCurrentDate().isEqual(it) } ?: false
     }
 
     fun hasFinished(): Boolean {

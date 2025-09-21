@@ -1,6 +1,5 @@
 package com.mamm.mammapps.ui.extension
 
-import android.content.Context
 import android.view.View
 import android.widget.ImageView
 import androidx.compose.foundation.background
@@ -98,7 +97,7 @@ fun Modifier.focusableWithColors(
 }
 
 fun String.squared() = this.replace(".png", "_x4.png").replace(".jpg", "_x4.jpg")
-fun String.landscape() = this.replace(".png", "_viewer.png")?.replace(".jpg", "_viewer.jpg")
+fun String.landscape() = this.replace(".png", "_viewer.png").replace(".jpg", "_viewer.jpg")
 
 fun ImageView.loadWatermarkOrHide(watermarkInfo: WatermarkInfo) {
     if (watermarkInfo.url.isNullOrEmpty()) {
@@ -114,9 +113,6 @@ fun ImageView.loadWatermarkOrHide(watermarkInfo: WatermarkInfo) {
         .into(this)
 }
 
-fun Int.dpToPx(context: Context): Int {
-    return (this * context.resources.displayMetrics.density + 0.5f).toInt()
-}
 
 fun ZonedDateTime.toDate(): Date {
     return Date(this.toInstant().toEpochMilli())

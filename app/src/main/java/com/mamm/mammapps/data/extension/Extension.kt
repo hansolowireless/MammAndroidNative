@@ -36,6 +36,14 @@ fun LocalDate.toEPGRequestDate () : String {
     return this.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 }
 
+fun ZonedDateTime.toTSTVDateString(): String {
+    return this.format(DateTimeFormatter.ofPattern("yyyy/MM/dd/HH/mm"))
+}
+
+fun getCurrentDate() : ZonedDateTime {
+    return ZonedDateTime.now()
+}
+
 fun String.toZonedDateTimeEPG(): ZonedDateTime {
     val isoString = this.replace(" ", "T") + "Z"
     val instant = Instant.parse(isoString)

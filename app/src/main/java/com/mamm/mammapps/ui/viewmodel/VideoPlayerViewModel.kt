@@ -1,10 +1,13 @@
 package com.mamm.mammapps.ui.viewmodel
 
 import android.content.Context
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bumptech.glide.Glide
 import com.example.openstream_flutter_rw.data.model.customdatasourcefactory.TokenParamDataSourceFactory
-import com.mamm.mammapps.ui.manager.videoresize.VideoResizeManagerWithTicker
 import com.example.openstream_flutter_rw.ui.manager.watermark.FingerprintController
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
@@ -15,31 +18,50 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.analytics.PlaybackStatsListener
 import com.google.android.exoplayer2.source.dash.DashMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.util.MimeTypes
+import com.mamm.mammapps.R
+import com.mamm.mammapps.data.extension.getCurrentDate
 import com.mamm.mammapps.data.logger.Logger
+import com.mamm.mammapps.data.model.player.Ticker
 import com.mamm.mammapps.data.model.player.VideoPlayerUIState
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
 import com.mamm.mammapps.domain.usecases.player.GetDRMUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.GetJwTokenUseCase
 import com.mamm.mammapps.domain.usecases.player.GetPlayableUrlUseCase
+import com.mamm.mammapps.domain.usecases.player.GetTSTVUrlUseCase
+import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
+import com.mamm.mammapps.ui.constant.PlayerConstant
+import com.mamm.mammapps.ui.extension.toDate
+import com.mamm.mammapps.ui.manager.videoresize.VideoResizeManagerWithTicker
+import com.mamm.mammapps.ui.mapper.toLiveEventInfoUI
+import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
+import com.mamm.mammapps.ui.model.player.LiveEventInfoUI
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.w3c.dom.Text
+import java.time.Duration
 import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
-class PlayerViewModel @Inject constructor(
+class VideoPlayerViewModel @Inject constructor(
     private val tokenParamDataSourceFactory: TokenParamDataSourceFactory,
     // UseCases para reemplazar Flutter calls
     private val getPlayableUrlUseCase: GetPlayableUrlUseCase,
     private val getDRMUrlUseCase: GetDRMUrlUseCase,
+    private val getTSTVUrlUseCase: GetTSTVUrlUseCase,
     private val getJwTokenUseCase: GetJwTokenUseCase,
 //    private val channelZapUseCase: ChannelZapUseCase,
 //    private val setNewContentUseCase: SetNewContentUseCase,
@@ -48,8 +70,8 @@ class PlayerViewModel @Inject constructor(
 //    private val sendBookmarkUseCase: SendBookmarkStampsUseCase,
 //    private val sendHeartbeatUseCase: SendHeartbeatUseCase,
 //    private val manageTickerUseCase: ManageTickerUseCase,
-    private val getNewLiveEventInfoUseCase: FindLiveEventOnChannelUseCase,
-    @ApplicationContext private val context : Context,
+    private val getLiveEventInfoUseCase: FindLiveEventOnChannelUseCase,
+    @ApplicationContext private val context: Context,
     private val logger: Logger
 ) : ViewModel() {
 
@@ -60,15 +82,22 @@ class PlayerViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(VideoPlayerUIState())
     val uiState = _uiState.asStateFlow()
 
-    private val _content = MutableStateFlow<ContentToPlayUI?>(null)
-    val content = _content.asStateFlow()
-
     private val _player = MutableStateFlow<ExoPlayer?>(null)
     val player = _player.asStateFlow()
 
+    private val _content = MutableStateFlow<ContentToPlayUI>(getInitialContent())
+    val content = _content.asStateFlow()
+
+    //Información del evento en directo cuando se está reproduciendo un canal
+    private val _liveEventInfo = MutableStateFlow<LiveEventInfoUI?>(null)
+    val liveEventInfo = _liveEventInfo.asStateFlow()
+
+    private val _tickerList = MutableStateFlow<List<Ticker>?>(null)
+    val tickerList = _tickerList.asStateFlow()
+
     // ExoPlayer y componentes
     private var trackSelector: DefaultTrackSelector? = null
-    private val statsListener: PlaybackStatsListener by lazy {PlaybackStatsListener(false) { _, _ -> }}
+    private val statsListener: PlaybackStatsListener by lazy { PlaybackStatsListener(false) { _, _ -> } }
 
     // Controllers
     private var watermarkController = FingerprintController()
@@ -80,15 +109,14 @@ class PlayerViewModel @Inject constructor(
     private var heartbeatJob: Job? = null
     private var channelInputJob: Job? = null
 
-    // Variables de estado interno
-    private var livePlayingURL = ""
-    private var livePlayingDRMURL = ""
-    private var contentID = ""
-    private var adjustedTSTVDate = Date()
-    private var hasSeeked = true
+    //Either the channel URL or the VOD/Catchup Event URL
+    private var playableUrl: String = ""
+    private var playableLicenseUrl: String = ""
 
-    private var playableUrl : String? = null
-    private var playableLicenseUrl : String? = null
+    //TSTV initial play position
+    private var tstvInitialPlayPositionMs = 0L
+    private val _isTstvMode = MutableStateFlow<Boolean>(false)
+    val isTstvMode = _isTstvMode.asStateFlow()
 
     /**
      * Inicializar el player con contenido específico
@@ -101,7 +129,7 @@ class PlayerViewModel @Inject constructor(
             runCatching {
                 // Ejecutar ambas operaciones en paralelo
                 val playableUrlDeferred = async {
-                    getPlayableUrlUseCase(content.deliveryURL, content.getCLMString())
+                    getPlayableUrlUseCase(content)
                 }
                 val drmUrlDeferred = async {
                     getDRMUrlUseCase(content = content)
@@ -114,13 +142,21 @@ class PlayerViewModel @Inject constructor(
                 // Verificar que ambos sean exitosos
                 if (playableUrlResult.isSuccess && drmUrlResult.isSuccess) {
                     logger.debug(TAG, "initializeWithContent getPlayableUrlUseCase success")
-                    playableUrl = playableUrlResult.getOrNull()
-                    playableLicenseUrl = drmUrlResult.getOrNull()
+                    playableUrl = playableUrlResult.getOrElse { "" }
+                    playableLicenseUrl = drmUrlResult.getOrElse { "" }
 
-                    setPlayerUrls()
+                    setPlayerUrls(
+                        videoUrl = playableUrl,
+                        drmUrl = playableLicenseUrl
+                    )
+
                 } else {
-                    val error = playableUrlResult.exceptionOrNull() ?: drmUrlResult.exceptionOrNull()
-                    logger.error(TAG, "initializeWithContent getPlayableUrlUseCase error = ${error?.message}")
+                    val error =
+                        playableUrlResult.exceptionOrNull() ?: drmUrlResult.exceptionOrNull()
+                    logger.error(
+                        TAG,
+                        "initializeWithContent getPlayableUrlUseCase error = ${error?.message}"
+                    )
 
                     _uiState.value = _uiState.value.copy(error = error?.message)
                 }
@@ -130,26 +166,15 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    private fun initializePlayerInternal() {
-        val state = _uiState.value
-        val content = _content.value
-
-        // Guardar URLs live
-//        if (content?.isLive == true && state.videoURL?.contains("vxwizard") != true) {
-//            livePlayingURL = state.videoURL ?: ""
-//            livePlayingDRMURL = state.licenseURL ?: ""
-//        }
-
-        // Crear y configurar player
-        createPlayer()
-    }
-
     private fun releasePlayer() {
+        _player.value?.removeAnalyticsListener(statsListener)
         _player.value?.release()
         _player.value = null
     }
 
     private fun createPlayer() {
+
+        releasePlayer()
 
         val builder = DefaultTrackSelector(context)
         trackSelector = builder
@@ -177,19 +202,13 @@ class PlayerViewModel @Inject constructor(
             }
 
             override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-                if (playbackState == Player.STATE_READY && playWhenReady) {
-                    _uiState.value = _uiState.value.copy(hidePreview = true)
-                }
 
-                // Actualizar posición y duración
-                updatePlayerPosition()
             }
         })
 
     }
 
-    private fun setPlayerUrls() {
-        val state = _uiState.value
+    private fun setPlayerUrls(videoUrl : String, drmUrl: String = "") {
         val player = _player.value
         val content = _content.value
 
@@ -200,12 +219,12 @@ class PlayerViewModel @Inject constructor(
         }
 
         val mediaItem = MediaItem.Builder()
-            .setUri(playableUrl)
+            .setUri(videoUrl)
             .setMediaMetadata(MediaMetadata.Builder().setTitle("").build())
             .setMimeType(MimeTypes.APPLICATION_MPD)
             .setDrmConfiguration(
                 MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
-                    .setLicenseUri(playableLicenseUrl)
+                    .setLicenseUri(drmUrl)
                     .setLicenseRequestHeaders(requestHeaders)
                     .setMultiSession(true)
                     .build()
@@ -218,29 +237,44 @@ class PlayerViewModel @Inject constructor(
 
         player?.setMediaSource(mediaSource)
 
-        if ((content?.initialPlayPositionMs ?: 0) > 0 ) {
-            player?.seekTo(content?.initialPlayPositionMs ?: 0)
-        } else {
+        if ((content.initialPlayPositionMs) > 0) {
+            player?.seekTo(content.initialPlayPositionMs ?: 0)
+        }
+        else if (tstvInitialPlayPositionMs > 0) {
+            player?.seekTo(tstvInitialPlayPositionMs)
+            tstvInitialPlayPositionMs = 0
+        }
+        else {
             player?.seekTo(0)
         }
 
-//        if (state.showVideoLoop) {
-//            player?.repeatMode = Player.REPEAT_MODE_ONE
-//        }
-
         player?.prepare()
         player?.playWhenReady = true
+    }
+
+    fun observeLiveEvents() {
+        if (_content.value.isLive)
+            getLiveEventInfoUseCase.observeLiveEvents((_content.value.identifier).getIdValue())
+                .onEach { event ->
+                    // Nuevo evento iniciado o terminado
+                    logger.debug(
+                        TAG,
+                        "startObservingLiveEvents Event changed: ${event?.getTitle()}"
+                    )
+                    _liveEventInfo.value = event?.toLiveEventInfoUI()
+                }
+                .launchIn(viewModelScope)
+        else logger.info(TAG, "startObservingLiveEvents Content is not channel")
     }
 
     private fun startPeriodicFunctions() {
 //        startHeartbeat()
 //        startQoSReporting()
 //        startBookmarkReporting()
-//        startWatermarking()
 //        startTickerService()
     }
-//
-//    private fun startHeartbeat() {
+
+    //    private fun startHeartbeat() {
 //        heartbeatJob?.cancel()
 //        heartbeatJob = viewModelScope.launch {
 //            sendHeartbeatUseCase(firstBeat = true)
@@ -338,358 +372,15 @@ class PlayerViewModel @Inject constructor(
 //    }
 //
     private fun stopPeriodicFunctions() {
-//        qosJob?.cancel()
-//        bookmarkJob?.cancel()
-//        watermarkController.stop()
-//        viewModelScope.launch {
-//            manageTickerUseCase.stopTicker()
-//        }
+        qosJob?.cancel()
+        bookmarkJob?.cancel()
+        heartbeatJob?.cancel()
+        channelInputJob?.cancel()
+
+        watermarkController.stop()
+        resizeManager?.release()
     }
 
-    private fun updatePlayerPosition() {
-        _uiState.value = _uiState.value.copy(
-            currentPosition = _player.value?.currentPosition ?: 0,
-            duration = _player.value?.duration ?: 0
-        )
-    }
-
-//    // Controles del player
-//    fun togglePlayPause() {
-//        _player.value?.let {
-//            if (it.isPlaying) it.pause() else it.play()
-//        }
-//    }
-//
-//    fun handleFastForward() {
-//        _uiState.value = _uiState.value.copy(showPreview = true)
-//        _player.value?.seekForward()
-//    }
-//
-//    fun handleRewind() {
-//        _uiState.value = _uiState.value.copy(showPreview = true)
-//        _player.value?.seekBack()
-//    }
-//
-//    fun showControls() {
-//        _uiState.value = _uiState.value.copy(showControls = true)
-//    }
-//
-//    // Zapping
-//    fun zapUp() {
-//        if (_uiState.value.isLive) {
-//            _uiState.value = _uiState.value.copy(isZapping = true)
-//            viewModelScope.launch {
-//                channelZapUseCase(increment = true)
-//            }
-//        }
-//    }
-//
-//    fun zapDown() {
-//        if (_uiState.value.isLive) {
-//            _uiState.value = _uiState.value.copy(isZapping = true)
-//            viewModelScope.launch {
-//                channelZapUseCase(increment = false)
-//            }
-//        }
-//    }
-//
-//    fun handleKeyUp() {
-//        val showingControls = _uiState.value.showControls
-//        if (!showingControls) {
-//            zapUp()
-//        }
-//    }
-//
-//    fun handleKeyDown() {
-//        val showingControls = _uiState.value.showControls
-//        if (!showingControls) {
-//            zapDown()
-//        }
-//    }
-//
-//    fun addChannelDigit(digit: String) {
-//        if (_uiState.value.isLive) {
-//            val currentDigits = _uiState.value.channelZapNumber + digit
-//            _uiState.value = _uiState.value.copy(
-//                channelZapNumber = currentDigits,
-//                showChannelZapDisplay = true
-//            )
-//
-//            channelInputJob?.cancel()
-//            channelInputJob = viewModelScope.launch {
-//                delay(2000)
-//                if (currentDigits.isNotEmpty()) {
-//                    changeToChannel(currentDigits.toInt() - 1)
-//                    _uiState.value = _uiState.value.copy(
-//                        channelZapNumber = "",
-//                        showChannelZapDisplay = false
-//                    )
-//                }
-//            }
-//        }
-//    }
-//
-//    private suspend fun changeToChannel(position: Int) {
-//        _uiState.value = _uiState.value.copy(isZapping = true)
-//        // Implementar cambio de canal usando UseCase
-//    }
-//
-//    // Diálogos
-//    fun showTrackSelection() {
-//        _uiState.value = _uiState.value.copy(showTrackSelectionDialog = true)
-//    }
-//
-//    fun hideTrackSelectionDialog() {
-//        _uiState.value = _uiState.value.copy(showTrackSelectionDialog = false)
-//    }
-//
-//    fun showSubtitlesDialog() {
-//        _uiState.value = _uiState.value.copy(showSubtitlesDialog = true)
-//    }
-//
-//    fun hideSubtitlesDialog() {
-//        _uiState.value = _uiState.value.copy(showSubtitlesDialog = false)
-//    }
-//
-//    fun showAudioTrackDialog() {
-//        _uiState.value = _uiState.value.copy(showAudioTrackDialog = true)
-//    }
-//
-//    fun hideAudioTrackDialog() {
-//        _uiState.value = _uiState.value.copy(showAudioTrackDialog = false)
-//    }
-//
-//    fun showPINDialog() {
-//        _uiState.value = _uiState.value.copy(showPINDialog = true)
-//    }
-//
-//    fun hidePINDialog() {
-//        _uiState.value = _uiState.value.copy(showPINDialog = false)
-//    }
-//
-//    fun validatePIN(pin: String) {
-//        viewModelScope.launch {
-//            validatePINUseCase(pin).fold(
-//                onSuccess = { isValid ->
-//                    _uiState.value = _uiState.value.copy(
-//                        showPINDialog = false,
-//                        isPINValid = isValid
-//                    )
-//                },
-//                onFailure = { error ->
-//                    _uiState.value = _uiState.value.copy(error = error.message)
-//                }
-//            )
-//        }
-//    }
-//
-//    // TSTV (Timeshift TV)
-//    fun goToLive() {
-//        _uiState.value = _uiState.value.copy(tstvMode = false)
-//        setContent(livePlayingURL, livePlayingDRMURL)
-//        _uiState.value = _uiState.value.copy(showLiveIndicator = true)
-//    }
-//
-//    fun goToBeginning() {
-//        setTSTVPoint(1, comesFromRestartButton = true)
-//        _uiState.value = _uiState.value.copy(showLiveIndicator = false)
-//    }
-//
-//    fun onScrubStart() {
-//        // PreviewBar scrub start
-//    }
-//
-//    fun onScrubMove(progress: Int, fromUser: Boolean) {
-//        // PreviewBar scrub move
-//    }
-//
-//    fun onScrubStop(progress: Int) {
-//        val state = _uiState.value
-//        val player = _player.value
-//
-//        if (state.isLive && state.eventHourEnd != null) {
-//            val currentTimeMillis = System.currentTimeMillis()
-//            val differenceNowCurrentProgress =
-//                currentTimeMillis - state.eventHourBegin!!.time - progress
-//
-//            if (System.currentTimeMillis() >= state.eventHourEnd.time) {
-//                viewModelScope.launch {
-//                    getNewLiveEventInfoUseCase()
-//                }
-//            } else if (differenceNowCurrentProgress < 60000) {
-//                goToLive()
-//            } else {
-//                setTSTVPoint(progress)
-//                _uiState.value = _uiState.value.copy(showLiveIndicator = false)
-//            }
-//        }
-//        player?.playWhenReady = true
-//    }
-//
-//    private fun setTSTVPoint(progress: Int, comesFromRestartButton: Boolean = false) {
-//        val state = _uiState.value
-//        val currentTimeMillis = System.currentTimeMillis()
-//        var differenceNowCurrentProgress =
-//            currentTimeMillis - state.eventHourBegin!!.time - progress
-//        val maxHours: Long = 2
-//
-//        if (differenceNowCurrentProgress > (maxHours * 60 * 60 * 1000)) {
-//            differenceNowCurrentProgress = (maxHours * 60 * 60 * 1000) - 1000
-//        }
-//
-//        adjustedTSTVDate = Date(currentTimeMillis - differenceNowCurrentProgress)
-//
-//        val dateFormat = SimpleDateFormat("yyyy/MM/dd/HH/mm", Locale.getDefault())
-//        dateFormat.timeZone = TimeZone.getTimeZone("UTC")
-//        val formattedDate = dateFormat.format(adjustedTSTVDate)
-//
-//        _uiState.value = _uiState.value.copy(
-//            tstvMode = true,
-//            tstvPoint = adjustedTSTVDate
-//        )
-//
-//        val tstvData = TSTVData(
-//            tstvOffset = formattedDate,
-//            progressMilliseconds = progress,
-//            comesFromRestartButton = comesFromRestartButton
-//        )
-//
-//        viewModelScope.launch {
-//            // Llamar UseCase para TSTV mode
-//        }
-//    }
-//
-//    // Preview/Thumbnail loading
-//    fun loadPreview(currentPosition: Long, max: Long) {
-//        if (player != null && player!!.isPlaying) {
-//            player!!.playWhenReady = false
-//        }
-//
-//        val thumbnailUrl = buildThumbnailUrl(currentPosition)
-//        _uiState.value = _uiState.value.copy(
-//            thumbnailUrl = thumbnailUrl,
-//            thumbnailPosition = currentPosition.mod(500000).toLong()
-//        )
-//    }
-//
-//    private fun buildThumbnailUrl(position: Long): String {
-//        val playingURL = _uiState.value.videoURL ?: return ""
-//
-//        contentID = when {
-//            playingURL.contains("smil:") -> playingURL.substringAfter("smil:").substringBefore("_")
-//            playingURL.contains("nopack03-") -> playingURL.substringAfter("nopack03-")
-//                .substringBefore("/")
-//
-//            else -> playingURL.substringAfter("nopack-").substringBefore("/")
-//        }
-//
-//        val subtractZeros = (floor((position / 500000).toDouble()) + 1).toInt()
-//        val numberOfZeros = 3 - subtractZeros.toString().length
-//        val thumbnailNumberString = "0".repeat(numberOfZeros) + subtractZeros.toString()
-//
-//        return when {
-//            playingURL.contains("smil:") ->
-//                playingURL.substringBefore("/smil:") + "-img/" + contentID + "_mf" + thumbnailNumberString + ".jpg"
-//
-//            playingURL.contains("nopack03-") ->
-//                playingURL.substringBefore("/nopack03-") + "-img/" + contentID + "_mf" + thumbnailNumberString + ".jpg"
-//
-//            else ->
-//                playingURL.substringBefore("/nopack-") + "-img/" + contentID + "_mf" + thumbnailNumberString + ".jpg"
-//        }
-//    }
-//
-//    // Content management
-//    fun handleNewContent(call: ContentUpdateData) {
-//        viewModelScope.launch {
-//            setNewContentUseCase(call).fold(
-//                onSuccess = {
-//                    // Actualizar state con la nueva configuración
-//                    _uiState.value = _uiState.value.copy(
-//                        videoURL = call.videoURL ?: _uiState.value.videoURL,
-//                        licenseURL = call.licenseURL ?: _uiState.value.licenseURL,
-//                        eventChannelName = call.eventChannelName ?: _uiState.value.eventChannelName,
-//                        eventTitle = call.eventTitle ?: _uiState.value.eventTitle,
-//                        isTimeshift = call.isTimeshift ?: _uiState.value.isTimeshift,
-//                        eventBeginEnd = call.eventBeginEnd ?: _uiState.value.eventBeginEnd
-//                    )
-//
-//                    // Actualizar URLs live si vienen en la llamada
-//                    call.videoURL?.let { livePlayingURL = it }
-//                    call.licenseURL?.let { livePlayingDRMURL = it }
-//
-//                    // Configurar nuevo contenido
-//                    if (call.videoURL != null && call.licenseURL != null) {
-//                        tokenRepository.storeK1KeyEncrypted(call.videoURL).also {
-//                            setContent(call.videoURL, call.licenseURL)
-//                        }
-//                    }
-//
-//                    // Actualizar fechas TSTV si vienen
-//                    call.eventBeginEnd?.let { setupTSTVDates(it) }
-//                },
-//                onFailure = { error ->
-//                    _uiState.value = _uiState.value.copy(error = error.message)
-//                }
-//            )
-//        }
-//    }
-//
-//    fun handleTSTVMode(call: TSTVModeData) {
-//        hasSeeked = false
-//        viewModelScope.launch {
-//            _uiState.value = _uiState.value.copy(
-//                initialPlayPositionInMs = call.initialPlayPositionInMs,
-//                videoURL = call.videoURL,
-//                licenseURL = call.licenseURL
-//            )
-//
-//            tokenRepository.storeK1KeyEncrypted(call.videoURL).also {
-//                setContent(call.videoURL, call.licenseURL)
-//            }
-//        }
-//    }
-//
-//    fun handleTickerUpdate(tickers: List<Ticker>) {
-//        viewModelScope.launch {
-//            manageTickerUseCase.updateTickers(tickers).fold(
-//                onSuccess = {
-//                    _uiState.value = _uiState.value.copy(tickers = tickers)
-//                },
-//                onFailure = { error ->
-//                    _uiState.value = _uiState.value.copy(error = error.message)
-//                }
-//            )
-//        }
-//    }
-//
-//    fun setupWatermarkController(
-//        playerContainer: ConstraintLayout?,
-//        playerFrameLayout: FrameLayout?
-//    ) {
-//        if (playerContainer != null && playerFrameLayout != null) {
-//            watermarkController.setup(playerContainer, playerFrameLayout, _uiState.value.userID)
-//        }
-//    }
-//
-//    fun setupResizeManager(
-//        fragment: Fragment,
-//        frameLayoutId: Int,
-//        tickers: List<com.mamm.mammapps.data.model.player.Ticker>
-//    ) {
-//        resizeManager = VideoResizeManagerWithTicker(
-//            fragment = fragment,
-//            frameLayoutId = frameLayoutId,
-//            tickerList = tickers
-//        )
-//        val state = _uiState.value
-//        resizeManager?.setAutoResize(
-//            enabled = state.showTickers(),
-//            intervalSecs = tickers.firstOrNull()?.tiempoEntreApariciones?.toLong() ?: 30,
-//            smallDurationSecs = tickers.firstOrNull()?.tiempoDuracion?.toLong() ?: 5
-//        )
-//    }
-//
     private fun handlePlayerError(error: PlaybackException, context: Context) {
         val message = when {
             error.message?.contains("DRM") == true && context.packageName == "goandgo.openstream.com" ->
@@ -700,19 +391,8 @@ class PlayerViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(error = message)
     }
 
-//    private fun setContent(contentURL: String, drmURL: String) {
-//        val player = _player.value
-//        player?.stop()
-//        player?.removeAnalyticsListener(statsListener)
-//
-//        _uiState.value = _uiState.value.copy(showVideoLoop = false)
-//
-//        stopPeriodicFunctions()
-//        configurePlayerContent(contentURL, drmURL)
-//    }
-
     // Método para manejar eventos de Compose
-    fun handleEvent(event: VideoPlayerEvent) {
+    fun handleEvent(event: String) {
         val player = _player.value
 //        when (event) {
 //            VideoPlayerEvent.TogglePlayPause -> togglePlayPause()
@@ -741,42 +421,160 @@ class PlayerViewModel @Inject constructor(
 //        }
     }
 
-    fun clearError() {
-        _uiState.value = _uiState.value.copy(error = null)
+    private fun getInitialContent(): ContentToPlayUI {
+        return ContentToPlayUI(
+            identifier = ContentIdentifier.VoD(-1),
+            imageUrl = "",
+            title = "",
+            subtitle = "",
+            description = "",
+            deliveryURL = ""
+        )
     }
 
-    override fun onCleared() {
-        super.onCleared()
-
-        val player = _player.value
-
-        qosJob?.cancel()
-        bookmarkJob?.cancel()
-        heartbeatJob?.cancel()
-        channelInputJob?.cancel()
-
-        watermarkController.stop()
-        resizeManager?.release()
-
-        player?.removeAnalyticsListener(statsListener)
+    fun releaseVariables() {
+        stopPeriodicFunctions()
         releasePlayer()
     }
-}
 
-// Eventos del VideoPlayer para Compose
-sealed class VideoPlayerEvent {
-    object TogglePlayPause : VideoPlayerEvent()
-    object FastForward : VideoPlayerEvent()
-    object Rewind : VideoPlayerEvent()
-    object ToggleControls : VideoPlayerEvent()
-    object Close : VideoPlayerEvent()
-    object ShowSettings : VideoPlayerEvent()
-    object ShowSubtitles : VideoPlayerEvent()
-    object ShowAudioTracks : VideoPlayerEvent()
-    object GoToLive : VideoPlayerEvent()
-    object GoToBeginning : VideoPlayerEvent()
-    object HidePINDialog : VideoPlayerEvent()
-    object SeekFinished : VideoPlayerEvent()
-    data class ValidatePIN(val pin: String) : VideoPlayerEvent()
-    data class SeekTo(val position: Long) : VideoPlayerEvent()
+    fun setControlVisibility(playerView: StyledPlayerView) {
+        val positionView: View = playerView.findViewById(R.id.exo_position)
+        val tstvHourBeginView: TextView = playerView.findViewById(R.id.tstv_hourbegin)
+        val liveLabel: View = playerView.findViewById(R.id.live_indicator)
+        val goToLiveButton: View = playerView.findViewById(R.id.go_live_button)
+        val previewBar = playerView.findViewById<CustomPreviewBar>(R.id.exo_progress)
+
+        configureTimeBar(previewBar)
+
+        if (_content.value.isTimeshift && _liveEventInfo.value != null) {
+            if (_liveEventInfo.value != null) {
+                positionView.visibility = View.GONE
+                tstvHourBeginView.visibility = View.VISIBLE
+                liveLabel.visibility = View.VISIBLE
+
+                if (previewBar?.isTstvMode == true) {
+                    liveLabel.visibility = View.GONE
+                    goToLiveButton.visibility = View.VISIBLE
+                }
+                else {
+                    liveLabel.visibility = View.VISIBLE
+                    goToLiveButton.visibility = View.GONE
+                }
+
+            } else {
+                positionView.visibility = View.GONE
+                tstvHourBeginView.visibility = View.GONE
+                liveLabel.visibility = View.VISIBLE
+            }
+        } else {
+
+            goToLiveButton.visibility = View.GONE
+
+            if (!_content.value.isLive) {
+                positionView.visibility = View.VISIBLE
+                tstvHourBeginView.visibility = View.GONE
+                liveLabel.visibility = View.GONE
+            } else {
+                positionView.visibility = View.GONE
+                tstvHourBeginView.visibility = View.GONE
+                liveLabel.visibility = View.VISIBLE
+            }
+        }
+
+
+        val titleLabel: TextView = playerView.findViewById(R.id.channel_or_title_label)
+        val liveEventTitleLabel: TextView = playerView.findViewById(R.id.live_event_title_Label)
+        val contentImageView: ImageView = playerView.findViewById(R.id.contentImageView)
+
+        titleLabel.text = _content.value.title
+        liveEventTitleLabel.text = _liveEventInfo.value?.title
+        Glide.with(playerView)
+            .load(_content.value.imageUrl)
+            .into(contentImageView)
+
+//        // Helper function para convertir visibility a string legible
+//        fun visibilityToString(visibility: Int): String {
+//            return when (visibility) {
+//                View.VISIBLE -> "VISIBLE"
+//                View.GONE -> "GONE"
+//                View.INVISIBLE -> "INVISIBLE"
+//                else -> "UNKNOWN"
+//            }
+//        }
+
+//        logger.debug(
+//            TAG, "manageControlVisibility - isTimeshift: ${_content.value.isTimeshift}, " +
+//                    "isLive: ${_content.value.isLive}, " +
+//                    "liveEventInfo: ${_liveEventInfo.value}, " +
+//                    "positionView: ${visibilityToString(positionView.visibility)}, " +
+//                    "tstvHourBeginView: ${visibilityToString(tstvHourBeginView.visibility)}, " +
+//                    "liveLabel: ${visibilityToString(liveLabel.visibility)}"
+//        )
+    }
+
+    private fun configureTimeBar(previewBar: CustomPreviewBar?) {
+
+        previewBar?.setKeyTimeIncrement(30000)
+
+        if (_content.value.isLive) {
+            if (_liveEventInfo.value != null && _content.value.isTimeshift) {
+                previewBar?.setEventHourEnd(_liveEventInfo.value?.eventEnd?.toDate())
+                previewBar?.setEventHourBegin(_liveEventInfo.value?.eventStart?.toDate())
+                previewBar?.setIsTimeshift(_content.value.isTimeshift)
+                previewBar?.visibility = View.VISIBLE
+                logger.debug(TAG, "configureTimeBar - previewBar visibility: VISIBLE")
+            } else {
+                previewBar?.setIsTimeshift(false)
+                previewBar?.visibility = View.GONE
+                logger.debug(TAG, "configureTimeBar - previewBar visibility: GONE")
+            }
+        } else {
+            previewBar?.visibility = View.VISIBLE
+            logger.debug(TAG, "configureTimeBar - previewBar visibility: VISIBLE")
+        }
+    }
+
+    fun handleScrubStop(previewBar: CustomPreviewBar?) {
+        if (_content.value.isLive && _content.value.isTimeshift) {
+            val progress = previewBar?.progress?.toLong() ?: 0
+            val timeToJump =
+                _liveEventInfo.value?.eventStart?.plusSeconds(progress/1000)
+            val startTSTV = Duration.between(timeToJump, getCurrentDate())
+                .toMillis() > PlayerConstant.MILLISECONDS_TO_BE_LIVE && (timeToJump?.isBefore(getCurrentDate()) ?: false)
+
+            if (startTSTV) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    getTSTVUrlUseCase.invoke(liveEventInfo = _liveEventInfo.value).onSuccess { url ->
+                        logger.debug(TAG, "handleScrubStop Success getting TSTV Url, setting it now...")
+
+                        previewBar?.isTstvMode = true
+                        _isTstvMode.update { true }
+                        previewBar?.setTstvPoint(_liveEventInfo.value?.eventStart?.toDate())
+                        tstvInitialPlayPositionMs = progress
+
+                        withContext(Dispatchers.Main) {
+                            setPlayerUrls(videoUrl = url)
+                        }
+
+                    }.onFailure {
+                        logger.error(TAG, "handleScrubStop Failed to get TSTV url, defaulting to Live Url")
+
+                        previewBar?.isTstvMode = false
+                        _isTstvMode.update { false }
+
+                        withContext(Dispatchers.Main) {
+                            setPlayerUrls(videoUrl = playableUrl, drmUrl = playableLicenseUrl)
+                        }
+                    }
+                }
+            } else {
+                logger.debug(TAG, "handleScrubStop Difference is not sufficient to get into TSTV Mode! Still in live...")
+                previewBar?.isTstvMode = false
+                _isTstvMode.update { false }
+                setPlayerUrls(videoUrl = playableUrl, drmUrl = playableLicenseUrl)
+            }
+        } else {
+            logger.debug(TAG, "handleScrubStop No action needed after scrub stop")
+        }
+    }
 }

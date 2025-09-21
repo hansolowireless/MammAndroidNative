@@ -1,38 +1,44 @@
-package com.mamm.mammapps.data.model.player;
+package com.mamm.mammapps.data.model.player
 
+import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
 import java.util.Date
 import java.util.Locale
 
+data class GetTickersResponse(
+    @SerializedName("fecha_generacion")
+    val fechaGeneracion: String,
+
+    @SerializedName("tickets")
+    val tickets: List<Ticker>
+)
+
 data class Ticker(
+    @SerializedName("titulo")
     val titulo: String,
+
+    @SerializedName("textos")
     val textos: List<String>,
+
+    @SerializedName("activo")
     val activo: Boolean,
+
+    @SerializedName("fecha_desde")
     val fechaDesde: String,
+
+    @SerializedName("fecha_hasta")
     val fechaHasta: String,
+
+    @SerializedName("fondo")
+    val fondo: String,
+
+    @SerializedName("tiempo_duracion")
     val tiempoDuracion: Int,
-    val tiempoEntreApariciones: Int,
-    val fondo: String
+
+    @SerializedName("tiempo_entre_apariciones")
+    val tiempoEntreApariciones: Int
 ) {
-    companion object {
-        fun fromMap(map: Map<String, Any>): Ticker {
-            return Ticker(
-                titulo = map["titulo"] as String,
-                textos = (map["textos"] as List<*>).map { it as String },
-                activo = map["activo"] as Boolean,
-                fechaDesde = map["fecha_desde"] as String,
-                fechaHasta = map["fecha_hasta"] as String,
-                tiempoDuracion = map["tiempo_duracion"] as Int,
-                tiempoEntreApariciones = map["tiempo_entre_apariciones"] as Int,
-                fondo = map["fondo"] as String
-            )
-        }
-
-        fun fromMapList(mapList: List<Map<String, Any>>): List<Ticker> {
-            return mapList.map { fromMap(it) }
-        }
-    }
-
     /**
      * Valida si el ticker es válido basado en:
      * - Debe estar activo (activo = true)
@@ -54,5 +60,4 @@ data class Ticker(
             false
         }
     }
-
 }

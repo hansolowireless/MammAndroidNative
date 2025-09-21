@@ -1,9 +1,10 @@
 package com.mamm.mammapps.ui.screen
 
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.FrameLayout
-import android.widget.ImageView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
@@ -25,22 +26,25 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.fragment.app.Fragment
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.bumptech.glide.Glide
 import com.example.openstream_flutter_rw.ui.manager.watermark.FingerprintController
+import com.github.rubensousa.previewseekbar.PreviewBar
 import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
-import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.mamm.mammapps.R
-import com.mamm.mammapps.data.model.player.WatermarkInfo
+import com.mamm.mammapps.data.model.player.Ticker
+import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
+import com.mamm.mammapps.ui.manager.videoresize.VideoResizeManagerWithTicker
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
-import com.mamm.mammapps.ui.viewmodel.PlayerViewModel
+import com.mamm.mammapps.ui.viewmodel.VideoPlayerViewModel
 
 @Composable
 fun VideoPlayerScreen(
-    viewModel: PlayerViewModel = hiltViewModel(),
+    viewModel: VideoPlayerViewModel = hiltViewModel(),
     playedContent: ContentToPlayUI
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -51,6 +55,16 @@ fun VideoPlayerScreen(
         viewModel.initializeWithContent(content = playedContent)
     }
 
+    LaunchedEffect(content) {
+        viewModel.observeLiveEvents()
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.releaseVariables()
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -59,28 +73,23 @@ fun VideoPlayerScreen(
 
         PlayerViewWithControls(
             modifier = Modifier.fillMaxSize(),
+            viewModel = viewModel,
             player = player
         )
 
-//        PlayerControlsOverlay(
-//            uiState = uiState,
-//            content = content,
-//            onEvent = viewModel::handleEvent,
-//            modifier = Modifier.fillMaxSize()
-//        )
-//
+
 //        PlayerDialogs(
 //            uiState = uiState,
 //            onEvent = viewModel::handleEvent
 //        )
-//
+
 //        if (uiState.showChannelZapDisplay) {
 //            ChannelZapDisplay(
 //                channelNumber = uiState.channelZapNumber,
 //                modifier = Modifier.align(Alignment.Center)
 //            )
 //        }
-//
+
 //        uiState.error?.let { error ->
 //            ErrorDisplay(
 //                message = error,
@@ -94,16 +103,29 @@ fun VideoPlayerScreen(
 @Composable
 fun PlayerViewWithControls(
     modifier: Modifier = Modifier,
-    player: ExoPlayer?
+    viewModel: VideoPlayerViewModel,
+    player: ExoPlayer?,
+    content: ContentToPlayUI? = null
 ) {
-    val watermarkController = remember { FingerprintController() }
     val focusRequester = remember { FocusRequester() }
     var playerViewRef by remember { mutableStateOf<StyledPlayerView?>(null) }
 
-    DisposableEffect(Unit) {
-        onDispose {
-            watermarkController.stop()
-        }
+    val fingerprintController = remember { FingerprintController() }
+    var videoResizeManager by remember { mutableStateOf<VideoResizeManagerWithTicker?>(null) }
+    var previewTimeBar by remember { mutableStateOf<CustomPreviewBar?>(null) }
+    var scrubListener by remember { mutableStateOf<PreviewBar.OnScrubListener?>(null) }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    val liveEventInfo by viewModel.liveEventInfo.collectAsStateWithLifecycle()
+    val isTstvMode by viewModel.isTstvMode.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
+    LaunchedEffect(liveEventInfo, content, isTstvMode) {
+        playerViewRef?.let { playerView -> viewModel.setControlVisibility(playerView)  }
     }
 
     AndroidView(
@@ -120,6 +142,43 @@ fun PlayerViewWithControls(
             val styledPlayerView = parentView.findViewById<StyledPlayerView>(R.id.player_view)
             playerViewRef = styledPlayerView
 
+            previewTimeBar = parentView.findViewById<CustomPreviewBar>(R.id.exo_progress)
+
+            // Inicializar manager si no existe
+            if (videoResizeManager == null) {
+                val dummyFragment = object : Fragment() {
+                    override fun getView(): View = parentView
+                    override fun getContext(): Context? = context
+                    override fun getViewLifecycleOwner(): LifecycleOwner = lifecycleOwner
+                }
+
+                videoResizeManager = VideoResizeManagerWithTicker(
+                    fragment = dummyFragment,
+                    frameLayoutId = R.id.root,
+                    tickerList = listOf(
+                        Ticker(
+                        titulo = "Noticia de prueba",
+                        textos = listOf(
+                            "Este es un texto de ejemplo para el ticker publicitario",
+                            "Segundo mensaje del ticker con más información",
+                            "Tercer texto que se mostrará en la animación"
+                        ),
+                        activo = true,
+                        fechaDesde = "2025-09-18T00:00:00Z",
+                        fechaHasta = "2025-12-31T23:59:59Z",
+                        tiempoDuracion = 10,
+                        tiempoEntreApariciones = 30,
+                        fondo = "https://www.marketingdirecto.com/wp-content/uploads/2024/05/Mahou-San-Isidro.jpg"
+                    )
+                    )
+                )
+                videoResizeManager?.setAutoResize(
+                    enabled = true,
+                    intervalSecs = 30,
+                    smallDurationSecs = 10
+                )
+            }
+
             styledPlayerView?.let { playerView ->
                 playerView.player = player
                 playerView.useController = true
@@ -130,16 +189,36 @@ fun PlayerViewWithControls(
                     Log.d("PlayerDebug", "Has media items: ${p.mediaItemCount}")
                     Log.d("PlayerDebug", "Duration: ${p.duration}")
                     Log.d("PlayerDebug", "Position: ${p.currentPosition}")
+                    Log.d("PlayerDebug", "FingerPrintInfo: ${content?.fingerprintInfo}")
                 }
 
-                watermarkController.setup(parentView, styledPlayerView, "Default Text")
-                watermarkController.start(
-                    enabled = true,
-                    interval = 30,
-                    duration = 5,
-                    position = "random",
-                    text = "Watermark",
-                    watermarkInfo = WatermarkInfo(has = true)
+                // Solo agregar listener si no existe
+                if (scrubListener == null) {
+                    val newListener = object : PreviewBar.OnScrubListener {
+                        override fun onScrubStart(previewBar: PreviewBar?) {
+                        }
+
+                        override fun onScrubMove(
+                            previewBar: PreviewBar?,
+                            progress: Int,
+                            fromUser: Boolean
+                        ) {
+                        }
+
+                        override fun onScrubStop(previewBar: PreviewBar?) {
+                            viewModel.handleScrubStop(previewTimeBar)
+                        }
+                    }
+
+                    previewTimeBar?.addOnScrubListener(newListener)
+                    scrubListener = newListener
+                }
+
+
+                fingerprintController.setup(parentView, styledPlayerView)
+                fingerprintController.start(
+                    fingerPrintInfo = content?.fingerprintInfo,
+                    watermarkInfo = content?.watermarkInfo
                 )
             }
         },
@@ -147,47 +226,37 @@ fun PlayerViewWithControls(
             .focusRequester(focusRequester)
             .focusable()
             .onKeyEvent { keyEvent ->
-                Log.d("ComposeKey", "Key: ${keyEvent.key}, Type: ${keyEvent.type}")
-
                 if (keyEvent.type == KeyEventType.KeyDown) {
-                    val playerView = playerViewRef
-                    val isControllerVisible = playerView?.isControllerFullyVisible ?: false
+
+                    val isControllerVisible = playerViewRef?.isControllerFullyVisible ?: false
 
                     when (keyEvent.key) {
                         Key.DirectionCenter,
-                        Key.Enter -> {
-                            Log.d("ComposeKey", "Center/Enter pressed, controller visible: $isControllerVisible")
-                            if (!isControllerVisible) {
-                                playerView?.showController()
-                                true
-                            } else {
-                                // Dejar que ExoPlayer maneje la navegación
-                                false
-                            }
-                        }
+                        Key.Enter,
                         Key.DirectionUp,
                         Key.DirectionDown,
                         Key.DirectionLeft,
                         Key.DirectionRight -> {
-                            Log.d("ComposeKey", "D-pad navigation, controller visible: $isControllerVisible")
+                            Log.d(
+                                "ComposeKey",
+                                "D-pad pressed, controller visible: $isControllerVisible"
+                            )
                             if (!isControllerVisible) {
                                 // Mostrar controles si no están visibles
-                                playerView?.showController()
-                                true
+                                playerViewRef?.showController()
+                                true // Consumir evento
                             } else {
                                 // Permitir navegación por los controles
-                                false
+                                false // No consumir, dejar pasar a ExoPlayer
                             }
                         }
+
                         else -> false
                     }
                 } else false
             }
     )
 
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
 }
 
 //

@@ -1,4 +1,4 @@
-package com.example.openstream_flutter_rw.ui.manager.videoresize
+package com.mamm.mammapps.ui.manager.videoresize
 
 import android.animation.ValueAnimator
 import android.os.Handler

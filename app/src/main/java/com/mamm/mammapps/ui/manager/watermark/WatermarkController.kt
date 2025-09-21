@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.mamm.mammapps.data.model.player.WatermarkInfo
 import com.mamm.mammapps.ui.extension.loadWatermarkOrHide
+import com.mamm.mammapps.ui.model.player.FingerPrintInfoUI
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -50,18 +51,36 @@ class FingerprintController
     /**
      * Start displaying the watermark.
      */
-    fun start(enabled: Boolean = false, interval: Int?, duration: Int?, position: String?, text: String? = null, watermarkInfo: WatermarkInfo) {
+    fun start(
+//        enabled: Boolean = false,
+//        interval: Int?,
+//        duration: Int?,
+//        position: String?,
+//        text: String? = null,
+        fingerPrintInfo: FingerPrintInfoUI?,
+        watermarkInfo: WatermarkInfo? = null
+    ) {
 
-        Log.d("WATERMARK", "Watermark enabled $enabled, interval $interval, duration $duration, position $position")
+        Log.d("WATERMARK", "Watermark enabled " +
+                "${fingerPrintInfo?.enabled}, " +
+                "interval ${fingerPrintInfo?.interval}, " +
+                "duration ${fingerPrintInfo?.duration}, " +
+                "position ${fingerPrintInfo?.position}")
 
         val container = playerContainer ?: return
         val playerFrameLayout = playerFrameLayout ?: return
 
         //Watermark de la liga
-        createAndShowWatermarkLogoImageView(playerFrameLayout, watermarkInfo = watermarkInfo)
+        createAndShowWatermarkLogoImageView(playerFrameLayout, watermarkInfo = watermarkInfo ?: WatermarkInfo(hasInt =  0, url = null))
 
-        if (!enabled || interval == null || duration == null) {
-            Log.d("WATERMARK", "Watermark stopped and disabled")
+        if (fingerPrintInfo == null) {
+            Log.d("WATERMARK", "Fingeprint info is null, fingeprint stopped and disabled")
+            stop()
+            return
+        }
+
+        if (!fingerPrintInfo.enabled || fingerPrintInfo.interval == null || fingerPrintInfo.duration == null) {
+            Log.d("WATERMARK", "Fingerprint info missing, stopping and disabling")
             stop()
             return
         }
@@ -80,10 +99,10 @@ class FingerprintController
         isRunning = true
         this.position = position ?: "random"
 
-        val totalCycleMs = (interval + duration) * 1000
-        val durationMs = duration * 1000
+        val totalCycleMs = (fingerPrintInfo.interval + fingerPrintInfo.duration) * 1000
+        val durationMs = fingerPrintInfo.duration * 1000
 
-        watermarkRunnable.setup(totalCycleMs.toLong(), durationMs.toLong(), text ?: defaultText ?: "")
+        watermarkRunnable.setup(totalCycleMs.toLong(), durationMs.toLong(), fingerPrintInfo.text ?: defaultText ?: "")
 
         // Dar un pequeño delay para evitar condiciones de carrera
         handler.postDelayed(watermarkRunnable, 1000)

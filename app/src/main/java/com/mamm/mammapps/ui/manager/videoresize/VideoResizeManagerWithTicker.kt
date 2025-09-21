@@ -16,7 +16,6 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.example.openstream_flutter_rw.ui.manager.videoresize.VideoResizeManager
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.player.Ticker
 import kotlinx.coroutines.Job
