@@ -4,6 +4,7 @@ import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import com.mamm.mammapps.data.extension.toZonedDateTimeEPG
 import com.mamm.mammapps.data.model.player.WatermarkInfo
+import com.mamm.mammapps.data.model.section.TbContentItem
 import kotlinx.parcelize.Parcelize
 import java.time.ZonedDateTime
 

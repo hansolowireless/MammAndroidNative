@@ -2,10 +2,11 @@ package com.mamm.mammapps.remote
 
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
-import com.mamm.mammapps.data.model.epg.GetEPGResponse
+import com.mamm.mammapps.data.model.GetEPGResponse
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
+import com.mamm.mammapps.data.model.player.GetTickersResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -66,6 +67,46 @@ interface ApiService {
         @Path("jsonParam") jsonParam: String
     ): Response<GetOtherContentResponse>
 
+    // ---------- DOCUMENTARIES ----------
+    @GET("epg_files/doc_pkg_{jsonParam}")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getDocumentaries(
+        @Path("jsonParam") jsonParam: String
+    ): Response<GetOtherContentResponse>
+
+    // ---------- SPORTS ----------
+    @GET("epg_files/dep_pkg_{jsonParam}")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getSports(
+        @Path("jsonParam") jsonParam: String
+    ): Response<GetOtherContentResponse>
+
+    // ---------- KIDS ----------
+    @GET("epg_files/inf_pkg_{jsonParam}")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getKids(
+        @Path("jsonParam") jsonParam: String
+    ): Response<GetOtherContentResponse>
+
+    // ---------- ADULTS ----------
+    @GET("epg_files/adt_pkg_{jsonParam}")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getAdults(
+        @Path("jsonParam") jsonParam: String
+    ): Response<GetOtherContentResponse>
+
 
 //    // ---------- Bookmarks ----------
 //    @GET("keep-watching/get-marks")
@@ -87,11 +128,7 @@ interface ApiService {
 //        @Query("q") query: String
 //    ): SearchResponse
 //
-//    // ---------- Metrics / QoS ----------
-//    @POST("QosMonitor/logs")
-//    suspend fun sendQosLogs(
-//        @Body logs: QosLogRequest
-//    ): ApiResponse
+
 
     // ---------- Playback ----------
     @GET
@@ -102,6 +139,12 @@ interface ApiService {
     suspend fun getUrlFromCLM(
         @Url url: String
     ): Response<String>
+
+    // ---------- Metrics / QoS ----------
+//    @POST("QosMonitor/logs")
+//    suspend fun sendQosLogs(
+//        @Body logs: QosLogRequest
+//    ): ApiResponse
 
     // ---------- Tickers ----------
     @GET

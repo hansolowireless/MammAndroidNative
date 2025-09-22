@@ -16,7 +16,7 @@ import com.mamm.mammapps.data.local.SecurePreferencesManager
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
-import com.mamm.mammapps.data.model.epg.GetEPGResponse
+import com.mamm.mammapps.data.model.GetEPGResponse
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
@@ -43,20 +43,32 @@ class RemoteDatasource @Inject constructor(
     @LocatorApi private val locatorApi: ApiService,
     @BaseUrlApi private val epgApi: ApiService,
     @NoBaseUrlApi private val noBaseUrlApi: ApiService,
-    @NoBaseUrlNoRedirectApi private val clmApi : ApiService,
+    @NoBaseUrlNoRedirectApi private val clmApi: ApiService,
     @DeviceTypeQualifier private val deviceType: String,
     @DeviceSerialQualifier private val deviceSerial: String,
     @DeviceModelQualifier private val deviceModel: String,
     private val sessionManager: SessionManager,
     private val securePreferencesManager: SecurePreferencesManager,
     private val logger: Logger
-    ) {
+) {
 
     @Volatile
     private var cachedHomeContent: GetHomeContentResponse? = null
 
     @Volatile
     private var cachedMoviesContent: GetOtherContentResponse? = null
+
+    @Volatile
+    private var cachedDocumentariesContent: GetOtherContentResponse? = null
+
+    @Volatile
+    private var cachedSportsContent: GetOtherContentResponse? = null
+
+    @Volatile
+    private var cachedAdultsContent: GetOtherContentResponse? = null
+
+    @Volatile
+    private var cachedKidsContent: GetOtherContentResponse? = null
 
     suspend fun login(username: String, password: String): LoginResponse {
         return idmApi.login(LoginRequest(username, password, deviceType, deviceSerial))
@@ -91,7 +103,7 @@ class RemoteDatasource @Inject constructor(
         }
     }
 
-     fun getCachedHomeContent(): GetHomeContentResponse? {
+    fun getCachedHomeContent(): GetHomeContentResponse? {
         return cachedHomeContent
     }
 
@@ -108,6 +120,7 @@ class RemoteDatasource @Inject constructor(
         }
     }
 
+    //----------MOVIES---------//
     suspend fun getMovies(jsonParam: String): GetOtherContentResponse {
         return withContext(Dispatchers.IO) {
 
@@ -129,11 +142,97 @@ class RemoteDatasource @Inject constructor(
         return cachedMoviesContent
     }
 
+    //----------DOCUMENTARIES---------//
+    suspend fun getDocumentaries(jsonParam: String): GetOtherContentResponse {
+        return withContext(Dispatchers.IO) {
+
+            cachedDocumentariesContent?.let { return@withContext it }
+
+            val response = epgApi.getDocumentaries(jsonParam)
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()?.string()?.toResponseBody()
+                throw HttpException(Response.error<Any>(response.code(), errorBody))
+            }
+            val docsData = response.body() ?: throw IllegalStateException("Response body is null")
+
+            cachedDocumentariesContent = docsData
+            docsData
+        }
+    }
+
+    fun getCachedDocumentaries(): GetOtherContentResponse? {
+        return cachedDocumentariesContent
+    }
+
+    //----------SPORTS---------//
+    suspend fun getSports(jsonParam: String): GetOtherContentResponse {
+        return withContext(Dispatchers.IO) {
+            cachedSportsContent?.let { return@withContext it }
+            val response = epgApi.getSports(jsonParam)
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()?.string()?.toResponseBody()
+                throw HttpException(Response.error<Any>(response.code(), errorBody))
+            }
+            val sportsData = response.body() ?: throw IllegalStateException("Response body is null")
+            cachedSportsContent = sportsData
+            sportsData
+        }
+    }
+
+    fun getCachedSports(): GetOtherContentResponse? {
+        return cachedSportsContent
+    }
+
+    //----------KIDS---------//
+    suspend fun getKids(jsonParam: String): GetOtherContentResponse {
+        return withContext(Dispatchers.IO) {
+
+            cachedKidsContent?.let { return@withContext it }
+
+            val response = epgApi.getKids(jsonParam)
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()?.string()?.toResponseBody()
+                throw HttpException(Response.error<Any>(response.code(), errorBody))
+            }
+            val kidsData = response.body() ?: throw IllegalStateException("Response body is null")
+
+            cachedKidsContent = kidsData
+            kidsData
+        }
+    }
+
+    fun getCachedKids(): GetOtherContentResponse? {
+        return cachedKidsContent
+    }
+
+    //----------ADULTS---------//
+    suspend fun getAdults(jsonParam: String): GetOtherContentResponse {
+        return withContext(Dispatchers.IO) {
+
+            cachedAdultsContent?.let { return@withContext it }
+            val response = epgApi.getAdults(jsonParam)
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()?.string()?.toResponseBody()
+                throw HttpException(Response.error<Any>(response.code(), errorBody))
+            }
+            val adultsData = response.body() ?: throw IllegalStateException("Response body is null")
+            cachedAdultsContent = adultsData
+            adultsData
+        }
+    }
+
+    fun getCachedAdults(): GetOtherContentResponse? {
+        return cachedAdultsContent
+    }
+
+
     //----------PLAYBACK---------//
     suspend fun getUrlFromCLM(deliveryURL: String, typeOfContentString: String): String? {
-        require(sessionManager.loginData?.skin?.operator != null
-                && sessionManager.jwToken != null
-                && securePreferencesManager.getCredentials().first != null) {
+        require(
+            sessionManager.loginData?.skin?.operator != null
+                    && sessionManager.jwToken != null
+                    && securePreferencesManager.getCredentials().first != null
+        ) {
             "getUrlFromCLM requires loginData, jwToken and userName to be set"
         }
 
@@ -195,7 +294,7 @@ class RemoteDatasource @Inject constructor(
     }
 
     //----------TICKERS---------//
-    suspend fun getTickers() : GetTickersResponse {
+    suspend fun getTickers(): GetTickersResponse {
         return withContext(Dispatchers.IO) {
             val url = "https://mammticker.b-cdn.net/" +
                     "${sessionManager.loginData?.userId}_tickets.json" +
@@ -207,7 +306,7 @@ class RemoteDatasource @Inject constructor(
                 throw HttpException(Response.error<Any>(response.code(), errorBody))
             }
 
-            response.body()
+            response.body() ?: throw IllegalStateException("Response body is null")
         }
     }
 

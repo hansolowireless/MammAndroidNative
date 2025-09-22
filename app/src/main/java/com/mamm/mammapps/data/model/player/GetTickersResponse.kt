@@ -11,7 +11,7 @@ data class GetTickersResponse(
     val fechaGeneracion: String,
 
     @SerializedName("tickets")
-    val tickets: List<Ticker>
+    val tickers: List<Ticker>
 )
 
 data class Ticker(

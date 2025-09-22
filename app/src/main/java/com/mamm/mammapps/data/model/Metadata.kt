@@ -1,6 +1,8 @@
 package com.mamm.mammapps.data.model
 
 import android.os.Parcelable
+import com.mamm.mammapps.data.model.section.TbContentItem
+import com.mamm.mammapps.data.model.section.TbEventItem
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

@@ -1,6 +1,7 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">MammApps</string>
 
+    <!--Details-->
     <string name="duration_minutes">%1$s min.</string>
     <string name="separator">|</string>
     <string name="director_label">Director: %1$s</string>
@@ -29,6 +30,19 @@
 
     <!--Player Strings-->
     <string name="live_content">Live</string>
-    <!--Left Menu for player-->
+
+    <!-- Navigation Labels -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_epg">EPG</string>
+    <string name="nav_channels">Canales</string>
+    <string name="nav_movies">Cine</string>
+    <string name="nav_documentaries">Documentales</string>
+    <string name="nav_series">Series</string>
+    <string name="nav_sports">Deportes</string>
+    <string name="nav_adults">Adultos</string>
+    <string name="nav_kids">Infantil</string>
+    <string name="nav_search">Buscar</string>
+    <string name="nav_diagnostics">Diagnóstico de Conexión</string>
+    <string name="nav_change_user">Cambiar usuario</string>
 
 </resources>

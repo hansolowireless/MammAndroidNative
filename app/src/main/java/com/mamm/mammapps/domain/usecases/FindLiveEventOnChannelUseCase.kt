@@ -1,7 +1,7 @@
 package com.mamm.mammapps.domain.usecases
 
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.EPGEvent
+import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.domain.interfaces.EPGRepository
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay

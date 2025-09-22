@@ -1,10 +1,10 @@
-package com.mamm.mammapps.data.model
+package com.mamm.mammapps.data.model.section
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import com.mamm.mammapps.data.extension.getCurrentDate
 import com.mamm.mammapps.data.extension.toZonedDateTimeEPG
-import com.mamm.mammapps.util.orRandom
+import com.mamm.mammapps.data.model.Metadata
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.time.ZonedDateTime

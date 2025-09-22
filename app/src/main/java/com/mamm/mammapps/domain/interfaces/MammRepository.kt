@@ -9,14 +9,26 @@ import com.mamm.mammapps.data.model.login.LoginResponse
 import com.mamm.mammapps.ui.model.ContentIdentifier
 
 interface MammRepository {
+
     suspend fun login(username: String, password: String): Result<LoginResponse>
     suspend fun checkLocator(username: String): Result<LocatorResponse>
     suspend fun saveUserCredentials(username: String, password: String) : Result<Unit>
     suspend fun getUserCredentials(): Result<Pair<String?, String?>>
+
     suspend fun getHomeContent() : Result<GetHomeContentResponse>
-    suspend fun getMovies(jsonParam: String): Result<GetOtherContentResponse>
+    suspend fun getMovies(): Result<GetOtherContentResponse>
+    suspend fun getAdults(): Result<GetOtherContentResponse>
+    suspend fun getDocumentaries(): Result<GetOtherContentResponse>
+    suspend fun getKids(): Result<GetOtherContentResponse>
+    suspend fun getSports(): Result<GetOtherContentResponse>
+
     fun findHomeContent(identifier: ContentIdentifier): Result<Any>?
     fun findMovieContent(identifier: ContentIdentifier): Result<Any>?
+    fun findDocumentaryContent(identifier: ContentIdentifier): Result<Any>?
+    fun findAdultContent(identifier: ContentIdentifier): Result<Any>?
+    fun findKidsContent(identifier: ContentIdentifier): Result<Any>?
+    fun findSportsContent(identifier: ContentIdentifier): Result<Any>?
+
     fun findGenreWithId(id: Int): Result<Genre>
     fun findChannelWithId(id: Int): Result<Channel>
 }

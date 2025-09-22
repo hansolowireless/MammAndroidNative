@@ -8,9 +8,13 @@ import androidx.lifecycle.viewModelScope
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.usecases.FindContentEntityUseCase
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
+import com.mamm.mammapps.domain.usecases.GetAdultsUseCase
+import com.mamm.mammapps.domain.usecases.GetDocumentariesUseCase
 import com.mamm.mammapps.domain.usecases.GetEPGContentUseCase
 import com.mamm.mammapps.domain.usecases.GetHomeContentUseCase
+import com.mamm.mammapps.domain.usecases.GetKidsUseCase
 import com.mamm.mammapps.domain.usecases.GetMoviesUseCase
+import com.mamm.mammapps.domain.usecases.GetSportsUseCase
 import com.mamm.mammapps.ui.common.UIState
 import com.mamm.mammapps.ui.mapper.toContentEntityUI
 import com.mamm.mammapps.ui.model.AppRoute
@@ -31,7 +35,11 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val getHomeContentUseCase: GetHomeContentUseCase,
     private val getEPGContentUseCase: GetEPGContentUseCase,
-    private val getmoviesUseCase: GetMoviesUseCase,
+    private val getMoviesUseCase: GetMoviesUseCase,
+    private val getDocumentariesUseCase: GetDocumentariesUseCase,
+    private val getKidsUseCase: GetKidsUseCase,
+    private val getAdultsUseCase: GetAdultsUseCase,
+    private val getSportsUseCase: GetSportsUseCase,
     private val findContentEntityUseCase: FindContentEntityUseCase,
     private val findLiveEventOnChannelUseCase: FindLiveEventOnChannelUseCase,
     private val logger: Logger
@@ -57,6 +65,10 @@ class HomeViewModel @Inject constructor(
         when (routeTag) {
             AppRoute.HOME -> getHomeContent()
             AppRoute.MOVIES -> getMoviesContent()
+            AppRoute.DOCUMENTARIES -> getDocumentariesContent()
+            AppRoute.KIDS -> getKidsContent()
+            AppRoute.SPORTS -> getSportsContent()
+            AppRoute.ADULTS -> getAdultsContent()
             else -> logger.debug(TAG, "Route not implemented")
         }
     }
@@ -81,7 +93,7 @@ class HomeViewModel @Inject constructor(
     private fun getMoviesContent() {
         homeContentUIState = UIState.Loading
         viewModelScope.launch(Dispatchers.IO) {
-            getmoviesUseCase().onSuccess { response ->
+            getMoviesUseCase().onSuccess { response ->
                 homeContentUI = response
                 homeContentUIState = UIState.Success(homeContentUI)
             }
@@ -91,6 +103,59 @@ class HomeViewModel @Inject constructor(
                 }
         }
     }
+
+    private fun getDocumentariesContent() {
+        homeContentUIState = UIState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            getDocumentariesUseCase().onSuccess { response ->
+                homeContentUI = response
+                homeContentUIState = UIState.Success(homeContentUI)
+            }.onFailure { exception ->
+                homeContentUIState =
+                    UIState.Error(exception.message ?: "Unknown error occurred")
+            }
+        }
+    }
+
+    private fun getAdultsContent() {
+        homeContentUIState = UIState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            getAdultsUseCase().onSuccess { response ->
+                homeContentUI = response
+                homeContentUIState = UIState.Success(homeContentUI)
+            }.onFailure { exception ->
+                homeContentUIState =
+                    UIState.Error(exception.message ?: "Unknown error occurred")
+            }
+        }
+    }
+
+    private fun getSportsContent() {
+        homeContentUIState = UIState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            getSportsUseCase().onSuccess { response ->
+                homeContentUI = response
+                homeContentUIState = UIState.Success(homeContentUI)
+            }.onFailure { exception ->
+                homeContentUIState =
+                    UIState.Error(exception.message ?: "Unknown error occurred")
+            }
+        }
+    }
+
+    private fun getKidsContent() {
+        homeContentUIState = UIState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            getKidsUseCase().onSuccess { response ->
+                homeContentUI = response
+                homeContentUIState = UIState.Success(homeContentUI)}
+                .onFailure { exception ->
+                    homeContentUIState =
+                        UIState.Error(exception.message ?: "Unknown error occurred")
+                }
+        }
+    }
+
 
     fun findContent(entityUI: ContentEntityUI, routeTag: AppRoute) {
         findContentEntityUseCase(

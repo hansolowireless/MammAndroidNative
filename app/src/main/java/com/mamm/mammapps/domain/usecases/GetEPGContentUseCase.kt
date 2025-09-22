@@ -1,7 +1,6 @@
 package com.mamm.mammapps.domain.usecases
 
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.epg.EPGChannelContent
 import com.mamm.mammapps.domain.interfaces.EPGRepository
 import java.time.LocalDate

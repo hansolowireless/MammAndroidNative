@@ -1,4 +1,4 @@
-package com.mamm.mammapps.data.model
+package com.mamm.mammapps.data.model.section
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName

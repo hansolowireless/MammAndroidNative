@@ -1,5 +1,6 @@
 package com.mamm.mammapps.data.repository
 
+import androidx.core.net.toUri
 import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.extension.transformData
@@ -63,11 +64,58 @@ class MammRepositoryImpl @Inject constructor (
         }
     }
 
-    override suspend fun getMovies(jsonParam: String): Result<GetOtherContentResponse> {
+    override suspend fun getMovies(): Result<GetOtherContentResponse> {
+        val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
+            ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
+
         return runCatching {
             remoteDatasource.getMovies(jsonParam)
         }.onSuccess { response ->
             logger.debug(TAG, "getMovies Received and saved successful response")
+        }
+    }
+
+    override suspend fun getDocumentaries(): Result<GetOtherContentResponse> {
+        val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
+            ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
+
+        return runCatching {
+            remoteDatasource.getDocumentaries(jsonParam)
+        }.onSuccess { response ->
+            logger.debug(TAG, "getMovies Received and saved successful response")
+        }
+    }
+
+    override suspend fun getAdults(): Result<GetOtherContentResponse> {
+        val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
+            ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
+
+        return runCatching {
+            remoteDatasource.getAdults(jsonParam)
+        }.onSuccess { response ->
+            logger.debug(TAG, "getAdults Received and saved successful response")
+        }
+    }
+
+    override suspend fun getKids(): Result<GetOtherContentResponse> {
+        val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
+            ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
+
+        return runCatching {
+            remoteDatasource.getKids(jsonParam)
+        }.onSuccess { response ->
+            logger.debug(TAG, "getKids Received and saved successful response")
+        }
+    }
+
+    override suspend fun getSports(): Result<GetOtherContentResponse> {
+        val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
+            ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
+
+        return runCatching {
+            remoteDatasource.getSports(jsonParam)
+        }.onSuccess { response ->
+            logger.debug(TAG, "getSports Received and saved successful response")
         }
     }
 
@@ -88,6 +136,46 @@ class MammRepositoryImpl @Inject constructor (
             is ContentIdentifier.Event -> remoteDatasource.getCachedMovies()?.events?.find { it.id == identifier.id }
             else -> null
         }
+
+        return content?.let { Result.success(it) }
+    }
+
+    override fun findDocumentaryContent(identifier: ContentIdentifier): Result<Any>? {
+        val content: Any? = when (identifier) {
+            is ContentIdentifier.VoD -> remoteDatasource.getCachedDocumentaries()?.vods?.find { it.id == identifier.id }
+            is ContentIdentifier.Event -> remoteDatasource.getCachedDocumentaries()?.events?.find { it.id == identifier.id }
+            else -> null
+        }
+
+        return content?.let { Result.success(it) }
+    }
+
+    override fun findAdultContent(identifier: ContentIdentifier): Result<Any>? {
+        val content: Any? = when (identifier) {
+            is ContentIdentifier.VoD -> remoteDatasource.getCachedAdults()?.vods?.find { it.id == identifier.id }
+            is ContentIdentifier.Event -> remoteDatasource.getCachedAdults()?.events?.find { it.id == identifier.id }
+            else -> null
+        }
+
+        return content?.let { Result.success(it) }
+    }
+
+    override fun findSportsContent(identifier: ContentIdentifier): Result<Any>? {
+        val content: Any? = when (identifier) {
+            is ContentIdentifier.VoD -> remoteDatasource.getCachedSports()?.vods?.find { it.id == identifier.id }
+            is ContentIdentifier.Event -> remoteDatasource.getCachedSports()?.events?.find { it.id == identifier.id }
+            else -> null
+        }
+
+        return content?.let { Result.success(it) }
+    }
+
+    override fun findKidsContent(identifier: ContentIdentifier): Result<Any>? {
+        val content: Any? = when (identifier) {
+            is ContentIdentifier.VoD -> remoteDatasource.getCachedKids()?.vods?.find { it.id == identifier.id }
+            is ContentIdentifier.Event -> remoteDatasource.getCachedKids()?.events?.find { it.id == identifier.id }
+            else -> null
+            }
 
         return content?.let { Result.success(it) }
     }

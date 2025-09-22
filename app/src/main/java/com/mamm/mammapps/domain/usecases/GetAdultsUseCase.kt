@@ -6,31 +6,31 @@ import com.mamm.mammapps.ui.mapper.toContentUIRows
 import com.mamm.mammapps.ui.model.ContentRowUI
 import javax.inject.Inject
 
-class GetMoviesUseCase @Inject constructor(
+class GetAdultsUseCase @Inject constructor(
     private val mammRepository: MammRepository,
     private val logger: Logger
 ){
 
     companion object {
-        private const val TAG = "GetMoviesUseCase"
+        private const val TAG = "GetAdultsUseCase"
     }
 
     suspend operator fun invoke(): Result<List<ContentRowUI>> {
-        return mammRepository.findGenreWithId(1).fold(
+        return mammRepository.findGenreWithId(162).fold(
             onSuccess = { genreResult ->
-                mammRepository.getMovies().fold(
+                mammRepository.getAdults().fold(
                     onSuccess = { response ->
-                        logger.debug(TAG, "GetMoviesUseCase Received successful response")
-                        Result.success(response.toContentUIRows(genreResult))
+                        logger.debug(TAG, "GetAdultsUseCase Received successful response")
+                        Result.success(response.toContentUIRows(genreResult, isAdult = true))
                     },
                     onFailure = { exception ->
-                        logger.debug(TAG, "GetMoviesUseCase Failed: ${exception.message}")
+                        logger.debug(TAG, "GetAdultsUseCase Failed: ${exception.message}")
                         Result.failure(exception)
                     }
                 )
             },
             onFailure = { exception ->
-                logger.debug(TAG, "Genre lookup failed: ${exception.message}")
+                logger.debug(TAG, "GetAdultsUseCase Genre lookup failed: ${exception.message}")
                 Result.failure(exception)
             }
         )

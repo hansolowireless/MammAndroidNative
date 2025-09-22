@@ -2,7 +2,7 @@ package com.mamm.mammapps.data.repository
 
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.EPGEvent
+import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.data.model.epg.EPGChannelContent
 import com.mamm.mammapps.data.model.epg.MultiDayEPG
 import com.mamm.mammapps.domain.interfaces.EPGRepository

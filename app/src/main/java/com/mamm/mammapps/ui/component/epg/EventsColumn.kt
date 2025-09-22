@@ -25,7 +25,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.ListItem
 import coil.compose.AsyncImage
-import com.mamm.mammapps.data.model.EPGEvent
+import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
 import com.mamm.mammapps.ui.theme.Dimensions
 

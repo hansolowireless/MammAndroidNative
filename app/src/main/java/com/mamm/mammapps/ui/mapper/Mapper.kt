@@ -1,14 +1,15 @@
 package com.mamm.mammapps.ui.mapper
 
 import com.mamm.mammapps.data.model.Channel
-import com.mamm.mammapps.data.model.EPGEvent
+import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.data.model.Event
 import com.mamm.mammapps.data.model.Genre
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
-import com.mamm.mammapps.data.model.SectionVod
+import com.mamm.mammapps.data.model.section.SectionVod
 import com.mamm.mammapps.data.model.Serie
 import com.mamm.mammapps.data.model.VoD
+import com.mamm.mammapps.ui.extension.adult
 import com.mamm.mammapps.ui.extension.landscape
 import com.mamm.mammapps.ui.extension.squared
 import com.mamm.mammapps.ui.model.ContentEPGUI
@@ -55,7 +56,7 @@ fun Event.toContentEntityUI() = ContentEntityUI(
     )
 )
 
-fun Serie.toContentEntityUI () = ContentEntityUI(
+fun Serie.toContentEntityUI() = ContentEntityUI(
     imageUrl = serieLogoUrl.orEmpty(),
     title = title.orEmpty(),
     aspectRatio = Ratios.HORIZONTAL,
@@ -63,8 +64,10 @@ fun Serie.toContentEntityUI () = ContentEntityUI(
     identifier = ContentIdentifier.Serie(id.orRandom())
 )
 
-fun EPGEvent.toContentEntityUI() = ContentEntityUI(
-    imageUrl = posterLogo.orEmpty(),
+fun EPGEvent.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
+    imageUrl = (posterLogo?.takeIf { it.isNotBlank() }
+        ?: eventLogoUrl500?.takeIf { it.isNotBlank() })
+        .orEmpty().adult(isAdult),
     title = getTitle(),
     aspectRatio = Ratios.VERTICAL,
     height = Dimensions.contentEntityHeight,
@@ -77,11 +80,13 @@ fun EPGEvent.toContentEntityUI() = ContentEntityUI(
     )
 )
 
-fun SectionVod.toContentEntityUI() = ContentEntityUI(
-    imageUrl = posterLogo.orEmpty(),
+fun SectionVod.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
+    imageUrl = (posterLogo?.takeIf { it.isNotBlank() }
+        ?: eventLogoUrl500?.takeIf { it.isNotBlank() })
+        .orEmpty().adult(isAdult),
     title = getTitle(),
     aspectRatio = Ratios.VERTICAL,
-    height = Dimensions.contentEntityHeight ,
+    height = Dimensions.contentEntityHeight,
     identifier = ContentIdentifier.VoD(
         id
     ),
@@ -94,7 +99,7 @@ fun SectionVod.toContentEntityUI() = ContentEntityUI(
 //-------------------------EPG----------------------------
 fun Channel.toContentEPGUI() = ContentEPGUI(
     identifier = ContentIdentifier.Channel(id.orRandom()),
-    title = name?: "",
+    title = name ?: "",
     imageUrl = logoURL?.squared() ?: ""
 )
 
@@ -102,8 +107,8 @@ fun Channel.toContentEPGUI() = ContentEPGUI(
 //------------------------PLAYBACK------------------------
 fun Channel.toContentToPlayUI() = ContentToPlayUI(
     identifier = ContentIdentifier.Channel(id.orRandom()),
-    deliveryURL = this.deliveryURL?: "",
-    title = name?: "",
+    deliveryURL = this.deliveryURL ?: "",
+    title = name ?: "",
     imageUrl = logoURL?.squared() ?: "",
     isTimeshift = this.timeshift ?: false,
     fingerprintInfo = FingerPrintInfoUI(
@@ -118,16 +123,16 @@ fun Channel.toContentToPlayUI() = ContentToPlayUI(
 
 fun VoD.toContentToPlayUI() = ContentToPlayUI(
     identifier = ContentIdentifier.VoD(id.orRandom()),
-    deliveryURL = this.deliveryURL?: "",
-    title = title?: "",
-    imageUrl = posterURL?: ""
+    deliveryURL = this.deliveryURL ?: "",
+    title = title ?: "",
+    imageUrl = posterURL ?: ""
 )
 
 fun Event.toContentToPlayUI() = ContentToPlayUI(
     identifier = ContentIdentifier.Event(id.orRandom()),
     deliveryURL = this.deliveryURL.orEmpty(),
-    title = title?: "",
-    imageUrl = logoURL?: "",
+    title = title ?: "",
+    imageUrl = logoURL ?: "",
     //It's used to get the start and end dates in order to build the catchup URL
     epgEventInfo = this.toLiveEventInfoUI()
 )
@@ -169,7 +174,10 @@ fun GetHomeContentResponse.toContentUIRows(): List<ContentRowUI> {
     } ?: emptyList()
 }
 
-fun GetOtherContentResponse.toContentUIRows(genre: Genre): List<ContentRowUI> {
+fun GetOtherContentResponse.toContentUIRows(
+    genre: Genre,
+    isAdult: Boolean = false
+): List<ContentRowUI> {
     val rows = mutableListOf<ContentRowUI>()
 
     genre.subgenres?.forEach { sub ->
@@ -178,8 +186,8 @@ fun GetOtherContentResponse.toContentUIRows(genre: Genre): List<ContentRowUI> {
         val subVods = vods.orEmpty().filter { it.idSubgenre == sub.id.toString() }
 
         // Convertimos a ContentEntityUI
-        val items = subEvents.map { it.toContentEntityUI() } +
-                subVods.map { it.toContentEntityUI() }
+        val items = subEvents.map { it.toContentEntityUI(isAdult = isAdult) } +
+                subVods.map { it.toContentEntityUI(isAdult = isAdult) }
 
         if (items.isNotEmpty()) {
             rows.add(
