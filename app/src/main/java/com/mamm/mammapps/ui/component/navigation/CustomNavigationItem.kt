@@ -1,6 +1,8 @@
 package com.mamm.mammapps.ui.component.navigation
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -8,6 +10,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -17,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
@@ -35,20 +39,23 @@ fun CustomTVNavigationItem(
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
 
+    // Opción 1: Usando animateFloatAsState para evitar cambios de layout
+    val labelAlpha by animateFloatAsState(
+        targetValue = if (parentIsFocused) 1f else 0f,
+        animationSpec = tween(300),
+        label = "labelAlpha"
+    )
+
     ListItem(
-        selected = false, // Manejamos la selección manualmente con colores
+        selected = false,
         onClick = onClick,
         headlineContent = {
-            AnimatedVisibility(
-                visible = parentIsFocused,
-                enter = slideInHorizontally(initialOffsetX = { -it / 2 }) + fadeIn(),
-                exit = slideOutHorizontally(targetOffsetX = { -it / 2 }) + fadeOut()
-            ) {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.alpha(labelAlpha),
+                maxLines = 1
+            )
         },
         leadingContent = {
             Box(
