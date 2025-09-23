@@ -73,8 +73,7 @@ data class SectionVod(
     val idSubgenre: String? = null
 ) : Parcelable {
 
-    @IgnoredOnParcel
-    val id : Int = idEvent?.toIntOrNull() ?: idEvent.hashCode()
+    fun getId(): Int = idEvent?.toIntOrNull() ?: idEvent?.hashCode() ?: 0
 
     fun getMetadata(): Metadata {
         return Metadata.fromTbContentItems(tbEventItems ?: emptyList())

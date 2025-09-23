@@ -36,9 +36,45 @@ class FindContentEntityUseCase @Inject constructor(
                         logger.debug(TAG, "invoke Failed: ${exception.message}, $exception")
                     } ?: Result.failure(Exception("Content not found"))
             }
+            AppRoute.DOCUMENTARIES -> {
+                return repository.findDocumentaryContent(identifier = identifier)
+                    ?.onSuccess { result ->
+                        logger.debug(TAG, "invoke Received content: $result")
+                    }
+                    ?.onFailure { exception ->
+                        logger.debug(TAG, "invoke Failed: ${exception.message}, $exception")
+                    } ?: Result.failure(Exception("Content not found"))
+            }
+            AppRoute.SPORTS -> {
+                return repository.findSportsContent(identifier = identifier)
+                    ?.onSuccess { result ->
+                        logger.debug(TAG, "invoke Received content: $result")
+                    }
+                    ?.onFailure { exception ->
+                        logger.debug(TAG, "invoke Failed: ${exception.message}, $exception")
+                    } ?: Result.failure(Exception("Content not found"))
+            }
+            AppRoute.KIDS -> {
+                return repository.findKidsContent(identifier = identifier)
+                    ?.onSuccess { result ->
+                        logger.debug(TAG, "invoke Received content: $result")
+                    }
+                    ?.onFailure { exception ->
+                        logger.debug(TAG, "invoke Failed: ${exception.message}, $exception")
+                    } ?: Result.failure(Exception("Content not found"))
+            }
+            AppRoute.ADULTS -> {
+                return repository.findAdultContent(identifier = identifier)
+                    ?.onSuccess { result ->
+                        logger.debug(TAG, "invoke Received content: $result")
+                    }
+                    ?.onFailure { exception ->
+                        logger.debug(TAG, "invoke Failed: ${exception.message}, $exception")
+                    } ?: Result.failure(Exception("Content not found"))
+            }
             else -> {
                 logger.debug(TAG, "invoke Route not implemented")
-                return Result.failure(Exception("Route not implemented"))
+                return Result.failure(Exception("FindContentEntityUseCase Route not implemented"))
             }
         }
 

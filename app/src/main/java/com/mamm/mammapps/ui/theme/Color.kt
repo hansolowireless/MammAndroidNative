@@ -11,10 +11,22 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 val Primary = Color(0xFFF0ED00)
+val Secondary = Color.White
+val Outlined = Color(0xFF625b71)
 val TextPrimary = Color.White
 
 
 object ContentEntityColor {
     val text = Color.White
     val glow = Color.White
+}
+
+object HomeGridTopColor {
+    val eventitle = Primary
+    val description = Secondary
+    val metadata = Primary
+}
+
+object HomeGridBottomColor {
+    val rowTitle = Outlined
 }

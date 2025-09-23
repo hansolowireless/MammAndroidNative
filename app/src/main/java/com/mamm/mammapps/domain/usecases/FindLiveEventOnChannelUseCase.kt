@@ -45,7 +45,7 @@ class FindLiveEventOnChannelUseCase @Inject constructor(
 
             runCatching { invoke(channelId) }
                 .onSuccess { newEvent ->
-                    if (newEvent?.id != currentEvent?.id) {
+                    if (newEvent?.getId() != currentEvent?.getId()) {
                         currentEvent = newEvent
                         emit(newEvent)
                     }
@@ -53,5 +53,5 @@ class FindLiveEventOnChannelUseCase @Inject constructor(
                 .onFailure { logger.error(TAG,"Error checking event for channel $channelId") }
         }
     }
-        .distinctUntilChanged { old, new -> old?.id == new?.id }
+        .distinctUntilChanged { old, new -> old?.getId() == new?.getId() }
 }

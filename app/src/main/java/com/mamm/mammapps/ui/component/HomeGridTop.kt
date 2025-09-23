@@ -9,12 +9,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -29,6 +31,7 @@ import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.DetailInfoUI
 import com.mamm.mammapps.ui.theme.Dimensions
+import com.mamm.mammapps.ui.theme.HomeGridTopColor
 
 @Composable
 fun HomeGridTop(event: ContentEntityUI) {
@@ -38,7 +41,6 @@ fun HomeGridTop(event: ContentEntityUI) {
             .height(260.dp)
     ) {
 
-        // Background image covering the right half
         Box(
             modifier = Modifier
                 .fillMaxHeight()
@@ -53,40 +55,20 @@ fun HomeGridTop(event: ContentEntityUI) {
             )
         }
 
-        // Horizontal gradient overlay - only over the image area (right half)
         Box(
             modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth(UIConstant.HOMEGRIDTOP_IMAGE_WIDTH_FRACTION)
                 .align(Alignment.CenterEnd)
-                .background(
-                    Brush.horizontalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.background,
-                            MaterialTheme.colorScheme.background.copy(alpha = 0.7f),
-                            Color.Transparent
-                        ),
-                        startX = 0f,
-                        endX = 200f
-                    )
-                )
-        )
-
-        // Vertical gradient overlay - bottom to top over the image area
-        Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .fillMaxWidth(UIConstant.HOMEGRIDTOP_IMAGE_WIDTH_FRACTION)
-                .align(Alignment.CenterEnd)
+                .clip(RoundedCornerShape(12.dp))
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
                             Color.Transparent,
-                            MaterialTheme.colorScheme.background.copy(alpha = 0.6f),
+                            Color.Transparent,
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
                             MaterialTheme.colorScheme.background
-                        ),
-                        startY = 0f,
-                        endY = Float.POSITIVE_INFINITY
+                        )
                     )
                 )
         )
@@ -95,7 +77,7 @@ fun HomeGridTop(event: ContentEntityUI) {
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(0.5f)
+                .fillMaxWidth(1 - UIConstant.HOMEGRIDTOP_IMAGE_WIDTH_FRACTION)
                 .padding(Dimensions.paddingMedium),
             contentAlignment = Alignment.TopStart
         ) {
@@ -106,7 +88,7 @@ fun HomeGridTop(event: ContentEntityUI) {
                 if (event.title.isNotBlank()) {
                     Text(
                         text = event.title,
-                        color = Color.White,
+                        color = HomeGridTopColor.eventitle,
                         style = MaterialTheme.typography.bodyLarge,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
@@ -119,12 +101,15 @@ fun HomeGridTop(event: ContentEntityUI) {
                         modifier = Modifier
                             .fillMaxWidth(0.7f)
                             .height(1.dp)
-                            .background(Color.White)
+                            .background(HomeGridTopColor.eventitle)
                     )
                 }
 
                 event.detailInfo?.metadata?.let { metadata ->
-                    DurationYearRatingRow(metadata = metadata)
+                    DurationYearRatingRow(
+                        metadata = metadata,
+                        textcolor = HomeGridTopColor.metadata
+                    )
                 }
 
                 // Event description from ContentEntityUI subtitle
@@ -132,7 +117,7 @@ fun HomeGridTop(event: ContentEntityUI) {
                     if (description.isNotBlank()) {
                         Text(
                             text = description,
-                            color = Color.White,
+                            color = HomeGridTopColor.description,
                             style = MaterialTheme.typography.bodyMedium,
                             overflow = TextOverflow.Ellipsis
                         )

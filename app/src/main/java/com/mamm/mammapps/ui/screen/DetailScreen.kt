@@ -41,6 +41,7 @@ import coil.compose.AsyncImage
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.Actor
 import com.mamm.mammapps.ui.component.common.DurationYearRatingRow
+import com.mamm.mammapps.ui.component.common.PrimaryButton
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.theme.Dimensions
 
@@ -121,7 +122,10 @@ fun DetailScreen(
                 // Título original si es diferente
                 if (metadata.originalTitle.isNotEmpty() && metadata.originalTitle != content.title) {
                     Text(
-                        text = stringResource(R.string.original_title_label, metadata.originalTitle),
+                        text = stringResource(
+                            R.string.original_title_label,
+                            metadata.originalTitle
+                        ),
                         color = Color.White.copy(alpha = 0.8f)
                     )
                 }
@@ -143,25 +147,18 @@ fun DetailScreen(
             }
 
             // Botón de reproducir
-            Button(
-                onClick = onPlayClick,
-                modifier = Modifier
-                    .width(200.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF1976D2)
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.PlayArrow,
-                    contentDescription = stringResource(R.string.play_icon_content_description),
-                    tint = Color.White,
-                    modifier = Modifier.padding(end = Dimensions.paddingXSmall)
-                )
-                Text(
-                    text = stringResource(R.string.play),
-                    color = Color.White
-                )
-            }
+            PrimaryButton(
+                text = stringResource(R.string.play),
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.PlayArrow,
+                        contentDescription = stringResource(R.string.play_icon_content_description),
+                        tint = Color.White,
+                        modifier = Modifier.padding(end = Dimensions.paddingXSmall)
+                    )
+                },
+                onClick = onPlayClick
+            )
 
             // Sección de reparto
             content.detailInfo?.metadata?.let { metadata ->

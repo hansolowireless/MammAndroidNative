@@ -38,6 +38,7 @@ import com.mamm.mammapps.R
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
 import com.mamm.mammapps.ui.component.navigation.CustomTVNavigationItem
 import com.mamm.mammapps.ui.model.AppRoute
+import com.mamm.mammapps.ui.theme.Dimensions
 
 @Composable
 fun TVNavigationLayout(navController: NavHostController) {
@@ -62,13 +63,13 @@ fun TVNavigationLayout(navController: NavHostController) {
 
     Row {
         if (showNavigationRail) {
-            ProvideLazyListPivotOffset(parentFraction = 0.5f) {
+            ProvideLazyListPivotOffset(parentFraction = 0.0f) {
                 NavigationRail(
                     modifier = Modifier
                         .width(railWidth)
                         .fillMaxHeight()
                         .verticalScroll(rememberScrollState())
-                        .padding(top = 270.dp, bottom = 300.dp)
+                        .padding(top = Dimensions.paddingSmall, bottom = 300.dp)
                         .onFocusChanged { hasItemFocused = it.hasFocus }
                 ) {
                     CustomTVNavigationItem(

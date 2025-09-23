@@ -132,8 +132,8 @@ class MammRepositoryImpl @Inject constructor (
 
     override fun findMovieContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
-            is ContentIdentifier.VoD -> remoteDatasource.getCachedMovies()?.vods?.find { it.id == identifier.id }
-            is ContentIdentifier.Event -> remoteDatasource.getCachedMovies()?.events?.find { it.id == identifier.id }
+            is ContentIdentifier.VoD -> remoteDatasource.getCachedMovies()?.vods?.find { it.getId() == identifier.id }
+            is ContentIdentifier.Event -> remoteDatasource.getCachedMovies()?.events?.find { it.getId() == identifier.id }
             else -> null
         }
 
@@ -142,8 +142,8 @@ class MammRepositoryImpl @Inject constructor (
 
     override fun findDocumentaryContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
-            is ContentIdentifier.VoD -> remoteDatasource.getCachedDocumentaries()?.vods?.find { it.id == identifier.id }
-            is ContentIdentifier.Event -> remoteDatasource.getCachedDocumentaries()?.events?.find { it.id == identifier.id }
+            is ContentIdentifier.VoD -> remoteDatasource.getCachedDocumentaries()?.vods?.find { it.getId() == identifier.id }
+            is ContentIdentifier.Event -> remoteDatasource.getCachedDocumentaries()?.events?.find { it.getId() == identifier.id }
             else -> null
         }
 
@@ -152,8 +152,8 @@ class MammRepositoryImpl @Inject constructor (
 
     override fun findAdultContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
-            is ContentIdentifier.VoD -> remoteDatasource.getCachedAdults()?.vods?.find { it.id == identifier.id }
-            is ContentIdentifier.Event -> remoteDatasource.getCachedAdults()?.events?.find { it.id == identifier.id }
+            is ContentIdentifier.VoD -> remoteDatasource.getCachedAdults()?.vods?.find { it.getId() == identifier.id }
+            is ContentIdentifier.Event -> remoteDatasource.getCachedAdults()?.events?.find { it.getId() == identifier.id }
             else -> null
         }
 
@@ -162,8 +162,8 @@ class MammRepositoryImpl @Inject constructor (
 
     override fun findSportsContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
-            is ContentIdentifier.VoD -> remoteDatasource.getCachedSports()?.vods?.find { it.id == identifier.id }
-            is ContentIdentifier.Event -> remoteDatasource.getCachedSports()?.events?.find { it.id == identifier.id }
+            is ContentIdentifier.VoD -> remoteDatasource.getCachedSports()?.vods?.find { it.getId() == identifier.id }
+            is ContentIdentifier.Event -> remoteDatasource.getCachedSports()?.events?.find { it.getId() == identifier.id }
             else -> null
         }
 
@@ -172,8 +172,8 @@ class MammRepositoryImpl @Inject constructor (
 
     override fun findKidsContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
-            is ContentIdentifier.VoD -> remoteDatasource.getCachedKids()?.vods?.find { it.id == identifier.id }
-            is ContentIdentifier.Event -> remoteDatasource.getCachedKids()?.events?.find { it.id == identifier.id }
+            is ContentIdentifier.VoD -> remoteDatasource.getCachedKids()?.vods?.find { it.getId() == identifier.id }
+            is ContentIdentifier.Event -> remoteDatasource.getCachedKids()?.events?.find { it.getId() == identifier.id }
             else -> null
             }
 

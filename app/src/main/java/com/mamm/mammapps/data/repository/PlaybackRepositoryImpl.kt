@@ -22,6 +22,7 @@ import javax.crypto.spec.SecretKeySpec
 import javax.inject.Inject
 import android.util.Base64
 import com.mamm.mammapps.data.config.Config
+import com.mamm.mammapps.data.model.player.GetTickersResponse
 import java.time.format.DateTimeFormatter
 
 class PlaybackRepositoryImpl @Inject constructor (
@@ -128,6 +129,14 @@ class PlaybackRepositoryImpl @Inject constructor (
         }.onFailure { exception ->
             logger.error(TAG, "error getting DRM URL $exception.message")
 
+        }
+    }
+
+    override suspend fun getTickers() : Result<GetTickersResponse> {
+        return runCatching {
+            remoteDatasource.getTickers()
+        }.onFailure {
+            logger.error(TAG, "error getting tickers $it.message")
         }
     }
 

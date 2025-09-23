@@ -16,7 +16,7 @@ import com.mamm.mammapps.data.model.Metadata
 import com.mamm.mammapps.ui.theme.Dimensions
 
 @Composable
-fun DurationYearRatingRow(metadata: Metadata) {
+fun DurationYearRatingRow(metadata: Metadata, textcolor: Color = Color.White) {
     val items = buildList {
         if (metadata.durationMin.isNotBlank()) {
             add(stringResource(R.string.duration_minutes, metadata.durationMin))

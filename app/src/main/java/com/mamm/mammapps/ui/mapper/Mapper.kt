@@ -72,7 +72,7 @@ fun EPGEvent.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
     aspectRatio = Ratios.VERTICAL,
     height = Dimensions.contentEntityHeight,
     identifier = ContentIdentifier.Event(
-        id
+        getId()
     ),
     detailInfo = DetailInfoUI(
         metadata = getMetadata(),
@@ -88,7 +88,7 @@ fun SectionVod.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
     aspectRatio = Ratios.VERTICAL,
     height = Dimensions.contentEntityHeight,
     identifier = ContentIdentifier.VoD(
-        id
+        getId()
     ),
     detailInfo = DetailInfoUI(
         description = getDescription(),
