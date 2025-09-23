@@ -14,7 +14,8 @@ enum class AppRoute {
     DIAGNOSTICS,
     PLAYER,
     DETAIL,
-    LOGIN;
+    LOGIN,
+    LOGOUT;
 
     val route: String
         get() = name.lowercase()
