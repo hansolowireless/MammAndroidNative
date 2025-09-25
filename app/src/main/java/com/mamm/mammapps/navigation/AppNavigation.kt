@@ -1,30 +1,11 @@
 package com.mamm.mammapps.navigation
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,43 +13,31 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.tv.material3.MaterialTheme
-import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.data.model.Event
 import com.mamm.mammapps.data.model.Serie
 import com.mamm.mammapps.data.model.VoD
+import com.mamm.mammapps.data.model.section.SectionVod
+import com.mamm.mammapps.navigation.extension.addContent
+import com.mamm.mammapps.navigation.extension.addRoute
 import com.mamm.mammapps.ui.component.LocalIsTV
-import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
 import com.mamm.mammapps.ui.mapper.toContentEntityUI
 import com.mamm.mammapps.ui.screen.VideoPlayerScreen
 import com.mamm.mammapps.ui.mapper.toContentToPlayUI
-import com.mamm.mammapps.ui.model.AppRoute
+import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.screen.DetailScreen
 import com.mamm.mammapps.ui.screen.EPGScreen
 import com.mamm.mammapps.ui.screen.HomeScreen
@@ -154,21 +123,19 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
         HomeScreen(
             onContentClicked = { content ->
                 when (content) {
-                    is Serie,
-                    is VoD,
-                    is Event -> {
-                        navController.navigate(AppRoute.DETAIL.route) {
-                            launchSingleTop = true
-                        }
-                    }
-
                     is Channel -> {
                         navController.navigate(AppRoute.PLAYER.route) {
                             launchSingleTop = true
                         }
                     }
+                    else -> {
+                        navController.navigate(AppRoute.DETAIL.route) {
+                            launchSingleTop = true
+                        }
+                    }
                 }
-                navController.currentBackStackEntry?.savedStateHandle?.set("content", content)
+                navController.currentBackStackEntry?.savedStateHandle?.addContent(content)
+                navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.HOME)
             }
         )
     }
@@ -180,7 +147,8 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                 navController.navigate(AppRoute.DETAIL.route) {
                     launchSingleTop = true
                 }
-                navController.currentBackStackEntry?.savedStateHandle?.set("content", content)
+                navController.currentBackStackEntry?.savedStateHandle?.addContent(content)
+                navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.MOVIES)
             }
         )
     }
@@ -193,6 +161,7 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                     launchSingleTop = true
                 }
                 navController.currentBackStackEntry?.savedStateHandle?.set("content", content)
+                navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.DOCUMENTARIES)
             }
         )
     }
@@ -205,6 +174,7 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                     launchSingleTop = true
                 }
                 navController.currentBackStackEntry?.savedStateHandle?.set("content", content)
+                navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.SPORTS)
             }
         )
     }
@@ -216,7 +186,8 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                 navController.navigate(AppRoute.DETAIL.route) {
                     launchSingleTop = true
                 }
-                navController.currentBackStackEntry?.savedStateHandle?.set("content", content)
+                navController.currentBackStackEntry?.savedStateHandle?.addContent(content)
+                navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.KIDS)
             }
         )
     }
@@ -228,7 +199,8 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                 navController.navigate(AppRoute.DETAIL.route) {
                     launchSingleTop = true
                 }
-                navController.currentBackStackEntry?.savedStateHandle?.set("content", content)
+                navController.currentBackStackEntry?.savedStateHandle?.addContent(content)
+                navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.ADULTS)
             }
         )
     }
@@ -238,20 +210,30 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
             backStackEntry.savedStateHandle.get<Any>("content")
         }
 
-        contentItem?.let {
+        val route = remember(backStackEntry) {
+            backStackEntry.savedStateHandle.get<AppRoute>("route")
+        }
+
+        if (contentItem != null && route != null) {
             DetailScreen(
-                content = when (it) {
-                    is VoD -> it.toContentEntityUI()
-                    is Event -> it.toContentEntityUI()
-                    is EPGEvent -> it.toContentEntityUI()
-                    is Serie -> it.toContentEntityUI()
-                    else -> return@composable
+                content = when (contentItem) {
+                    is VoD -> contentItem.toContentEntityUI()
+                    is Event -> contentItem.toContentEntityUI()
+                    is EPGEvent -> contentItem.toContentEntityUI()
+                    is Serie -> contentItem.toContentEntityUI()
+                    else -> return@composable // Or handle error appropriately
                 },
-                onPlayClick = {
-                    TODO()
-                }
+                onClickPlay = { content ->
+                    navController.navigate(AppRoute.PLAYER.route) {
+                        launchSingleTop = true
+                    }
+                    navController.currentBackStackEntry?.savedStateHandle?.addContent(content)
+                },
+                routeTag = route
             )
-        } ?: Text("No content available")
+        } else {
+            Text("No content available or route is missing")
+        }
     }
 
     composable(AppRoute.EPG.route) {
@@ -269,6 +251,8 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                     is VoD -> it.toContentToPlayUI()
                     is Event -> it.toContentToPlayUI()
                     is Channel -> it.toContentToPlayUI()
+                    is EPGEvent -> it.toContentToPlayUI()
+                    is SectionVod -> it.toContentToPlayUI()
                     else -> return@composable
                 }
             )

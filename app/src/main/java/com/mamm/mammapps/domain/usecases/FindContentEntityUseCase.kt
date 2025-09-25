@@ -2,7 +2,7 @@ package com.mamm.mammapps.domain.usecases
 
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.interfaces.MammRepository
-import com.mamm.mammapps.ui.model.AppRoute
+import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import javax.inject.Inject
 

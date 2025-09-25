@@ -5,9 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -19,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -36,7 +39,9 @@ import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.ui.component.common.PrimaryButton
 import com.mamm.mammapps.ui.component.detail.SeasonTabs
 import com.mamm.mammapps.ui.component.metadata.ActorCard
+import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.model.ContentEntityUI
+import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.viewmodel.DetailViewModel
 
@@ -44,12 +49,20 @@ import com.mamm.mammapps.ui.viewmodel.DetailViewModel
 fun DetailScreen(
     viewModel: DetailViewModel = hiltViewModel(),
     content: ContentEntityUI,
-    onPlayClick: () -> Unit
+    routeTag: AppRoute,
+    onClickPlay: (Any) -> Unit
 ) {
 
     val seasonInfoUIState by viewModel.seasonInfoUIState.collectAsStateWithLifecycle()
+    val clickedContent by viewModel.clickedContent.collectAsStateWithLifecycle()
 
     val scrollState = rememberScrollState()
+
+    LaunchedEffect (clickedContent) {
+        if (clickedContent != null) {
+            onClickPlay(clickedContent!!)
+        }
+    }
 
     LaunchedEffect(Unit) {
         scrollState.scrollTo(0) // Fuerza el scroll al inicio
@@ -57,6 +70,12 @@ fun DetailScreen(
 
     LaunchedEffect(Unit) {
         viewModel.getSeasonInfo(content)
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.clearClickedContent()
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -149,19 +168,28 @@ fun DetailScreen(
                     )
                 }
 
-                // Botón de reproducir
-                PrimaryButton(
-                    text = stringResource(R.string.play),
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Default.PlayArrow,
-                            contentDescription = stringResource(R.string.play_icon_content_description),
-                            tint = Color.White,
-                            modifier = Modifier.padding(end = Dimensions.paddingXSmall)
-                        )
-                    },
-                    onClick = onPlayClick
-                )
+                Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
+
+                // Botón de reproducir, solo si no es serie
+                if (content.identifier !is ContentIdentifier.Serie) {
+                    PrimaryButton(
+                        text = stringResource(R.string.play),
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.PlayArrow,
+                                contentDescription = stringResource(R.string.play_icon_content_description),
+                                tint = Color.White,
+                                modifier = Modifier.padding(end = Dimensions.paddingXSmall)
+                            )
+                        },
+                        onClick = {
+                            viewModel.findContent(
+                                entityUI = content,
+                                routeTag = routeTag
+                            )
+                        }
+                    )
+                }
 
                 // Sección de reparto
                 content.detailInfo?.metadata?.let { metadata ->

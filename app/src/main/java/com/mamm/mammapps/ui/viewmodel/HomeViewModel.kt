@@ -17,7 +17,7 @@ import com.mamm.mammapps.domain.usecases.GetMoviesUseCase
 import com.mamm.mammapps.domain.usecases.GetSportsUseCase
 import com.mamm.mammapps.ui.common.UIState
 import com.mamm.mammapps.ui.mapper.toContentEntityUI
-import com.mamm.mammapps.ui.model.AppRoute
+import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.ContentRowUI

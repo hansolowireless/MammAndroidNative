@@ -10,6 +10,7 @@ import com.mamm.mammapps.data.model.GetSeasonInfoResponse
 import com.mamm.mammapps.data.model.section.SectionVod
 import com.mamm.mammapps.data.model.Serie
 import com.mamm.mammapps.data.model.VoD
+import com.mamm.mammapps.data.model.serie.Episode
 import com.mamm.mammapps.domain.usecases.GetSeasonsInfoUseCase
 import com.mamm.mammapps.ui.extension.adult
 import com.mamm.mammapps.ui.extension.landscape
@@ -30,18 +31,18 @@ import com.mamm.mammapps.util.orRandom
 
 //--------------------region Home------------------------
 fun Channel.toContentEntityUI() = ContentEntityUI(
+    identifier = ContentIdentifier.Channel(id.orRandom()),
     imageUrl = logoURL?.landscape() ?: "",
     title = name ?: "",
     detailInfo = DetailInfoUI(squareLogo = logoURL?.squared()),
-    identifier = ContentIdentifier.Channel(id.orRandom())
 )
 
 fun VoD.toContentEntityUI() = ContentEntityUI(
+    identifier = ContentIdentifier.VoD(id.orRandom()),
     imageUrl = posterURL ?: "",
     title = title ?: "",
     aspectRatio = Ratios.VERTICAL,
     height = Dimensions.contentEntityHeight,
-    identifier = ContentIdentifier.VoD(id.orRandom()),
     detailInfo = DetailInfoUI(
         metadata = metadata,
         description = longDesc.orEmpty()
@@ -49,11 +50,11 @@ fun VoD.toContentEntityUI() = ContentEntityUI(
 )
 
 fun Event.toContentEntityUI() = ContentEntityUI(
+    identifier = ContentIdentifier.Event(id.orRandom()),
     imageUrl = logoURL.orEmpty(),
     title = title.orEmpty(),
     aspectRatio = Ratios.VERTICAL,
     height = Dimensions.contentEntityHeight,
-    identifier = ContentIdentifier.Event(id.orRandom()),
     detailInfo = DetailInfoUI(
         subtitle = subtitle.orEmpty(),
         description = description.orEmpty()
@@ -61,6 +62,7 @@ fun Event.toContentEntityUI() = ContentEntityUI(
 )
 
 fun Serie.toContentEntityUI() = ContentEntityUI(
+    identifier = ContentIdentifier.Serie(id.orRandom()),
     imageUrl = serieLogoUrl.orEmpty(),
     title = title.orEmpty(),
     detailInfo = DetailInfoUI(
@@ -68,19 +70,18 @@ fun Serie.toContentEntityUI() = ContentEntityUI(
     ),
     aspectRatio = Ratios.HORIZONTAL,
     height = Dimensions.channelEntityHeight,
-    identifier = ContentIdentifier.Serie(id.orRandom())
 )
 
 fun EPGEvent.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
+    identifier = ContentIdentifier.Event(
+        getId()
+    ),
     imageUrl = (posterLogo?.takeIf { it.isNotBlank() }
         ?: eventLogoUrl500?.takeIf { it.isNotBlank() })
         .orEmpty().adult(isAdult),
     title = getTitle(),
     aspectRatio = Ratios.VERTICAL,
     height = Dimensions.contentEntityHeight,
-    identifier = ContentIdentifier.Event(
-        getId()
-    ),
     detailInfo = DetailInfoUI(
         metadata = getMetadata(),
         description = getDescription()
@@ -112,14 +113,25 @@ fun Channel.toContentEPGUI() = ContentEPGUI(
     imageUrl = logoURL?.squared() ?: ""
 )
 
-//-------------------------region ContentAsList----------------------------
+//-------------------------region ContentAsListItem----------------------------
 fun EPGEvent.toContentListUI () = ContentListUI(
-    identifier = ContentIdentifier.Event(getId().orRandom()),
+    identifier = ContentIdentifier.Event(getId()),
     imageUrl = eventLogoUrl500?.takeIf { it.isNotBlank() }
         .orEmpty(),
     title = getTitle(),
+    detailInfo = DetailInfoUI(
+        description = getDescription()
+    )
 )
 
+fun Episode.toContentListUI() = ContentListUI(
+    identifier = ContentIdentifier.VoD(getId()),
+    imageUrl = contentLogo.orEmpty(),
+    title = getTitle(),
+    detailInfo = DetailInfoUI(
+        description = getDescription()
+    )
+)
 //-------------------------endregion ContentAsList-------------------------
 
 
@@ -154,6 +166,21 @@ fun Event.toContentToPlayUI() = ContentToPlayUI(
     imageUrl = logoURL ?: "",
     //It's used to get the start and end dates in order to build the catchup URL
     epgEventInfo = this.toLiveEventInfoUI()
+)
+
+fun EPGEvent.toContentToPlayUI() = ContentToPlayUI(
+    identifier = ContentIdentifier.Event(getId()),
+    deliveryURL = this.deliveryUrl.orEmpty(),
+    title = this.getTitle(),
+    imageUrl = this.eventLogoUrl500.orEmpty(),
+    epgEventInfo = this.toLiveEventInfoUI()
+)
+
+fun SectionVod.toContentToPlayUI() = ContentToPlayUI(
+    identifier = ContentIdentifier.VoD(getId()),
+    deliveryURL = this.deliveryURL.orEmpty(),
+    title = this.getTitle(),
+    imageUrl = this.posterLogo.orEmpty(),
 )
 
 //------------------------LIVE EVENT INFO------------------------
@@ -224,13 +251,9 @@ fun GetOtherContentResponse.toContentUIRows(
 fun GetSeasonInfoResponse.toSeasonUIList(): List<SeasonUI> {
     val list = this.tbSeasons?.map{ tbSeason ->
 
-        val episodes : List<ContentEntityUI> = tbSeason.tbContentSeasons?.map { tbContentSeason ->
-            ContentEntityUI(
-                identifier = ContentIdentifier.VoD(tbContentSeason.contentDetails?.getId().orRandom()),
-                imageUrl = tbContentSeason.contentDetails?.contentLogo.orEmpty(),
-                title = tbContentSeason.contentDetails?.getTitle().orEmpty(),
-            )
-        } ?: emptyList()
+        val episodes: List<ContentListUI> = tbSeason.tbContentSeasons?.map { tbContentSeason ->
+            tbContentSeason.contentDetails?.toContentListUI()
+        }?.filterNotNull() ?: emptyList()
 
         SeasonUI(
             order = tbSeason.getOrder(),

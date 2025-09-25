@@ -77,7 +77,7 @@ data class Episode(
     }
 
     fun getTitle(): String {
-        return contentLogoTitle ?: ""
+        return tbContentLanguages?.first()?.title.orEmpty()
     }
 
     fun getDescription(): String {

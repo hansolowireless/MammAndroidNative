@@ -45,7 +45,8 @@ data class TbSeason(
     }
 
     fun getTitle(): String {
-        return tbSeasonLanguages?.firstOrNull()?.title ?: ""
+        //return tbSeasonLanguages?.firstOrNull()?.title ?: ""
+        return "Temporada " + getOrder()
     }
 
 }

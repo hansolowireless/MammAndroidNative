@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,7 +19,7 @@ import com.mamm.mammapps.ui.common.UIState
 import com.mamm.mammapps.ui.component.HomeGridBottom
 import com.mamm.mammapps.ui.component.HomeGridTop
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
-import com.mamm.mammapps.ui.model.AppRoute
+import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.viewmodel.HomeViewModel
 
 @Composable

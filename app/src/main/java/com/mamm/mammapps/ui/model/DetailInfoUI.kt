@@ -6,6 +6,5 @@ data class DetailInfoUI (
     val squareLogo: String? = null,
     val subtitle: String = "",
     val description: String = "",
-    val metadata: Metadata? = null,
-    val seasons: List<SeasonUI> = emptyList()
+    val metadata: Metadata? = null
 )

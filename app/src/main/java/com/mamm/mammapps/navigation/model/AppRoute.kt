@@ -1,4 +1,4 @@
-package com.mamm.mammapps.ui.model
+package com.mamm.mammapps.navigation.model
 
 enum class AppRoute {
     HOME,

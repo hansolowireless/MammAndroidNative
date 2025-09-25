@@ -10,8 +10,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.epg.EPGChannelContent
 import com.mamm.mammapps.ui.common.UIState
 import com.mamm.mammapps.ui.component.epg.EPGContent
@@ -45,7 +47,7 @@ fun EPGScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Error loading EPG data",
+                    text = stringResource(R.string.error_loading_epg),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }

@@ -19,8 +19,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,7 +35,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.mamm.mammapps.R
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
 import com.mamm.mammapps.ui.component.navigation.CustomTVNavigationItem
-import com.mamm.mammapps.ui.model.AppRoute
+import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.theme.Dimensions
 
 @Composable

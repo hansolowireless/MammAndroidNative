@@ -21,6 +21,11 @@ object ButtonColor {
     val background = Primary
 }
 
+object ContentEntityListItemColor {
+    val focusedContent = Color.White.copy(alpha = 0.2f)
+    val unfocusedContent = Color.Transparent
+}
+
 object ContentEntityColor {
     val text = Color.White
     val glow = Color.White
@@ -34,4 +39,8 @@ object HomeGridTopColor {
 
 object HomeGridBottomColor {
     val rowTitle = Outlined
+}
+
+object SeasonSelectorTabs {
+    val tabTitle = Color.White
 }

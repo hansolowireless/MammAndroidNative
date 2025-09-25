@@ -45,4 +45,8 @@
     <string name="nav_diagnostics">Diagnóstico de Conexión</string>
     <string name="nav_change_user">Cambiar usuario</string>
 
+    <!--Error-->
+    <string name="error_loading_epg">Error cargando la Guía</string>
+
+
 </resources>

@@ -53,9 +53,21 @@ class GetPlayableUrlUseCase @Inject constructor(
             return playableUrl
         }
 
-        val event = content.epgEventInfo ?: return playableUrl
-        val startTime = event.eventStart ?: return playableUrl
-        val endTime = event.eventEnd ?: return playableUrl
+        val event = content.epgEventInfo ?: run {
+            logger.debug(TAG, "tuneUrlToCatchupIfNeeded EPG event info is null, will not be tuned")
+            return playableUrl
+        }
+
+        val startTime = event.eventStart ?: run {
+            logger.debug(TAG, "tuneUrlToCatchupIfNeeded Event start time is null, will not be tuned")
+            return playableUrl
+        }
+
+        val endTime = event.eventEnd ?: run {
+            logger.debug(TAG, "tuneUrlToCatchupIfNeeded Event end time is null, will not be tuned")
+            return playableUrl
+        }
+
 
         if (endTime.isBefore(startTime)) {
             throw IllegalArgumentException("End time cannot be before start time")
