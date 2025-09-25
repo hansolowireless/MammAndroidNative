@@ -61,6 +61,7 @@ import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.data.model.Event
+import com.mamm.mammapps.data.model.Serie
 import com.mamm.mammapps.data.model.VoD
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
@@ -153,12 +154,10 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
         HomeScreen(
             onContentClicked = { content ->
                 when (content) {
+                    is Serie,
                     is VoD,
                     is Event -> {
-//                        navController.navigate(AppRoute.DETAIL.route) {
-//                            launchSingleTop = true
-//                        }
-                        navController.navigate(AppRoute.PLAYER.route) {
+                        navController.navigate(AppRoute.DETAIL.route) {
                             launchSingleTop = true
                         }
                     }
@@ -245,6 +244,7 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                     is VoD -> it.toContentEntityUI()
                     is Event -> it.toContentEntityUI()
                     is EPGEvent -> it.toContentEntityUI()
+                    is Serie -> it.toContentEntityUI()
                     else -> return@composable
                 },
                 onPlayClick = {

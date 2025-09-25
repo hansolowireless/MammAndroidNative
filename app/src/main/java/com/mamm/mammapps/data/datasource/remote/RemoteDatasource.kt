@@ -17,6 +17,7 @@ import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.GetEPGResponse
+import com.mamm.mammapps.data.model.GetSeasonInfoResponse
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
@@ -41,7 +42,7 @@ import javax.inject.Singleton
 class RemoteDatasource @Inject constructor(
     @IdmApi private val idmApi: ApiService,
     @LocatorApi private val locatorApi: ApiService,
-    @BaseUrlApi private val epgApi: ApiService,
+    @BaseUrlApi private val baseUrlApi: ApiService,
     @NoBaseUrlApi private val noBaseUrlApi: ApiService,
     @NoBaseUrlNoRedirectApi private val clmApi: ApiService,
     @DeviceTypeQualifier private val deviceType: String,
@@ -109,7 +110,7 @@ class RemoteDatasource @Inject constructor(
 
     suspend fun getChannelEPG(channelId: Int, date: LocalDate): GetEPGResponse {
         return withContext(Dispatchers.IO) {
-            val response = epgApi.getEPG(channelId, date.toEPGRequestDate())
+            val response = baseUrlApi.getEPG(channelId, date.toEPGRequestDate())
 
             if (!response.isSuccessful) {
                 val errorBody = response.errorBody()?.string()?.toResponseBody()
@@ -126,7 +127,7 @@ class RemoteDatasource @Inject constructor(
 
             cachedMoviesContent?.let { return@withContext it }
 
-            val response = epgApi.getMovies(jsonParam)
+            val response = baseUrlApi.getMovies(jsonParam)
             if (!response.isSuccessful) {
                 val errorBody = response.errorBody()?.string()?.toResponseBody()
                 throw HttpException(Response.error<Any>(response.code(), errorBody))
@@ -148,7 +149,7 @@ class RemoteDatasource @Inject constructor(
 
             cachedDocumentariesContent?.let { return@withContext it }
 
-            val response = epgApi.getDocumentaries(jsonParam)
+            val response = baseUrlApi.getDocumentaries(jsonParam)
             if (!response.isSuccessful) {
                 val errorBody = response.errorBody()?.string()?.toResponseBody()
                 throw HttpException(Response.error<Any>(response.code(), errorBody))
@@ -168,7 +169,7 @@ class RemoteDatasource @Inject constructor(
     suspend fun getSports(jsonParam: String): GetOtherContentResponse {
         return withContext(Dispatchers.IO) {
             cachedSportsContent?.let { return@withContext it }
-            val response = epgApi.getSports(jsonParam)
+            val response = baseUrlApi.getSports(jsonParam)
             if (!response.isSuccessful) {
                 val errorBody = response.errorBody()?.string()?.toResponseBody()
                 throw HttpException(Response.error<Any>(response.code(), errorBody))
@@ -189,7 +190,7 @@ class RemoteDatasource @Inject constructor(
 
             cachedKidsContent?.let { return@withContext it }
 
-            val response = epgApi.getKids(jsonParam)
+            val response = baseUrlApi.getKids(jsonParam)
             if (!response.isSuccessful) {
                 val errorBody = response.errorBody()?.string()?.toResponseBody()
                 throw HttpException(Response.error<Any>(response.code(), errorBody))
@@ -210,7 +211,7 @@ class RemoteDatasource @Inject constructor(
         return withContext(Dispatchers.IO) {
 
             cachedAdultsContent?.let { return@withContext it }
-            val response = epgApi.getAdults(jsonParam)
+            val response = baseUrlApi.getAdults(jsonParam)
             if (!response.isSuccessful) {
                 val errorBody = response.errorBody()?.string()?.toResponseBody()
                 throw HttpException(Response.error<Any>(response.code(), errorBody))
@@ -223,6 +224,19 @@ class RemoteDatasource @Inject constructor(
 
     fun getCachedAdults(): GetOtherContentResponse? {
         return cachedAdultsContent
+    }
+
+    //----------SERIES - SEASON CONTENT---------//
+    suspend fun getSeasonInfo(serieId: Int): GetSeasonInfoResponse {
+        return withContext(Dispatchers.IO) {
+            val response = baseUrlApi.getSeasonContent(serieId.toString())
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()?.string()?.toResponseBody()
+                throw HttpException(Response.error<Any>(response.code(), errorBody))
+            }
+            val seasonData = response.body() ?: throw IllegalStateException("Response body is null")
+            seasonData
+        }
     }
 
 

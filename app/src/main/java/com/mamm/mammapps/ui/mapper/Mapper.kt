@@ -6,17 +6,21 @@ import com.mamm.mammapps.data.model.Event
 import com.mamm.mammapps.data.model.Genre
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
+import com.mamm.mammapps.data.model.GetSeasonInfoResponse
 import com.mamm.mammapps.data.model.section.SectionVod
 import com.mamm.mammapps.data.model.Serie
 import com.mamm.mammapps.data.model.VoD
+import com.mamm.mammapps.domain.usecases.GetSeasonsInfoUseCase
 import com.mamm.mammapps.ui.extension.adult
 import com.mamm.mammapps.ui.extension.landscape
 import com.mamm.mammapps.ui.extension.squared
 import com.mamm.mammapps.ui.model.ContentEPGUI
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
+import com.mamm.mammapps.ui.model.ContentListUI
 import com.mamm.mammapps.ui.model.ContentRowUI
 import com.mamm.mammapps.ui.model.DetailInfoUI
+import com.mamm.mammapps.ui.model.SeasonUI
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import com.mamm.mammapps.ui.model.player.FingerPrintInfoUI
 import com.mamm.mammapps.ui.model.player.LiveEventInfoUI
@@ -24,7 +28,7 @@ import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.Ratios
 import com.mamm.mammapps.util.orRandom
 
-//--------------------Home------------------------
+//--------------------region Home------------------------
 fun Channel.toContentEntityUI() = ContentEntityUI(
     imageUrl = logoURL?.landscape() ?: "",
     title = name ?: "",
@@ -59,6 +63,9 @@ fun Event.toContentEntityUI() = ContentEntityUI(
 fun Serie.toContentEntityUI() = ContentEntityUI(
     imageUrl = serieLogoUrl.orEmpty(),
     title = title.orEmpty(),
+    detailInfo = DetailInfoUI(
+        description = longDesc.orEmpty()
+    ),
     aspectRatio = Ratios.HORIZONTAL,
     height = Dimensions.channelEntityHeight,
     identifier = ContentIdentifier.Serie(id.orRandom())
@@ -95,6 +102,8 @@ fun SectionVod.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
         metadata = getMetadata()
     )
 )
+//--------------------endregion Home------------------------
+
 
 //-------------------------EPG----------------------------
 fun Channel.toContentEPGUI() = ContentEPGUI(
@@ -103,8 +112,18 @@ fun Channel.toContentEPGUI() = ContentEPGUI(
     imageUrl = logoURL?.squared() ?: ""
 )
 
+//-------------------------region ContentAsList----------------------------
+fun EPGEvent.toContentListUI () = ContentListUI(
+    identifier = ContentIdentifier.Event(getId().orRandom()),
+    imageUrl = eventLogoUrl500?.takeIf { it.isNotBlank() }
+        .orEmpty(),
+    title = getTitle(),
+)
 
-//------------------------PLAYBACK------------------------
+//-------------------------endregion ContentAsList-------------------------
+
+
+//-----------region PLAYBACK-------------------
 fun Channel.toContentToPlayUI() = ContentToPlayUI(
     identifier = ContentIdentifier.Channel(id.orRandom()),
     deliveryURL = this.deliveryURL ?: "",
@@ -152,6 +171,7 @@ fun Event.toLiveEventInfoUI(): LiveEventInfoUI = LiveEventInfoUI(
     eventStart = this.startDateTime,
     eventEnd = this.endDateTime
 )
+//----------endregion PLAYBACK----------------------
 
 fun GetHomeContentResponse.toContentUIRows(): List<ContentRowUI> {
     return categories?.mapNotNull { category ->
@@ -201,5 +221,26 @@ fun GetOtherContentResponse.toContentUIRows(
     return rows
 }
 
+fun GetSeasonInfoResponse.toSeasonUIList(): List<SeasonUI> {
+    val list = this.tbSeasons?.map{ tbSeason ->
 
+        val episodes : List<ContentEntityUI> = tbSeason.tbContentSeasons?.map { tbContentSeason ->
+            ContentEntityUI(
+                identifier = ContentIdentifier.VoD(tbContentSeason.contentDetails?.getId().orRandom()),
+                imageUrl = tbContentSeason.contentDetails?.contentLogo.orEmpty(),
+                title = tbContentSeason.contentDetails?.getTitle().orEmpty(),
+            )
+        } ?: emptyList()
+
+        SeasonUI(
+            order = tbSeason.getOrder(),
+            title = tbSeason.getTitle(),
+            imageUrl = tbSeason.seasonLogoTitleUrl.orEmpty(),
+            episodes = episodes
+        )
+
+    }
+
+    return list.orEmpty()
+}
 

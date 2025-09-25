@@ -161,6 +161,7 @@ data class Event(
         get() = fcEnd?.toZonedDateTimeEPG()
 }
 
+@Parcelize
 data class Serie(
     @SerializedName("subgenreById") val subgenreById: Int? = null,
     @SerializedName("featured") val featured: Int? = null,
@@ -171,4 +172,4 @@ data class Serie(
     @SerializedName("id") val id: Int? = null,
     @SerializedName("title") val title: String? = null,
     @SerializedName("longDesc") val longDesc: String? = null
-)
+) : Parcelable

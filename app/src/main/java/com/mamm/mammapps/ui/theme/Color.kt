@@ -15,6 +15,11 @@ val Secondary = Color.White
 val Outlined = Color(0xFF625b71)
 val TextPrimary = Color.White
 
+object ButtonColor {
+    val focusedContent = Color.Black
+    val unfocusedContent = Color.Black
+    val background = Primary
+}
 
 object ContentEntityColor {
     val text = Color.White

@@ -75,14 +75,6 @@ data class EPGEvent(
     val idSubgenre: String? = null
 ) : Parcelable {
 
-    init {
-        println("=== EPGEvent Created ===")
-        println("idEvent: '$idEvent'")
-        println("idChannel: '$idChannel'")
-        println("featured: '$featured'")
-        println("========================")
-    }
-
     fun getId(): Int = idEvent?.toIntOrNull() ?: idEvent?.hashCode() ?: 0
 
     // Propiedades calculadas para fechas

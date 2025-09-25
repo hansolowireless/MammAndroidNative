@@ -1,0 +1,27 @@
+package com.mamm.mammapps.data.model.serie
+
+import android.os.Parcelable
+import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
+
+
+@Parcelize
+data class TbSeasonLanguage(
+    @SerializedName("id_season_lang")
+    val idSeasonLang: String? = null,
+
+    @SerializedName("id_season")
+    val idSeason: String? = null,
+
+    @SerializedName("subtitle")
+    val subtitle: String? = null,
+
+    @SerializedName("id_language")
+    val idLanguage: String? = null,
+
+    @SerializedName("description")
+    val description: String? = null,
+
+    @SerializedName("title")
+    val title: String? = null
+) : Parcelable

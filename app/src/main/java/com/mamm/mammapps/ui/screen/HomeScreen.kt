@@ -19,6 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamm.mammapps.ui.common.UIState
 import com.mamm.mammapps.ui.component.HomeGridBottom
 import com.mamm.mammapps.ui.component.HomeGridTop
+import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.ui.model.AppRoute
 import com.mamm.mammapps.ui.viewmodel.HomeViewModel
 
@@ -66,9 +67,7 @@ fun HomeScreen(
     ) {
         when (homeContentState) {
             is UIState.Loading -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                LoadingSpinner()
             }
 
             is UIState.Error -> {

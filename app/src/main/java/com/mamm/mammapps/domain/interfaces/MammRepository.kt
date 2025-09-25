@@ -4,6 +4,7 @@ import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.Genre
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
+import com.mamm.mammapps.data.model.GetSeasonInfoResponse
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginResponse
 import com.mamm.mammapps.ui.model.ContentIdentifier
@@ -21,6 +22,7 @@ interface MammRepository {
     suspend fun getDocumentaries(): Result<GetOtherContentResponse>
     suspend fun getKids(): Result<GetOtherContentResponse>
     suspend fun getSports(): Result<GetOtherContentResponse>
+    suspend fun getSeasonsInfo(serieId: Int): Result<GetSeasonInfoResponse>
 
     fun findHomeContent(identifier: ContentIdentifier): Result<Any>?
     fun findMovieContent(identifier: ContentIdentifier): Result<Any>?

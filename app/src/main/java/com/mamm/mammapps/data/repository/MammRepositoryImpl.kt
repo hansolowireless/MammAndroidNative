@@ -9,6 +9,7 @@ import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.Genre
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
+import com.mamm.mammapps.data.model.GetSeasonInfoResponse
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginResponse
 import com.mamm.mammapps.data.session.SessionManager
@@ -116,6 +117,14 @@ class MammRepositoryImpl @Inject constructor (
             remoteDatasource.getSports(jsonParam)
         }.onSuccess { response ->
             logger.debug(TAG, "getSports Received and saved successful response")
+        }
+    }
+
+    override suspend fun getSeasonsInfo(serieId: Int) : Result<GetSeasonInfoResponse> {
+        return runCatching {
+            remoteDatasource.getSeasonInfo(serieId)
+        }.onSuccess { response ->
+            logger.debug(TAG, "getSeasonsInfo Received successful response")
         }
     }
 

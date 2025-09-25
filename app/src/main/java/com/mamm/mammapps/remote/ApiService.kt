@@ -3,6 +3,7 @@ package com.mamm.mammapps.remote
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.GetEPGResponse
+import com.mamm.mammapps.data.model.GetSeasonInfoResponse
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
@@ -106,6 +107,16 @@ interface ApiService {
     suspend fun getAdults(
         @Path("jsonParam") jsonParam: String
     ): Response<GetOtherContentResponse>
+
+    // ---------- SEASON CONTENT ----------
+    @GET("epg_files/serie_{serieId}.json")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getSeasonContent(
+        @Path("serieId") jsonParam: String
+    ): Response<GetSeasonInfoResponse>
 
 
 //    // ---------- Bookmarks ----------

@@ -1,17 +1,20 @@
 package com.mamm.mammapps.ui.component.common
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
+import androidx.tv.material3.Text
 import com.mamm.mammapps.ui.component.LocalIsTV
-import com.mamm.mammapps.ui.theme.Primary
+import com.mamm.mammapps.ui.theme.ButtonColor
 
 @Composable
 fun PrimaryButton(
@@ -26,14 +29,25 @@ fun PrimaryButton(
         modifier = modifier
             .fillMaxWidth()
             .height(if (LocalIsTV.current) 80.dp else 48.dp),
+        glow = ButtonDefaults.glow(),
         colors = ButtonDefaults.colors(
-            containerColor = Primary,
-            contentColor = Color.Black
+            containerColor = ButtonColor.background,
+            focusedContainerColor = ButtonColor.background,
+            contentColor = ButtonColor.unfocusedContent,
+            focusedContentColor = ButtonColor.focusedContent
         )
     ) {
-        if (icon != null) {
-            icon()
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (icon != null) {
+                icon()
+            }
+            Text(
+                text = text
+            )
         }
-        Text(text)
     }
 }
