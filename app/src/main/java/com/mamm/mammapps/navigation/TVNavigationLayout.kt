@@ -1,9 +1,11 @@
 package com.mamm.mammapps.navigation
 
+import android.widget.Space
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,12 +22,15 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationRail
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -50,6 +55,9 @@ fun TVNavigationLayout(navController: NavHostController) {
         AppRoute.KIDS.route,
         AppRoute.SERIES.route,
         AppRoute.SPORTS.route,
+        AppRoute.SEARCH.route,
+        AppRoute.DIAGNOSTICS.route,
+        AppRoute.LASTSEVENDAYS.route,
         AppRoute.ADULTS.route
     )
     val showNavigationRail = currentRoute in sectionsWithMenu
@@ -58,189 +66,200 @@ fun TVNavigationLayout(navController: NavHostController) {
         targetValue = if (hasItemFocused) 200.dp else 80.dp,
         animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
     )
+    val scrollState = rememberScrollState()
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(hasItemFocused) {
+        scrollState.scrollTo(0)
+        if (hasItemFocused) {
+            kotlinx.coroutines.delay(50) // Espera a que se estabilice
+            focusRequester.requestFocus()
+        }
+    }
 
     Row {
         if (showNavigationRail) {
-            ProvideLazyListPivotOffset(parentFraction = 0.0f) {
-                NavigationRail(
-                    modifier = Modifier
-                        .width(railWidth)
-                        .fillMaxHeight()
-                        .verticalScroll(rememberScrollState())
-                        .padding(top = Dimensions.paddingSmall, bottom = 300.dp)
-                        .onFocusChanged { hasItemFocused = it.hasFocus }
-                ) {
-                    CustomTVNavigationItem(
-                        icon = {
-                            Icon(
-                                Icons.Default.Home,
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        },
-                        label = stringResource(R.string.nav_home),
-                        parentIsFocused = hasItemFocused,
-                        selected = currentRoute == AppRoute.HOME.route,
-                        onClick = { navController.navigate(AppRoute.HOME.route) }
-                    )
+            NavigationRail(
+                modifier = Modifier
+                    .width(railWidth)
+                    .fillMaxHeight()
+                    .verticalScroll(scrollState)
+                    .padding(top = 50.dp, bottom = 300.dp)
+                    .onFocusChanged { hasItemFocused = it.hasFocus }
+            ) {
 
-                    CustomTVNavigationItem(
-                        icon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.menu_calendaricon),
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        },
-                        label = stringResource(R.string.nav_epg),
-                        parentIsFocused = hasItemFocused,
-                        selected = currentRoute == AppRoute.EPG.route,
-                        onClick = { navController.navigate(AppRoute.EPG.route) }
-                    )
+                CustomTVNavigationItem(
+                    modifier = Modifier.focusRequester(focusRequester),
+                    icon = {
+                        Icon(
+                            Icons.Default.Home,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = stringResource(R.string.nav_home),
+                    parentIsFocused = hasItemFocused,
+                    selected = currentRoute == AppRoute.HOME.route,
+                    onClick = { navController.navigate(AppRoute.HOME.route) }
+                )
 
-                    CustomTVNavigationItem(
-                        icon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.menu_channelsicon),
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        },
-                        label = stringResource(R.string.nav_channels),
-                        parentIsFocused = hasItemFocused,
-                        selected = currentRoute == AppRoute.CHANNELS.route,
-                        onClick = { navController.navigate(AppRoute.CHANNELS.route) }
-                    )
+                CustomTVNavigationItem(
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.menu_calendaricon),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = stringResource(R.string.nav_epg),
+                    parentIsFocused = hasItemFocused,
+                    selected = currentRoute == AppRoute.EPG.route,
+                    onClick = { navController.navigate(AppRoute.EPG.route) }
+                )
 
-                    CustomTVNavigationItem(
-                        icon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.menu_cinemaicon),
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        },
-                        label = stringResource(R.string.nav_movies),
-                        parentIsFocused = hasItemFocused,
-                        selected = currentRoute == AppRoute.MOVIES.route,
-                        onClick = { navController.navigate(AppRoute.MOVIES.route) }
-                    )
+                CustomTVNavigationItem(
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.menu_channelsicon),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = stringResource(R.string.nav_channels),
+                    parentIsFocused = hasItemFocused,
+                    selected = currentRoute == AppRoute.CHANNELS.route,
+                    onClick = { navController.navigate(AppRoute.CHANNELS.route) }
+                )
 
-                    CustomTVNavigationItem(
-                        icon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.menu_documentariesicon),
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        },
-                        label = stringResource(R.string.nav_documentaries),
-                        parentIsFocused = hasItemFocused,
-                        selected = currentRoute == AppRoute.DOCUMENTARIES.route,
-                        onClick = { navController.navigate(AppRoute.DOCUMENTARIES.route) }
-                    )
+                CustomTVNavigationItem(
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.menu_cinemaicon),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = stringResource(R.string.nav_movies),
+                    parentIsFocused = hasItemFocused,
+                    selected = currentRoute == AppRoute.MOVIES.route,
+                    onClick = { navController.navigate(AppRoute.MOVIES.route) }
+                )
 
-                    CustomTVNavigationItem(
-                        icon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.menu_serieslogoicon),
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        },
-                        label = stringResource(R.string.nav_series),
-                        parentIsFocused = hasItemFocused,
-                        selected = currentRoute == AppRoute.SERIES.route,
-                        onClick = { navController.navigate(AppRoute.SERIES.route) }
-                    )
+                CustomTVNavigationItem(
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.menu_documentariesicon),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = stringResource(R.string.nav_documentaries),
+                    parentIsFocused = hasItemFocused,
+                    selected = currentRoute == AppRoute.DOCUMENTARIES.route,
+                    onClick = { navController.navigate(AppRoute.DOCUMENTARIES.route) }
+                )
 
-                    CustomTVNavigationItem(
-                        icon = {
-                            Icon(
-                                Icons.Default.Person,
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        },
-                        label = stringResource(R.string.nav_sports),
-                        parentIsFocused = hasItemFocused,
-                        selected = currentRoute == AppRoute.SPORTS.route,
-                        onClick = { navController.navigate(AppRoute.SPORTS.route) }
-                    )
+                CustomTVNavigationItem(
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.menu_serieslogoicon),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = stringResource(R.string.nav_series),
+                    parentIsFocused = hasItemFocused,
+                    selected = currentRoute == AppRoute.SERIES.route,
+                    onClick = { navController.navigate(AppRoute.SERIES.route) }
+                )
 
-                    CustomTVNavigationItem(
-                        icon = {
-                            Icon(
-                                Icons.Default.Person,
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        },
-                        label = stringResource(R.string.nav_adults),
-                        parentIsFocused = hasItemFocused,
-                        selected = currentRoute == AppRoute.ADULTS.route,
-                        onClick = { navController.navigate(AppRoute.ADULTS.route) }
-                    )
+                CustomTVNavigationItem(
+                    icon = {
+                        Icon(
+                            Icons.Default.Person,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = stringResource(R.string.nav_sports),
+                    parentIsFocused = hasItemFocused,
+                    selected = currentRoute == AppRoute.SPORTS.route,
+                    onClick = { navController.navigate(AppRoute.SPORTS.route) }
+                )
 
-                    CustomTVNavigationItem(
-                        icon = {
-                            Icon(
-                                Icons.Default.Person,
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        },
-                        label = stringResource(R.string.nav_kids),
-                        parentIsFocused = hasItemFocused,
-                        selected = currentRoute == AppRoute.KIDS.route,
-                        onClick = { navController.navigate(AppRoute.KIDS.route) }
-                    )
+                CustomTVNavigationItem(
+                    icon = {
+                        Icon(
+                            Icons.Default.Person,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = stringResource(R.string.nav_adults),
+                    parentIsFocused = hasItemFocused,
+                    selected = currentRoute == AppRoute.ADULTS.route,
+                    onClick = { navController.navigate(AppRoute.ADULTS.route) }
+                )
 
-                    CustomTVNavigationItem(
-                        icon = {
-                            Icon(
-                                Icons.Default.Search,
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        },
-                        label = stringResource(R.string.nav_search),
-                        parentIsFocused = hasItemFocused,
-                        selected = currentRoute == AppRoute.SEARCH.route,
-                        onClick = { navController.navigate(AppRoute.SEARCH.route) }
-                    )
+                CustomTVNavigationItem(
+                    icon = {
+                        Icon(
+                            Icons.Default.Person,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = stringResource(R.string.nav_kids),
+                    parentIsFocused = hasItemFocused,
+                    selected = currentRoute == AppRoute.KIDS.route,
+                    onClick = { navController.navigate(AppRoute.KIDS.route) }
+                )
 
-                    CustomTVNavigationItem(
-                        icon = {
-                            Icon(
-                                Icons.Default.Person,
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        },
-                        label = stringResource(R.string.nav_diagnostics),
-                        parentIsFocused = hasItemFocused,
-                        selected = currentRoute == AppRoute.DIAGNOSTICS.route,
-                        onClick = { navController.navigate(AppRoute.DIAGNOSTICS.route) }
-                    )
+                CustomTVNavigationItem(
+                    icon = {
+                        Icon(
+                            Icons.Default.Search,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = stringResource(R.string.nav_search),
+                    parentIsFocused = hasItemFocused,
+                    selected = currentRoute == AppRoute.SEARCH.route,
+                    onClick = { navController.navigate(AppRoute.SEARCH.route) }
+                )
 
-                    CustomTVNavigationItem(
-                        icon = {
-                            Icon(
-                                Icons.Default.Person,
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        },
-                        label = stringResource(R.string.nav_change_user),
-                        parentIsFocused = hasItemFocused,
-                        selected = currentRoute == AppRoute.LOGOUT.route,
-                        onClick = { navController.navigate(AppRoute.LOGOUT.route) }
-                    )
+                CustomTVNavigationItem(
+                    icon = {
+                        Icon(
+                            Icons.Default.Person,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = stringResource(R.string.nav_diagnostics),
+                    parentIsFocused = hasItemFocused,
+                    selected = currentRoute == AppRoute.DIAGNOSTICS.route,
+                    onClick = { navController.navigate(AppRoute.DIAGNOSTICS.route) }
+                )
 
-                    Spacer(modifier = Modifier.height(1000.dp))
-                }
+                CustomTVNavigationItem(
+                    icon = {
+                        Icon(
+                            Icons.Default.Person,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = stringResource(R.string.nav_change_user),
+                    parentIsFocused = hasItemFocused,
+                    selected = currentRoute == AppRoute.LOGOUT.route,
+                    onClick = { navController.navigate(AppRoute.LOGOUT.route) }
+                )
+
+                Spacer(modifier = Modifier.height(1000.dp))
             }
+
         }
 
         NavHost(

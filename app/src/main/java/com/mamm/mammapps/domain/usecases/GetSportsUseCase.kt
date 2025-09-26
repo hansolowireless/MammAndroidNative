@@ -24,13 +24,13 @@ class GetSportsUseCase @Inject constructor(
                         Result.success(response.toContentUIRows(genreResult))
                     },
                     onFailure = { exception ->
-                        logger.debug(TAG, "GetSportsUseCase Failed: ${exception.message}")
+                        logger.error(TAG, "GetSportsUseCase Failed: ${exception.message}")
                         Result.failure(exception)
                     }
                 )
             },
             onFailure = { exception ->
-                logger.debug(TAG, "GetSportsUseCase Genre lookup failed: ${exception.message}")
+                logger.error(TAG, "GetSportsUseCase Genre lookup failed: ${exception.message}")
                 Result.failure(exception)
             }
         )

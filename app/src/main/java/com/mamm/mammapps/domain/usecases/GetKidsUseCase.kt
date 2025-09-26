@@ -24,13 +24,13 @@ class GetKidsUseCase @Inject constructor(
                         Result.success(response.toContentUIRows(genreResult))
                     },
                     onFailure = { exception ->
-                        logger.debug(TAG, "GetKidsUseCase Failed: ${exception.message}")
+                        logger.error(TAG, "GetKidsUseCase Failed: ${exception.message}")
                         Result.failure(exception)
                     }
                 )
             },
             onFailure = { exception ->
-                logger.debug(TAG, "GetKidsUseCase Genre lookup failed: ${exception.message}")
+                logger.error(TAG, "GetKidsUseCase Genre lookup failed: ${exception.message}")
                 Result.failure(exception)
             }
         )

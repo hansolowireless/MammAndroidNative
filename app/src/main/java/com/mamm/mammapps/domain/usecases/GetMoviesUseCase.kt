@@ -24,13 +24,13 @@ class GetMoviesUseCase @Inject constructor(
                         Result.success(response.toContentUIRows(genreResult))
                     },
                     onFailure = { exception ->
-                        logger.debug(TAG, "GetMoviesUseCase Failed: ${exception.message}")
+                        logger.error(TAG, "GetMoviesUseCase Failed: ${exception.message}")
                         Result.failure(exception)
                     }
                 )
             },
             onFailure = { exception ->
-                logger.debug(TAG, "Genre lookup failed: ${exception.message}")
+                logger.error(TAG, "Genre lookup failed: ${exception.message}")
                 Result.failure(exception)
             }
         )

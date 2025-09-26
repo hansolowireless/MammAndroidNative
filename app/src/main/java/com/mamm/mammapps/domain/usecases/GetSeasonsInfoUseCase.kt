@@ -22,7 +22,7 @@ class GetSeasonsInfoUseCase @Inject constructor(
                 Result.success(response.toSeasonUIList())
             },
             onFailure = { exception ->
-                logger.debug(TAG, "GetSeasonsInfoUseCase Failed: ${exception.message}")
+                logger.error(TAG, "GetSeasonsInfoUseCase Failed: ${exception.message}")
                 Result.failure(exception)
             }
         )

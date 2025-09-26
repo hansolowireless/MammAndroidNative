@@ -24,13 +24,13 @@ class GetDocumentariesUseCase @Inject constructor(
                         Result.success(response.toContentUIRows(genreResult))
                     },
                     onFailure = { exception ->
-                        logger.debug(TAG, "GetDocumentariesUseCase Failed: ${exception.message}")
+                        logger.error(TAG, "GetDocumentariesUseCase Failed: ${exception.message}")
                         Result.failure(exception)
                     }
                 )
             },
             onFailure = { exception ->
-                logger.debug(TAG, "GetDocumentariesUseCase Genre lookup failed: ${exception.message}")
+                logger.error(TAG, "GetDocumentariesUseCase Genre lookup failed: ${exception.message}")
                 Result.failure(exception)
             }
         )

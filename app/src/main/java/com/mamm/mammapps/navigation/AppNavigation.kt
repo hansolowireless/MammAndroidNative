@@ -38,6 +38,7 @@ import com.mamm.mammapps.ui.mapper.toContentEntityUI
 import com.mamm.mammapps.ui.screen.VideoPlayerScreen
 import com.mamm.mammapps.ui.mapper.toContentToPlayUI
 import com.mamm.mammapps.navigation.model.AppRoute
+import com.mamm.mammapps.ui.screen.ChannelsScreen
 import com.mamm.mammapps.ui.screen.DetailScreen
 import com.mamm.mammapps.ui.screen.EPGScreen
 import com.mamm.mammapps.ui.screen.HomeScreen
@@ -136,6 +137,29 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                 }
                 navController.currentBackStackEntry?.savedStateHandle?.addContent(content)
                 navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.HOME)
+            }
+        )
+    }
+
+    composable(AppRoute.CHANNELS.route) {
+        ChannelsScreen(
+            onContentClicked = { content ->
+                navController.navigate(AppRoute.PLAYER.route) {
+                    launchSingleTop = true
+                }
+                navController.currentBackStackEntry?.savedStateHandle?.addContent(content)
+            }
+        )
+    }
+
+    composable(AppRoute.SERIES.route) {
+        HomeScreen (
+            routeTag = AppRoute.SERIES,
+            onContentClicked = { content ->
+                navController.navigate(AppRoute.PLAYER.route) {
+                    launchSingleTop = true
+                }
+                navController.currentBackStackEntry?.savedStateHandle?.addContent(content)
             }
         )
     }

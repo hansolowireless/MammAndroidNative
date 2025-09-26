@@ -39,6 +39,10 @@ fun HomeScreen(
 
     val focusedContent by viewModel.focusedContent.collectAsStateWithLifecycle()
 
+    LaunchedEffect(homeContent) {
+        viewModel.setFirstFocusedContent()
+    }
+
     LaunchedEffect(Unit) {
         viewModel.content(routeTag)
     }

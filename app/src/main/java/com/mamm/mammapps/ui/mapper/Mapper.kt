@@ -248,6 +248,23 @@ fun GetOtherContentResponse.toContentUIRows(
     return rows
 }
 
+fun List<Serie>.toContentUIRows(genre: Genre): List<ContentRowUI> {
+    val rows = mutableListOf<ContentRowUI>()
+    genre.subgenres?.forEach { sub ->
+        val subSeries = this.filter { it.subgenreById == sub.id }
+        val items = subSeries.map { it.toContentEntityUI() }
+        if (items.isNotEmpty()) {
+            rows.add(
+                ContentRowUI(
+                    categoryName = sub.ds ?: "",
+                    items = items
+                )
+            )
+        }
+    }
+    return rows
+}
+
 fun GetSeasonInfoResponse.toSeasonUIList(): List<SeasonUI> {
     val list = this.tbSeasons?.map{ tbSeason ->
 

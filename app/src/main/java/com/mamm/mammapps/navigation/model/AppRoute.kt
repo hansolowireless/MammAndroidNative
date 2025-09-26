@@ -11,6 +11,7 @@ enum class AppRoute {
     SEARCH,
     ADULTS,
     EPG,
+    LASTSEVENDAYS,
     DIAGNOSTICS,
     PLAYER,
     DETAIL,

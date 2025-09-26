@@ -23,7 +23,7 @@ class LoginViewModel @Inject constructor(
         const val TAG = "LoginViewModel"
     }
 
-    var loginState by mutableStateOf<UIState<Unit>>(UIState.Idle)
+    var loginState by mutableStateOf<UIState<Unit>>(UIState.Loading)
         private set
 
     fun trytoAutoLogin() {

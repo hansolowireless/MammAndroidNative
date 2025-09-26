@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -60,7 +61,7 @@ fun HomeGridTop(event: ContentEntityUI) {
                 .fillMaxHeight()
                 .fillMaxWidth(UIConstant.HOMEGRIDTOP_IMAGE_WIDTH_FRACTION)
                 .align(Alignment.CenterEnd)
-                .clip(RoundedCornerShape(12.dp))
+                .clip(RectangleShape)
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(

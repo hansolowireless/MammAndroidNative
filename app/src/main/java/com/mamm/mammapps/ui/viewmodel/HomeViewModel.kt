@@ -14,6 +14,7 @@ import com.mamm.mammapps.domain.usecases.GetEPGContentUseCase
 import com.mamm.mammapps.domain.usecases.GetHomeContentUseCase
 import com.mamm.mammapps.domain.usecases.GetKidsUseCase
 import com.mamm.mammapps.domain.usecases.GetMoviesUseCase
+import com.mamm.mammapps.domain.usecases.GetSeriesUseCase
 import com.mamm.mammapps.domain.usecases.GetSportsUseCase
 import com.mamm.mammapps.ui.common.UIState
 import com.mamm.mammapps.ui.mapper.toContentEntityUI
@@ -35,6 +36,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val getHomeContentUseCase: GetHomeContentUseCase,
     private val getEPGContentUseCase: GetEPGContentUseCase,
+    private val getSeriesUseCase: GetSeriesUseCase,
     private val getMoviesUseCase: GetMoviesUseCase,
     private val getDocumentariesUseCase: GetDocumentariesUseCase,
     private val getKidsUseCase: GetKidsUseCase,
@@ -64,6 +66,7 @@ class HomeViewModel @Inject constructor(
     fun content(routeTag: AppRoute) {
         when (routeTag) {
             AppRoute.HOME -> getHomeContent()
+            AppRoute.SERIES -> getSeriesContent()
             AppRoute.MOVIES -> getMoviesContent()
             AppRoute.DOCUMENTARIES -> getDocumentariesContent()
             AppRoute.KIDS -> getKidsContent()
@@ -90,6 +93,20 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private fun getSeriesContent() {
+        homeContentUIState = UIState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            getSeriesUseCase().onSuccess { response ->
+                homeContentUI = response
+                homeContentUIState = UIState.Success(homeContentUI)
+            }
+                .onFailure { exception ->
+                    homeContentUIState =
+                        UIState.Error(exception.message ?: "getSeriesContent Unknown error occurred")
+                }
+        }
+    }
+
     private fun getMoviesContent() {
         homeContentUIState = UIState.Loading
         viewModelScope.launch(Dispatchers.IO) {
@@ -99,7 +116,7 @@ class HomeViewModel @Inject constructor(
             }
                 .onFailure { exception ->
                     homeContentUIState =
-                        UIState.Error(exception.message ?: "Unknown error occurred")
+                        UIState.Error(exception.message ?: "getMoviesContent Unknown error occurred")
                 }
         }
     }
@@ -112,7 +129,7 @@ class HomeViewModel @Inject constructor(
                 homeContentUIState = UIState.Success(homeContentUI)
             }.onFailure { exception ->
                 homeContentUIState =
-                    UIState.Error(exception.message ?: "Unknown error occurred")
+                    UIState.Error(exception.message ?: "getDocumentariesContent Unknown error occurred")
             }
         }
     }
@@ -125,7 +142,7 @@ class HomeViewModel @Inject constructor(
                 homeContentUIState = UIState.Success(homeContentUI)
             }.onFailure { exception ->
                 homeContentUIState =
-                    UIState.Error(exception.message ?: "Unknown error occurred")
+                    UIState.Error(exception.message ?: "getAdultsContent Unknown error occurred")
             }
         }
     }
@@ -138,7 +155,7 @@ class HomeViewModel @Inject constructor(
                 homeContentUIState = UIState.Success(homeContentUI)
             }.onFailure { exception ->
                 homeContentUIState =
-                    UIState.Error(exception.message ?: "Unknown error occurred")
+                    UIState.Error(exception.message ?: "getAdultsContent Unknown error occurred")
             }
         }
     }
@@ -151,9 +168,14 @@ class HomeViewModel @Inject constructor(
                 homeContentUIState = UIState.Success(homeContentUI)}
                 .onFailure { exception ->
                     homeContentUIState =
-                        UIState.Error(exception.message ?: "Unknown error occurred")
+                        UIState.Error(exception.message ?: "getAdultsContent Unknown error occurred")
                 }
         }
+    }
+
+    fun setFirstFocusedContent() {
+        if (homeContentUI.isNotEmpty())
+            _focusedContent.update { homeContentUI.first().items.first() }
     }
 
 
