@@ -30,14 +30,17 @@ import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.data.model.Event
 import com.mamm.mammapps.data.model.Serie
 import com.mamm.mammapps.data.model.VoD
+import com.mamm.mammapps.data.model.branded.BrandedVod
 import com.mamm.mammapps.data.model.section.SectionVod
 import com.mamm.mammapps.navigation.extension.addContent
 import com.mamm.mammapps.navigation.extension.addRoute
+import com.mamm.mammapps.navigation.extension.homeScreenRoute
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.mapper.toContentEntityUI
 import com.mamm.mammapps.ui.screen.VideoPlayerScreen
 import com.mamm.mammapps.ui.mapper.toContentToPlayUI
 import com.mamm.mammapps.navigation.model.AppRoute
+import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.screen.ChannelsScreen
 import com.mamm.mammapps.ui.screen.DetailScreen
 import com.mamm.mammapps.ui.screen.EPGScreen
@@ -57,58 +60,6 @@ fun AppNavigation() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MobileNavigationLayout(navController: NavHostController) {
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet {
-                NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.Home, null) },
-                    label = { Text("Inicio") },
-                    selected = false,
-                    onClick = {
-                        navController.navigate("home")
-                        scope.launch { drawerState.close() }
-                    }
-                )
-                NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.Person, null) },
-                    label = { Text("Perfil") },
-                    selected = false,
-                    onClick = {
-                        navController.navigate("profile")
-                        scope.launch { drawerState.close() }
-                    }
-                )
-            }
-        }
-    ) {
-        Column {
-            TopAppBar(
-                title = { Text("Mi App") },
-                navigationIcon = {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(Icons.Default.Menu, null)
-                    }
-                }
-            )
-
-            NavHost(
-                navController = navController,
-                startDestination = AppRoute.LOGIN.route,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                navigationGraph(navController)
-            }
-        }
-    }
-}
-
 fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
     composable(AppRoute.LOGIN.route) {
         LoginScreen(
@@ -123,8 +74,8 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
     composable(AppRoute.HOME.route) {
         HomeScreen(
             onContentClicked = { content ->
-                when (content) {
-                    is Channel -> {
+                when (content.identifier) {
+                    is ContentIdentifier.Channel -> {
                         navController.navigate(AppRoute.PLAYER.route) {
                             launchSingleTop = true
                         }
@@ -152,82 +103,16 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
         )
     }
 
-    composable(AppRoute.SERIES.route) {
-        HomeScreen (
-            routeTag = AppRoute.SERIES,
-            onContentClicked = { content ->
-                navController.navigate(AppRoute.PLAYER.route) {
-                    launchSingleTop = true
-                }
-                navController.currentBackStackEntry?.savedStateHandle?.addContent(content)
-            }
-        )
-    }
+    homeScreenRoute(AppRoute.SERIES, navController)
+    homeScreenRoute(AppRoute.MOVIES, navController)
+    homeScreenRoute(AppRoute.DOCUMENTARIES, navController)
+    homeScreenRoute(AppRoute.KIDS, navController)
+    homeScreenRoute(AppRoute.SPORTS, navController)
+    homeScreenRoute(AppRoute.WARNER, navController)
+    homeScreenRoute(AppRoute.ACONTRA, navController)
+    homeScreenRoute(AppRoute.AMC, navController)
+    homeScreenRoute(AppRoute.ADULTS, navController)
 
-    composable(AppRoute.MOVIES.route) {
-        HomeScreen(
-            routeTag = AppRoute.MOVIES,
-            onContentClicked = { content ->
-                navController.navigate(AppRoute.DETAIL.route) {
-                    launchSingleTop = true
-                }
-                navController.currentBackStackEntry?.savedStateHandle?.addContent(content)
-                navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.MOVIES)
-            }
-        )
-    }
-
-    composable(AppRoute.DOCUMENTARIES.route) {
-        HomeScreen(
-            routeTag = AppRoute.DOCUMENTARIES,
-            onContentClicked = { content ->
-                navController.navigate(AppRoute.DETAIL.route) {
-                    launchSingleTop = true
-                }
-                navController.currentBackStackEntry?.savedStateHandle?.set("content", content)
-                navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.DOCUMENTARIES)
-            }
-        )
-    }
-
-    composable(AppRoute.SPORTS.route) {
-        HomeScreen(
-            routeTag = AppRoute.SPORTS,
-            onContentClicked = { content ->
-                navController.navigate(AppRoute.DETAIL.route) {
-                    launchSingleTop = true
-                }
-                navController.currentBackStackEntry?.savedStateHandle?.set("content", content)
-                navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.SPORTS)
-            }
-        )
-    }
-
-    composable(AppRoute.KIDS.route) {
-        HomeScreen(
-            routeTag = AppRoute.KIDS,
-            onContentClicked = { content ->
-                navController.navigate(AppRoute.DETAIL.route) {
-                    launchSingleTop = true
-                }
-                navController.currentBackStackEntry?.savedStateHandle?.addContent(content)
-                navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.KIDS)
-            }
-        )
-    }
-
-    composable(AppRoute.ADULTS.route) {
-        HomeScreen(
-            routeTag = AppRoute.ADULTS,
-            onContentClicked = { content ->
-                navController.navigate(AppRoute.DETAIL.route) {
-                    launchSingleTop = true
-                }
-                navController.currentBackStackEntry?.savedStateHandle?.addContent(content)
-                navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.ADULTS)
-            }
-        )
-    }
 
     composable(AppRoute.DETAIL.route) { backStackEntry ->
         val contentItem = remember(backStackEntry) {
@@ -245,6 +130,7 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                     is Event -> contentItem.toContentEntityUI()
                     is EPGEvent -> contentItem.toContentEntityUI()
                     is Serie -> contentItem.toContentEntityUI()
+                    is BrandedVod -> contentItem.toContentEntityUI()
                     else -> return@composable // Or handle error appropriately
                 },
                 onClickPlay = { content ->
