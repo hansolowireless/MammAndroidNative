@@ -14,6 +14,7 @@ import com.mamm.mammapps.data.extension.toEPGRequestDate
 import com.mamm.mammapps.data.extension.transformData
 import com.mamm.mammapps.data.local.SecurePreferencesManager
 import com.mamm.mammapps.data.logger.Logger
+import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.GetEPGResponse
@@ -70,6 +71,15 @@ class RemoteDatasource @Inject constructor(
 
     @Volatile
     private var cachedKidsContent: GetOtherContentResponse? = null
+
+    @Volatile
+    private var cachedWarnerContent: GetBrandedContentResponse? = null
+
+    @Volatile
+    private var cachedAcontraContent: GetBrandedContentResponse? = null
+
+    @Volatile
+    private var cachedAMCContent: GetBrandedContentResponse? = null
 
     suspend fun login(username: String, password: String): LoginResponse {
         return idmApi.login(LoginRequest(username, password, deviceType, deviceSerial))
@@ -224,6 +234,66 @@ class RemoteDatasource @Inject constructor(
 
     fun getCachedAdults(): GetOtherContentResponse? {
         return cachedAdultsContent
+    }
+
+    //----------WARNER---------//
+    suspend fun getWarner(jsonParam: String): GetBrandedContentResponse {
+        return withContext(Dispatchers.IO) {
+
+            cachedWarnerContent?.let { return@withContext it }
+            val response = baseUrlApi.getWarner(jsonParam)
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()?.string()?.toResponseBody()
+                throw HttpException(Response.error<Any>(response.code(), errorBody))
+            }
+            val warnerData = response.body() ?: throw IllegalStateException("Response body is null")
+            cachedWarnerContent = warnerData
+            warnerData
+        }
+    }
+
+    fun getCachedWarner(): GetBrandedContentResponse? {
+        return cachedWarnerContent
+    }
+
+    //----------ACONTRA---------//
+    suspend fun getAcontra(jsonParam: String): GetBrandedContentResponse {
+        return withContext(Dispatchers.IO) {
+
+            cachedAcontraContent?.let { return@withContext it }
+            val response = baseUrlApi.getAcontra(jsonParam)
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()?.string()?.toResponseBody()
+                throw HttpException(Response.error<Any>(response.code(), errorBody))
+            }
+            val acontraData = response.body() ?: throw IllegalStateException("Response body is null")
+            cachedAcontraContent = acontraData
+            acontraData
+        }
+    }
+
+    fun getCachedAcontra(): GetBrandedContentResponse? {
+        return cachedAcontraContent
+    }
+
+    //----------AMC---------//
+    suspend fun getAMC(jsonParam: String): GetBrandedContentResponse {
+        return withContext(Dispatchers.IO) {
+
+            cachedAMCContent?.let { return@withContext it }
+            val response = baseUrlApi.getAMC(jsonParam)
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()?.string()?.toResponseBody()
+                throw HttpException(Response.error<Any>(response.code(), errorBody))
+            }
+            val amcData = response.body() ?: throw IllegalStateException("Response body is null")
+            cachedAMCContent = amcData
+            amcData
+        }
+    }
+
+    fun getCachedAMC(): GetBrandedContentResponse? {
+        return cachedAMCContent
     }
 
     //----------SERIES - SEASON CONTENT---------//

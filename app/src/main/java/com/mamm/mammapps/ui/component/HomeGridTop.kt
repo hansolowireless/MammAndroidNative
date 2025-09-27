@@ -49,7 +49,7 @@ fun HomeGridTop(event: ContentEntityUI) {
                 .align(Alignment.CenterEnd)
         ) {
             AsyncImage(
-                model = event.imageUrl,
+                model = event.horizontalImageUrl,
                 contentDescription = event.title,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop

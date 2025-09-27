@@ -41,6 +41,11 @@
     <string name="nav_sports">Deportes</string>
     <string name="nav_adults">Adultos</string>
     <string name="nav_kids">Infantil</string>
+    <string name="nav_warner">Warner</string>
+    <string name="nav_acontra">Acontra+</string>
+    <string name="nav_amc">AMC</string>
+    <string name="nav_movies_amc">Cine AMC</string>
+    <string name="nav_series_amc">Series AMC</string>
     <string name="nav_search">Buscar</string>
     <string name="nav_diagnostics">Diagnóstico de Conexión</string>
     <string name="nav_change_user">Cambiar usuario</string>

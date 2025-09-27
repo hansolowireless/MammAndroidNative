@@ -55,6 +55,9 @@ fun TVNavigationLayout(navController: NavHostController) {
         AppRoute.KIDS.route,
         AppRoute.SERIES.route,
         AppRoute.SPORTS.route,
+        AppRoute.WARNER.route,
+        AppRoute.ACONTRA.route,
+        AppRoute.AMC.route,
         AppRoute.SEARCH.route,
         AppRoute.DIAGNOSTICS.route,
         AppRoute.LASTSEVENDAYS.route,
@@ -171,6 +174,48 @@ fun TVNavigationLayout(navController: NavHostController) {
                     parentIsFocused = hasItemFocused,
                     selected = currentRoute == AppRoute.SERIES.route,
                     onClick = { navController.navigate(AppRoute.SERIES.route) }
+                )
+
+                CustomTVNavigationItem(
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.menu_serieslogoicon),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = stringResource(R.string.nav_warner),
+                    parentIsFocused = hasItemFocused,
+                    selected = currentRoute == AppRoute.WARNER.route,
+                    onClick = { navController.navigate(AppRoute.WARNER.route) }
+                )
+
+                CustomTVNavigationItem(
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.menu_serieslogoicon),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = stringResource(R.string.nav_acontra),
+                    parentIsFocused = hasItemFocused,
+                    selected = currentRoute == AppRoute.ACONTRA.route,
+                    onClick = { navController.navigate(AppRoute.ACONTRA.route) }
+                )
+
+                CustomTVNavigationItem(
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.menu_serieslogoicon),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = stringResource(R.string.nav_amc),
+                    parentIsFocused = hasItemFocused,
+                    selected = currentRoute == AppRoute.AMC.route,
+                    onClick = { navController.navigate(AppRoute.AMC.route) }
                 )
 
                 CustomTVNavigationItem(

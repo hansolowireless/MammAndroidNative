@@ -20,13 +20,16 @@ import com.mamm.mammapps.ui.component.HomeGridBottom
 import com.mamm.mammapps.ui.component.HomeGridTop
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.navigation.model.AppRoute
+import com.mamm.mammapps.ui.model.ContentEntityUI
+import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.viewmodel.HomeViewModel
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     routeTag: AppRoute = AppRoute.HOME,
-    onContentClicked: (item: Any) -> Unit
+    onShowDetails: (item: ContentEntityUI) -> Unit,
+    onPlay: (item: Any) -> Unit
 ) {
     val homeContentState = viewModel.homeContentUIState
     val homeContent = viewModel.homeContentUI
@@ -58,7 +61,7 @@ fun HomeScreen(
     LaunchedEffect(clickedContent) {
         clickedContent?.let { content ->
             if (!hasNavigated.value) {
-                onContentClicked(content)
+                onPlay(content)
                 hasNavigated.value = true
                 viewModel.clearClickedContent()
             }
@@ -92,10 +95,17 @@ fun HomeScreen(
                         columnListState = columnListState,
                         onContentClicked = { index, entityUI ->
                             lastClickedItemIndex = index
-                            viewModel.findContent(
-                                entityUI = entityUI,
-                                routeTag = routeTag
-                            )
+
+                            if (entityUI.identifier is ContentIdentifier.Channel) {
+                                viewModel.findContent(
+                                    entityUI = entityUI,
+                                    routeTag = routeTag
+                                )
+                            }
+                            else {
+                                onShowDetails(entityUI)
+                            }
+
                         },
                         onFocus = { content ->
                             viewModel.setFocusedContent(content)

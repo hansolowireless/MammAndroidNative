@@ -1,5 +1,6 @@
 package com.mamm.mammapps.remote
 
+import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.GetEPGResponse
@@ -107,6 +108,36 @@ interface ApiService {
     suspend fun getAdults(
         @Path("jsonParam") jsonParam: String
     ): Response<GetOtherContentResponse>
+
+    // ---------- WARNER ----------
+    @GET("epg_files/wb_pkg_{jsonParam}")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getWarner(
+        @Path("jsonParam") jsonParam: String
+    ): Response<GetBrandedContentResponse>
+
+    // ---------- ACONTRA ----------
+    @GET("epg_files/acf_pkg_{jsonParam}")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getAcontra(
+        @Path("jsonParam") jsonParam: String
+    ): Response<GetBrandedContentResponse>
+
+    // ---------- AMC ----------
+    @GET("epg_files/amc_pkg_{jsonParam}")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getAMC(
+        @Path("jsonParam") jsonParam: String
+    ): Response<GetBrandedContentResponse>
 
     // ---------- SEASON CONTENT ----------
     @GET("epg_files/serie_{serieId}.json")

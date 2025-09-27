@@ -131,12 +131,15 @@ fun Featured.toContentEntityUI(): ContentEntityUI? {
     val id = id ?: return null
 
     return ContentEntityUI(
+        identifier = ContentIdentifier.fromFormat(format = format, id = id),
         imageUrl = logoUrl.orEmpty(),
         horizontalImageUrl = logoUrl.orEmpty(),
         title = title.orEmpty(),
         aspectRatio = Ratios.HORIZONTAL,
         height = Dimensions.channelEntityHeight,
-        identifier = ContentIdentifier.fromFormat(format = format, id = id)
+        detailInfo = DetailInfoUI(
+            description = description.orEmpty()
+        )
     )
 }
 
@@ -246,7 +249,8 @@ fun Event.toLiveEventInfoUI(): LiveEventInfoUI = LiveEventInfoUI(
 //----------endregion PLAYBACK----------------------
 
 fun GetHomeContentResponse.toContentUIRows(): List<ContentRowUI> {
-    return categories?.mapNotNull { category ->
+    val orderedCategories = categories?.sortedBy { it.pos }
+    return orderedCategories?.mapNotNull { category ->
         val items = category.order?.mapNotNull { orderItem ->
             when (orderItem.type) {
                 "channel" -> channels?.find { it.id == orderItem.id }?.toContentEntityUI()
@@ -296,12 +300,22 @@ fun GetOtherContentResponse.toContentUIRows(
 fun GetBrandedContentResponse.toContentUIRows(genre: Genre): List<ContentRowUI> {
     val rows = mutableListOf<ContentRowUI>()
 
+    // Add "Eventos Destacados" row without subgenre filtering
+    val allFeaturedItems = featured.orEmpty().mapNotNull { it.toContentEntityUI() }
+    if (allFeaturedItems.isNotEmpty()) {
+        rows.add(
+            ContentRowUI(
+                categoryName = "Eventos Destacados",
+                items = allFeaturedItems
+            )
+        )
+    }
+
     genre.subgenres?.forEach { sub ->
         val subVods = vods.orEmpty().filter { it.idSubgenre == sub.id.toString() }
-        val subFeatured = featured.orEmpty().filter { it.subgenreById == sub.id.toString() }
 
         // Convertimos a ContentEntityUI
-        val items = subVods.map { it.toContentEntityUI() } + subFeatured.mapNotNull { it.toContentEntityUI() }
+        val items = subVods.map { it.toContentEntityUI() }
 
         if (items.isNotEmpty()) {
             rows.add(

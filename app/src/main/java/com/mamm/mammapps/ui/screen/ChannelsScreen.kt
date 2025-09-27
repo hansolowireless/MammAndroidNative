@@ -91,7 +91,7 @@ fun ChannelGrid(
                 vertical = Dimensions.paddingSmall
             ),
             horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium),
-            verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
+            verticalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall)
         ) {
             items(channels) { channel ->
                 ContentEntity(

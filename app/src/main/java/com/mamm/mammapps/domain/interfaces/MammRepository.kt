@@ -2,6 +2,7 @@ package com.mamm.mammapps.domain.interfaces
 
 import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.Genre
+import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.GetSeasonInfoResponse
@@ -22,6 +23,11 @@ interface MammRepository {
     suspend fun getDocumentaries(): Result<GetOtherContentResponse>
     suspend fun getKids(): Result<GetOtherContentResponse>
     suspend fun getSports(): Result<GetOtherContentResponse>
+
+    suspend fun getWarner(): Result<GetBrandedContentResponse>
+    suspend fun getAcontra(): Result<GetBrandedContentResponse>
+    suspend fun getAMC(): Result<GetBrandedContentResponse>
+
     suspend fun getSeasonsInfo(serieId: Int): Result<GetSeasonInfoResponse>
 
     fun findHomeContent(identifier: ContentIdentifier): Result<Any>?
@@ -30,6 +36,9 @@ interface MammRepository {
     fun findAdultContent(identifier: ContentIdentifier): Result<Any>?
     fun findKidsContent(identifier: ContentIdentifier): Result<Any>?
     fun findSportsContent(identifier: ContentIdentifier): Result<Any>?
+    fun findWarnerContent(identifier: ContentIdentifier): Result<Any>?
+    fun findAcontraContent(identifier: ContentIdentifier): Result<Any>?
+    fun findAMCContent(identifier: ContentIdentifier): Result<Any>?
 
     fun findGenreWithId(id: Int): Result<Genre>
     fun findChannelWithId(id: Int): Result<Channel>

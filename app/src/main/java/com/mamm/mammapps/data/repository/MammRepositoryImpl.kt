@@ -7,6 +7,7 @@ import com.mamm.mammapps.data.extension.transformData
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.Genre
+import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.GetSeasonInfoResponse
@@ -17,7 +18,7 @@ import com.mamm.mammapps.domain.interfaces.MammRepository
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import javax.inject.Inject
 
-class MammRepositoryImpl @Inject constructor (
+class MammRepositoryImpl @Inject constructor(
     private val remoteDatasource: RemoteDatasource,
     private val localDataSource: LocalDataSource,
     private val sessionManager: SessionManager,
@@ -40,7 +41,7 @@ class MammRepositoryImpl @Inject constructor (
         }
     }
 
-    override suspend fun saveUserCredentials(username: String, password: String) : Result<Unit> {
+    override suspend fun saveUserCredentials(username: String, password: String): Result<Unit> {
         return runCatching {
             localDataSource.saveUserCredentials(username, password)
         }
@@ -57,7 +58,7 @@ class MammRepositoryImpl @Inject constructor (
         }
     }
 
-    override suspend fun getHomeContent() : Result<GetHomeContentResponse> {
+    override suspend fun getHomeContent(): Result<GetHomeContentResponse> {
         return runCatching {
             remoteDatasource.getHomeContent().transformData(sessionManager.channelOrder)
         }.onSuccess { response ->
@@ -120,7 +121,40 @@ class MammRepositoryImpl @Inject constructor (
         }
     }
 
-    override suspend fun getSeasonsInfo(serieId: Int) : Result<GetSeasonInfoResponse> {
+    override suspend fun getWarner(): Result<GetBrandedContentResponse> {
+        val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
+            ?: return Result
+                .failure(IllegalStateException("No valid path segment found in session file"))
+        return runCatching {
+            remoteDatasource.getWarner(jsonParam)
+        }.onSuccess { response ->
+            logger.debug(TAG, "getWarner Received and saved successful response")
+        }
+    }
+
+    override suspend fun getAcontra(): Result<GetBrandedContentResponse> {
+        val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
+            ?: return Result
+                .failure(IllegalStateException("No valid path segment found in session file"))
+        return runCatching {
+            remoteDatasource.getAcontra(jsonParam)
+        }.onSuccess { response ->
+            logger.debug(TAG, "getAcontra Received and saved successful response")
+        }
+    }
+
+    override suspend fun getAMC(): Result<GetBrandedContentResponse> {
+        val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
+            ?: return Result
+                .failure(IllegalStateException("No valid path segment found in session file"))
+        return runCatching {
+            remoteDatasource.getAMC(jsonParam)
+        }.onSuccess { response ->
+            logger.debug(TAG, "getAMC Received and saved successful response")
+        }
+    }
+
+    override suspend fun getSeasonsInfo(serieId: Int): Result<GetSeasonInfoResponse> {
         return runCatching {
             remoteDatasource.getSeasonInfo(serieId)
         }.onSuccess { response ->
@@ -184,8 +218,32 @@ class MammRepositoryImpl @Inject constructor (
             is ContentIdentifier.VoD -> remoteDatasource.getCachedKids()?.vods?.find { it.getId() == identifier.id }
             is ContentIdentifier.Event -> remoteDatasource.getCachedKids()?.events?.find { it.getId() == identifier.id }
             else -> null
-            }
+        }
 
+        return content?.let { Result.success(it) }
+    }
+
+    override fun findWarnerContent(identifier: ContentIdentifier) : Result<Any>? {
+        val content: Any? = when (identifier) {
+            is ContentIdentifier.VoD -> remoteDatasource.getCachedWarner()?.vods?.find { it.getId() == identifier.id }
+            else -> null
+        }
+        return content?.let { Result.success(it) }
+    }
+
+    override fun findAcontraContent(identifier: ContentIdentifier) : Result<Any>? {
+        val content: Any? = when (identifier) {
+            is ContentIdentifier.VoD -> remoteDatasource.getCachedAcontra()?.vods?.find { it.getId() == identifier.id }
+            else -> null
+        }
+        return content?.let { Result.success(it) }
+    }
+
+    override fun findAMCContent(identifier: ContentIdentifier) : Result<Any>? {
+        val content: Any? = when (identifier) {
+            is ContentIdentifier.VoD -> remoteDatasource.getCachedAMC()?.vods?.find { it.getId() == identifier.id }
+            else -> null
+        }
         return content?.let { Result.success(it) }
     }
 
@@ -203,7 +261,8 @@ class MammRepositoryImpl @Inject constructor (
             remoteDatasource.getCachedHomeContent()
                 ?.channels
                 ?.find { it.id == id }
-                ?: throw NoSuchElementException("Channel with id $id not found")}
+                ?: throw NoSuchElementException("Channel with id $id not found")
+        }
     }
 
 }
