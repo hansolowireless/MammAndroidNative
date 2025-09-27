@@ -12,13 +12,13 @@ class GetEPGContentUseCase @Inject constructor(
 ) {
 
     companion object {
-        private const val TAG = "GetHomeContentUseCase"
+        private const val TAG = "GetEPGContentUseCase"
     }
 
     suspend operator fun invoke(date: LocalDate): Result<List<EPGChannelContent>> {
         return epgRepository.getEPG(date).fold(
             onSuccess = { response ->
-                logger.error(TAG, "GetEPGContentUseCase Received successful response")
+                logger.info(TAG, "GetEPGContentUseCase Received successful response")
                 Result.success(response)
             },
             onFailure = { exception ->

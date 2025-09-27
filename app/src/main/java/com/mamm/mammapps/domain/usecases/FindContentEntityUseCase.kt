@@ -72,6 +72,33 @@ class FindContentEntityUseCase @Inject constructor(
                         logger.debug(TAG, "invoke Failed: ${exception.message}, $exception")
                     } ?: Result.failure(Exception("Content not found"))
             }
+            AppRoute.WARNER -> {
+                return repository.findWarnerContent(identifier = identifier)
+                    ?.onSuccess { result ->
+                        logger.debug(TAG, "invoke Received content: $result")
+                    }
+                    ?.onFailure { exception ->
+                        logger.debug(TAG, "invoke Failed: ${exception.message}, $exception")
+                    } ?: Result.failure(Exception("Content not found"))
+            }
+            AppRoute.AMC -> {
+                return repository.findAMCContent(identifier = identifier)
+                    ?.onSuccess { result ->
+                        logger.debug(TAG, "invoke Received content: $result")
+                    }
+                    ?.onFailure { exception ->
+                        logger.debug(TAG, "invoke Failed: ${exception.message}, $exception")
+                    } ?: Result.failure(Exception("Content not found"))
+            }
+            AppRoute.ACONTRA -> {
+                return repository.findAcontraContent(identifier = identifier)
+                    ?.onSuccess { result ->
+                        logger.debug(TAG, "invoke Received content: $result")
+                    }
+                    ?.onFailure { exception ->
+                        logger.debug(TAG, "invoke Failed: ${exception.message}, $exception")
+                    } ?: Result.failure(Exception("Content not found"))
+            }
             else -> {
                 logger.debug(TAG, "invoke Route not implemented")
                 return Result.failure(Exception("FindContentEntityUseCase Route not implemented"))
