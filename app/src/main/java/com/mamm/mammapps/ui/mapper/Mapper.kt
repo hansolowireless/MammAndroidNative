@@ -4,12 +4,15 @@ import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.data.model.Event
 import com.mamm.mammapps.data.model.Genre
+import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.GetSeasonInfoResponse
 import com.mamm.mammapps.data.model.section.SectionVod
 import com.mamm.mammapps.data.model.Serie
 import com.mamm.mammapps.data.model.VoD
+import com.mamm.mammapps.data.model.branded.BrandedVod
+import com.mamm.mammapps.data.model.branded.Featured
 import com.mamm.mammapps.data.model.serie.Episode
 import com.mamm.mammapps.domain.usecases.GetSeasonsInfoUseCase
 import com.mamm.mammapps.ui.extension.adult
@@ -40,6 +43,7 @@ fun Channel.toContentEntityUI() = ContentEntityUI(
 fun VoD.toContentEntityUI() = ContentEntityUI(
     identifier = ContentIdentifier.VoD(id.orRandom()),
     imageUrl = posterURL ?: "",
+    horizontalImageUrl = logoURL.orEmpty(),
     title = title ?: "",
     aspectRatio = Ratios.VERTICAL,
     height = Dimensions.contentEntityHeight,
@@ -52,6 +56,7 @@ fun VoD.toContentEntityUI() = ContentEntityUI(
 fun Event.toContentEntityUI() = ContentEntityUI(
     identifier = ContentIdentifier.Event(id.orRandom()),
     imageUrl = logoURL.orEmpty(),
+    horizontalImageUrl = logoURL.orEmpty(),
     title = title.orEmpty(),
     aspectRatio = Ratios.VERTICAL,
     height = Dimensions.contentEntityHeight,
@@ -64,6 +69,7 @@ fun Event.toContentEntityUI() = ContentEntityUI(
 fun Serie.toContentEntityUI() = ContentEntityUI(
     identifier = ContentIdentifier.Serie(id.orRandom()),
     imageUrl = serieLogoUrl.orEmpty(),
+    horizontalImageUrl = serieLogoUrl.orEmpty(),
     title = title.orEmpty(),
     detailInfo = DetailInfoUI(
         description = longDesc.orEmpty()
@@ -79,6 +85,7 @@ fun EPGEvent.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
     imageUrl = (posterLogo?.takeIf { it.isNotBlank() }
         ?: eventLogoUrl500?.takeIf { it.isNotBlank() })
         .orEmpty().adult(isAdult),
+    horizontalImageUrl = eventLogoTitleUrl.orEmpty(),
     title = getTitle(),
     aspectRatio = Ratios.VERTICAL,
     height = Dimensions.contentEntityHeight,
@@ -89,20 +96,51 @@ fun EPGEvent.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
 )
 
 fun SectionVod.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
-    imageUrl = (posterLogo?.takeIf { it.isNotBlank() }
-        ?: eventLogoUrl500?.takeIf { it.isNotBlank() })
-        .orEmpty().adult(isAdult),
-    title = getTitle(),
-    aspectRatio = Ratios.VERTICAL,
-    height = Dimensions.contentEntityHeight,
     identifier = ContentIdentifier.VoD(
         getId()
     ),
+    imageUrl = (posterLogo?.takeIf { it.isNotBlank() }
+        ?: eventLogoUrl500?.takeIf { it.isNotBlank() })
+        .orEmpty().adult(isAdult),
+    horizontalImageUrl = eventLogoTitleUrl.orEmpty(),
+    title = getTitle(),
+    aspectRatio = Ratios.VERTICAL,
+    height = Dimensions.contentEntityHeight,
     detailInfo = DetailInfoUI(
         description = getDescription(),
         metadata = getMetadata()
     )
 )
+
+fun BrandedVod.toContentEntityUI() = ContentEntityUI(
+    identifier = ContentIdentifier.VoD(
+        getId()
+    ),
+    imageUrl = contentLogo.orEmpty(),
+    horizontalImageUrl = contentLogo500.orEmpty(),
+    title = getTitle(),
+    aspectRatio = Ratios.VERTICAL,
+    height = Dimensions.contentEntityHeight,
+    detailInfo = DetailInfoUI(
+        description = getDescription()
+    )
+)
+
+fun Featured.toContentEntityUI(): ContentEntityUI? {
+    val format = format ?: return null
+    val id = id ?: return null
+
+    return ContentEntityUI(
+        imageUrl = logoUrl.orEmpty(),
+        horizontalImageUrl = logoUrl.orEmpty(),
+        title = title.orEmpty(),
+        aspectRatio = Ratios.HORIZONTAL,
+        height = Dimensions.channelEntityHeight,
+        identifier = ContentIdentifier.fromFormat(format = format, id = id)
+    )
+}
+
+
 //--------------------endregion Home------------------------
 
 
@@ -183,6 +221,13 @@ fun SectionVod.toContentToPlayUI() = ContentToPlayUI(
     imageUrl = this.posterLogo.orEmpty(),
 )
 
+fun BrandedVod.toContentToPlayUI() = ContentToPlayUI(
+    identifier = ContentIdentifier.VoD(getId()),
+    deliveryURL = this.path.orEmpty(),
+    title = this.getTitle(),
+    imageUrl = this.contentLogo.orEmpty(),
+)
+
 //------------------------LIVE EVENT INFO------------------------
 fun EPGEvent.toLiveEventInfoUI(): LiveEventInfoUI = LiveEventInfoUI(
     title = this.getTitle(),
@@ -235,6 +280,28 @@ fun GetOtherContentResponse.toContentUIRows(
         // Convertimos a ContentEntityUI
         val items = subEvents.map { it.toContentEntityUI(isAdult = isAdult) } +
                 subVods.map { it.toContentEntityUI(isAdult = isAdult) }
+
+        if (items.isNotEmpty()) {
+            rows.add(
+                ContentRowUI(
+                    categoryName = sub.ds ?: "",
+                    items = items
+                )
+            )
+        }
+    }
+    return rows
+}
+
+fun GetBrandedContentResponse.toContentUIRows(genre: Genre): List<ContentRowUI> {
+    val rows = mutableListOf<ContentRowUI>()
+
+    genre.subgenres?.forEach { sub ->
+        val subVods = vods.orEmpty().filter { it.idSubgenre == sub.id.toString() }
+        val subFeatured = featured.orEmpty().filter { it.subgenreById == sub.id.toString() }
+
+        // Convertimos a ContentEntityUI
+        val items = subVods.map { it.toContentEntityUI() } + subFeatured.mapNotNull { it.toContentEntityUI() }
 
         if (items.isNotEmpty()) {
             rows.add(
