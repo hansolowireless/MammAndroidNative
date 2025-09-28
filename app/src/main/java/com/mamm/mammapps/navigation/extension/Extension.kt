@@ -6,15 +6,22 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.model.ContentEntityUI
-import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import com.mamm.mammapps.ui.screen.HomeScreen
 
-fun SavedStateHandle.addContent(content: ContentEntityUI) {
-    this["content"] = content
+fun SavedStateHandle.addContentUI(content: ContentEntityUI) {
+    this["contentUI"] = content
 }
 
-fun SavedStateHandle.addContentToPlay(content: Any) {
-    this["content"] = content
+fun SavedStateHandle.addContentClass(content: Any) {
+    this["contentClass"] = content
+}
+
+fun SavedStateHandle.retrieveContentUI(): ContentEntityUI? {
+    return this.get<ContentEntityUI>("contentUI")
+}
+
+fun SavedStateHandle.retrieveContentClass(): Any? {
+    return this.get<Any>("contentClass")
 }
 
 fun SavedStateHandle.addRoute(route: AppRoute) {
@@ -33,7 +40,7 @@ fun NavGraphBuilder.homeScreenRoute(
                     launchSingleTop = true
                 }
                 navController.currentBackStackEntry?.savedStateHandle?.apply {
-                    addContent(content)
+                    addContentUI(content)
                     addRoute(appRoute)
                 }
             },

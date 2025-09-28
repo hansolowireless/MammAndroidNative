@@ -2,8 +2,7 @@ package com.mamm.mammapps.data.model.section
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import com.mamm.mammapps.data.model.Metadata
-import kotlinx.parcelize.IgnoredOnParcel
+import com.mamm.mammapps.data.model.metadata.Metadata
 import kotlinx.parcelize.Parcelize
 
 // Assuming Vod has similar structure to Event, but you may need to adjust based on actual structure

@@ -1,20 +1,19 @@
 package com.mamm.mammapps.ui.mapper
 
 import com.mamm.mammapps.data.model.Channel
-import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.data.model.Event
 import com.mamm.mammapps.data.model.Genre
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
-import com.mamm.mammapps.data.model.GetSeasonInfoResponse
-import com.mamm.mammapps.data.model.section.SectionVod
+import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.data.model.Serie
 import com.mamm.mammapps.data.model.VoD
 import com.mamm.mammapps.data.model.branded.BrandedVod
 import com.mamm.mammapps.data.model.branded.Featured
+import com.mamm.mammapps.data.model.section.EPGEvent
+import com.mamm.mammapps.data.model.section.SectionVod
 import com.mamm.mammapps.data.model.serie.Episode
-import com.mamm.mammapps.domain.usecases.GetSeasonsInfoUseCase
 import com.mamm.mammapps.ui.extension.adult
 import com.mamm.mammapps.ui.extension.landscape
 import com.mamm.mammapps.ui.extension.squared
@@ -35,7 +34,8 @@ import com.mamm.mammapps.util.orRandom
 //--------------------region Home------------------------
 fun Channel.toContentEntityUI() = ContentEntityUI(
     identifier = ContentIdentifier.Channel(id.orRandom()),
-    imageUrl = logoURL?.landscape() ?: "",
+    imageUrl = logoURL?.landscape().orEmpty(),
+    horizontalImageUrl = logoURL?.landscape().orEmpty(),
     title = name ?: "",
     detailInfo = DetailInfoUI(squareLogo = logoURL?.squared()),
 )
@@ -79,9 +79,7 @@ fun Serie.toContentEntityUI() = ContentEntityUI(
 )
 
 fun EPGEvent.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
-    identifier = ContentIdentifier.Event(
-        getId()
-    ),
+    identifier = ContentIdentifier.Event(getId()),
     imageUrl = (posterLogo?.takeIf { it.isNotBlank() }
         ?: eventLogoUrl500?.takeIf { it.isNotBlank() })
         .orEmpty().adult(isAdult),
@@ -91,8 +89,7 @@ fun EPGEvent.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
     height = Dimensions.contentEntityHeight,
     detailInfo = DetailInfoUI(
         metadata = getMetadata(),
-        description = getDescription()
-    )
+        description = getDescription())
 )
 
 fun SectionVod.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
@@ -142,8 +139,6 @@ fun Featured.toContentEntityUI(): ContentEntityUI? {
         )
     )
 }
-
-
 //--------------------endregion Home------------------------
 
 
@@ -230,6 +225,18 @@ fun BrandedVod.toContentToPlayUI() = ContentToPlayUI(
     title = this.getTitle(),
     imageUrl = this.contentLogo.orEmpty(),
 )
+
+fun Featured.toContentToPlayUI(): ContentToPlayUI? {
+    val format = format ?: return null
+    val id = id ?: return null
+
+    return ContentToPlayUI(
+        identifier = ContentIdentifier.fromFormat(format = format, id = id),
+        deliveryURL = this.deliveryUrl.orEmpty(),
+        title = this.title.orEmpty(),
+        imageUrl = this.logoUrl.orEmpty(),
+    )
+}
 
 //------------------------LIVE EVENT INFO------------------------
 fun EPGEvent.toLiveEventInfoUI(): LiveEventInfoUI = LiveEventInfoUI(
@@ -329,6 +336,7 @@ fun GetBrandedContentResponse.toContentUIRows(genre: Genre): List<ContentRowUI> 
     return rows
 }
 
+//----------------region SERIE DETAIL---------------------
 fun List<Serie>.toContentUIRows(genre: Genre): List<ContentRowUI> {
     val rows = mutableListOf<ContentRowUI>()
     genre.subgenres?.forEach { sub ->
@@ -349,9 +357,10 @@ fun List<Serie>.toContentUIRows(genre: Genre): List<ContentRowUI> {
 fun GetSeasonInfoResponse.toSeasonUIList(): List<SeasonUI> {
     val list = this.tbSeasons?.map{ tbSeason ->
 
-        val episodes: List<ContentListUI> = tbSeason.tbContentSeasons?.map { tbContentSeason ->
-            tbContentSeason.contentDetails?.toContentListUI()
-        }?.filterNotNull() ?: emptyList()
+        val episodes: List<ContentListUI> =
+            tbSeason.tbContentSeasons?.mapNotNull { tbContentSeason ->
+                tbContentSeason.contentDetails?.toContentListUI()
+            } ?: emptyList()
 
         SeasonUI(
             order = tbSeason.getOrder(),
@@ -364,4 +373,5 @@ fun GetSeasonInfoResponse.toSeasonUIList(): List<SeasonUI> {
 
     return list.orEmpty()
 }
+//----------------endregion SERIE DETAIL---------------------
 

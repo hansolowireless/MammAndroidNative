@@ -7,4 +7,5 @@ import java.time.LocalDate
 interface EPGRepository {
     suspend fun getEPG(date: LocalDate) : Result<List<EPGChannelContent>>
     fun getLiveEventForChannel(channelId: Int) : EPGEvent?
+    fun findContent(channelId: Int, eventId: Int, date: LocalDate) : EPGEvent
 }

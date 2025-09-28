@@ -1,9 +1,7 @@
-package com.mamm.mammapps.data.model
+package com.mamm.mammapps.data.model.serie
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import com.mamm.mammapps.data.model.serie.TbSeason
-import com.mamm.mammapps.data.model.serie.TbSerieLanguage
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

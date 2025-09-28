@@ -12,6 +12,12 @@
 
     <!--region EPG-->
     <string name="no_title">Sin título</string>
+    <string name="day_before_yesterday">Anteayer</string>
+    <string name="yesterday">Ayer</string>
+    <string name="today">Hoy</string>
+    <string name="tomorrow">Mañana</string>
+    <string name="day_after_tomorrow">Pasado mañana</string>
+    <!--endregion EPG-->
 
     <!-- Content descriptions for accessibility -->
     <string name="rating_content_description">Rating</string>

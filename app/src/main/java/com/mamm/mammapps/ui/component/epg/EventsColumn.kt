@@ -20,7 +20,8 @@ import com.mamm.mammapps.ui.theme.Dimensions
 @Composable
 fun EventsColumn(
     events: List<EPGEvent>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onEventClicked: (EPGEvent) -> Unit = {}
 ) {
     val listState = rememberLazyListState()
 
@@ -31,7 +32,7 @@ fun EventsColumn(
         }
     }
 
-    ProvideLazyListPivotOffset(parentFraction = 0.03f) {
+    ProvideLazyListPivotOffset(parentFraction = 0.01f) {
         LazyColumn(
             state = listState,
             modifier = modifier,
@@ -41,7 +42,9 @@ fun EventsColumn(
 
                 Box {
                     ContentEntityListItem(
-                        content = event.toContentListUI()
+                        content = event.toContentListUI(),
+                        showLiveIndicator = event.isLive(),
+                        onClick = { onEventClicked(event) }
                     )
                 }
             }

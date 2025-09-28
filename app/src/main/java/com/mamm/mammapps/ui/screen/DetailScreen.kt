@@ -45,10 +45,12 @@ import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.viewmodel.DetailViewModel
 
+
 @Composable
 fun DetailScreen(
     viewModel: DetailViewModel = hiltViewModel(),
     content: ContentEntityUI,
+    prefoundContent: Any? = null,
     routeTag: AppRoute,
     onClickPlay: (Any) -> Unit
 ) {
@@ -59,13 +61,11 @@ fun DetailScreen(
     val scrollState = rememberScrollState()
 
     LaunchedEffect (clickedContent) {
-        if (clickedContent != null) {
-            onClickPlay(clickedContent!!)
-        }
+        clickedContent?.let(onClickPlay)
     }
 
     LaunchedEffect(Unit) {
-        scrollState.scrollTo(0) // Fuerza el scroll al inicio
+        scrollState.scrollTo(0)
     }
 
     LaunchedEffect(Unit) {
@@ -183,6 +183,12 @@ fun DetailScreen(
                             )
                         },
                         onClick = {
+
+                            if (prefoundContent != null) {
+                                onClickPlay(prefoundContent)
+                                return@PrimaryButton
+                            }
+
                             viewModel.findContent(
                                 entityUI = content,
                                 routeTag = routeTag
@@ -212,7 +218,12 @@ fun DetailScreen(
             }
 
             when (val seasonInfoState = seasonInfoUIState) {
-                is UIState.Success -> SeasonTabs(seasons = seasonInfoState.data)
+                is UIState.Success -> SeasonTabs(
+                    seasons = seasonInfoState.data,
+                    onEpisodeClick = { seasonOrder, episodeId ->
+                        viewModel.findEpisode(seasonOrder, episodeId)
+                    }
+                )
                 UIState.Loading -> LoadingSpinner()
                 else -> return@Row
             }

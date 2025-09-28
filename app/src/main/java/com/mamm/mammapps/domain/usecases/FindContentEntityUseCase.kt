@@ -1,9 +1,11 @@
 package com.mamm.mammapps.domain.usecases
 
 import com.mamm.mammapps.data.logger.Logger
+import com.mamm.mammapps.domain.interfaces.EPGRepository
 import com.mamm.mammapps.domain.interfaces.MammRepository
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.model.ContentIdentifier
+import java.time.LocalDate
 import javax.inject.Inject
 
 class FindContentEntityUseCase @Inject constructor(
@@ -15,7 +17,10 @@ class FindContentEntityUseCase @Inject constructor(
         const val TAG = "FindContentEntityUseCase"
     }
 
-    operator fun invoke(identifier: ContentIdentifier, routeTag: AppRoute = AppRoute.HOME): Result<Any> {
+    operator fun invoke(
+        identifier: ContentIdentifier,
+        routeTag: AppRoute = AppRoute.HOME
+    ): Result<Any> {
 
         when (routeTag) {
             AppRoute.HOME -> {

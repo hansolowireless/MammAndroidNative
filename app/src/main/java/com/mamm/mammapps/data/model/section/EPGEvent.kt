@@ -4,8 +4,7 @@ import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import com.mamm.mammapps.data.extension.getCurrentDate
 import com.mamm.mammapps.data.extension.toZonedDateTimeEPG
-import com.mamm.mammapps.data.model.Metadata
-import kotlinx.parcelize.IgnoredOnParcel
+import com.mamm.mammapps.data.model.metadata.Metadata
 import kotlinx.parcelize.Parcelize
 import java.time.ZonedDateTime
 
@@ -111,6 +110,10 @@ data class EPGEvent(
 
     fun getDescription(): String {
         return tbEventLanguages?.firstOrNull()?.description ?: ""
+    }
+
+    fun getChannelId() : Int {
+        return idChannel?.toIntOrNull() ?: 0
     }
 
     fun getSubtitle(): String {

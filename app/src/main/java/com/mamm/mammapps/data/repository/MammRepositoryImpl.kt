@@ -10,7 +10,7 @@ import com.mamm.mammapps.data.model.Genre
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
-import com.mamm.mammapps.data.model.GetSeasonInfoResponse
+import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginResponse
 import com.mamm.mammapps.data.session.SessionManager
@@ -225,7 +225,10 @@ class MammRepositoryImpl @Inject constructor(
 
     override fun findWarnerContent(identifier: ContentIdentifier) : Result<Any>? {
         val content: Any? = when (identifier) {
-            is ContentIdentifier.VoD -> remoteDatasource.getCachedWarner()?.vods?.find { it.getId() == identifier.id }
+            is ContentIdentifier.VoD -> {
+                remoteDatasource.getCachedWarner()?.vods?.find { it.getId() == identifier.id }
+                    ?: remoteDatasource.getCachedWarner()?.featured?.find { it.id == identifier.id }
+            }
             else -> null
         }
         return content?.let { Result.success(it) }
@@ -233,7 +236,10 @@ class MammRepositoryImpl @Inject constructor(
 
     override fun findAcontraContent(identifier: ContentIdentifier) : Result<Any>? {
         val content: Any? = when (identifier) {
-            is ContentIdentifier.VoD -> remoteDatasource.getCachedAcontra()?.vods?.find { it.getId() == identifier.id }
+            is ContentIdentifier.VoD -> {
+                remoteDatasource.getCachedAcontra()?.vods?.find { it.getId() == identifier.id }
+                    ?: remoteDatasource.getCachedAcontra()?.featured?.find { it.id == identifier.id }
+            }
             else -> null
         }
         return content?.let { Result.success(it) }
@@ -241,7 +247,10 @@ class MammRepositoryImpl @Inject constructor(
 
     override fun findAMCContent(identifier: ContentIdentifier) : Result<Any>? {
         val content: Any? = when (identifier) {
-            is ContentIdentifier.VoD -> remoteDatasource.getCachedAMC()?.vods?.find { it.getId() == identifier.id }
+            is ContentIdentifier.VoD -> {
+                remoteDatasource.getCachedAMC()?.vods?.find { it.getId() == identifier.id }
+                    ?: remoteDatasource.getCachedAMC()?.featured?.find { it.id == identifier.id }
+            }
             else -> null
         }
         return content?.let { Result.success(it) }

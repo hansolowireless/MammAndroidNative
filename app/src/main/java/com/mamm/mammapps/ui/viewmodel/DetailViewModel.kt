@@ -2,6 +2,7 @@ package com.mamm.mammapps.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mamm.mammapps.data.model.serie.TbSeason
 import com.mamm.mammapps.domain.usecases.FindContentEntityUseCase
 import com.mamm.mammapps.domain.usecases.GetSeasonsInfoUseCase
 import com.mamm.mammapps.ui.common.UIState
@@ -30,11 +31,14 @@ class DetailViewModel @Inject constructor(
     private val _clickedContent = MutableStateFlow<Any?>(null)
     val clickedContent: StateFlow<Any?> = _clickedContent.asStateFlow()
 
+    private var seasonListOriginal: List<TbSeason> = mutableListOf()
+
     fun getSeasonInfo(content: ContentEntityUI) {
         if (content.identifier is ContentIdentifier.Serie) {
             viewModelScope.launch(Dispatchers.IO) {
                 getSeasonsInfoUseCase(content.identifier.id).onSuccess { seasonList ->
-                    _seasonInfoUIState.value = UIState.Success(seasonList)
+                    _seasonInfoUIState.value = UIState.Success(seasonList.first)
+                    seasonListOriginal = seasonList.second
                 }.onFailure {
                     _seasonInfoUIState.value = UIState.Error(it.message.orEmpty())
                 }
@@ -48,6 +52,16 @@ class DetailViewModel @Inject constructor(
             routeTag = routeTag
         ).onSuccess { entity ->
             _clickedContent.update { entity }
+        }
+    }
+    
+    fun findEpisode(seasonOrder: Int, episodeId: Int) {
+        seasonListOriginal.find { it.getOrder() == seasonOrder }
+        ?.let { seasonTb ->
+            seasonTb.tbContentSeasons?.find { it.contentDetails?.getId() == episodeId }
+            ?.let { episodeTb ->
+                _clickedContent.update { episodeTb }
+            }
         }
     }
 

@@ -45,3 +45,7 @@ object HomeGridBottomColor {
 object SeasonSelectorTabs {
     val tabTitle = Color.White
 }
+
+object SectionTitleColor {
+    val title = Primary
+}

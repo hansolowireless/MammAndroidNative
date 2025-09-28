@@ -1,7 +1,7 @@
 package com.mamm.mammapps.data.extension
 
 import com.mamm.mammapps.data.model.GetHomeContentResponse
-import com.mamm.mammapps.data.model.Metadata
+import com.mamm.mammapps.data.model.metadata.Metadata
 import retrofit2.Response
 import java.time.Instant
 import java.time.LocalDate

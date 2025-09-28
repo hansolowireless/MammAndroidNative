@@ -1,4 +1,4 @@
-package com.mamm.mammapps.data.model
+package com.mamm.mammapps.data.model.metadata
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

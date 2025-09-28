@@ -72,4 +72,10 @@ class EPGRepositoryImpl @Inject constructor(
         return todayEPG?.find { it.channel.id == channelId }
             ?.events?.find { it.isLive() }
     }
+
+    override fun findContent(channelId: Int, eventId: Int, date: LocalDate) : EPGEvent {
+        val todayEPG = cachedMultiDayEPG?.multiDayEPG?.get(date)
+        return todayEPG?.find { it.channel.id == channelId }
+            ?.events?.find { it.getId() == eventId } ?: throw IllegalStateException("Content not found")
+    }
 }

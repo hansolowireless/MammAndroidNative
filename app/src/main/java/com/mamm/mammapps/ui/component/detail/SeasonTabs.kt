@@ -35,14 +35,17 @@ import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.SeasonSelectorTabs
 
 @Composable
-fun SeasonTabs(seasons: List<SeasonUI>) {
+fun SeasonTabs(
+    seasons: List<SeasonUI>,
+    onEpisodeClick: (Int, Int) -> Unit
+) {
     if (seasons.isEmpty()) {
         return
     }
 
     var selectedTabIndex by remember { mutableStateOf(0) }
 
-    Column (modifier = Modifier.padding(horizontal = Dimensions.paddingMedium)) {
+    Column(modifier = Modifier.padding(horizontal = Dimensions.paddingMedium)) {
 
         Spacer(
             modifier = Modifier.height(Dimensions.paddingLarge)
@@ -78,10 +81,15 @@ fun SeasonTabs(seasons: List<SeasonUI>) {
             modifier = Modifier.height(Dimensions.paddingSmall)
         )
 
-        ProvideLazyListPivotOffset (parentFraction = 0.02f) {
+        ProvideLazyListPivotOffset(parentFraction = 0.02f) {
             LazyColumn {
                 items(seasons[selectedTabIndex].episodes) { episode ->
-                    ContentEntityListItem(episode)
+                    ContentEntityListItem(
+                        content = episode,
+                        onClick = {
+                            onEpisodeClick(seasons[selectedTabIndex].order, episode.identifier.id)
+                        }
+                    )
                 }
                 item {
                     Spacer(modifier = Modifier.height(500.dp))

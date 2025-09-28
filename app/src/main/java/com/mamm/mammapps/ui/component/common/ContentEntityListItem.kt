@@ -1,6 +1,11 @@
 package com.mamm.mammapps.ui.component.common
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -9,44 +14,63 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.ListItem
 import androidx.tv.material3.ListItemDefaults
 import coil.compose.AsyncImage
-import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentListUI
-import com.mamm.mammapps.ui.theme.ContentEntityColor
 import com.mamm.mammapps.ui.theme.ContentEntityListItemColor
+import com.mamm.mammapps.ui.theme.Dimensions
 
 @Composable
-fun ContentEntityListItem (
+fun ContentEntityListItem(
     content: ContentListUI,
-    showLiveIndicator: Boolean = false
+    showLiveIndicator: Boolean = false,
+    onClick: () -> Unit = {}
 ) {
     var isFocused by remember { mutableStateOf(false) }
 
     ListItem(
         selected = false,
-        onClick = {
-            //TODO
-        },
+        onClick = onClick,
         colors = ListItemDefaults.colors(
             containerColor = ContentEntityListItemColor.unfocusedContent,
             focusedContainerColor = ContentEntityListItemColor.focusedContent,
         ),
         modifier = Modifier.onFocusChanged { isFocused = it.isFocused },
         headlineContent = {
-            Text(
-                text = content.title,
-                style = MaterialTheme.typography.titleSmall,
-                maxLines = if (isFocused) 2 else 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            Row {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = content.title,
+                    style = MaterialTheme.typography.titleSmall,
+                    maxLines = if (isFocused) 2 else 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                if (showLiveIndicator) {
+                    Text(
+                        text = "Directo",
+                        style = MaterialTheme.typography.titleSmall,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .background(
+                                color = Color.Red,
+                                shape = RectangleShape
+                            )
+                            .padding(horizontal = Dimensions.paddingXSmall)
+                            .weight(0.3f)
+                    )
+                }
+            }
         },
         supportingContent = if (isFocused) {
             content.detailInfo?.description?.let { description ->

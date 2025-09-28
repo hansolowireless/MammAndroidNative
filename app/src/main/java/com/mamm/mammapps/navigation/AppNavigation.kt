@@ -11,16 +11,19 @@ import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.Event
 import com.mamm.mammapps.data.model.VoD
 import com.mamm.mammapps.data.model.branded.BrandedVod
+import com.mamm.mammapps.data.model.branded.Featured
 import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.data.model.section.SectionVod
-import com.mamm.mammapps.navigation.extension.addContent
-import com.mamm.mammapps.navigation.extension.addContentToPlay
+import com.mamm.mammapps.navigation.extension.addContentClass
+import com.mamm.mammapps.navigation.extension.addContentUI
 import com.mamm.mammapps.navigation.extension.addRoute
 import com.mamm.mammapps.navigation.extension.homeScreenRoute
+import com.mamm.mammapps.navigation.extension.retrieveContentClass
+import com.mamm.mammapps.navigation.extension.retrieveContentUI
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.component.LocalIsTV
+import com.mamm.mammapps.ui.mapper.toContentEntityUI
 import com.mamm.mammapps.ui.mapper.toContentToPlayUI
-import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.screen.ChannelsScreen
 import com.mamm.mammapps.ui.screen.DetailScreen
 import com.mamm.mammapps.ui.screen.EPGScreen
@@ -36,7 +39,6 @@ fun AppNavigation() {
         TVNavigationLayout(navController)
     } else {
         MobileNavigationLayout(navController)
-//        TVNavigationLayout(navController)
     }
 }
 
@@ -57,26 +59,14 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                 navController.navigate(AppRoute.DETAIL.route) {
                     launchSingleTop = true
                 }
-                navController.currentBackStackEntry?.savedStateHandle?.addContent(content)
+                navController.currentBackStackEntry?.savedStateHandle?.addContentUI(content)
                 navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.HOME)
             },
             onPlay = { content ->
                 navController.navigate(AppRoute.PLAYER.route) {
                     launchSingleTop = true
                 }
-                navController.currentBackStackEntry?.savedStateHandle?.addContentToPlay(content)
-                navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.HOME)
-            }
-        )
-    }
-
-    composable(AppRoute.CHANNELS.route) {
-        ChannelsScreen(
-            onContentClicked = { content ->
-                navController.navigate(AppRoute.PLAYER.route) {
-                    launchSingleTop = true
-                }
-                navController.currentBackStackEntry?.savedStateHandle?.addContentToPlay(content)
+                navController.currentBackStackEntry?.savedStateHandle?.addContentClass(content)
             }
         )
     }
@@ -91,25 +81,60 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
     homeScreenRoute(AppRoute.AMC, navController)
     homeScreenRoute(AppRoute.ADULTS, navController)
 
+    composable(AppRoute.CHANNELS.route) {
+        ChannelsScreen(
+            onContentClicked = { content ->
+                navController.navigate(AppRoute.PLAYER.route) {
+                    launchSingleTop = true
+                }
+                navController.currentBackStackEntry?.savedStateHandle?.addContentClass(content)
+            }
+        )
+    }
+
+    composable(AppRoute.EPG.route) {
+        EPGScreen(
+            onShowDetails = { content ->
+                navController.navigate(AppRoute.DETAIL.route) {
+                    launchSingleTop = true
+                }
+                navController.currentBackStackEntry?.savedStateHandle?.addContentUI(content.toContentEntityUI())
+                navController.currentBackStackEntry?.savedStateHandle?.addContentClass(content)
+                navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.EPG)
+            },
+            onPlayClick = { content ->
+                navController.navigate(AppRoute.PLAYER.route) {
+                    launchSingleTop = true
+                }
+                navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.EPG)
+                navController.currentBackStackEntry?.savedStateHandle?.addContentClass(content)
+            }
+        )
+    }
 
     composable(AppRoute.DETAIL.route) { backStackEntry ->
-        val contentItem = remember(backStackEntry) {
-            backStackEntry.savedStateHandle.get<ContentEntityUI>("content")
+        val contentUI = remember(backStackEntry) {
+            backStackEntry.savedStateHandle.retrieveContentUI()
+        }
+
+        val contentFromEPG = remember(backStackEntry) {
+            backStackEntry.savedStateHandle.retrieveContentClass()
         }
 
         val route = remember(backStackEntry) {
             backStackEntry.savedStateHandle.get<AppRoute>("route")
         }
 
-        if (contentItem != null && route != null) {
+        if (contentUI != null && route != null) {
             DetailScreen(
-                content = contentItem,
+                content = contentUI,
                 onClickPlay = { content ->
                     navController.navigate(AppRoute.PLAYER.route) {
                         launchSingleTop = true
                     }
-                    navController.currentBackStackEntry?.savedStateHandle?.addContentToPlay(content)
+                    navController.currentBackStackEntry?.savedStateHandle?.addContentClass(content)
                 },
+                prefoundContent = contentFromEPG,
                 routeTag = route
             )
         } else {
@@ -117,13 +142,9 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
         }
     }
 
-    composable(AppRoute.EPG.route) {
-        EPGScreen()
-    }
-
     composable(AppRoute.PLAYER.route) { backStackEntry ->
         val contentItem = remember(backStackEntry) {
-            backStackEntry.savedStateHandle.get<Any>("content")
+            backStackEntry.savedStateHandle.retrieveContentClass()
         }
 
         val playableContent = when (contentItem) {
@@ -133,6 +154,7 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
             is EPGEvent -> contentItem.toContentToPlayUI()
             is SectionVod -> contentItem.toContentToPlayUI()
             is BrandedVod -> contentItem.toContentToPlayUI()
+            is Featured -> contentItem.toContentToPlayUI()
             else -> null
         }
 

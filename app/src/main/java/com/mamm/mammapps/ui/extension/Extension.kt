@@ -27,10 +27,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.Glide
 import com.mamm.mammapps.R
-import com.mamm.mammapps.data.model.GetSeasonInfoResponse
 import com.mamm.mammapps.data.model.player.WatermarkInfo
-import com.mamm.mammapps.ui.model.ContentEntityUI
-import com.mamm.mammapps.ui.model.ContentIdentifier
 import java.time.ZonedDateTime
 import java.util.Date
 
@@ -123,3 +120,4 @@ fun ImageView.loadWatermarkOrHide(watermarkInfo: WatermarkInfo) {
 fun ZonedDateTime.toDate(): Date {
     return Date(this.toInstant().toEpochMilli())
 }
+

@@ -1,4 +1,4 @@
-package com.mamm.mammapps.data.model
+package com.mamm.mammapps.data.model.metadata
 
 import android.os.Parcelable
 import com.mamm.mammapps.data.model.section.TbContentItem

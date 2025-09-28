@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
 import com.mamm.mammapps.R
-import com.mamm.mammapps.data.model.Metadata
+import com.mamm.mammapps.data.model.metadata.Metadata
 import com.mamm.mammapps.ui.theme.Dimensions
 
 @Composable

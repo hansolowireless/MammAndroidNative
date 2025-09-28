@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -36,7 +37,7 @@ fun ChannelsColumn(
     selectedChannelId: Int? = null,
     onChannelSelected: (ContentEPGUI) -> Unit = {}
 ) {
-    ProvideLazyListPivotOffset (parentFraction = 0.05f) {
+    ProvideLazyListPivotOffset (parentFraction = 0.0f) {
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall)
@@ -49,7 +50,7 @@ fun ChannelsColumn(
 
             val containerColor = when {
                 isFocused -> MaterialTheme.colorScheme.primaryContainer // Color cuando tiene foco
-                isSelected -> MaterialTheme.colorScheme.secondaryContainer // Un color distinto para la selección sin foco
+                isSelected -> Color.Transparent
                 else -> MaterialTheme.colorScheme.surface // Color por defecto
             }
 
