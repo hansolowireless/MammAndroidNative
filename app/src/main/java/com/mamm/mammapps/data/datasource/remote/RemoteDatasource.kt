@@ -23,6 +23,7 @@ import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
 import com.mamm.mammapps.data.model.player.GetTickersResponse
+import com.mamm.mammapps.data.model.player.heartbeat.HeartBeatRequest
 import com.mamm.mammapps.data.model.player.playback.CLMRequest
 import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.remote.ApiService
@@ -266,7 +267,8 @@ class RemoteDatasource @Inject constructor(
                 val errorBody = response.errorBody()?.string()?.toResponseBody()
                 throw HttpException(Response.error<Any>(response.code(), errorBody))
             }
-            val acontraData = response.body() ?: throw IllegalStateException("Response body is null")
+            val acontraData =
+                response.body() ?: throw IllegalStateException("Response body is null")
             cachedAcontraContent = acontraData
             acontraData
         }
@@ -356,6 +358,19 @@ class RemoteDatasource @Inject constructor(
         return locationHeader
     }
 
+    suspend fun sendHeartBeat() {
+        val request = HeartBeatRequest(
+            deviceType = deviceType,
+            deviceSerial = deviceSerial
+        )
+        withContext(Dispatchers.IO) {
+            val response = idmApi.sendHeartBeat(request.toQueryMap())
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()
+                throw HttpException(response)
+            }
+        }
+    }
 
     //----------USER IP---------//
     suspend fun getCurrentUserIp(): String {

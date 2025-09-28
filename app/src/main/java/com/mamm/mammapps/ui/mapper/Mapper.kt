@@ -238,6 +238,13 @@ fun Featured.toContentToPlayUI(): ContentToPlayUI? {
     )
 }
 
+fun Episode.toContentToPlayUI() = ContentToPlayUI(
+    identifier = ContentIdentifier.VoD(getId()),
+    deliveryURL = this.path.orEmpty(),
+    title = this.getTitle(),
+    imageUrl = this.contentLogo.orEmpty(),
+)
+
 //------------------------LIVE EVENT INFO------------------------
 fun EPGEvent.toLiveEventInfoUI(): LiveEventInfoUI = LiveEventInfoUI(
     title = this.getTitle(),

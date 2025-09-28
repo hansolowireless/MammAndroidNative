@@ -57,6 +57,7 @@ fun VideoPlayerScreen(
 
     LaunchedEffect(content) {
         viewModel.observeLiveEvents()
+        viewModel.observeTickers()
     }
 
     DisposableEffect(Unit) {
@@ -77,26 +78,6 @@ fun VideoPlayerScreen(
             player = player
         )
 
-
-//        PlayerDialogs(
-//            uiState = uiState,
-//            onEvent = viewModel::handleEvent
-//        )
-
-//        if (uiState.showChannelZapDisplay) {
-//            ChannelZapDisplay(
-//                channelNumber = uiState.channelZapNumber,
-//                modifier = Modifier.align(Alignment.Center)
-//            )
-//        }
-
-//        uiState.error?.let { error ->
-//            ErrorDisplay(
-//                message = error,
-//                onDismiss = { viewModel.clearError() },
-//                modifier = Modifier.align(Alignment.BottomCenter)
-//            )
-//        }
     }
 }
 
@@ -119,6 +100,7 @@ fun PlayerViewWithControls(
 
     val liveEventInfo by viewModel.liveEventInfo.collectAsStateWithLifecycle()
     val isTstvMode by viewModel.isTstvMode.collectAsStateWithLifecycle()
+    val tickerList by viewModel.tickerList.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -126,6 +108,10 @@ fun PlayerViewWithControls(
 
     LaunchedEffect(liveEventInfo, content, isTstvMode) {
         playerViewRef?.let { playerView -> viewModel.setControlVisibility(playerView)  }
+    }
+
+    LaunchedEffect (tickerList) {
+        videoResizeManager?.replaceTickers(tickerList)
     }
 
     AndroidView(
@@ -155,27 +141,23 @@ fun PlayerViewWithControls(
                 videoResizeManager = VideoResizeManagerWithTicker(
                     fragment = dummyFragment,
                     frameLayoutId = R.id.root,
-                    tickerList = listOf(
-                        Ticker(
-                        titulo = "Noticia de prueba",
-                        textos = listOf(
-                            "Este es un texto de ejemplo para el ticker publicitario",
-                            "Segundo mensaje del ticker con más información",
-                            "Tercer texto que se mostrará en la animación"
-                        ),
-                        activo = true,
-                        fechaDesde = "2025-09-18T00:00:00Z",
-                        fechaHasta = "2025-12-31T23:59:59Z",
-                        tiempoDuracion = 10,
-                        tiempoEntreApariciones = 30,
-                        fondo = "https://www.marketingdirecto.com/wp-content/uploads/2024/05/Mahou-San-Isidro.jpg"
-                    )
-                    )
-                )
-                videoResizeManager?.setAutoResize(
-                    enabled = true,
-                    intervalSecs = 30,
-                    smallDurationSecs = 10
+                    tickerList = emptyList()
+//                    tickerList = listOf(
+//                        Ticker(
+//                        titulo = "Noticia de prueba",
+//                        textos = listOf(
+//                            "Este es un texto de ejemplo para el ticker publicitario",
+//                            "Segundo mensaje del ticker con más información",
+//                            "Tercer texto que se mostrará en la animación"
+//                        ),
+//                        activo = true,
+//                        fechaDesde = "2025-09-18T00:00:00Z",
+//                        fechaHasta = "2025-12-31T23:59:59Z",
+//                        tiempoDuracion = 10,
+//                        tiempoEntreApariciones = 30,
+//                        fondo = "https://www.marketingdirecto.com/wp-content/uploads/2024/05/Mahou-San-Isidro.jpg"
+//                    )
+//                    )
                 )
             }
 

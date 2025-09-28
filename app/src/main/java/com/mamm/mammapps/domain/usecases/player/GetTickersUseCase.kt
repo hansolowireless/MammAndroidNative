@@ -1,4 +1,4 @@
-package com.mamm.mammapps.domain.usecases
+package com.mamm.mammapps.domain.usecases.player
 
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.player.GetTickersResponse
@@ -7,10 +7,8 @@ import com.mamm.mammapps.domain.interfaces.PlaybackRepository
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class GetTickersUseCase @Inject constructor(

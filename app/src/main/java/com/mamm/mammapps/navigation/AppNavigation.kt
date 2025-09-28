@@ -14,6 +14,8 @@ import com.mamm.mammapps.data.model.branded.BrandedVod
 import com.mamm.mammapps.data.model.branded.Featured
 import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.data.model.section.SectionVod
+import com.mamm.mammapps.data.model.serie.Episode
+import com.mamm.mammapps.data.model.serie.TbContentSeason
 import com.mamm.mammapps.navigation.extension.addContentClass
 import com.mamm.mammapps.navigation.extension.addContentUI
 import com.mamm.mammapps.navigation.extension.addRoute
@@ -155,6 +157,7 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
             is SectionVod -> contentItem.toContentToPlayUI()
             is BrandedVod -> contentItem.toContentToPlayUI()
             is Featured -> contentItem.toContentToPlayUI()
+            is TbContentSeason -> contentItem.contentDetails?.toContentToPlayUI()
             else -> null
         }
 

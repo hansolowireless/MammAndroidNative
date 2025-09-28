@@ -1,4 +1,4 @@
-package com.mamm.mammapps.domain.usecases
+package com.mamm.mammapps.domain.usecases.login
 
 import com.mamm.mammapps.data.config.Config
 import com.mamm.mammapps.data.logger.Logger

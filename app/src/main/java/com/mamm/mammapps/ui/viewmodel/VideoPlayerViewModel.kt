@@ -26,10 +26,12 @@ import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.player.Ticker
 import com.mamm.mammapps.data.model.player.VideoPlayerUIState
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
+import com.mamm.mammapps.domain.usecases.player.GetTickersUseCase
 import com.mamm.mammapps.domain.usecases.player.GetDRMUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.GetJwTokenUseCase
 import com.mamm.mammapps.domain.usecases.player.GetPlayableUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.GetTSTVUrlUseCase
+import com.mamm.mammapps.domain.usecases.player.SendHeartBeatUseCase
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.constant.PlayerConstant
 import com.mamm.mammapps.ui.extension.toDate
@@ -43,6 +45,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -50,9 +53,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.w3c.dom.Text
 import java.time.Duration
-import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -68,9 +69,10 @@ class VideoPlayerViewModel @Inject constructor(
 //    private val validatePINUseCase: ValidatePINUseCase,
 //    private val sendQoSUseCase: SendQoSParametersUseCase,
 //    private val sendBookmarkUseCase: SendBookmarkStampsUseCase,
-//    private val sendHeartbeatUseCase: SendHeartbeatUseCase,
+    private val sendHeartbeatUseCase: SendHeartBeatUseCase,
 //    private val manageTickerUseCase: ManageTickerUseCase,
     private val getLiveEventInfoUseCase: FindLiveEventOnChannelUseCase,
+    private val getTickersUseCase: GetTickersUseCase,
     @ApplicationContext private val context: Context,
     private val logger: Logger
 ) : ViewModel() {
@@ -92,7 +94,7 @@ class VideoPlayerViewModel @Inject constructor(
     private val _liveEventInfo = MutableStateFlow<LiveEventInfoUI?>(null)
     val liveEventInfo = _liveEventInfo.asStateFlow()
 
-    private val _tickerList = MutableStateFlow<List<Ticker>?>(null)
+    private val _tickerList = MutableStateFlow<List<Ticker>>(emptyList())
     val tickerList = _tickerList.asStateFlow()
 
     // ExoPlayer y componentes
@@ -208,7 +210,7 @@ class VideoPlayerViewModel @Inject constructor(
 
     }
 
-    private fun setPlayerUrls(videoUrl : String, drmUrl: String = "") {
+    private fun setPlayerUrls(videoUrl: String, drmUrl: String = "") {
         val player = _player.value
         val content = _content.value
 
@@ -239,12 +241,10 @@ class VideoPlayerViewModel @Inject constructor(
 
         if ((content.initialPlayPositionMs) > 0) {
             player?.seekTo(content.initialPlayPositionMs ?: 0)
-        }
-        else if (tstvInitialPlayPositionMs > 0) {
+        } else if (tstvInitialPlayPositionMs > 0) {
             player?.seekTo(tstvInitialPlayPositionMs)
             tstvInitialPlayPositionMs = 0
-        }
-        else {
+        } else {
             player?.seekTo(0)
         }
 
@@ -267,26 +267,35 @@ class VideoPlayerViewModel @Inject constructor(
         else logger.info(TAG, "startObservingLiveEvents Content is not channel")
     }
 
+    fun observeTickers() {
+        getTickersUseCase.observeTickers().onEach { tickers ->
+            _tickerList.value = tickers
+        }.launchIn(viewModelScope)
+    }
+
     private fun startPeriodicFunctions() {
-//        startHeartbeat()
+        startHeartbeat()
 //        startQoSReporting()
 //        startBookmarkReporting()
 //        startTickerService()
     }
 
-    //    private fun startHeartbeat() {
-//        heartbeatJob?.cancel()
-//        heartbeatJob = viewModelScope.launch {
-//            sendHeartbeatUseCase(firstBeat = true)
-//
-//            while (true) {
-//                delay(120000) // 2 minutos
-//                sendHeartbeatUseCase(firstBeat = false)
-//            }
-//        }
-//    }
-//
-//    private fun startQoSReporting() {
+
+    private fun startHeartbeat() {
+        heartbeatJob?.cancel()
+        heartbeatJob = viewModelScope.launch (Dispatchers.IO) {
+            logger.debug(TAG, "startHeartbeat Starting to send heartbeat...")
+            sendHeartbeatUseCase()
+            while (true) {
+                delay(120000)
+
+                logger.debug(TAG, "startHeartbeat Sending another heartbeat...")
+                sendHeartbeatUseCase()
+            }
+        }
+    }
+
+    //    private fun startQoSReporting() {
 //        qosJob?.cancel()
 //        qosJob = viewModelScope.launch {
 //            while (true) {
@@ -455,8 +464,7 @@ class VideoPlayerViewModel @Inject constructor(
                 if (previewBar?.isTstvMode == true) {
                     liveLabel.visibility = View.GONE
                     goToLiveButton.visibility = View.VISIBLE
-                }
-                else {
+                } else {
                     liveLabel.visibility = View.VISIBLE
                     goToLiveButton.visibility = View.GONE
                 }
@@ -538,26 +546,35 @@ class VideoPlayerViewModel @Inject constructor(
         if (_content.value.isLive && _content.value.isTimeshift) {
             val progress = previewBar?.progress?.toLong() ?: 0
             val timeToJump =
-                _liveEventInfo.value?.eventStart?.plusSeconds(progress/1000)
+                _liveEventInfo.value?.eventStart?.plusSeconds(progress / 1000)
             val startTSTV = Duration.between(timeToJump, getCurrentDate())
-                .toMillis() > PlayerConstant.MILLISECONDS_TO_BE_LIVE && (timeToJump?.isBefore(getCurrentDate()) ?: false)
+                .toMillis() > PlayerConstant.MILLISECONDS_TO_BE_LIVE && (timeToJump?.isBefore(
+                getCurrentDate()
+            ) ?: false)
 
             if (startTSTV) {
                 viewModelScope.launch(Dispatchers.IO) {
-                    getTSTVUrlUseCase.invoke(liveEventInfo = _liveEventInfo.value).onSuccess { url ->
-                        logger.debug(TAG, "handleScrubStop Success getting TSTV Url, setting it now...")
+                    getTSTVUrlUseCase.invoke(liveEventInfo = _liveEventInfo.value)
+                        .onSuccess { url ->
+                            logger.debug(
+                                TAG,
+                                "handleScrubStop Success getting TSTV Url, setting it now..."
+                            )
 
-                        previewBar?.isTstvMode = true
-                        _isTstvMode.update { true }
-                        previewBar?.setTstvPoint(_liveEventInfo.value?.eventStart?.toDate())
-                        tstvInitialPlayPositionMs = progress
+                            previewBar?.isTstvMode = true
+                            _isTstvMode.update { true }
+                            previewBar?.setTstvPoint(_liveEventInfo.value?.eventStart?.toDate())
+                            tstvInitialPlayPositionMs = progress
 
-                        withContext(Dispatchers.Main) {
-                            setPlayerUrls(videoUrl = url)
-                        }
+                            withContext(Dispatchers.Main) {
+                                setPlayerUrls(videoUrl = url)
+                            }
 
-                    }.onFailure {
-                        logger.error(TAG, "handleScrubStop Failed to get TSTV url, defaulting to Live Url")
+                        }.onFailure {
+                        logger.error(
+                            TAG,
+                            "handleScrubStop Failed to get TSTV url, defaulting to Live Url"
+                        )
 
                         previewBar?.isTstvMode = false
                         _isTstvMode.update { false }
@@ -568,7 +585,10 @@ class VideoPlayerViewModel @Inject constructor(
                     }
                 }
             } else {
-                logger.debug(TAG, "handleScrubStop Difference is not sufficient to get into TSTV Mode! Still in live...")
+                logger.debug(
+                    TAG,
+                    "handleScrubStop Difference is not sufficient to get into TSTV Mode! Still in live..."
+                )
                 previewBar?.isTstvMode = false
                 _isTstvMode.update { false }
                 setPlayerUrls(videoUrl = playableUrl, drmUrl = playableLicenseUrl)

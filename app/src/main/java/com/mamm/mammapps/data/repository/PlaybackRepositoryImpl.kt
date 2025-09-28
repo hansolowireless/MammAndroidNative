@@ -140,4 +140,12 @@ class PlaybackRepositoryImpl @Inject constructor (
         }
     }
 
+
+    override suspend fun sendHeartBeat() : Result<Unit> {
+        return runCatching {
+            remoteDatasource.sendHeartBeat()
+        }.onFailure {
+            logger.error(TAG, "sendHeartBeat error sending heartbeat $it.message")
+        }
+    }
 }

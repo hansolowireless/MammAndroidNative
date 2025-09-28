@@ -2,7 +2,9 @@ package com.mamm.mammapps.data.di
 
 import com.mamm.mammapps.BuildConfig
 import com.mamm.mammapps.data.config.Config
+import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.remote.ApiService
+import com.mamm.mammapps.remote.interceptor.AuthInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -65,10 +67,14 @@ object NetworkModule {
     @IdmApi
     @Provides
     @Singleton
-    fun provideIdmRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    fun provideIdmRetrofit(okHttpClient: OkHttpClient, sessionManager: SessionManager): Retrofit {
+        val idmClient = okHttpClient.newBuilder()
+            .addInterceptor(AuthInterceptor(sessionManager))
+            .build()
+
         return Retrofit.Builder()
             .baseUrl(Config.idmUrl)
-            .client(okHttpClient)
+            .client(idmClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
