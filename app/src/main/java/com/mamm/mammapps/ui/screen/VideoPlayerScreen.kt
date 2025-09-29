@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
@@ -25,8 +26,10 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -38,6 +41,7 @@ import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.player.Ticker
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
+import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
 import com.mamm.mammapps.ui.manager.videoresize.VideoResizeManagerWithTicker
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import com.mamm.mammapps.ui.viewmodel.VideoPlayerViewModel
@@ -47,7 +51,7 @@ fun VideoPlayerScreen(
     viewModel: VideoPlayerViewModel = hiltViewModel(),
     playedContent: ContentToPlayUI
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     val player by viewModel.player.collectAsStateWithLifecycle()
     val content by viewModel.content.collectAsStateWithLifecycle()
 
@@ -91,16 +95,25 @@ fun PlayerViewWithControls(
     val focusRequester = remember { FocusRequester() }
     var playerViewRef by remember { mutableStateOf<StyledPlayerView?>(null) }
 
+    //Watermark y fingerprinting
     val fingerprintController = remember { FingerprintController() }
+
+    //Tickers
     var videoResizeManager by remember { mutableStateOf<VideoResizeManagerWithTicker?>(null) }
+    val tickerList by viewModel.tickerList.collectAsStateWithLifecycle()
+
+    //Barra para TSTV
     var previewTimeBar by remember { mutableStateOf<CustomPreviewBar?>(null) }
     var scrubListener by remember { mutableStateOf<PreviewBar.OnScrubListener?>(null) }
+    val liveEventInfo by viewModel.liveEventInfo.collectAsStateWithLifecycle()
+    val isTstvMode by viewModel.isTstvMode.collectAsStateWithLifecycle()
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    val liveEventInfo by viewModel.liveEventInfo.collectAsStateWithLifecycle()
-    val isTstvMode by viewModel.isTstvMode.collectAsStateWithLifecycle()
-    val tickerList by viewModel.tickerList.collectAsStateWithLifecycle()
+    // Mostrar diálogo de subtítulos
+    val context = LocalContext.current
+    val fragmentManager = (context as? FragmentActivity)?.supportFragmentManager
+    val showCcDialog by viewModel.showCcDialog.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -112,6 +125,17 @@ fun PlayerViewWithControls(
 
     LaunchedEffect (tickerList) {
         videoResizeManager?.replaceTickers(tickerList)
+    }
+
+    LaunchedEffect(showCcDialog) {
+        if (showCcDialog && fragmentManager != null) {
+            val trackSelectionDialog = TrackSelectionDialog.createCCDialogForPlayer(
+                player
+            ) { dismissedDialog ->  // Este es el onDismissListener
+                viewModel.onCcDialogDismissed()
+            }
+            trackSelectionDialog.show(fragmentManager, null)
+        }
     }
 
     AndroidView(
@@ -127,8 +151,12 @@ fun PlayerViewWithControls(
         update = { parentView ->
             val styledPlayerView = parentView.findViewById<StyledPlayerView>(R.id.player_view)
             playerViewRef = styledPlayerView
-
             previewTimeBar = parentView.findViewById<CustomPreviewBar>(R.id.exo_progress)
+
+            val ccTracksButton = parentView.findViewById<AppCompatImageButton>(R.id.cc_tracks_button)
+            ccTracksButton?.setOnClickListener {
+                viewModel.onCcDialogButtonClick()
+            }
 
             // Inicializar manager si no existe
             if (videoResizeManager == null) {
@@ -142,22 +170,6 @@ fun PlayerViewWithControls(
                     fragment = dummyFragment,
                     frameLayoutId = R.id.root,
                     tickerList = emptyList()
-//                    tickerList = listOf(
-//                        Ticker(
-//                        titulo = "Noticia de prueba",
-//                        textos = listOf(
-//                            "Este es un texto de ejemplo para el ticker publicitario",
-//                            "Segundo mensaje del ticker con más información",
-//                            "Tercer texto que se mostrará en la animación"
-//                        ),
-//                        activo = true,
-//                        fechaDesde = "2025-09-18T00:00:00Z",
-//                        fechaHasta = "2025-12-31T23:59:59Z",
-//                        tiempoDuracion = 10,
-//                        tiempoEntreApariciones = 30,
-//                        fondo = "https://www.marketingdirecto.com/wp-content/uploads/2024/05/Mahou-San-Isidro.jpg"
-//                    )
-//                    )
                 )
             }
 
@@ -165,14 +177,6 @@ fun PlayerViewWithControls(
                 playerView.player = player
                 playerView.useController = true
                 playerView.controllerShowTimeoutMs = 10000
-
-                player?.let { p ->
-                    Log.d("PlayerDebug", "Player state: ${p.playbackState}")
-                    Log.d("PlayerDebug", "Has media items: ${p.mediaItemCount}")
-                    Log.d("PlayerDebug", "Duration: ${p.duration}")
-                    Log.d("PlayerDebug", "Position: ${p.currentPosition}")
-                    Log.d("PlayerDebug", "FingerPrintInfo: ${content?.fingerprintInfo}")
-                }
 
                 // Solo agregar listener si no existe
                 if (scrubListener == null) {
@@ -241,56 +245,6 @@ fun PlayerViewWithControls(
 
 }
 
-//
-//@Composable
-//fun PlayerDialogs(
-//    uiState: VideoPlayerUIState,
-//    onEvent: (VideoPlayerEvent) -> Unit
-//) {
-//    if (uiState.showPINDialog) {
-//        PINDialog(
-//            onPINEntered = { pin -> onEvent(VideoPlayerEvent.ValidatePIN(pin)) },
-//            onDismiss = { onEvent(VideoPlayerEvent.HidePINDialog) }
-//        )
-//    }
-//}
-//
-//@Composable
-//fun PINDialog(
-//    onPINEntered: (String) -> Unit,
-//    onDismiss: () -> Unit
-//) {
-//    var pin by remember { mutableStateOf("") }
-//
-//    AlertDialog(
-//        onDismissRequest = onDismiss,
-//        title = { Text("Introduce PIN") },
-//        text = {
-//            OutlinedTextField(
-//                value = pin,
-//                onValueChange = { pin = it },
-//                label = { Text("PIN") },
-//                visualTransformation = PasswordVisualTransformation(),
-//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-//            )
-//        },
-//        confirmButton = {
-//            TextButton(
-//                onClick = {
-//                    onPINEntered(pin)
-//                    pin = ""
-//                }
-//            ) {
-//                Text("OK")
-//            }
-//        },
-//        dismissButton = {
-//            TextButton(onClick = onDismiss) {
-//                Text("Cancelar")
-//            }
-//        }
-//    )
-//}
 //
 //@Composable
 //fun ChannelZapDisplay(

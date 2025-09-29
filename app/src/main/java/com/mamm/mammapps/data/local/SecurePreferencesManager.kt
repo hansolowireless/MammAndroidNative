@@ -88,7 +88,7 @@ class SecurePreferencesManager @Inject constructor(
     }
 
     // Obtener credenciales
-    private fun getUsername(): String? {
+    fun getUsername(): String? {
         return try {
             sharedPrefs.getString(KEY_USERNAME, null)
         } catch (e: Exception) {

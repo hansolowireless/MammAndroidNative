@@ -2,9 +2,11 @@ package com.mamm.mammapps.data.di
 
 import com.mamm.mammapps.BuildConfig
 import com.mamm.mammapps.data.config.Config
+import com.mamm.mammapps.data.local.SecurePreferencesManager
 import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.remote.ApiService
 import com.mamm.mammapps.remote.interceptor.AuthInterceptor
+import com.mamm.mammapps.remote.interceptor.QosAuthInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -40,6 +42,10 @@ annotation class NoBaseUrlApi
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class NoBaseUrlNoRedirectApi
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class QosApi
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -140,6 +146,25 @@ object NetworkModule {
             .build()
     }
 
+    @QosApi
+    @Provides
+    @Singleton
+    fun provideQosRetrofit(
+        okHttpClient: OkHttpClient,
+        securePreferencesManager: SecurePreferencesManager,
+        sessionManager: SessionManager
+    ): Retrofit {
+        val qosClient = okHttpClient.newBuilder()
+            .addInterceptor(QosAuthInterceptor(sessionManager, securePreferencesManager))
+            .build()
+
+        return Retrofit.Builder()
+            .baseUrl(Config.qosUrl)
+            .client(qosClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
     @IdmApi
     @Provides
     @Singleton
@@ -180,6 +205,13 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideNoRedirectContentApi(@NoBaseUrlNoRedirectApi retrofit: Retrofit): ApiService {
+        return retrofit.create(ApiService::class.java)
+    }
+
+    @QosApi
+    @Provides
+    @Singleton
+    fun provideQosApi(@QosApi retrofit: Retrofit): ApiService {
         return retrofit.create(ApiService::class.java)
     }
 

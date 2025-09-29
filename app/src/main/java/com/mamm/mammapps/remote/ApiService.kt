@@ -9,6 +9,7 @@ import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
 import com.mamm.mammapps.data.model.player.GetTickersResponse
+import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.model.player.heartbeat.HeartBeatRequest
 import retrofit2.Response
 import retrofit2.http.Body
@@ -17,7 +18,6 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
-import retrofit2.http.QueryMap
 import retrofit2.http.Url
 
 interface ApiService {
@@ -190,7 +190,16 @@ interface ApiService {
         "Accept: application/json"
     )
     suspend fun sendHeartBeat(
-        @Body heartBeatRequest: Map<String, String>
+        @Body heartBeatRequest: HeartBeatRequest
+    ): Response<Unit>
+
+    @POST("/QosMonitor/logs")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun sendQos(
+        @Body qosRequest: QosData
     ): Response<Unit>
 
     // ---------- Metrics / QoS ----------

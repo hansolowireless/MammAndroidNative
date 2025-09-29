@@ -23,6 +23,7 @@ import javax.inject.Inject
 import android.util.Base64
 import com.mamm.mammapps.data.config.Config
 import com.mamm.mammapps.data.model.player.GetTickersResponse
+import com.mamm.mammapps.data.model.player.QosData
 import java.time.format.DateTimeFormatter
 
 class PlaybackRepositoryImpl @Inject constructor (
@@ -146,6 +147,14 @@ class PlaybackRepositoryImpl @Inject constructor (
             remoteDatasource.sendHeartBeat()
         }.onFailure {
             logger.error(TAG, "sendHeartBeat error sending heartbeat $it.message")
+        }
+    }
+
+    override suspend fun sendQosData(qosData: QosData) : Result<Unit> {
+        return runCatching {
+            remoteDatasource.sendQosData(qosData)
+        }.onFailure {
+            logger.error(TAG, "sendQoSData error sending qos data $it.message")
         }
     }
 }

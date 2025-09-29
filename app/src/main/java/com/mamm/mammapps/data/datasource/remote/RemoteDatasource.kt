@@ -8,6 +8,7 @@ import com.mamm.mammapps.data.di.IdmApi
 import com.mamm.mammapps.data.di.LocatorApi
 import com.mamm.mammapps.data.di.NoBaseUrlApi
 import com.mamm.mammapps.data.di.NoBaseUrlNoRedirectApi
+import com.mamm.mammapps.data.di.QosApi
 import com.mamm.mammapps.data.extension.getCurrentDate
 import com.mamm.mammapps.data.extension.isRedirect
 import com.mamm.mammapps.data.extension.toEPGRequestDate
@@ -23,6 +24,7 @@ import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
 import com.mamm.mammapps.data.model.player.GetTickersResponse
+import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.model.player.heartbeat.HeartBeatRequest
 import com.mamm.mammapps.data.model.player.playback.CLMRequest
 import com.mamm.mammapps.data.session.SessionManager
@@ -47,6 +49,7 @@ class RemoteDatasource @Inject constructor(
     @BaseUrlApi private val baseUrlApi: ApiService,
     @NoBaseUrlApi private val noBaseUrlApi: ApiService,
     @NoBaseUrlNoRedirectApi private val clmApi: ApiService,
+    @QosApi private val qosApi: ApiService,
     @DeviceTypeQualifier private val deviceType: String,
     @DeviceSerialQualifier private val deviceSerial: String,
     @DeviceModelQualifier private val deviceModel: String,
@@ -364,7 +367,17 @@ class RemoteDatasource @Inject constructor(
             deviceSerial = deviceSerial
         )
         withContext(Dispatchers.IO) {
-            val response = idmApi.sendHeartBeat(request.toQueryMap())
+            val response = idmApi.sendHeartBeat(request)
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()
+                throw HttpException(response)
+            }
+        }
+    }
+
+    suspend fun sendQosData(data: QosData) {
+        withContext(Dispatchers.IO) {
+            val response = qosApi.sendQos(data)
             if (!response.isSuccessful) {
                 val errorBody = response.errorBody()
                 throw HttpException(response)

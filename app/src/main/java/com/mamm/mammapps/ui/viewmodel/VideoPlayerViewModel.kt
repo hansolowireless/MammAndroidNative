@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
@@ -23,6 +24,7 @@ import com.google.android.exoplayer2.util.MimeTypes
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.extension.getCurrentDate
 import com.mamm.mammapps.data.logger.Logger
+import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.model.player.Ticker
 import com.mamm.mammapps.data.model.player.VideoPlayerUIState
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
@@ -32,7 +34,9 @@ import com.mamm.mammapps.domain.usecases.player.GetJwTokenUseCase
 import com.mamm.mammapps.domain.usecases.player.GetPlayableUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.GetTSTVUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.SendHeartBeatUseCase
+import com.mamm.mammapps.domain.usecases.player.SendQosUseCase
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
+import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
 import com.mamm.mammapps.ui.constant.PlayerConstant
 import com.mamm.mammapps.ui.extension.toDate
 import com.mamm.mammapps.ui.manager.videoresize.VideoResizeManagerWithTicker
@@ -67,10 +71,9 @@ class VideoPlayerViewModel @Inject constructor(
 //    private val channelZapUseCase: ChannelZapUseCase,
 //    private val setNewContentUseCase: SetNewContentUseCase,
 //    private val validatePINUseCase: ValidatePINUseCase,
-//    private val sendQoSUseCase: SendQoSParametersUseCase,
+    private val sendQoSUseCase: SendQosUseCase,
 //    private val sendBookmarkUseCase: SendBookmarkStampsUseCase,
     private val sendHeartbeatUseCase: SendHeartBeatUseCase,
-//    private val manageTickerUseCase: ManageTickerUseCase,
     private val getLiveEventInfoUseCase: FindLiveEventOnChannelUseCase,
     private val getTickersUseCase: GetTickersUseCase,
     @ApplicationContext private val context: Context,
@@ -94,6 +97,11 @@ class VideoPlayerViewModel @Inject constructor(
     private val _liveEventInfo = MutableStateFlow<LiveEventInfoUI?>(null)
     val liveEventInfo = _liveEventInfo.asStateFlow()
 
+    //Información del evento en directo cuando se está reproduciendo un canal
+    private val _showCcDialog = MutableStateFlow<Boolean>(false)
+    val showCcDialog = _showCcDialog.asStateFlow()
+
+    //Tickers
     private val _tickerList = MutableStateFlow<List<Ticker>>(emptyList())
     val tickerList = _tickerList.asStateFlow()
 
@@ -168,11 +176,7 @@ class VideoPlayerViewModel @Inject constructor(
         }
     }
 
-    private fun releasePlayer() {
-        _player.value?.removeAnalyticsListener(statsListener)
-        _player.value?.release()
-        _player.value = null
-    }
+
 
     private fun createPlayer() {
 
@@ -252,6 +256,18 @@ class VideoPlayerViewModel @Inject constructor(
         player?.playWhenReady = true
     }
 
+    fun onCcDialogButtonClick() {
+        if (TrackSelectionDialog.willHaveCCContent(_player.value)) {
+            logger.debug(TAG, "onCcDialogButtonClick Showing CC dialog")
+            _showCcDialog.value = true
+        }
+    }
+
+    fun onCcDialogDismissed () {
+        logger.debug(TAG, "onCcDialogDismissed Dismissing CC dialog")
+        _showCcDialog.value = false
+    }
+
     fun observeLiveEvents() {
         if (_content.value.isLive)
             getLiveEventInfoUseCase.observeLiveEvents((_content.value.identifier).getIdValue())
@@ -275,7 +291,7 @@ class VideoPlayerViewModel @Inject constructor(
 
     private fun startPeriodicFunctions() {
         startHeartbeat()
-//        startQoSReporting()
+        startQoSReporting()
 //        startBookmarkReporting()
 //        startTickerService()
     }
@@ -295,16 +311,35 @@ class VideoPlayerViewModel @Inject constructor(
         }
     }
 
-    //    private fun startQoSReporting() {
-//        qosJob?.cancel()
-//        qosJob = viewModelScope.launch {
-//            while (true) {
-//                delay(60000) // 1 minuto
-//                sendQoSParameters()
-//            }
-//        }
-//    }
-//
+    private fun startQoSReporting() {
+        qosJob?.cancel()
+        qosJob = viewModelScope.launch {
+            while (true) {
+                delay(60000)
+                logger.debug(TAG, "startQoSReporting Sending qos data...")
+                val qosData = createQosData()
+                withContext(Dispatchers.IO) {
+                    sendQoSUseCase(qosData)
+                }
+            }
+        }
+    }
+
+    private fun createQosData(): QosData {
+        val player = _player.value
+        return QosData(
+            playerBw = statsListener.playbackStats?.meanBandwidth?.toString() ?: "0",
+            activeTrack = player?.videoFormat?.height?.toString() ?: "0",
+            videoBw = player?.videoFormat?.bitrate?.toString() ?: "0",
+            bufTime = statsListener.playbackStats?.rebufferRate?.toString() ?: "0",
+            loadLatency = statsListener.playbackStats?.meanJoinTimeMs?.toString() ?: "0",
+            playTime = "0.0",
+            primaryNode = player?.currentMediaItem?.localConfiguration?.uri?.host ?: "",
+            id = _content.value.identifier.id.toString(),
+            type = _content.value.identifier.toString()
+        )
+    }
+
 //    private fun startBookmarkReporting() {
 //        val state = _uiState.value
 //
@@ -319,33 +354,8 @@ class VideoPlayerViewModel @Inject constructor(
 //            }
 //        }
 //    }
-//
-//    private fun sendQoSParameters() {
-//        val state = _uiState.value
-//        val player = _player.value
-//
-//        val correctedID = if (state.eventType == "cutv") {
-//            "${state.cutvChannelID}-${state.eventID}"
-//        } else {
-//            state.eventID.toString()
-//        }
-//
-//        val qosData = QoSData(
-//            playerBw = statsListener.playbackStats?.meanBandwidth?.toString() ?: "0",
-//            activeTrack = player?.videoFormat?.height?.toString() ?: "0",
-//            videoBw = player?.videoFormat?.bitrate?.toString() ?: "0",
-//            bufTime = statsListener.playbackStats?.rebufferRate?.toString() ?: "0",
-//            loadLatency = statsListener.playbackStats?.meanJoinTimeMs?.toString() ?: "0",
-//            playTime = "0.0",
-//            primaryNode = player?.currentMediaItem?.localConfiguration?.uri?.host ?: "",
-//            id = correctedID,
-//            type = _content.value?.identifier.toString() ?: ""
-//        )
-//
-//        viewModelScope.launch {
-//            sendQoSUseCase(qosData)
-//        }
-//    }
+
+
 //
 //    private fun sendBookmarkStamps() {
 //        val state = _uiState.value
@@ -373,22 +383,8 @@ class VideoPlayerViewModel @Inject constructor(
 //            watermarkInfo = state.watermark
 //        )
 //    }
-//
-//    private fun startTickerService() {
-//        viewModelScope.launch {
-//            manageTickerUseCase.startTicker()
-//        }
-//    }
-//
-    private fun stopPeriodicFunctions() {
-        qosJob?.cancel()
-        bookmarkJob?.cancel()
-        heartbeatJob?.cancel()
-        channelInputJob?.cancel()
 
-        watermarkController.stop()
-        resizeManager?.release()
-    }
+
 
     private fun handlePlayerError(error: PlaybackException, context: Context) {
         val message = when {
@@ -398,36 +394,6 @@ class VideoPlayerViewModel @Inject constructor(
             else -> "Error: ${error.message ?: ""}, code: ${error.errorCode}"
         }
         _uiState.value = _uiState.value.copy(error = message)
-    }
-
-    // Método para manejar eventos de Compose
-    fun handleEvent(event: String) {
-        val player = _player.value
-//        when (event) {
-//            VideoPlayerEvent.TogglePlayPause -> togglePlayPause()
-//            VideoPlayerEvent.FastForward -> handleFastForward()
-//            VideoPlayerEvent.Rewind -> handleRewind()
-//            VideoPlayerEvent.ToggleControls -> showControls()
-//            VideoPlayerEvent.Close -> {
-//                // Manejar cierre - podrías emitir un evento para cerrar la pantalla
-//            }
-//
-//            VideoPlayerEvent.ShowSettings -> showTrackSelection()
-//            VideoPlayerEvent.ShowSubtitles -> showSubtitlesDialog()
-//            VideoPlayerEvent.ShowAudioTracks -> showAudioTrackDialog()
-//            VideoPlayerEvent.GoToLive -> goToLive()
-//            VideoPlayerEvent.GoToBeginning -> goToBeginning()
-//            VideoPlayerEvent.HidePINDialog -> hidePINDialog()
-//            VideoPlayerEvent.SeekFinished -> {
-//                // Manejar fin de seek
-//            }
-//
-//            is VideoPlayerEvent.ValidatePIN -> validatePIN(event.pin)
-//            is VideoPlayerEvent.SeekTo -> {
-//                player?.seekTo(event.position)
-//                updatePlayerPosition()
-//            }
-//        }
     }
 
     private fun getInitialContent(): ContentToPlayUI {
@@ -441,25 +407,21 @@ class VideoPlayerViewModel @Inject constructor(
         )
     }
 
-    fun releaseVariables() {
-        stopPeriodicFunctions()
-        releasePlayer()
-    }
-
     fun setControlVisibility(playerView: StyledPlayerView) {
         val positionView: View = playerView.findViewById(R.id.exo_position)
         val tstvHourBeginView: TextView = playerView.findViewById(R.id.tstv_hourbegin)
         val liveLabel: View = playerView.findViewById(R.id.live_indicator)
-        val goToLiveButton: View = playerView.findViewById(R.id.go_live_button)
+        val goToLiveButton: AppCompatImageButton = playerView.findViewById(R.id.go_live_button)
         val previewBar = playerView.findViewById<CustomPreviewBar>(R.id.exo_progress)
+        val startOverButton : View = playerView.findViewById(R.id.go_beginning_button)
 
         configureTimeBar(previewBar)
 
-        if (_content.value.isTimeshift && _liveEventInfo.value != null) {
+        if (_content.value.isTimeshift) {
             if (_liveEventInfo.value != null) {
                 positionView.visibility = View.GONE
                 tstvHourBeginView.visibility = View.VISIBLE
-                liveLabel.visibility = View.VISIBLE
+                startOverButton.visibility = View.VISIBLE
 
                 if (previewBar?.isTstvMode == true) {
                     liveLabel.visibility = View.GONE
@@ -473,10 +435,11 @@ class VideoPlayerViewModel @Inject constructor(
                 positionView.visibility = View.GONE
                 tstvHourBeginView.visibility = View.GONE
                 liveLabel.visibility = View.VISIBLE
+                startOverButton.visibility = View.GONE
             }
         } else {
-
             goToLiveButton.visibility = View.GONE
+            startOverButton.visibility = View.GONE
 
             if (!_content.value.isLive) {
                 positionView.visibility = View.VISIBLE
@@ -489,7 +452,6 @@ class VideoPlayerViewModel @Inject constructor(
             }
         }
 
-
         val titleLabel: TextView = playerView.findViewById(R.id.channel_or_title_label)
         val liveEventTitleLabel: TextView = playerView.findViewById(R.id.live_event_title_Label)
         val contentImageView: ImageView = playerView.findViewById(R.id.contentImageView)
@@ -500,24 +462,24 @@ class VideoPlayerViewModel @Inject constructor(
             .load(_content.value.imageUrl)
             .into(contentImageView)
 
-//        // Helper function para convertir visibility a string legible
-//        fun visibilityToString(visibility: Int): String {
-//            return when (visibility) {
-//                View.VISIBLE -> "VISIBLE"
-//                View.GONE -> "GONE"
-//                View.INVISIBLE -> "INVISIBLE"
-//                else -> "UNKNOWN"
-//            }
-//        }
+    }
 
-//        logger.debug(
-//            TAG, "manageControlVisibility - isTimeshift: ${_content.value.isTimeshift}, " +
-//                    "isLive: ${_content.value.isLive}, " +
-//                    "liveEventInfo: ${_liveEventInfo.value}, " +
-//                    "positionView: ${visibilityToString(positionView.visibility)}, " +
-//                    "tstvHourBeginView: ${visibilityToString(tstvHourBeginView.visibility)}, " +
-//                    "liveLabel: ${visibilityToString(liveLabel.visibility)}"
-//        )
+    fun setDialogButtonVisibility(playerView: StyledPlayerView) {
+        //Dialogs Buttons
+        val ccTracksButton = playerView.findViewById<AppCompatImageButton>(R.id.cc_tracks_button)
+        val audioTracksButton = playerView.findViewById<AppCompatImageButton>(R.id.audio_tracks_button)
+
+        if (TrackSelectionDialog.willHaveCCContent(_player.value)) {
+            ccTracksButton.visibility = View.VISIBLE
+        } else {
+            ccTracksButton.visibility = View.GONE
+        }
+
+        if (TrackSelectionDialog.willHaveAudioContent(_player.value)) {
+            audioTracksButton.visibility = View.VISIBLE
+        } else {
+            audioTracksButton.visibility = View.GONE
+        }
     }
 
     private fun configureTimeBar(previewBar: CustomPreviewBar?) {
@@ -596,5 +558,26 @@ class VideoPlayerViewModel @Inject constructor(
         } else {
             logger.debug(TAG, "handleScrubStop No action needed after scrub stop")
         }
+    }
+
+    fun releaseVariables() {
+        stopPeriodicFunctions()
+        releasePlayer()
+    }
+
+    private fun stopPeriodicFunctions() {
+        qosJob?.cancel()
+        bookmarkJob?.cancel()
+        heartbeatJob?.cancel()
+        channelInputJob?.cancel()
+
+        watermarkController.stop()
+        resizeManager?.release()
+    }
+
+    private fun releasePlayer() {
+        _player.value?.removeAnalyticsListener(statsListener)
+        _player.value?.release()
+        _player.value = null
     }
 }

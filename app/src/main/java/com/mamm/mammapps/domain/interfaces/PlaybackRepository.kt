@@ -1,6 +1,7 @@
 package com.mamm.mammapps.domain.interfaces
 
 import com.mamm.mammapps.data.model.player.GetTickersResponse
+import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 
 interface PlaybackRepository {
@@ -11,5 +12,7 @@ interface PlaybackRepository {
     suspend fun getTickers () : Result<GetTickersResponse>
 
     suspend fun sendHeartBeat () : Result<Unit>
+
+    suspend fun sendQosData (qosData: QosData) : Result<Unit>
 
 }

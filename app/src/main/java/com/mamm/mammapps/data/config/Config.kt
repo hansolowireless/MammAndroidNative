@@ -48,6 +48,9 @@ object Config {
     val operatorNameDRM: String
         get() = BuildConfig.OPERATORNAME_DRM
 
+    val qosUrl: String
+        get() = BuildConfig.METRICS_URL
+
     /**
      * Método para actualizar las URLs dinámicas en caliente.
      * Solo tiene efecto si el flavor tiene `DYNAMIC_URLS = true`.
