@@ -11,6 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.mamm.mammapps.data.extension.catchupIsAvailable
+import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.ui.component.common.ContentEntityListItem
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
@@ -20,6 +22,7 @@ import com.mamm.mammapps.ui.theme.Dimensions
 @Composable
 fun EventsColumn(
     events: List<EPGEvent>,
+    channel: Channel,
     modifier: Modifier = Modifier,
     onEventClicked: (EPGEvent) -> Unit = {}
 ) {
@@ -44,6 +47,7 @@ fun EventsColumn(
                     ContentEntityListItem(
                         content = event.toContentListUI(),
                         showLiveIndicator = event.isLive(),
+                        showCatchupIndicator = event.catchupIsAvailable(availableCatchupHours = channel.catchupHours ?: 0),
                         onClick = { onEventClicked(event) }
                     )
                 }

@@ -80,7 +80,8 @@ data class Channel(
     @SerializedName("logoTitleURL") val logoTitleURL: String? = null,
     @SerializedName("fingerprintDuration") val fingerprintDuration: Int? = null,
     @SerializedName("watermark") val watermark: WatermarkInfo? = null,
-    var position : Int = 0
+    var position : Int = 0,
+    var fingerPrintText: String? = null
 ): Parcelable
 
 @Parcelize

@@ -13,5 +13,6 @@
     <color name="gray">#babab6</color>
     <color name="blackTransparent">#99000000</color>
     <color name="grayTransparent">#996f6f6d</color>
+    <color name="dark_gray_translucent">#33A9A9A9</color>
 
 </resources>

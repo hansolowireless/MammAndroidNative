@@ -6,8 +6,12 @@
         <item name="windowNoTitle">false</item>
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:textColorSecondary">@color/colorPrimaryDark</item>
-        <item name="android:textColor">@android:color/primary_text_dark</item>
+        <item name="android:textColor">@color/white</item>
+
         <item name="colorAccent">@color/colorPrimaryDark</item>
+
+        <item name="colorControlHighlight">@color/dark_gray_translucent</item>
+
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@color/blackTransparent</item>
         <item name="android:background">@android:color/transparent</item>
@@ -15,7 +19,7 @@
     </style>
 
     <style name="TrackSelectionListViewStyle" parent="android:style/Widget.ListView">
-        <item name="android:textColorPrimary">@color/blackTransparent</item>
+        <item name="android:textColorPrimary">@color/white</item>
     </style>
 
     <style name="MyBordelessButtonStyle" parent="@style/Widget.AppCompat.Button.Borderless">

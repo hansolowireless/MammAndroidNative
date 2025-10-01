@@ -36,7 +36,7 @@ fun Channel.toContentEntityUI() = ContentEntityUI(
     identifier = ContentIdentifier.Channel(id.orRandom()),
     imageUrl = logoURL?.landscape().orEmpty(),
     horizontalImageUrl = logoURL?.landscape().orEmpty(),
-    title = name ?: "",
+    title = name.orEmpty(),
     detailInfo = DetailInfoUI(squareLogo = logoURL?.squared()),
 )
 
@@ -174,32 +174,32 @@ fun Episode.toContentListUI() = ContentListUI(
 //-----------region PLAYBACK-------------------
 fun Channel.toContentToPlayUI() = ContentToPlayUI(
     identifier = ContentIdentifier.Channel(id.orRandom()),
-    deliveryURL = this.deliveryURL ?: "",
-    title = name ?: "",
-    imageUrl = logoURL?.squared() ?: "",
+    deliveryURL = this.deliveryURL.orEmpty(),
+    title = name.orEmpty(),
+    imageUrl = logoURL?.squared().orEmpty(),
     isTimeshift = this.timeshift ?: false,
     fingerprintInfo = FingerPrintInfoUI(
         enabled = this.fingerprint ?: false,
         interval = this.fingerprintFrequency,
         duration = this.fingerprintDuration,
         position = this.fingerprintPosition ?: "random",
-        text = "Watermark"
+        text = this.fingerPrintText.orEmpty()
     ),
     watermarkInfo = this.watermark
 )
 
 fun VoD.toContentToPlayUI() = ContentToPlayUI(
     identifier = ContentIdentifier.VoD(id.orRandom()),
-    deliveryURL = this.deliveryURL ?: "",
-    title = title ?: "",
-    imageUrl = posterURL ?: ""
+    deliveryURL = this.deliveryURL.orEmpty(),
+    title = title.orEmpty(),
+    imageUrl = posterURL.orEmpty()
 )
 
 fun Event.toContentToPlayUI() = ContentToPlayUI(
     identifier = ContentIdentifier.Event(id.orRandom()),
     deliveryURL = this.deliveryURL.orEmpty(),
-    title = title ?: "",
-    imageUrl = logoURL ?: "",
+    title = title.orEmpty(),
+    imageUrl = logoURL.orEmpty(),
     //It's used to get the start and end dates in order to build the catchup URL
     epgEventInfo = this.toLiveEventInfoUI()
 )

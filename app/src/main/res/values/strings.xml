@@ -17,6 +17,7 @@
     <string name="today">Hoy</string>
     <string name="tomorrow">Mañana</string>
     <string name="day_after_tomorrow">Pasado mañana</string>
+    <string name="live">Directo</string>
     <!--endregion EPG-->
 
     <!-- Content descriptions for accessibility -->

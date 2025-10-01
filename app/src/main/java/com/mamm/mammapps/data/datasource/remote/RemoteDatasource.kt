@@ -113,7 +113,10 @@ class RemoteDatasource @Inject constructor(
             val homeData = response.body()
                 ?: throw IOException("Home content response body is null")
 
-            cachedHomeContent = homeData.transformData(sessionManager.channelOrder)
+            cachedHomeContent = homeData.transformData(
+                channelOrder = sessionManager.channelOrder,
+                userId = sessionManager.loginData?.userId.toString()
+            )
             cachedHomeContent!!
         }
     }

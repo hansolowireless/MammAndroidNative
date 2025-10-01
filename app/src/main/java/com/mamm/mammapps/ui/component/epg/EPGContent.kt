@@ -16,7 +16,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.mamm.mammapps.R
+import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.epg.EPGChannelContent
 import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.ui.component.common.SectionTitle
@@ -33,10 +36,10 @@ fun EPGContent(
     onEventClicked: (EPGEvent) -> Unit
 ) {
 
-    var selectedChannel by remember { mutableStateOf<ContentEPGUI?>(epgContent.first().channel.toContentEPGUI()) }
+    var selectedChannel by remember { mutableStateOf<Channel>(epgContent.first().channel) }
 
     Column {
-        SectionTitle(title = "GUÍA DE PROGRAMACIÓN")
+        SectionTitle(title = stringResource(R.string.nav_epg))
         Row(
             modifier = Modifier
                 .fillMaxSize()
@@ -45,9 +48,11 @@ fun EPGContent(
             ChannelsColumn(
                 channels = epgContent.map { it.channel.toContentEPGUI() },
                 modifier = Modifier.weight(1f),
-                selectedChannelId = selectedChannel?.id,
+                selectedChannelId = selectedChannel.id,
                 onChannelSelected = { channel ->
-                    selectedChannel = channel
+                    epgContent.find { it.channel.id == channel.id }?.channel?.let {
+                        selectedChannel = it
+                    }
                 }
             )
 
@@ -75,8 +80,9 @@ fun EPGContent(
                 modifier = Modifier
                     .weight(2f)
                     .padding(horizontal = Dimensions.paddingSmall),
-                events = epgContent.find { it.channel.id == selectedChannel?.id }?.events
+                events = epgContent.find { it.channel.id == selectedChannel.id }?.events
                     ?: emptyList(),
+                channel = selectedChannel,
                 onEventClicked = onEventClicked
             )
         }

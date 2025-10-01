@@ -1,11 +1,9 @@
 package com.mamm.mammapps.navigation
 
-import android.widget.Space
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,8 +27,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -38,10 +36,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.mamm.mammapps.R
-import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
-import com.mamm.mammapps.ui.component.navigation.CustomTVNavigationItem
 import com.mamm.mammapps.navigation.model.AppRoute
-import com.mamm.mammapps.ui.theme.Dimensions
+import com.mamm.mammapps.ui.component.navigation.CustomTVNavigationItem
 
 @Composable
 fun TVNavigationLayout(navController: NavHostController) {
@@ -179,7 +175,7 @@ fun TVNavigationLayout(navController: NavHostController) {
                 CustomTVNavigationItem(
                     icon = {
                         Icon(
-                            painter = painterResource(id = R.drawable.menu_serieslogoicon),
+                            painter = painterResource(id = R.drawable.menu_wblogoicon),
                             contentDescription = null,
                             modifier = Modifier.size(24.dp)
                         )
@@ -193,7 +189,7 @@ fun TVNavigationLayout(navController: NavHostController) {
                 CustomTVNavigationItem(
                     icon = {
                         Icon(
-                            painter = painterResource(id = R.drawable.menu_serieslogoicon),
+                            painter = painterResource(id = R.drawable.menu_acontralogoicon),
                             contentDescription = null,
                             modifier = Modifier.size(24.dp)
                         )
@@ -207,7 +203,7 @@ fun TVNavigationLayout(navController: NavHostController) {
                 CustomTVNavigationItem(
                     icon = {
                         Icon(
-                            painter = painterResource(id = R.drawable.menu_serieslogoicon),
+                            painter = painterResource(id = R.drawable.menu_amclogoicon),
                             contentDescription = null,
                             modifier = Modifier.size(24.dp)
                         )
@@ -316,3 +312,6 @@ fun TVNavigationLayout(navController: NavHostController) {
         }
     }
 }
+
+
+
