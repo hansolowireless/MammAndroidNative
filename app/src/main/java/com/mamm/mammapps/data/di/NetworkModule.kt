@@ -47,6 +47,10 @@ annotation class NoBaseUrlNoRedirectApi
 @Retention(AnnotationRetention.BINARY)
 annotation class QosApi
 
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class BookmarksApi
+
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
@@ -165,6 +169,24 @@ object NetworkModule {
             .build()
     }
 
+    @BookmarksApi
+    @Provides
+    @Singleton
+    fun provideBookmarksRetrofit(
+        okHttpClient: OkHttpClient,
+        sessionManager: SessionManager
+    ): Retrofit {
+        val bookmarksClient = okHttpClient.newBuilder()
+            .addInterceptor(AuthInterceptor(sessionManager))
+            .build()
+        return Retrofit.Builder()
+            .baseUrl(Config.bookmarksUrl)
+            .client(bookmarksClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+
     @IdmApi
     @Provides
     @Singleton
@@ -212,6 +234,13 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideQosApi(@QosApi retrofit: Retrofit): ApiService {
+        return retrofit.create(ApiService::class.java)
+    }
+
+    @BookmarksApi
+    @Provides
+    @Singleton
+    fun provideBookmarksApi(@BookmarksApi retrofit: Retrofit): ApiService {
         return retrofit.create(ApiService::class.java)
     }
 

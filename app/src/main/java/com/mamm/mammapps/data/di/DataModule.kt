@@ -2,12 +2,16 @@ package com.mamm.mammapps.data.di
 
 import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.local.LocalDataSourceImpl
+import com.mamm.mammapps.data.repository.CustomContentRepositoryImpl
 import com.mamm.mammapps.data.repository.EPGRepositoryImpl
+import com.mamm.mammapps.data.repository.LoginRepositoryImpl
 import com.mamm.mammapps.data.repository.MammRepositoryImpl
 import com.mamm.mammapps.data.repository.PlaybackRepositoryImpl
 import com.mamm.mammapps.data.repository.TokenRepositoryImpl
+import com.mamm.mammapps.domain.interfaces.CustomContentRepository
 import com.mamm.mammapps.domain.interfaces.TokenRepository
 import com.mamm.mammapps.domain.interfaces.EPGRepository
+import com.mamm.mammapps.domain.interfaces.LoginRepository
 import com.mamm.mammapps.domain.interfaces.MammRepository
 import com.mamm.mammapps.domain.interfaces.PlaybackRepository
 import dagger.Binds
@@ -25,6 +29,12 @@ abstract class DataModule {
     abstract fun bindLocalDataSource(
         localDataSource: LocalDataSourceImpl
     ): LocalDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindLoginRepository(
+        loginRepository: LoginRepositoryImpl
+    ): LoginRepository
 
     @Binds
     @Singleton
@@ -49,5 +59,12 @@ abstract class DataModule {
     abstract fun bindTokenRepository(
         impl: TokenRepositoryImpl
     ): TokenRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCustomContentRepository(
+        impl: CustomContentRepositoryImpl
+    ): CustomContentRepository
+
 
 }

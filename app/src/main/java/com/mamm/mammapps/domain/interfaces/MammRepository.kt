@@ -12,11 +12,6 @@ import com.mamm.mammapps.ui.model.ContentIdentifier
 
 interface MammRepository {
 
-    suspend fun login(username: String, password: String): Result<LoginResponse>
-    suspend fun checkLocator(username: String): Result<LocatorResponse>
-    suspend fun saveUserCredentials(username: String, password: String) : Result<Unit>
-    suspend fun getUserCredentials(): Result<Pair<String?, String?>>
-
     suspend fun getHomeContent() : Result<GetHomeContentResponse>
     suspend fun getMovies(): Result<GetOtherContentResponse>
     suspend fun getAdults(): Result<GetOtherContentResponse>

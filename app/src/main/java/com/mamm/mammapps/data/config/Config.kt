@@ -51,6 +51,14 @@ object Config {
     val qosUrl: String
         get() = BuildConfig.METRICS_URL
 
+    /*En principio parece que la base url de bookmarks es la misma que search*/
+    val bookmarksUrl: String
+        get() = if (dynamicSearchUrl != null) {
+            dynamicSearchUrl!!
+        } else {
+            BuildConfig.SEARCH_URL
+        }
+
     /**
      * Método para actualizar las URLs dinámicas en caliente.
      * Solo tiene efecto si el flavor tiene `DYNAMIC_URLS = true`.

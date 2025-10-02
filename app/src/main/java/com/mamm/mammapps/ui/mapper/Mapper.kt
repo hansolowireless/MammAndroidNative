@@ -9,6 +9,7 @@ import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.data.model.Serie
 import com.mamm.mammapps.data.model.VoD
+import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.branded.BrandedVod
 import com.mamm.mammapps.data.model.branded.Featured
 import com.mamm.mammapps.data.model.section.EPGEvent
@@ -89,7 +90,8 @@ fun EPGEvent.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
     height = Dimensions.contentEntityHeight,
     detailInfo = DetailInfoUI(
         metadata = getMetadata(),
-        description = getDescription())
+        description = getDescription()
+    )
 )
 
 fun SectionVod.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
@@ -139,6 +141,19 @@ fun Featured.toContentEntityUI(): ContentEntityUI? {
         )
     )
 }
+
+fun Bookmark.toContentEntityUI(): ContentEntityUI? {
+    val format = type ?: return null
+    val id = id ?: return null
+    return ContentEntityUI(
+        identifier = ContentIdentifier.fromFormat(format = type, id = id),
+        imageUrl = posterLogo.orEmpty(),
+        horizontalImageUrl = logoURL.orEmpty(),
+        title = title.orEmpty(),
+        aspectRatio = Ratios.VERTICAL,
+        height = Dimensions.contentEntityHeight
+    )
+}
 //--------------------endregion Home------------------------
 
 
@@ -150,7 +165,7 @@ fun Channel.toContentEPGUI() = ContentEPGUI(
 )
 
 //-------------------------region ContentAsListItem----------------------------
-fun EPGEvent.toContentListUI () = ContentListUI(
+fun EPGEvent.toContentListUI() = ContentListUI(
     identifier = ContentIdentifier.Event(getId()),
     imageUrl = eventLogoUrl500?.takeIf { it.isNotBlank() }
         .orEmpty(),
@@ -343,6 +358,15 @@ fun GetBrandedContentResponse.toContentUIRows(genre: Genre): List<ContentRowUI> 
     return rows
 }
 
+fun List<ContentRowUI>.insertBookmarks(bookmarks: List<Bookmark>): List<ContentRowUI> {
+    ContentRowUI(
+        categoryName = "Seguir viendo",
+        items = bookmarks.mapNotNull { it.toContentEntityUI() }
+    ).let {
+       return  listOf(it) + this
+    }
+}
+
 //----------------region SERIE DETAIL---------------------
 fun List<Serie>.toContentUIRows(genre: Genre): List<ContentRowUI> {
     val rows = mutableListOf<ContentRowUI>()
@@ -362,7 +386,7 @@ fun List<Serie>.toContentUIRows(genre: Genre): List<ContentRowUI> {
 }
 
 fun GetSeasonInfoResponse.toSeasonUIList(): List<SeasonUI> {
-    val list = this.tbSeasons?.map{ tbSeason ->
+    val list = this.tbSeasons?.map { tbSeason ->
 
         val episodes: List<ContentListUI> =
             tbSeason.tbContentSeasons?.mapNotNull { tbContentSeason ->

@@ -1,6 +1,7 @@
 package com.mamm.mammapps.data.datasource.remote
 
 import com.mamm.mammapps.data.di.BaseUrlApi
+import com.mamm.mammapps.data.di.BookmarksApi
 import com.mamm.mammapps.data.di.DeviceModelQualifier
 import com.mamm.mammapps.data.di.DeviceSerialQualifier
 import com.mamm.mammapps.data.di.DeviceTypeQualifier
@@ -19,6 +20,7 @@ import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.GetEPGResponse
+import com.mamm.mammapps.data.model.bookmark.SetBookmarkRequest
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
@@ -50,6 +52,7 @@ class RemoteDatasource @Inject constructor(
     @NoBaseUrlApi private val noBaseUrlApi: ApiService,
     @NoBaseUrlNoRedirectApi private val clmApi: ApiService,
     @QosApi private val qosApi: ApiService,
+    @BookmarksApi private val bookmarksApi: ApiService,
     @DeviceTypeQualifier private val deviceType: String,
     @DeviceSerialQualifier private val deviceSerial: String,
     @DeviceModelQualifier private val deviceModel: String,
@@ -424,5 +427,16 @@ class RemoteDatasource @Inject constructor(
             response.body() ?: throw IllegalStateException("Response body is null")
         }
     }
+
+    //----------BOOKMARKS---------//
+    suspend fun getBookmarks() = bookmarksApi.getBookmarks()
+
+    suspend fun setBookmark(bookmarkRequest: SetBookmarkRequest) = bookmarksApi.setBookmark(bookmarkRequest)
+
+    suspend fun deleteBookmark(contentId: Int, contentType: String) = bookmarksApi.deleteBookmark(
+        contentId = contentId.toString(),
+        contentType = contentType
+    )
+
 
 }

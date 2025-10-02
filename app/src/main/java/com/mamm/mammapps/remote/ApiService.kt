@@ -4,6 +4,9 @@ import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.GetEPGResponse
+import com.mamm.mammapps.data.model.bookmark.Bookmark
+import com.mamm.mammapps.data.model.bookmark.GetBookmarksResponse
+import com.mamm.mammapps.data.model.bookmark.SetBookmarkRequest
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
@@ -152,20 +155,7 @@ interface ApiService {
     ): Response<GetSeasonInfoResponse>
 
 
-//    // ---------- Bookmarks ----------
-//    @GET("keep-watching/get-marks")
-//    suspend fun getBookmarks(): List<ContentEntity>
-//
-//    @POST("bookmark/add")
-//    suspend fun addBookmark(
-//        @Body bookmark: BookmarkRequest
-//    ): ApiResponse
-//
-//    @POST("bookmark/delete")
-//    suspend fun deleteBookmark(
-//        @Body bookmark: BookmarkRequest
-//    ): ApiResponse
-//
+
 //    // ---------- Search ----------
 //    @GET("search")
 //    suspend fun searchContent(
@@ -200,6 +190,25 @@ interface ApiService {
     )
     suspend fun sendQos(
         @Body qosRequest: QosData
+    ): Response<Unit>
+
+    // ---------- Bookmarks ----------
+    @GET("keep-watching/get-marks")
+    suspend fun getBookmarks(): List<Bookmark>
+
+    @POST("bookmark/set")
+    suspend fun setBookmark(
+        @Body bookmark: SetBookmarkRequest
+    ): Response<Unit>
+
+    @POST("bookmark/{contentId}/{contentType}")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun deleteBookmark(
+        @Path("contentId") contentId: String,
+        @Path("contentType") contentType: String,
     ): Response<Unit>
 
     // ---------- Metrics / QoS ----------

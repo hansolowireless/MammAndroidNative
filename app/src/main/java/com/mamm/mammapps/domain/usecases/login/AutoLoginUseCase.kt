@@ -3,11 +3,12 @@ package com.mamm.mammapps.domain.usecases.login
 import com.mamm.mammapps.data.config.Config
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.session.SessionManager
+import com.mamm.mammapps.domain.interfaces.LoginRepository
 import com.mamm.mammapps.domain.interfaces.MammRepository
 import javax.inject.Inject
 
 class AutoLoginUseCase @Inject constructor(
-    private val repository: MammRepository,
+    private val repository: LoginRepository,
     private val session: SessionManager,
     private val logger: Logger
 ) {
