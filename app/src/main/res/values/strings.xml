@@ -40,7 +40,7 @@
 
     <!-- Navigation Labels -->
     <string name="nav_home">Inicio</string>
-    <string name="nav_epg">EPG</string>
+    <string name="nav_epg">Guía</string>
     <string name="nav_channels">Canales</string>
     <string name="nav_movies">Cine</string>
     <string name="nav_documentaries">Documentales</string>

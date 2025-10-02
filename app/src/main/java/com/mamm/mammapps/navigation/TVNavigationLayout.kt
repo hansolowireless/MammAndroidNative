@@ -37,6 +37,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.mamm.mammapps.R
 import com.mamm.mammapps.navigation.model.AppRoute
+import com.mamm.mammapps.ui.component.icon.BulletedList
+import com.mamm.mammapps.ui.component.icon.Fire
+import com.mamm.mammapps.ui.component.icon.Football
+import com.mamm.mammapps.ui.component.icon.WifiSignal
 import com.mamm.mammapps.ui.component.navigation.CustomTVNavigationItem
 
 @Composable
@@ -62,7 +66,7 @@ fun TVNavigationLayout(navController: NavHostController) {
     val showNavigationRail = currentRoute in sectionsWithMenu
     var hasItemFocused by remember { mutableStateOf(false) }
     val railWidth by animateDpAsState(
-        targetValue = if (hasItemFocused) 200.dp else 80.dp,
+        targetValue = if (hasItemFocused) 200.dp else 60.dp,
         animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
     )
     val scrollState = rememberScrollState()
@@ -105,7 +109,7 @@ fun TVNavigationLayout(navController: NavHostController) {
                 CustomTVNavigationItem(
                     icon = {
                         Icon(
-                            painter = painterResource(id = R.drawable.menu_calendaricon),
+                            BulletedList,
                             contentDescription = null,
                             modifier = Modifier.size(24.dp)
                         )
@@ -217,7 +221,7 @@ fun TVNavigationLayout(navController: NavHostController) {
                 CustomTVNavigationItem(
                     icon = {
                         Icon(
-                            Icons.Default.Person,
+                            Football,
                             contentDescription = null,
                             modifier = Modifier.size(24.dp)
                         )
@@ -231,7 +235,7 @@ fun TVNavigationLayout(navController: NavHostController) {
                 CustomTVNavigationItem(
                     icon = {
                         Icon(
-                            Icons.Default.Person,
+                            Fire,
                             contentDescription = null,
                             modifier = Modifier.size(24.dp)
                         )
@@ -273,7 +277,7 @@ fun TVNavigationLayout(navController: NavHostController) {
                 CustomTVNavigationItem(
                     icon = {
                         Icon(
-                            Icons.Default.Person,
+                            WifiSignal,
                             contentDescription = null,
                             modifier = Modifier.size(24.dp)
                         )
