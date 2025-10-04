@@ -10,8 +10,10 @@ import androidx.navigation.compose.rememberNavController
 import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.Event
 import com.mamm.mammapps.data.model.VoD
+import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.branded.BrandedVod
 import com.mamm.mammapps.data.model.branded.Featured
+import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.data.model.section.SectionVod
 import com.mamm.mammapps.data.model.serie.Episode
@@ -158,6 +160,8 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
             is BrandedVod -> contentItem.toContentToPlayUI()
             is Featured -> contentItem.toContentToPlayUI()
             is TbContentSeason -> contentItem.contentDetails?.toContentToPlayUI()
+            is Bookmark -> contentItem.toContentToPlayUI()
+            is MostWatchedContent -> contentItem.toContentToPlayUI()
             else -> null
         }
 

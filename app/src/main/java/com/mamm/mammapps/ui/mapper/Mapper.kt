@@ -6,15 +6,16 @@ import com.mamm.mammapps.data.model.Genre
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
-import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.data.model.Serie
 import com.mamm.mammapps.data.model.VoD
 import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.branded.BrandedVod
 import com.mamm.mammapps.data.model.branded.Featured
+import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.data.model.section.SectionVod
 import com.mamm.mammapps.data.model.serie.Episode
+import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.ui.extension.adult
 import com.mamm.mammapps.ui.extension.landscape
 import com.mamm.mammapps.ui.extension.squared
@@ -23,6 +24,7 @@ import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.ContentListUI
 import com.mamm.mammapps.ui.model.ContentRowUI
+import com.mamm.mammapps.ui.model.CustomizedContent
 import com.mamm.mammapps.ui.model.DetailInfoUI
 import com.mamm.mammapps.ui.model.SeasonUI
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
@@ -146,14 +148,36 @@ fun Bookmark.toContentEntityUI(): ContentEntityUI? {
     val format = type ?: return null
     val id = id ?: return null
     return ContentEntityUI(
-        identifier = ContentIdentifier.fromFormat(format = type, id = id),
+        identifier = ContentIdentifier.fromFormat(format = format, id = id),
         imageUrl = posterLogo.orEmpty(),
         horizontalImageUrl = logoURL.orEmpty(),
         title = title.orEmpty(),
+        detailInfo = DetailInfoUI(
+            description = longDesc.orEmpty()
+        ),
         aspectRatio = Ratios.VERTICAL,
-        height = Dimensions.contentEntityHeight
+        height = Dimensions.contentEntityHeight,
+        customContentType = CustomizedContent.BookmarkType
     )
 }
+
+fun MostWatchedContent.toContentEntityUI(): ContentEntityUI {
+    return ContentEntityUI(
+        identifier = ContentIdentifier.VoD(
+            id = id.orRandom()
+        ),
+        imageUrl = posterLogo.orEmpty(),
+        horizontalImageUrl = logoURL.orEmpty(),
+        title = title.orEmpty(),
+        detailInfo = DetailInfoUI(
+            description = longDesc.orEmpty()
+        ),
+        aspectRatio = Ratios.VERTICAL,
+        height = Dimensions.contentEntityHeight,
+        customContentType = CustomizedContent.MostWatchedType
+    )
+}
+
 //--------------------endregion Home------------------------
 
 
@@ -260,6 +284,29 @@ fun Episode.toContentToPlayUI() = ContentToPlayUI(
     imageUrl = this.contentLogo.orEmpty(),
 )
 
+fun Bookmark.toContentToPlayUI(): ContentToPlayUI? {
+    val format = type ?: return null
+    val id = id ?: return null
+    return ContentToPlayUI(
+        identifier = ContentIdentifier.fromFormat(format = format, id = id),
+        deliveryURL = this.deliveryURL.orEmpty(),
+        title = this.title.orEmpty(),
+        imageUrl = this.logoURL.orEmpty(),
+        epgEventInfo = LiveEventInfoUI(
+            title = this.title.orEmpty(),
+            eventStart = this.startDateTime,
+            eventEnd = this.endDateTime
+        )
+    )
+}
+
+fun MostWatchedContent.toContentToPlayUI() = ContentToPlayUI(
+    identifier = ContentIdentifier.VoD(id.orRandom()),
+    deliveryURL = this.deliveryURL.orEmpty(),
+    title = this.title.orEmpty(),
+    imageUrl = this.logoURL.orEmpty(),
+)
+
 //------------------------LIVE EVENT INFO------------------------
 fun EPGEvent.toLiveEventInfoUI(): LiveEventInfoUI = LiveEventInfoUI(
     title = this.getTitle(),
@@ -277,6 +324,14 @@ fun Event.toLiveEventInfoUI(): LiveEventInfoUI = LiveEventInfoUI(
 )
 //----------endregion PLAYBACK----------------------
 
+fun List<ContentEntityUI>.repeat(threshold: Int): List<ContentEntityUI> {
+    return if (this.size > threshold) {
+        this.plus(this).plus(this)
+    } else {
+        this
+    }
+}
+
 fun GetHomeContentResponse.toContentUIRows(): List<ContentRowUI> {
     val orderedCategories = categories?.sortedBy { it.pos }
     return orderedCategories?.mapNotNull { category ->
@@ -293,7 +348,7 @@ fun GetHomeContentResponse.toContentUIRows(): List<ContentRowUI> {
         if (items.isNotEmpty()) {
             ContentRowUI(
                 categoryName = category.name ?: "",
-                items = items.plus(items).plus(items)
+                items = items.repeat(threshold = 5)
             )
         } else null
     } ?: emptyList()
@@ -363,7 +418,16 @@ fun List<ContentRowUI>.insertBookmarks(bookmarks: List<Bookmark>): List<ContentR
         categoryName = "Seguir viendo",
         items = bookmarks.mapNotNull { it.toContentEntityUI() }
     ).let {
-       return  listOf(it) + this
+        return listOf(it) + this
+    }
+}
+
+fun List<ContentRowUI>.insertMostWatched(mostWatched: List<MostWatchedContent>): List<ContentRowUI> {
+    ContentRowUI(
+        categoryName = "Más visto",
+        items = mostWatched.map { it.toContentEntityUI() }
+    ).let {
+        return listOf(it) + this
     }
 }
 

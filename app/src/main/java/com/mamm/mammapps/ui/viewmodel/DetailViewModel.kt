@@ -49,12 +49,13 @@ class DetailViewModel @Inject constructor(
     fun findContent(entityUI: ContentEntityUI, routeTag: AppRoute) {
         findContentEntityUseCase(
             identifier = entityUI.identifier,
+            customContent = entityUI.customContentType,
             routeTag = routeTag
         ).onSuccess { entity ->
             _clickedContent.update { entity }
         }
     }
-    
+
     fun findEpisode(seasonOrder: Int, episodeId: Int) {
         seasonListOriginal.find { it.getOrder() == seasonOrder }
         ?.let { seasonTb ->

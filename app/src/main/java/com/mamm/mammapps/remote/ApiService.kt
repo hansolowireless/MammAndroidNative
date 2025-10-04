@@ -1,19 +1,19 @@
 package com.mamm.mammapps.remote
 
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
+import com.mamm.mammapps.data.model.GetEPGResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
-import com.mamm.mammapps.data.model.GetEPGResponse
 import com.mamm.mammapps.data.model.bookmark.Bookmark
-import com.mamm.mammapps.data.model.bookmark.GetBookmarksResponse
 import com.mamm.mammapps.data.model.bookmark.SetBookmarkRequest
-import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
+import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.player.GetTickersResponse
 import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.model.player.heartbeat.HeartBeatRequest
+import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -210,6 +210,14 @@ interface ApiService {
         @Path("contentId") contentId: String,
         @Path("contentType") contentType: String,
     ): Response<Unit>
+
+    //---------Most Watched---------------
+    @GET("recommendation/get-most-watched")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getMostWatched(): List<MostWatchedContent>
 
     // ---------- Metrics / QoS ----------
 //    @POST("QosMonitor/logs")

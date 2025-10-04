@@ -34,6 +34,8 @@ class MammRepositoryImpl @Inject constructor(
             remoteDatasource.getHomeContent().transformData(sessionManager.channelOrder)
         }.onSuccess { response ->
             logger.debug(TAG, "getHomeContent Received and saved successful response")
+        }.onFailure {
+            logger.error(TAG, "getHomeContent Failed: ${it}")
         }
     }
 

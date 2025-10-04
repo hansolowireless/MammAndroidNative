@@ -4,11 +4,14 @@ import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.interfaces.CustomContentRepository
 import com.mamm.mammapps.domain.interfaces.MammRepository
 import com.mamm.mammapps.ui.mapper.insertBookmarks
+import com.mamm.mammapps.ui.mapper.insertMostWatched
 import com.mamm.mammapps.ui.mapper.toContentUIRows
 import com.mamm.mammapps.ui.model.ContentRowUI
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.supervisorScope
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 class GetHomeContentUseCase @Inject constructor(
     private val repository: MammRepository,
@@ -20,22 +23,38 @@ class GetHomeContentUseCase @Inject constructor(
     }
 
     suspend operator fun invoke(): Result<List<ContentRowUI>> {
-        return runCatching {
-            coroutineScope {
-                val homeContent = async { repository.getHomeContent().getOrThrow() }
-                val bookmarks = async { customContentRepository.getBookmarks().getOrThrow() }
-                val recommended = async { customContentRepository.getRecommended().getOrThrow() }
-                val mostWatched = async { customContentRepository.getMostWatched().getOrThrow() }
+        return try {
+            supervisorScope {
+                val homeContent = async { repository.getHomeContent() }
+                val bookmarks = async { customContentRepository.getBookmarks() }
+                val mostWatched = async { customContentRepository.getMostWatched() }
 
-                homeContent.await().toContentUIRows()
-                    .insertBookmarks(bookmarks.await())
-                    .insertBookmarks(recommended.await())
-                    .insertBookmarks(mostWatched.await())
+                //Wait for all to complete
+                val homeResult = homeContent.await()
+                val bookmarksResult = bookmarks.await()
+                val mostWatchedResult = mostWatched.await()
+
+                // Now check if home content succeeded (it's required)
+                if (homeResult.isFailure) {
+                    logger.error(TAG, "GetHomeContentUseCase: $homeResult")
+                    return@supervisorScope Result.failure(
+                        homeResult.exceptionOrNull() ?: Exception("Failed to load home content")
+                    )
+                }
+
+                // Use successful results, fallback for optional content
+                val contentRows = homeResult.getOrThrow().toContentUIRows()
+                    .insertBookmarks(bookmarksResult.getOrElse { emptyList() })
+                    .insertMostWatched(mostWatchedResult.getOrElse { emptyList() })
+
+                Result.success(contentRows)
             }
-        }.onSuccess {
-            logger.debug(TAG, "GetHomeContentUseCase Received successful response")
-        }.onFailure { exception ->
-            logger.error(TAG, "GetHomeContentUseCase Failed: ${exception.message}, $exception")
+        } catch (e: CancellationException) {
+            logger.debug(TAG, "GetHomeContentUseCase was cancelled")
+            throw e
+        } catch (e: Exception) {
+            logger.error(TAG, "GetHomeContentUseCase Failed: ${e.message}")
+            Result.failure(e)
         }
     }
 

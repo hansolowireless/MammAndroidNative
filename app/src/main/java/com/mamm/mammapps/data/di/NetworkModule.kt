@@ -3,6 +3,7 @@ package com.mamm.mammapps.data.di
 import com.mamm.mammapps.BuildConfig
 import com.mamm.mammapps.data.config.Config
 import com.mamm.mammapps.data.local.SecurePreferencesManager
+import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.remote.ApiService
 import com.mamm.mammapps.remote.interceptor.AuthInterceptor
@@ -11,6 +12,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -49,7 +51,7 @@ annotation class QosApi
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class BookmarksApi
+annotation class CustomContentApi
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -57,12 +59,14 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
-        val loggingInterceptor = HttpLoggingInterceptor().apply {
+    fun provideOkHttpClient(logger: Logger): OkHttpClient {
+        val loggingInterceptor = HttpLoggingInterceptor { message ->
+            logger.debug("OkHttpClient", message)
+        }.apply {
             level = if (BuildConfig.DEBUG) {
                 HttpLoggingInterceptor.Level.BASIC
             } else {
-                HttpLoggingInterceptor.Level.NONE
+                HttpLoggingInterceptor.Level.BASIC
             }
         }
 
@@ -169,7 +173,7 @@ object NetworkModule {
             .build()
     }
 
-    @BookmarksApi
+    @CustomContentApi
     @Provides
     @Singleton
     fun provideBookmarksRetrofit(
@@ -180,7 +184,7 @@ object NetworkModule {
             .addInterceptor(AuthInterceptor(sessionManager))
             .build()
         return Retrofit.Builder()
-            .baseUrl(Config.bookmarksUrl)
+            .baseUrl(Config.customContentUrl)
             .client(bookmarksClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -237,10 +241,10 @@ object NetworkModule {
         return retrofit.create(ApiService::class.java)
     }
 
-    @BookmarksApi
+    @CustomContentApi
     @Provides
     @Singleton
-    fun provideBookmarksApi(@BookmarksApi retrofit: Retrofit): ApiService {
+    fun provideBookmarksApi(@CustomContentApi retrofit: Retrofit): ApiService {
         return retrofit.create(ApiService::class.java)
     }
 

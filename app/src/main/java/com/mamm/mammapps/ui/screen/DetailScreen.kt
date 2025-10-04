@@ -24,11 +24,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -44,6 +46,7 @@ import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.viewmodel.DetailViewModel
+import kotlin.math.max
 
 
 @Composable
@@ -81,7 +84,7 @@ fun DetailScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         // Imagen de fondo
         AsyncImage(
-            model = content.imageUrl,
+            model = content.horizontalImageUrl,
             contentDescription = content.title,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
@@ -125,16 +128,16 @@ fun DetailScreen(
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingXSmall)
                     ) {
-                        Text(
-                            text = stringResource(R.string.director_label, metadata.director),
-                            color = Color.White
-                        )
-
-                        Text(
-                            text = stringResource(R.string.separator),
-                            color = Color.White
-                        )
-
+                        if (metadata.director.isNotBlank()) {
+                            Text(
+                                text = stringResource(R.string.director_label, metadata.director),
+                                color = Color.White
+                            )
+                            Text(
+                                text = stringResource(R.string.separator),
+                                color = Color.White
+                            )
+                        }
                         Text(
                             text = metadata.genres,
                             color = Color.White
@@ -151,12 +154,6 @@ fun DetailScreen(
                             color = Color.White.copy(alpha = 0.8f)
                         )
                     }
-
-                    // Disponible hasta (si hay fecha)
-                    Text(
-                        text = stringResource(R.string.available_until_label, "01-01-2026"),
-                        color = Color.White.copy(alpha = 0.8f)
-                    )
                 }
 
                 // Descripción
@@ -164,11 +161,13 @@ fun DetailScreen(
                     Text(
                         text = description,
                         color = Color.White,
+                        maxLines = 5,
+                        overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
 
-                Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
+                Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
 
                 // Botón de reproducir, solo si no es serie
                 if (content.identifier !is ContentIdentifier.Serie) {
@@ -196,6 +195,8 @@ fun DetailScreen(
                         }
                     )
                 }
+
+                Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
 
                 // Sección de reparto
                 content.detailInfo?.metadata?.let { metadata ->

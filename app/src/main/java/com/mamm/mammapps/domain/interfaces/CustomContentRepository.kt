@@ -5,15 +5,24 @@ import com.mamm.mammapps.data.model.bookmark.GetBookmarksResponse
 import com.mamm.mammapps.data.model.bookmark.SetBookmarkRequest
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginResponse
+import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
+import com.mamm.mammapps.data.model.section.SectionVod
+import com.mamm.mammapps.ui.model.CustomizedContent
 
 interface CustomContentRepository {
     suspend fun getBookmarks(): Result<List<Bookmark>>
 
-    suspend fun setBookmark(bookmarkRequest: SetBookmarkRequest): Result<Unit>
+    suspend fun saveBookmark(bookmarkRequest: SetBookmarkRequest): Result<Unit>
 
     suspend fun deleteBookmark(contentId: Int, contentType: String): Result<Unit>
 
-    suspend fun getMostWatched(): Result<GetBookmarksResponse>
+    suspend fun getMostWatched(): Result<List<MostWatchedContent>>
 
     suspend fun getRecommended(): Result<GetBookmarksResponse>
+
+    fun findContent(
+        contentId: Int,
+        contentType: CustomizedContent
+    ): Result<Any>?
+
 }

@@ -1,5 +1,7 @@
 package com.mamm.mammapps.data.di
 
+import com.mamm.mammapps.data.cache.Cache
+import com.mamm.mammapps.data.cache.CacheImpl
 import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.local.LocalDataSourceImpl
 import com.mamm.mammapps.data.repository.CustomContentRepositoryImpl
@@ -66,5 +68,10 @@ abstract class DataModule {
         impl: CustomContentRepositoryImpl
     ): CustomContentRepository
 
+    @Binds
+    @Singleton
+    abstract fun bindCache(
+        impl: CacheImpl
+    ): Cache
 
 }

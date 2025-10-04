@@ -9,9 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
+import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.theme.ButtonColor
@@ -28,7 +30,7 @@ fun PrimaryButton(
         shape = ButtonDefaults.shape(RectangleShape),
         modifier = modifier
             .fillMaxWidth()
-            .height(if (LocalIsTV.current) 80.dp else 48.dp),
+            .height(if (LocalIsTV.current) 40.dp else 48.dp),
         glow = ButtonDefaults.glow(),
         colors = ButtonDefaults.colors(
             containerColor = ButtonColor.background,
@@ -46,8 +48,17 @@ fun PrimaryButton(
                 icon()
             }
             Text(
-                text = text
+                text = text,
+                style = MaterialTheme.typography.bodyLarge
             )
         }
+    }
+}
+
+@Preview
+@Composable
+fun PrimaryButtonPreview() {
+    MaterialTheme {
+        PrimaryButton(text = "Play", onClick = {})
     }
 }

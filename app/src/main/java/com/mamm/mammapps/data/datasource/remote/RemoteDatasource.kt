@@ -1,7 +1,8 @@
 package com.mamm.mammapps.data.datasource.remote
 
+import com.mamm.mammapps.data.cache.Cache
 import com.mamm.mammapps.data.di.BaseUrlApi
-import com.mamm.mammapps.data.di.BookmarksApi
+import com.mamm.mammapps.data.di.CustomContentApi
 import com.mamm.mammapps.data.di.DeviceModelQualifier
 import com.mamm.mammapps.data.di.DeviceSerialQualifier
 import com.mamm.mammapps.data.di.DeviceTypeQualifier
@@ -17,18 +18,20 @@ import com.mamm.mammapps.data.extension.transformData
 import com.mamm.mammapps.data.local.SecurePreferencesManager
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
+import com.mamm.mammapps.data.model.GetEPGResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
-import com.mamm.mammapps.data.model.GetEPGResponse
+import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.bookmark.SetBookmarkRequest
-import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
+import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.player.GetTickersResponse
 import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.model.player.heartbeat.HeartBeatRequest
 import com.mamm.mammapps.data.model.player.playback.CLMRequest
+import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.remote.ApiService
 import com.mamm.mammapps.ui.extension.toDate
@@ -52,12 +55,13 @@ class RemoteDatasource @Inject constructor(
     @NoBaseUrlApi private val noBaseUrlApi: ApiService,
     @NoBaseUrlNoRedirectApi private val clmApi: ApiService,
     @QosApi private val qosApi: ApiService,
-    @BookmarksApi private val bookmarksApi: ApiService,
+    @CustomContentApi private val customContentApi: ApiService,
     @DeviceTypeQualifier private val deviceType: String,
     @DeviceSerialQualifier private val deviceSerial: String,
     @DeviceModelQualifier private val deviceModel: String,
     private val sessionManager: SessionManager,
     private val securePreferencesManager: SecurePreferencesManager,
+    private val cache: Cache,
     private val logger: Logger
 ) {
 
@@ -107,6 +111,9 @@ class RemoteDatasource @Inject constructor(
                 "JSON file is required to get Home Content, but was null"
             }
 
+            logger.debug(
+                "getHomeContent", "JSON file: $jsonFile"
+            )
             val response = noBaseUrlApi.getHomeContent(jsonFile)
 
             if (!response.isSuccessful) {
@@ -429,14 +436,41 @@ class RemoteDatasource @Inject constructor(
     }
 
     //----------BOOKMARKS---------//
-    suspend fun getBookmarks() = bookmarksApi.getBookmarks()
+    suspend fun getBookmarks() : List<Bookmark> {
+        cache.getBookmarks()?.let {
+            return it
+        }
+        val response = customContentApi.getBookmarks()
+        cache.setBookmarks(response)
+        return response
+    }
 
-    suspend fun setBookmark(bookmarkRequest: SetBookmarkRequest) = bookmarksApi.setBookmark(bookmarkRequest)
+    fun getCachedBookmarks() : List<Bookmark> {
+        return cache.getBookmarks() ?: emptyList()
+    }
 
-    suspend fun deleteBookmark(contentId: Int, contentType: String) = bookmarksApi.deleteBookmark(
-        contentId = contentId.toString(),
-        contentType = contentType
-    )
+    suspend fun saveBookmark(bookmarkRequest: SetBookmarkRequest) =
+        customContentApi.setBookmark(bookmarkRequest)
+
+    suspend fun deleteBookmark(contentId: Int, contentType: String) =
+        customContentApi.deleteBookmark(
+            contentId = contentId.toString(),
+            contentType = contentType
+        )
+
+    //----------MOST WATCHED---------//
+    suspend fun getMostWatched(): List<MostWatchedContent> {
+        cache.getMostWatched()?.let {
+            return it
+        }
+        val response = customContentApi.getMostWatched()
+        cache.setMostWatched(response)
+        return response
+    }
+
+    fun getCachedMostWatched() : List<MostWatchedContent> {
+        return cache.getMostWatched() ?: emptyList()
+    }
 
 
 }

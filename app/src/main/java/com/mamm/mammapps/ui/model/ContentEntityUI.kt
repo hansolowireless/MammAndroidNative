@@ -17,5 +17,6 @@ data class ContentEntityUI(
     val detailInfo: DetailInfoUI? = null,
     var liveEventInfo: LiveEventInfoUI? = null,
     val aspectRatio: Float = Ratios.HORIZONTAL,
-    val height: @RawValue Dp = Dimensions.channelEntityHeight
+    val height: @RawValue Dp = Dimensions.channelEntityHeight,
+    val customContentType: CustomizedContent = CustomizedContent.None
 ) : Parcelable

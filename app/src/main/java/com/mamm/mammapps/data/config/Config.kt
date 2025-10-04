@@ -52,7 +52,7 @@ object Config {
         get() = BuildConfig.METRICS_URL
 
     /*En principio parece que la base url de bookmarks es la misma que search*/
-    val bookmarksUrl: String
+    val customContentUrl: String
         get() = if (dynamicSearchUrl != null) {
             dynamicSearchUrl!!
         } else {

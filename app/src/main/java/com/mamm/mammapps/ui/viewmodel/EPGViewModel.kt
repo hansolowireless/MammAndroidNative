@@ -55,7 +55,10 @@ class EPGViewModel @Inject constructor(
     fun findChannel (event: EPGEvent) {
         val channelIdentifier = ContentIdentifier.Channel(event.getChannelId())
 
-        findContentEntityUseCase(channelIdentifier, AppRoute.HOME).onSuccess { entity ->
+        findContentEntityUseCase(
+            channelIdentifier,
+            routeTag = AppRoute.HOME
+        ).onSuccess { entity ->
             if (entity is Channel) _playedChannel.update { entity } else logger.error(TAG, "findChannel Found entity is not a channel")
         }
     }

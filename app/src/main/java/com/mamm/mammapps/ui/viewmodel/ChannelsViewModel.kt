@@ -4,16 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.Channel
-import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.domain.usecases.FindContentEntityUseCase
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
 import com.mamm.mammapps.domain.usecases.GetChannelsUseCase
-import com.mamm.mammapps.domain.usecases.GetHomeContentUseCase
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.mapper.toContentEntityUI
-import com.mamm.mammapps.ui.mapper.toLiveEventInfoUI
 import com.mamm.mammapps.ui.model.ContentEntityUI
-import com.mamm.mammapps.ui.model.player.LiveEventInfoUI
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -77,7 +73,7 @@ class ChannelsViewModel @Inject constructor(
     }
 
     fun findChannel (content: ContentEntityUI) {
-        findContentEntityUseCase(content.identifier, AppRoute.HOME).onSuccess { entity ->
+        findContentEntityUseCase(content.identifier, routeTag = AppRoute.HOME).onSuccess { entity ->
             if (entity is Channel) _clickedContent.update { entity } else logger.error(TAG, "findChannel Found entity is not a channel")
         }
     }
