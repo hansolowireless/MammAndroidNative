@@ -5,10 +5,10 @@
     <string name="duration_minutes">%1$s min.</string>
     <string name="separator">|</string>
     <string name="director_label">Director: %1$s</string>
-    <string name="original_title_label">Original title: %1$s</string>
-    <string name="available_until_label">Available until: %1$s</string>
-    <string name="play">Play</string>
-    <string name="cast">Cast</string>
+    <string name="original_title_label">Título original: %1$s</string>
+    <string name="available_until_label">Disponible hasta: %1$s</string>
+    <string name="play">Reproducir</string>
+    <string name="cast">Reparto</string>
 
     <!--region EPG-->
     <string name="no_title">Sin título</string>
