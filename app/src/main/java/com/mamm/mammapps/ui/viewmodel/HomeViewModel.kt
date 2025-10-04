@@ -108,7 +108,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun setFirstFocusedContent() {
-        if (homeContentUI.isNotEmpty())
+        if (homeContentUI.isNotEmpty() && homeContentUI.first().items.isNotEmpty())
             _focusedContent.update { homeContentUI.first().items.first() }
     }
 

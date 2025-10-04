@@ -2,6 +2,7 @@ package com.mamm.mammapps.domain.usecases
 
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.interfaces.MammRepository
+import com.mamm.mammapps.ui.mapper.insertChannelRow
 import com.mamm.mammapps.ui.mapper.toContentUIRows
 import com.mamm.mammapps.ui.model.ContentRowUI
 import javax.inject.Inject
@@ -21,7 +22,10 @@ class GetAdultsUseCase @Inject constructor(
                 mammRepository.getAdults().fold(
                     onSuccess = { response ->
                         logger.debug(TAG, "GetAdultsUseCase Received successful response")
-                        Result.success(response.toContentUIRows(genreResult, isAdult = true))
+
+                        val adultChannels = mammRepository.getHomeContent().getOrNull()?.channels?.filter { it.isPornChannel == true }
+
+                        Result.success(response.toContentUIRows(genreResult, isAdult = true).insertChannelRow(adultChannels))
                     },
                     onFailure = { exception ->
                         logger.error(TAG, "GetAdultsUseCase Failed: ${exception.message}")

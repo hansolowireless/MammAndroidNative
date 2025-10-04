@@ -50,8 +50,16 @@ class CustomContentRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getRecommended(): Result<GetBookmarksResponse> {
-        TODO("Not yet implemented")
+    override suspend fun getRecommended(): Result<List<Bookmark>> {
+        return runCatching {
+            remoteDatasource.getRecommended()?.let { response ->
+                val vods = response.vods.orEmpty()
+                val cutvs = response.cutvs.orEmpty()
+                vods + cutvs
+            }.orEmpty()
+        }.onFailure {
+            logger.error(TAG, "getRecommended failed: ${it.message}, $it")
+        }
     }
 
     override fun findContent(

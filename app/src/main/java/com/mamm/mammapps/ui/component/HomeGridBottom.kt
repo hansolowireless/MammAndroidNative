@@ -20,6 +20,7 @@ import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentRowUI
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.HomeGridBottomColor
+import java.util.UUID
 
 @Composable
 fun HomeGridBottom(
@@ -41,7 +42,7 @@ fun HomeGridBottom(
         ) {
             itemsIndexed(
                 items = content,
-                key = { _, item -> item.categoryName }
+                key = { _, item -> "${item.categoryName}_${UUID.randomUUID()}"  }
             ) { index, contentRow ->
 
                 Column(

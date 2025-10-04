@@ -118,7 +118,7 @@ fun BrandedVod.toContentEntityUI() = ContentEntityUI(
         getId()
     ),
     imageUrl = contentLogo.orEmpty(),
-    horizontalImageUrl = contentLogo500.orEmpty(),
+    horizontalImageUrl = contentLogo.orEmpty(),
     title = getTitle(),
     aspectRatio = Ratios.VERTICAL,
     height = Dimensions.contentEntityHeight,
@@ -429,6 +429,18 @@ fun List<ContentRowUI>.insertMostWatched(mostWatched: List<MostWatchedContent>):
     ).let {
         return listOf(it) + this
     }
+}
+
+fun List<ContentRowUI>.insertChannelRow(recommended: List<Channel>?): List<ContentRowUI> {
+    recommended?.let {
+        ContentRowUI(
+            categoryName = "Canales",
+            items = it.map { channel -> channel.toContentEntityUI() }
+        ).let { row ->
+            return listOf(row) + this
+        }
+    }
+    return this
 }
 
 //----------------region SERIE DETAIL---------------------

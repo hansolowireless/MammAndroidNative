@@ -31,6 +31,7 @@ import com.mamm.mammapps.data.model.player.GetTickersResponse
 import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.model.player.heartbeat.HeartBeatRequest
 import com.mamm.mammapps.data.model.player.playback.CLMRequest
+import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.remote.ApiService
@@ -471,6 +472,23 @@ class RemoteDatasource @Inject constructor(
     fun getCachedMostWatched() : List<MostWatchedContent> {
         return cache.getMostWatched() ?: emptyList()
     }
+
+    //----------RECOMMENDED---------//
+    suspend fun getRecommended() : GetRecommendedResponse {
+        cache.getRecommended()?.let {
+            return it
+        }
+        val response = customContentApi.getRecommended()
+        cache.setRecommended(response)
+        return response
+    }
+
+    fun getCachedRecommended() : GetRecommendedResponse? {
+        return cache.getRecommended()
+    }
+
+    //----------SIMILAR CONTENT---------//
+
 
 
 }

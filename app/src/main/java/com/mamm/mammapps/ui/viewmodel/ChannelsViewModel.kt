@@ -57,7 +57,6 @@ class ChannelsViewModel @Inject constructor(
         _focusedContent.value?.let {
             getLiveEventInfoUseCase.observeLiveEvents((it.identifier).getIdValue())
                 .onEach { event ->
-                    // Nuevo evento iniciado o terminado
                     logger.debug(
                         TAG,
                         "startObservingLiveEvents Event changed: ${event?.getTitle()}"
@@ -70,6 +69,10 @@ class ChannelsViewModel @Inject constructor(
 
     fun setFocusedContent(content: ContentEntityUI) {
         _focusedContent.update { content }
+    }
+
+    fun setFirstFocusedContent() {
+        _focusedContent.update { _channels.value.firstOrNull() }
     }
 
     fun findChannel (content: ContentEntityUI) {

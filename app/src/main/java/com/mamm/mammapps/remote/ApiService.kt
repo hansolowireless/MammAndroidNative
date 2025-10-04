@@ -13,6 +13,7 @@ import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.player.GetTickersResponse
 import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.model.player.heartbeat.HeartBeatRequest
+import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -154,16 +155,6 @@ interface ApiService {
         @Path("serieId") jsonParam: String
     ): Response<GetSeasonInfoResponse>
 
-
-
-//    // ---------- Search ----------
-//    @GET("search")
-//    suspend fun searchContent(
-//        @Query("q") query: String
-//    ): SearchResponse
-//
-
-
     // ---------- Playback ----------
     @GET
     @Headers(
@@ -219,11 +210,13 @@ interface ApiService {
     )
     suspend fun getMostWatched(): List<MostWatchedContent>
 
-    // ---------- Metrics / QoS ----------
-//    @POST("QosMonitor/logs")
-//    suspend fun sendQosLogs(
-//        @Body logs: QosLogRequest
-//    ): ApiResponse
+    //---------Recommended---------------
+    @GET("recommendation/get-recommendations")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getRecommended(): GetRecommendedResponse
 
     // ---------- Tickers ----------
     @GET
@@ -234,5 +227,12 @@ interface ApiService {
     suspend fun getTickers(
         @Url url: String
     ): Response<GetTickersResponse>
+
+    // ---------- Search ----------
+//    @GET("search")
+//    suspend fun searchContent(
+//        @Query("q") query: String
+//    ): SearchResponse
+//
 
 }

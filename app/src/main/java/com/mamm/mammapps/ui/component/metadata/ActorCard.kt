@@ -15,7 +15,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.MaterialTheme
 import coil.compose.AsyncImage
 import com.mamm.mammapps.data.model.metadata.Actor
 import com.mamm.mammapps.ui.theme.Dimensions
@@ -42,8 +44,21 @@ fun ActorCard(actor: Actor) {
             text = actor.name,
             color = Color.White,
             textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodySmall,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
+    }
+}
+
+@Preview
+@Composable
+fun ActorCardPreview() {
+    val actor = Actor(
+        name = "Shawn Hatosy",
+        image = "https://example.com/actor_image.jpg"
+    )
+    MaterialTheme {
+        ActorCard(actor = actor)
     }
 }

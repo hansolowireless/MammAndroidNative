@@ -18,7 +18,7 @@ interface CustomContentRepository {
 
     suspend fun getMostWatched(): Result<List<MostWatchedContent>>
 
-    suspend fun getRecommended(): Result<GetBookmarksResponse>
+    suspend fun getRecommended(): Result<List<Bookmark>>
 
     fun findContent(
         contentId: Int,

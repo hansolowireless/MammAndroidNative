@@ -49,6 +49,10 @@ fun ChannelsScreen(
         viewModel.observeLiveEvents()
     }
 
+    LaunchedEffect(channels) {
+        viewModel.setFirstFocusedContent()
+    }
+
     LaunchedEffect(clickedContent) {
         clickedContent?.let { content ->
             if (!hasNavigated.value) {

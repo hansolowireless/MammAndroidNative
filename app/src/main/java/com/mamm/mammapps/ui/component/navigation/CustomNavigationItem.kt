@@ -52,7 +52,7 @@ fun CustomTVNavigationItem(
         headlineContent = {
             Text(
                 text = label,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.alpha(labelAlpha),
                 maxLines = 1
             )

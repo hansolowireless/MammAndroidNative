@@ -8,7 +8,6 @@ import com.mamm.mammapps.ui.mapper.insertMostWatched
 import com.mamm.mammapps.ui.mapper.toContentUIRows
 import com.mamm.mammapps.ui.model.ContentRowUI
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.supervisorScope
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
@@ -28,11 +27,13 @@ class GetHomeContentUseCase @Inject constructor(
                 val homeContent = async { repository.getHomeContent() }
                 val bookmarks = async { customContentRepository.getBookmarks() }
                 val mostWatched = async { customContentRepository.getMostWatched() }
+                val recommended = async { customContentRepository.getRecommended() }
 
                 //Wait for all to complete
                 val homeResult = homeContent.await()
                 val bookmarksResult = bookmarks.await()
                 val mostWatchedResult = mostWatched.await()
+                val recommendedResult = recommended.await()
 
                 // Now check if home content succeeded (it's required)
                 if (homeResult.isFailure) {
@@ -45,6 +46,7 @@ class GetHomeContentUseCase @Inject constructor(
                 // Use successful results, fallback for optional content
                 val contentRows = homeResult.getOrThrow().toContentUIRows()
                     .insertBookmarks(bookmarksResult.getOrElse { emptyList() })
+                    .insertBookmarks(recommendedResult.getOrElse { emptyList() })
                     .insertMostWatched(mostWatchedResult.getOrElse { emptyList() })
 
                 Result.success(contentRows)
