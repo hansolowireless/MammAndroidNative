@@ -2,6 +2,7 @@ package com.mamm.mammapps.ui.extension
 
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,7 +29,9 @@ import androidx.compose.ui.unit.dp
 import com.bumptech.glide.Glide
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.player.WatermarkInfo
+import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Date
 
 fun Modifier.glow(
@@ -119,5 +122,12 @@ fun ImageView.loadWatermarkOrHide(watermarkInfo: WatermarkInfo) {
 
 fun ZonedDateTime.toDate(): Date {
     return Date(this.toInstant().toEpochMilli())
+}
+
+fun TextView.setHourText(date: ZonedDateTime?) {
+    this.text = date
+        ?.withZoneSameInstant(ZoneId.systemDefault()) // Convierte a la zona horaria del dispositivo
+        ?.format(DateTimeFormatter.ofPattern("HH:mm"))
+        ?: ""
 }
 
