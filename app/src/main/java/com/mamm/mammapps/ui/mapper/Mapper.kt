@@ -34,6 +34,22 @@ import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.Ratios
 import com.mamm.mammapps.util.orRandom
 
+fun Any.toContentEntityUI(isAdult: Boolean = false): ContentEntityUI? {
+    return when (this) {
+        is Channel -> this.toContentEntityUI()
+        is VoD -> this.toContentEntityUI()
+        is Event -> this.toContentEntityUI()
+        is Serie -> this.toContentEntityUI()
+        is EPGEvent -> this.toContentEntityUI(isAdult)
+        is SectionVod -> this.toContentEntityUI(isAdult)
+        is BrandedVod -> this.toContentEntityUI()
+        is Featured -> this.toContentEntityUI()
+        is Bookmark -> this.toContentEntityUI()
+        is MostWatchedContent -> this.toContentEntityUI()
+        else -> null
+    }
+}
+
 //--------------------region Home------------------------
 fun Channel.toContentEntityUI() = ContentEntityUI(
     identifier = ContentIdentifier.Channel(id.orRandom()),
@@ -52,7 +68,8 @@ fun VoD.toContentEntityUI() = ContentEntityUI(
     height = Dimensions.contentEntityHeight,
     detailInfo = DetailInfoUI(
         metadata = metadata,
-        description = longDesc.orEmpty()
+        description = longDesc.orEmpty(),
+        subgenreId = this.subgenreById
     )
 )
 
@@ -65,7 +82,8 @@ fun Event.toContentEntityUI() = ContentEntityUI(
     height = Dimensions.contentEntityHeight,
     detailInfo = DetailInfoUI(
         subtitle = subtitle.orEmpty(),
-        description = description.orEmpty()
+        description = description.orEmpty(),
+        subgenreId = this.subgenreById
     )
 )
 
@@ -92,7 +110,8 @@ fun EPGEvent.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
     height = Dimensions.contentEntityHeight,
     detailInfo = DetailInfoUI(
         metadata = getMetadata(),
-        description = getDescription()
+        description = getDescription(),
+        subgenreId = this.idSubgenre?.toInt()
     )
 )
 
@@ -109,7 +128,8 @@ fun SectionVod.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
     height = Dimensions.contentEntityHeight,
     detailInfo = DetailInfoUI(
         description = getDescription(),
-        metadata = getMetadata()
+        metadata = getMetadata(),
+        subgenreId = this.idSubgenre?.toInt()
     )
 )
 
@@ -482,3 +502,12 @@ fun GetSeasonInfoResponse.toSeasonUIList(): List<SeasonUI> {
 }
 //----------------endregion SERIE DETAIL---------------------
 
+//----------------region SIMILAR CONTENT---------------------
+fun List<Bookmark>.toSimilarContentRow() : ContentRowUI {
+    ContentRowUI(
+        categoryName = "Contenido Similar",
+        items = this.mapNotNull { it.toContentEntityUI() }
+    ).let {
+       return it
+    }
+}

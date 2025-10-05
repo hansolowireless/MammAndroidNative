@@ -9,5 +9,6 @@ data class DetailInfoUI (
     val squareLogo: String? = null,
     val subtitle: String = "",
     val description: String = "",
+    val subgenreId: Int? = null,
     val metadata: Metadata? = null
 ) : Parcelable

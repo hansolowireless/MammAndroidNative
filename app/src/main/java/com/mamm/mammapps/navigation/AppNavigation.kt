@@ -22,6 +22,7 @@ import com.mamm.mammapps.navigation.extension.addContentClass
 import com.mamm.mammapps.navigation.extension.addContentUI
 import com.mamm.mammapps.navigation.extension.addRoute
 import com.mamm.mammapps.navigation.extension.homeScreenRoute
+import com.mamm.mammapps.navigation.extension.removeContentUI
 import com.mamm.mammapps.navigation.extension.retrieveContentClass
 import com.mamm.mammapps.navigation.extension.retrieveContentUI
 import com.mamm.mammapps.navigation.model.AppRoute
@@ -117,19 +118,21 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
     }
 
     composable(AppRoute.DETAIL.route) { backStackEntry ->
-        val contentUI = remember(backStackEntry) {
-            backStackEntry.savedStateHandle.retrieveContentUI()
-        }
-
-        val contentFromEPG = remember(backStackEntry) {
+        //Comes from EPG or from a click in "Similar Content" in the detail view
+        val prefoundContent = remember(backStackEntry) {
             backStackEntry.savedStateHandle.retrieveContentClass()
         }
+
+        //El Any.toContentEntityUI (prefound.toContentEntityUI) no me convence mucho, supuestamente coge el que más sentido tenga por el polimorfismo de Kotlin
+        val contentUI = remember(backStackEntry) {
+            backStackEntry.savedStateHandle.retrieveContentUI()
+        } ?: prefoundContent?.toContentEntityUI()
 
         val route = remember(backStackEntry) {
             backStackEntry.savedStateHandle.get<AppRoute>("route")
         }
 
-        if (contentUI != null && route != null) {
+        if (contentUI != null && route != null ) {
             DetailScreen(
                 content = contentUI,
                 onClickPlay = { content ->
@@ -138,7 +141,21 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                     }
                     navController.currentBackStackEntry?.savedStateHandle?.addContentClass(content)
                 },
-                prefoundContent = contentFromEPG,
+                onSimilarContentClick = { content ->
+
+                    kotlin.runCatching {
+                        content.toContentEntityUI()
+                    }
+
+                    //Quitamos el contentUI para que la siguiente vista Detalle no coja el que tenía de antes
+                    navController.currentBackStackEntry?.savedStateHandle?.removeContentUI()
+                    navController.currentBackStackEntry?.savedStateHandle?.addContentClass(content)
+                    navController.currentBackStackEntry?.savedStateHandle?.addRoute(route)
+                    navController.navigate(AppRoute.DETAIL.route) {
+                        launchSingleTop = true
+                    }
+                },
+                prefoundContent = prefoundContent,
                 routeTag = route
             )
         } else {

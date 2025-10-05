@@ -1,11 +1,16 @@
 package com.mamm.mammapps.ui.component.common
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
@@ -24,8 +29,16 @@ fun PrimaryButton(
     text: String,
     icon: @Composable (() -> Unit)? = null,
     onClick: () -> Unit,
+    onRegainFocus: (() -> Unit)? = null,
 ) {
-    Button (
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
+    LaunchedEffect(isFocused) {
+        if (isFocused) onRegainFocus?.invoke()
+    }
+
+    Button(
         onClick = onClick,
         shape = ButtonDefaults.shape(RectangleShape),
         modifier = modifier
@@ -37,7 +50,8 @@ fun PrimaryButton(
             focusedContainerColor = ButtonColor.background,
             contentColor = ButtonColor.unfocusedContent,
             focusedContentColor = ButtonColor.focusedContent
-        )
+        ),
+        interactionSource = interactionSource // Pasar el interactionSource
     ) {
         Row(
             modifier = Modifier.fillMaxSize(),

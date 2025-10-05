@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -42,10 +43,15 @@ import com.mamm.mammapps.ui.component.common.PrimaryButton
 import com.mamm.mammapps.ui.component.detail.SeasonTabs
 import com.mamm.mammapps.ui.component.metadata.ActorCard
 import com.mamm.mammapps.navigation.model.AppRoute
+import com.mamm.mammapps.ui.component.detail.SimilarContentRow
+import com.mamm.mammapps.ui.mapper.toSimilarContentRow
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.viewmodel.DetailViewModel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlin.coroutines.coroutineContext
 import kotlin.math.max
 
 
@@ -55,15 +61,18 @@ fun DetailScreen(
     content: ContentEntityUI,
     prefoundContent: Any? = null,
     routeTag: AppRoute,
-    onClickPlay: (Any) -> Unit
+    onClickPlay: (Any) -> Unit,
+    onSimilarContentClick: (Any) -> Unit
 ) {
 
     val seasonInfoUIState by viewModel.seasonInfoUIState.collectAsStateWithLifecycle()
     val clickedContent by viewModel.clickedContent.collectAsStateWithLifecycle()
+    val similarContent by viewModel.similarContent.collectAsStateWithLifecycle()
 
+    val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
 
-    LaunchedEffect (clickedContent) {
+    LaunchedEffect(clickedContent) {
         clickedContent?.let(onClickPlay)
     }
 
@@ -73,6 +82,10 @@ fun DetailScreen(
 
     LaunchedEffect(Unit) {
         viewModel.getSeasonInfo(content)
+    }
+
+    LaunchedEffect(content) {
+        viewModel.getSimilar(content.detailInfo?.subgenreId)
     }
 
     DisposableEffect(Unit) {
@@ -104,117 +117,139 @@ fun DetailScreen(
 
         // Contenido principal
         Row {
-            Column(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .fillMaxWidth(0.5f)
-                    .padding(Dimensions.paddingLarge)
-                    .verticalScroll(scrollState),
-                verticalArrangement = Arrangement.spacedBy(Dimensions.paddingXSmall)
-            ) {
+            Column(modifier = Modifier.verticalScroll(scrollState)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth(0.5f)
+                        .padding(Dimensions.paddingLarge),
+                    verticalArrangement = Arrangement.spacedBy(Dimensions.paddingXSmall)
+                ) {
 
-                // Título
-                Text(
-                    text = content.title,
-                    color = Color.White,
-                    style = MaterialTheme.typography.headlineLarge,
-                )
-
-                // Metadata principal
-                content.detailInfo?.metadata?.let { metadata ->
-                    DurationYearRatingRow(metadata = metadata)
-
-                    // Director y género
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingXSmall)
-                    ) {
-                        if (metadata.director.isNotBlank()) {
-                            Text(
-                                text = stringResource(R.string.director_label, metadata.director),
-                                color = Color.White
-                            )
-                            Text(
-                                text = stringResource(R.string.separator),
-                                color = Color.White
-                            )
-                        }
-                        Text(
-                            text = metadata.genres,
-                            color = Color.White
-                        )
-                    }
-
-                    // Título original si es diferente
-                    if (metadata.originalTitle.isNotEmpty() && metadata.originalTitle != content.title) {
-                        Text(
-                            text = stringResource(
-                                R.string.original_title_label,
-                                metadata.originalTitle
-                            ),
-                            color = Color.White.copy(alpha = 0.8f)
-                        )
-                    }
-                }
-
-                // Descripción
-                content.detailInfo?.description?.let { description ->
+                    // Título
                     Text(
-                        text = description,
+                        text = content.title.orEmpty(),
                         color = Color.White,
-                        maxLines = 5,
-                        overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.headlineLarge,
                     )
-                }
 
-                Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
+                    // Metadata principal
+                    content.detailInfo?.metadata?.let { metadata ->
+                        DurationYearRatingRow(metadata = metadata)
 
-                // Botón de reproducir, solo si no es serie
-                if (content.identifier !is ContentIdentifier.Serie) {
-                    PrimaryButton(
-                        text = stringResource(R.string.play),
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.PlayArrow,
-                                contentDescription = stringResource(R.string.play_icon_content_description),
-                                tint = Color.White,
-                                modifier = Modifier.padding(end = Dimensions.paddingXSmall)
-                            )
-                        },
-                        onClick = {
-
-                            if (prefoundContent != null) {
-                                onClickPlay(prefoundContent)
-                                return@PrimaryButton
+                        // Director y género
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingXSmall)
+                        ) {
+                            if (metadata.director.isNotBlank()) {
+                                Text(
+                                    text = stringResource(
+                                        R.string.director_label,
+                                        metadata.director
+                                    ),
+                                    color = Color.White
+                                )
+                                Text(
+                                    text = stringResource(R.string.separator),
+                                    color = Color.White
+                                )
                             }
-
-                            viewModel.findContent(
-                                entityUI = content,
-                                routeTag = routeTag
+                            Text(
+                                text = metadata.genres,
+                                color = Color.White
                             )
                         }
-                    )
-                }
 
-                Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
+                        // Título original si es diferente
+                        if (metadata.originalTitle.isNotEmpty() && metadata.originalTitle != content.title) {
+                            Text(
+                                text = stringResource(
+                                    R.string.original_title_label,
+                                    metadata.originalTitle
+                                ),
+                                color = Color.White.copy(alpha = 0.8f)
+                            )
+                        }
+                    }
 
-                // Sección de reparto
-                content.detailInfo?.metadata?.let { metadata ->
-                    if (metadata.actors.isNotEmpty()) {
+                    // Descripción
+                    content.detailInfo?.description?.let { description ->
                         Text(
-                            text = stringResource(R.string.cast),
+                            text = description,
                             color = Color.White,
-                            modifier = Modifier.padding(bottom = Dimensions.paddingSmall)
+                            maxLines = 5,
+                            overflow = TextOverflow.Ellipsis,
+                            style = MaterialTheme.typography.bodyMedium
                         )
+                    }
 
-                        LazyRow(
-                            horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall)
-                        ) {
-                            items(metadata.actors) { actor ->
-                                ActorCard(actor = actor)
+                    Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
+
+                    // Botón de reproducir, solo si no es serie
+                    if (content.identifier !is ContentIdentifier.Serie) {
+                        PrimaryButton(
+                            text = stringResource(R.string.play),
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Default.PlayArrow,
+                                    contentDescription = stringResource(R.string.play_icon_content_description),
+                                    tint = Color.White,
+                                    modifier = Modifier.padding(end = Dimensions.paddingXSmall)
+                                )
+                            },
+                            onClick = {
+
+                                if (prefoundContent != null) {
+                                    onClickPlay(prefoundContent)
+                                    return@PrimaryButton
+                                }
+
+                                viewModel.findContent(
+                                    entityUI = content,
+                                    routeTag = routeTag
+                                )
+                            },
+                            onRegainFocus = {
+                                coroutineScope.launch { scrollState.animateScrollTo(0) }
+                            }
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
+
+                    // Sección de reparto
+                    content.detailInfo?.metadata?.let { metadata ->
+                        if (metadata.actors.isNotEmpty()) {
+                            Text(
+                                text = stringResource(R.string.cast),
+                                color = Color.White,
+                                modifier = Modifier.padding(bottom = Dimensions.paddingSmall)
+                            )
+
+                            LazyRow(
+                                horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall)
+                            ) {
+                                items(metadata.actors) { actor ->
+                                    ActorCard(actor = actor)
+                                }
                             }
                         }
                     }
+                }
+
+                similarContent?.let { it ->
+                    SimilarContentRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = Dimensions.paddingSmall),
+                        content = it.toSimilarContentRow(),
+                        onContentClicked = { content ->
+                            //Buscamos el contenido que mandamos a la siguiente vista detalle
+                            similarContent?.find { it.id == content.identifier.id }?.let {
+                                onSimilarContentClick(it)
+                            }
+                        }
+                    )
                 }
             }
 
@@ -225,6 +260,7 @@ fun DetailScreen(
                         viewModel.findEpisode(seasonOrder, episodeId)
                     }
                 )
+
                 UIState.Loading -> LoadingSpinner()
                 else -> return@Row
             }

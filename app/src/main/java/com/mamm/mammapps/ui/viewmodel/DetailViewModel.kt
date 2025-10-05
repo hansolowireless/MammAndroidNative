@@ -2,13 +2,17 @@ package com.mamm.mammapps.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mamm.mammapps.data.logger.Logger
+import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.serie.TbSeason
 import com.mamm.mammapps.domain.usecases.FindContentEntityUseCase
 import com.mamm.mammapps.domain.usecases.GetSeasonsInfoUseCase
+import com.mamm.mammapps.domain.usecases.GetSimilarContentUseCase
 import com.mamm.mammapps.ui.common.UIState
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
+import com.mamm.mammapps.ui.model.ContentRowUI
 import com.mamm.mammapps.ui.model.SeasonUI
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -22,16 +26,25 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailViewModel @Inject constructor(
     private val getSeasonsInfoUseCase: GetSeasonsInfoUseCase,
-    private val findContentEntityUseCase: FindContentEntityUseCase
+    private val findContentEntityUseCase: FindContentEntityUseCase,
+    private val getSimilarContentUseCase: GetSimilarContentUseCase,
+    private val logger: Logger
 ) : ViewModel() {
 
-    private val _seasonInfoUIState = MutableStateFlow<UIState<List<SeasonUI>>>(UIState.Idle)
-    val seasonInfoUIState = _seasonInfoUIState.asStateFlow()
+    companion object {
+        private const val TAG = "DetailViewModel"
+    }
 
     private val _clickedContent = MutableStateFlow<Any?>(null)
     val clickedContent: StateFlow<Any?> = _clickedContent.asStateFlow()
 
+    private val _seasonInfoUIState = MutableStateFlow<UIState<List<SeasonUI>>>(UIState.Idle)
+    val seasonInfoUIState = _seasonInfoUIState.asStateFlow()
+
     private var seasonListOriginal: List<TbSeason> = mutableListOf()
+
+    private val _similarContent = MutableStateFlow<List<Bookmark>?>(null)
+    val similarContent: StateFlow<List<Bookmark>?> = _similarContent.asStateFlow()
 
     fun getSeasonInfo(content: ContentEntityUI) {
         if (content.identifier is ContentIdentifier.Serie) {
@@ -58,11 +71,24 @@ class DetailViewModel @Inject constructor(
 
     fun findEpisode(seasonOrder: Int, episodeId: Int) {
         seasonListOriginal.find { it.getOrder() == seasonOrder }
-        ?.let { seasonTb ->
-            seasonTb.tbContentSeasons?.find { it.contentDetails?.getId() == episodeId }
-            ?.let { episodeTb ->
-                _clickedContent.update { episodeTb }
+            ?.let { seasonTb ->
+                seasonTb.tbContentSeasons?.find { it.contentDetails?.getId() == episodeId }
+                    ?.let { episodeTb ->
+                        _clickedContent.update { episodeTb }
+                    }
             }
+    }
+
+    fun getSimilar(subgenreId: Int?) {
+        subgenreId?.let {
+            viewModelScope.launch(Dispatchers.IO) {
+                getSimilarContentUseCase(subgenreId)
+                    .onSuccess { result ->
+                        _similarContent.update { result }
+                    }
+            }
+        } ?: run {
+            logger.debug(TAG, "getSimilar: subgenreId is null")
         }
     }
 

@@ -218,6 +218,16 @@ interface ApiService {
     )
     suspend fun getRecommended(): GetRecommendedResponse
 
+    //---------Similar Content---------------
+    @GET("recommendation/get-similar")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getSimilarContent(
+        @Query("subgenre") subgenreId: Int,
+    ): GetRecommendedResponse
+
     // ---------- Tickers ----------
     @GET
     @Headers(

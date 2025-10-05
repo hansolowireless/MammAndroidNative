@@ -12,6 +12,10 @@ fun SavedStateHandle.addContentUI(content: ContentEntityUI) {
     this["contentUI"] = content
 }
 
+fun SavedStateHandle.removeContentUI() {
+    this.remove<ContentEntityUI>("contentUI")
+}
+
 fun SavedStateHandle.addContentClass(content: Any) {
     this["contentClass"] = content
 }

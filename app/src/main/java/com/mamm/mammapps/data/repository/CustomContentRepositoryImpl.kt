@@ -2,10 +2,12 @@ package com.mamm.mammapps.data.repository
 
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.logger.Logger
+import com.mamm.mammapps.data.model.Subgenre
 import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.bookmark.GetBookmarksResponse
 import com.mamm.mammapps.data.model.bookmark.SetBookmarkRequest
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
+import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
 import com.mamm.mammapps.domain.interfaces.CustomContentRepository
 import com.mamm.mammapps.ui.model.CustomizedContent
 import javax.inject.Inject
@@ -59,6 +61,14 @@ class CustomContentRepositoryImpl @Inject constructor(
             }.orEmpty()
         }.onFailure {
             logger.error(TAG, "getRecommended failed: ${it.message}, $it")
+        }
+    }
+
+    override suspend fun getSimilar(subgenreId: Int): Result<GetRecommendedResponse> {
+        return runCatching {
+            remoteDatasource.getSimilarContent(subgenreId = subgenreId)
+        }.onFailure {
+            logger.error(TAG, "getSimilar failed: ${it.message}, $it")
         }
     }
 

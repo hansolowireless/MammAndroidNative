@@ -488,7 +488,10 @@ class RemoteDatasource @Inject constructor(
     }
 
     //----------SIMILAR CONTENT---------//
-
+    suspend fun getSimilarContent(subgenreId: Int) : GetRecommendedResponse {
+        val response = customContentApi.getSimilarContent(subgenreId)
+        return response
+    }
 
 
 }

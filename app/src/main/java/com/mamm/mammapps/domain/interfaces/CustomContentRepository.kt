@@ -6,7 +6,9 @@ import com.mamm.mammapps.data.model.bookmark.SetBookmarkRequest
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginResponse
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
+import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
 import com.mamm.mammapps.data.model.section.SectionVod
+import com.mamm.mammapps.domain.usecases.GetSimilarContentUseCase
 import com.mamm.mammapps.ui.model.CustomizedContent
 
 interface CustomContentRepository {
@@ -19,6 +21,8 @@ interface CustomContentRepository {
     suspend fun getMostWatched(): Result<List<MostWatchedContent>>
 
     suspend fun getRecommended(): Result<List<Bookmark>>
+
+    suspend fun getSimilar(subgenreId: Int) : Result<GetRecommendedResponse>
 
     fun findContent(
         contentId: Int,
