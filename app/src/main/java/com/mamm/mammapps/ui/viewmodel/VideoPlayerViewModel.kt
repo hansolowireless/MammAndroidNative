@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import com.example.openstream_flutter_rw.data.model.customdatasourcefactory.TokenParamDataSourceFactory
-import com.example.openstream_flutter_rw.ui.manager.watermark.FingerprintController
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -26,24 +25,24 @@ import com.mamm.mammapps.data.extension.getCurrentDate
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.model.player.Ticker
-import com.mamm.mammapps.data.model.player.VideoPlayerUIState
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
-import com.mamm.mammapps.domain.usecases.player.GetTickersUseCase
 import com.mamm.mammapps.domain.usecases.player.GetDRMUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.GetJwTokenUseCase
 import com.mamm.mammapps.domain.usecases.player.GetPlayableUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.GetTSTVUrlUseCase
+import com.mamm.mammapps.domain.usecases.player.GetTickersUseCase
 import com.mamm.mammapps.domain.usecases.player.SendHeartBeatUseCase
 import com.mamm.mammapps.domain.usecases.player.SendQosUseCase
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
 import com.mamm.mammapps.ui.constant.PlayerConstant
+import com.mamm.mammapps.ui.extension.setHourText
 import com.mamm.mammapps.ui.extension.toDate
-import com.mamm.mammapps.ui.manager.videoresize.VideoResizeManagerWithTicker
 import com.mamm.mammapps.ui.mapper.toLiveEventInfoUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import com.mamm.mammapps.ui.model.player.LiveEventInfoUI
+import com.mamm.mammapps.ui.model.player.PlayerUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -68,13 +67,12 @@ class VideoPlayerViewModel @Inject constructor(
     private val getDRMUrlUseCase: GetDRMUrlUseCase,
     private val getTSTVUrlUseCase: GetTSTVUrlUseCase,
     private val getJwTokenUseCase: GetJwTokenUseCase,
-//    private val channelZapUseCase: ChannelZapUseCase,
-//    private val setNewContentUseCase: SetNewContentUseCase,
-//    private val validatePINUseCase: ValidatePINUseCase,
     private val sendQoSUseCase: SendQosUseCase,
-//    private val sendBookmarkUseCase: SendBookmarkStampsUseCase,
+    //    private val sendBookmarkUseCase: SendBookmarkStampsUseCase,
     private val sendHeartbeatUseCase: SendHeartBeatUseCase,
     private val getLiveEventInfoUseCase: FindLiveEventOnChannelUseCase,
+    //    private val channelZapUseCase: ChannelZapUseCase,
+    //    private val validatePINUseCase: ValidatePINUseCase,
     private val getTickersUseCase: GetTickersUseCase,
     @ApplicationContext private val context: Context,
     private val logger: Logger
@@ -84,8 +82,8 @@ class VideoPlayerViewModel @Inject constructor(
         private const val TAG = "PlayerViewModel"
     }
 
-    private val _uiState = MutableStateFlow(VideoPlayerUIState())
-    val uiState = _uiState.asStateFlow()
+    private val _playerState = MutableStateFlow<PlayerUIState>(PlayerUIState.Idle)
+    val playerState = _playerState.asStateFlow()
 
     private val _player = MutableStateFlow<ExoPlayer?>(null)
     val player = _player.asStateFlow()
@@ -97,10 +95,6 @@ class VideoPlayerViewModel @Inject constructor(
     private val _liveEventInfo = MutableStateFlow<LiveEventInfoUI?>(null)
     val liveEventInfo = _liveEventInfo.asStateFlow()
 
-    //Información del evento en directo cuando se está reproduciendo un canal
-    private val _showCcDialog = MutableStateFlow<Boolean>(false)
-    val showCcDialog = _showCcDialog.asStateFlow()
-
     //Tickers
     private val _tickerList = MutableStateFlow<List<Ticker>>(emptyList())
     val tickerList = _tickerList.asStateFlow()
@@ -108,10 +102,6 @@ class VideoPlayerViewModel @Inject constructor(
     // ExoPlayer y componentes
     private var trackSelector: DefaultTrackSelector? = null
     private val statsListener: PlaybackStatsListener by lazy { PlaybackStatsListener(false) { _, _ -> } }
-
-    // Controllers
-    private var watermarkController = FingerprintController()
-    private var resizeManager: VideoResizeManagerWithTicker? = null
 
     // Jobs para handlers periódicos
     private var qosJob: Job? = null
@@ -167,11 +157,10 @@ class VideoPlayerViewModel @Inject constructor(
                         TAG,
                         "initializeWithContent getPlayableUrlUseCase error = ${error?.message}"
                     )
-
-                    _uiState.value = _uiState.value.copy(error = error?.message)
+                    //TODO SHOW ERROR
                 }
             }.onFailure { exception ->
-                _uiState.value = _uiState.value.copy(error = exception.message)
+                //TODO SHOW ERROR
             }
         }
     }
@@ -199,11 +188,12 @@ class VideoPlayerViewModel @Inject constructor(
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
-                _uiState.value = _uiState.value.copy(isPlaying = isPlaying)
                 if (isPlaying) {
                     startPeriodicFunctions()
+                    _playerState.update { PlayerUIState.Playing }
                 } else {
                     stopPeriodicFunctions()
+                    _playerState.update { PlayerUIState.Paused }
                 }
             }
 
@@ -256,18 +246,6 @@ class VideoPlayerViewModel @Inject constructor(
         player?.playWhenReady = true
     }
 
-    fun onCcDialogButtonClick() {
-        if (TrackSelectionDialog.willHaveCCContent(_player.value)) {
-            logger.debug(TAG, "onCcDialogButtonClick Showing CC dialog")
-            _showCcDialog.value = true
-        }
-    }
-
-    fun onCcDialogDismissed () {
-        logger.debug(TAG, "onCcDialogDismissed Dismissing CC dialog")
-        _showCcDialog.value = false
-    }
-
     fun observeLiveEvents() {
         if (_content.value.isLive)
             getLiveEventInfoUseCase.observeLiveEvents((_content.value.identifier).getIdValue())
@@ -293,9 +271,7 @@ class VideoPlayerViewModel @Inject constructor(
         startHeartbeat()
         startQoSReporting()
 //        startBookmarkReporting()
-//        startTickerService()
     }
-
 
     private fun startHeartbeat() {
         heartbeatJob?.cancel()
@@ -386,14 +362,8 @@ class VideoPlayerViewModel @Inject constructor(
 
 
 
-    private fun handlePlayerError(error: PlaybackException, context: Context) {
-        val message = when {
-            error.message?.contains("DRM") == true && context.packageName == "goandgo.openstream.com" ->
-                "Contenido no disponible. Consulte opciones de compra en www.goandgotv.com"
-
-            else -> "Error: ${error.message ?: ""}, code: ${error.errorCode}"
-        }
-        _uiState.value = _uiState.value.copy(error = message)
+    private fun handlePlayerError(exception: PlaybackException, context: Context) {
+        //TODO SHOW ERROR
     }
 
     private fun getInitialContent(): ContentToPlayUI {
@@ -411,17 +381,23 @@ class VideoPlayerViewModel @Inject constructor(
         val positionView: View = playerView.findViewById(R.id.exo_position)
         val tstvHourBeginView: TextView = playerView.findViewById(R.id.tstv_hourbegin)
         val liveLabel: View = playerView.findViewById(R.id.live_indicator)
+
         val goToLiveButton: AppCompatImageButton = playerView.findViewById(R.id.go_live_button)
-        val previewBar = playerView.findViewById<CustomPreviewBar>(R.id.exo_progress)
         val startOverButton : View = playerView.findViewById(R.id.go_beginning_button)
+
+        playerView.setShowNextButton(false)
+        playerView.setShowPreviousButton(false)
+
+        val previewBar = playerView.findViewById<CustomPreviewBar>(R.id.exo_progress)
 
         configureTimeBar(previewBar)
 
         if (_content.value.isTimeshift) {
             if (_liveEventInfo.value != null) {
-                positionView.visibility = View.GONE
                 tstvHourBeginView.visibility = View.VISIBLE
+                positionView.visibility = View.GONE
                 startOverButton.visibility = View.VISIBLE
+                tstvHourBeginView.setHourText(_liveEventInfo.value?.eventStart)
 
                 if (previewBar?.isTstvMode == true) {
                     liveLabel.visibility = View.GONE
@@ -464,21 +440,21 @@ class VideoPlayerViewModel @Inject constructor(
 
     }
 
-    fun setDialogButtonVisibility(playerView: StyledPlayerView) {
-        //Dialogs Buttons
-        val ccTracksButton = playerView.findViewById<AppCompatImageButton>(R.id.cc_tracks_button)
-        val audioTracksButton = playerView.findViewById<AppCompatImageButton>(R.id.audio_tracks_button)
+    fun setDialogButtonVisibility(ccTracksButton: AppCompatImageButton?, audioTracksButton: AppCompatImageButton?) {
+        runCatching {
+            if (TrackSelectionDialog.willHaveCCContent(_player.value)) {
+                ccTracksButton?.visibility = View.VISIBLE
+            } else {
+                ccTracksButton?.visibility = View.GONE
+            }
 
-        if (TrackSelectionDialog.willHaveCCContent(_player.value)) {
-            ccTracksButton.visibility = View.VISIBLE
-        } else {
-            ccTracksButton.visibility = View.GONE
-        }
-
-        if (TrackSelectionDialog.willHaveAudioContent(_player.value)) {
-            audioTracksButton.visibility = View.VISIBLE
-        } else {
-            audioTracksButton.visibility = View.GONE
+            if (TrackSelectionDialog.willHaveAudioContent(_player.value)) {
+                audioTracksButton?.visibility = View.VISIBLE
+            } else {
+                audioTracksButton?.visibility = View.GONE
+            }
+        }.onFailure {
+            logger.error(TAG, "setDialogButtonVisibility - Error setting button visibility: ${it.message}")
         }
     }
 
@@ -504,9 +480,9 @@ class VideoPlayerViewModel @Inject constructor(
         }
     }
 
-    fun handleScrubStop(previewBar: CustomPreviewBar?) {
+    fun triggerTSTVMode(previewBar: CustomPreviewBar?, forcePosition: Long? = null) {
         if (_content.value.isLive && _content.value.isTimeshift) {
-            val progress = previewBar?.progress?.toLong() ?: 0
+            val progress = forcePosition ?: previewBar?.progress?.toLong() ?: 0
             val timeToJump =
                 _liveEventInfo.value?.eventStart?.plusSeconds(progress / 1000)
             val startTSTV = Duration.between(timeToJump, getCurrentDate())
@@ -570,9 +546,6 @@ class VideoPlayerViewModel @Inject constructor(
         bookmarkJob?.cancel()
         heartbeatJob?.cancel()
         channelInputJob?.cancel()
-
-        watermarkController.stop()
-        resizeManager?.release()
     }
 
     private fun releasePlayer() {

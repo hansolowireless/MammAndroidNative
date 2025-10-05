@@ -27,6 +27,7 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -44,6 +45,7 @@ import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
 import com.mamm.mammapps.ui.manager.videoresize.VideoResizeManagerWithTicker
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
+import com.mamm.mammapps.ui.model.player.PlayerUIState
 import com.mamm.mammapps.ui.viewmodel.VideoPlayerViewModel
 
 @Composable
@@ -79,7 +81,8 @@ fun VideoPlayerScreen(
         PlayerViewWithControls(
             modifier = Modifier.fillMaxSize(),
             viewModel = viewModel,
-            player = player
+            player = player,
+            content = content
         )
 
     }
@@ -92,6 +95,9 @@ fun PlayerViewWithControls(
     player: ExoPlayer?,
     content: ContentToPlayUI? = null
 ) {
+
+    val playerState by viewModel.playerState.collectAsStateWithLifecycle()
+
     val focusRequester = remember { FocusRequester() }
     var playerViewRef by remember { mutableStateOf<StyledPlayerView?>(null) }
 
@@ -112,8 +118,13 @@ fun PlayerViewWithControls(
 
     // Mostrar diálogo de subtítulos
     val context = LocalContext.current
-    val fragmentManager = (context as? FragmentActivity)?.supportFragmentManager
-    val showCcDialog by viewModel.showCcDialog.collectAsStateWithLifecycle()
+    val fragmentManager = remember(context) {
+        (context as? FragmentActivity)?.supportFragmentManager
+    }
+    var ccTracksButton by remember { mutableStateOf<AppCompatImageButton?>(null) }
+    var audioTracksButton by remember { mutableStateOf<AppCompatImageButton?>(null) }
+    var videoQualityButton by remember { mutableStateOf<AppCompatImageButton?>(null) }
+    var startOverButton by remember { mutableStateOf<AppCompatImageButton?>(null) }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -123,25 +134,18 @@ fun PlayerViewWithControls(
         playerViewRef?.let { playerView -> viewModel.setControlVisibility(playerView)  }
     }
 
+    LaunchedEffect (playerState){
+        viewModel.setDialogButtonVisibility(ccTracksButton, audioTracksButton)
+    }
+
     LaunchedEffect (tickerList) {
         videoResizeManager?.replaceTickers(tickerList)
     }
 
-    LaunchedEffect(showCcDialog) {
-        if (showCcDialog && fragmentManager != null) {
-            val trackSelectionDialog = TrackSelectionDialog.createCCDialogForPlayer(
-                player
-            ) { dismissedDialog ->  // Este es el onDismissListener
-                viewModel.onCcDialogDismissed()
-            }
-            trackSelectionDialog.show(fragmentManager, null)
-        }
-    }
-
     AndroidView(
-        factory = { context ->
-            val parentView = FrameLayout(context)
-            LayoutInflater.from(context).inflate(
+        factory = { viewContext ->
+            val parentView = FrameLayout(viewContext)
+            LayoutInflater.from(viewContext).inflate(
                 R.layout.activity_video_player_thumbnail_mobile,
                 parentView,
                 true
@@ -153,9 +157,103 @@ fun PlayerViewWithControls(
             playerViewRef = styledPlayerView
             previewTimeBar = parentView.findViewById<CustomPreviewBar>(R.id.exo_progress)
 
-            val ccTracksButton = parentView.findViewById<AppCompatImageButton>(R.id.cc_tracks_button)
+            ccTracksButton = parentView.findViewById<AppCompatImageButton>(R.id.cc_tracks_button)
+            audioTracksButton = parentView.findViewById<AppCompatImageButton>(R.id.audio_tracks_button)
+            videoQualityButton = parentView.findViewById<AppCompatImageButton>(R.id.select_tracks_button)
+            startOverButton = parentView.findViewById(R.id.go_beginning_button)
+
+            audioTracksButton?.setOnClickListener {
+                if (fragmentManager == null || player == null) {
+                    Log.e("AudioDialog", "FragmentManager or Player is NULL")
+                    return@setOnClickListener
+                }
+
+                if (fragmentManager.isStateSaved || fragmentManager.isDestroyed) {
+                    Log.e("AudioDialog", "FragmentManager invalid state: saved=${fragmentManager.isStateSaved}, destroyed=${fragmentManager.isDestroyed}")
+                    return@setOnClickListener
+                }
+
+                try {
+                    val trackSelectionDialog = TrackSelectionDialog.createAudioTrackDialogForPlayer(
+                        player
+                    ) {
+                        // Dialog dismissed
+                    }
+
+                    trackSelectionDialog.setStyle(
+                        TrackSelectionDialog.STYLE_NORMAL,
+                        R.style.TrackSelectionDialogThemeOverlay
+                    )
+
+                    trackSelectionDialog.show(fragmentManager, "audio_track_dialog")
+
+                } catch (e: Exception) {
+                    Log.e("AudioDialog", "ERROR showing dialog", e)
+                }
+            }
+
             ccTracksButton?.setOnClickListener {
-                viewModel.onCcDialogButtonClick()
+                if (fragmentManager == null || player == null) {
+                    Log.e("CCDialog", "FragmentManager or Player is NULL")
+                    return@setOnClickListener
+                }
+
+                if (fragmentManager.isStateSaved || fragmentManager.isDestroyed) {
+                    Log.e("CCDialog", "FragmentManager invalid state: saved=${fragmentManager.isStateSaved}, destroyed=${fragmentManager.isDestroyed}")
+                    return@setOnClickListener
+                }
+
+                try {
+                    val trackSelectionDialog = TrackSelectionDialog.createCCDialogForPlayer(
+                        player
+                    ) {
+                        // Dialog dismissed
+                    }
+
+                    trackSelectionDialog.setStyle(
+                        TrackSelectionDialog.STYLE_NORMAL,
+                        R.style.TrackSelectionDialogThemeOverlay
+                    )
+
+                    trackSelectionDialog.show(fragmentManager, "cc_track_dialog")
+
+                } catch (e: Exception) {
+                    Log.e("CCDialog", "ERROR showing dialog", e)
+                }
+            }
+
+            videoQualityButton?.setOnClickListener {
+                if (fragmentManager == null || player == null) {
+                    Log.e("VideoQualityDialog", "FragmentManager or Player is NULL")
+                    return@setOnClickListener
+                }
+
+                if (fragmentManager.isStateSaved || fragmentManager.isDestroyed) {
+                    Log.e("VideoQualityDialog", "FragmentManager invalid state: saved=${fragmentManager.isStateSaved}, destroyed=${fragmentManager.isDestroyed}")
+                    return@setOnClickListener
+                }
+
+                try {
+                    val trackSelectionDialog = TrackSelectionDialog.createForPlayer(
+                        player
+                    ) {
+
+                    }
+
+                    trackSelectionDialog.setStyle(
+                        TrackSelectionDialog.STYLE_NORMAL,
+                        R.style.TrackSelectionDialogThemeOverlay
+                    )
+
+                    trackSelectionDialog.show(fragmentManager, "video_quality_dialog")
+                }
+                catch (e: Exception) {
+                    Log.e("VideoQualityDialog", "ERROR showing dialog", e)
+                }
+            }
+
+            startOverButton?.setOnClickListener {
+                viewModel.triggerTSTVMode(previewTimeBar, forcePosition = 0)
             }
 
             // Inicializar manager si no existe
@@ -192,14 +290,13 @@ fun PlayerViewWithControls(
                         }
 
                         override fun onScrubStop(previewBar: PreviewBar?) {
-                            viewModel.handleScrubStop(previewTimeBar)
+                            viewModel.triggerTSTVMode(previewTimeBar)
                         }
                     }
 
                     previewTimeBar?.addOnScrubListener(newListener)
                     scrubListener = newListener
                 }
-
 
                 fingerprintController.setup(parentView, styledPlayerView)
                 fingerprintController.start(

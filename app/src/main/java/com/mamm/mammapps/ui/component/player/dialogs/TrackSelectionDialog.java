@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDialog;
 import androidx.fragment.app.DialogFragment;
@@ -50,6 +51,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Dialog to select tracks.
@@ -283,13 +285,14 @@ public final class TrackSelectionDialog extends DialogFragment {
         return trackView == null ? Collections.emptyMap() : trackView.overrides;
     }
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // We need to own the view to let tab layout work correctly on all API levels. We can't use
         // AlertDialog because it owns the view itself, so we use AppCompatDialog instead, themed using
         // the AlertDialog theme overlay with force-enabled title.
         AppCompatDialog dialog =
-                new AppCompatDialog(getActivity(), R.style.TrackSelectionDialogThemeOverlay);
+                new AppCompatDialog(requireActivity(), R.style.TrackSelectionDialogThemeOverlay);
         dialog.setTitle(titleId);
         return dialog;
     }
@@ -388,15 +391,28 @@ public final class TrackSelectionDialog extends DialogFragment {
                             TrackSelectionView.filterOverrides(overrides, trackGroups, allowMultipleOverrides));
         }
 
+        /*Lo introdujo Gemini para que se vieran los colores del Style definido para el dialogo en los textos*/
         @Override
         public View onCreateView(
                 LayoutInflater inflater,
                 @Nullable ViewGroup container,
                 @Nullable Bundle savedInstanceState) {
+
+            // 1. FORZAR TEMA: Creamos un Contexto que utiliza explícitamente tu tema de diálogo.
+            final android.view.ContextThemeWrapper contextThemeWrapper = new android.view.ContextThemeWrapper(
+                    inflater.getContext(), R.style.TrackSelectionDialogThemeOverlay);
+
+            // 2. INFLADOR TEMÁTICO: Clonamos el inflador usando ese nuevo Contexto.
+            LayoutInflater themedInflater = inflater.cloneInContext(contextThemeWrapper);
+
+            // 3. INFLAR VISTA: Usamos el inflador temático para inflar el layout de la lista.
             View rootView =
-                    inflater.inflate(
+                    themedInflater.inflate(
                             com.google.android.exoplayer2.ui.R.layout.exo_track_selection_dialog, container, /* attachToRoot= */ false);
+
             TrackSelectionView trackSelectionView = rootView.findViewById(com.google.android.exoplayer2.ui.R.id.exo_track_selection_view);
+
+            // Inicialización del TrackSelectionView (código original)
             trackSelectionView.setShowDisableOption(true);
             trackSelectionView.setAllowMultipleOverrides(allowMultipleOverrides);
             trackSelectionView.setAllowAdaptiveSelections(allowAdaptiveSelections);
@@ -406,6 +422,7 @@ public final class TrackSelectionDialog extends DialogFragment {
                     overrides,
                     /* trackFormatComparator= */ null,
                     /* listener= */ this);
+
             return rootView;
         }
 
