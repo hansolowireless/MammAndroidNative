@@ -135,6 +135,7 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
         if (contentUI != null && route != null ) {
             DetailScreen(
                 content = contentUI,
+                prefoundContent = prefoundContent,
                 onClickPlay = { content ->
                     navController.navigate(AppRoute.PLAYER.route) {
                         launchSingleTop = true
@@ -142,10 +143,6 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                     navController.currentBackStackEntry?.savedStateHandle?.addContentClass(content)
                 },
                 onSimilarContentClick = { content ->
-
-                    kotlin.runCatching {
-                        content.toContentEntityUI()
-                    }
 
                     //Quitamos el contentUI para que la siguiente vista Detalle no coja el que tenía de antes
                     navController.currentBackStackEntry?.savedStateHandle?.removeContentUI()
@@ -155,7 +152,6 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                         launchSingleTop = true
                     }
                 },
-                prefoundContent = prefoundContent,
                 routeTag = route
             )
         } else {
