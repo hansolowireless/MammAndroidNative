@@ -20,10 +20,9 @@ import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.epg.EPGChannelContent
 import com.mamm.mammapps.data.model.section.EPGEvent
-import com.mamm.mammapps.ui.common.UIState
+import com.mamm.mammapps.ui.component.common.LoadingSpinner
+import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.component.epg.EPGContent
-import com.mamm.mammapps.ui.mapper.toContentEntityUI
-import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.viewmodel.EPGViewModel
 import java.time.LocalDate
 
@@ -48,12 +47,7 @@ fun EPGScreen(
 
     when (val state = uiState) {
         is UIState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
+            LoadingSpinner()
         }
         is UIState.Success<List<EPGChannelContent>> -> {
             EPGContent(

@@ -1,4 +1,4 @@
-package com.mamm.mammapps.ui.common
+package com.mamm.mammapps.ui.model.uistate
 
 abstract class UIState<out T> {
     object Idle : UIState<Nothing>()

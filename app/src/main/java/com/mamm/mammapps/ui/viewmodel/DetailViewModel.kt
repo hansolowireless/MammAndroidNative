@@ -8,12 +8,11 @@ import com.mamm.mammapps.data.model.serie.TbSeason
 import com.mamm.mammapps.domain.usecases.FindContentEntityUseCase
 import com.mamm.mammapps.domain.usecases.GetSeasonsInfoUseCase
 import com.mamm.mammapps.domain.usecases.GetSimilarContentUseCase
-import com.mamm.mammapps.ui.common.UIState
+import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.mapper.toSeasonUIList
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
-import com.mamm.mammapps.ui.model.ContentRowUI
 import com.mamm.mammapps.ui.model.SeasonUI
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

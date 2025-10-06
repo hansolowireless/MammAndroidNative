@@ -9,8 +9,7 @@ import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.domain.usecases.FindContentEntityUseCase
 import com.mamm.mammapps.domain.usecases.GetEPGContentUseCase
 import com.mamm.mammapps.navigation.model.AppRoute
-import com.mamm.mammapps.ui.common.UIState
-import com.mamm.mammapps.ui.model.ContentEntityUI
+import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.viewmodel.ChannelsViewModel.Companion.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel

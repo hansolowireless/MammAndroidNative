@@ -10,6 +10,7 @@
     <string name="play">Reproducir</string>
     <string name="cast">Reparto</string>
 
+
     <!--region EPG-->
     <string name="no_title">Sin título</string>
     <string name="day_before_yesterday">Anteayer</string>
@@ -65,6 +66,14 @@
 
     <!--Error-->
     <string name="error_loading_epg">Error cargando la Guía</string>
+
+    <!--region PIN DIALOG-->
+    <string name="pin_dialog_title">Acceso Restringido</string>
+    <string name="pin_dialog_message">Por favor, introduce tu PIN para continuar.</string>
+    <string name="pin_field_label">PIN</string>
+    <string name="confirm_button_label">Confirmar</string>
+    <string name="cancel_button_label">Cancelar</string>
+    <!--endregion PIN DIALOG-->
 
 
 </resources>

@@ -1,6 +1,4 @@
-package com.mamm.mammapps.ui.model.player
-
-import com.mamm.mammapps.ui.common.UIState
+package com.mamm.mammapps.ui.model.uistate
 
 sealed class PlayerUIState : UIState<Nothing>() {
     data object Idle : PlayerUIState()

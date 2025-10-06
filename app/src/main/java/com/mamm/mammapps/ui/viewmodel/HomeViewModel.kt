@@ -19,12 +19,15 @@ import com.mamm.mammapps.domain.usecases.GetMoviesUseCase
 import com.mamm.mammapps.domain.usecases.GetSeriesUseCase
 import com.mamm.mammapps.domain.usecases.GetSportsUseCase
 import com.mamm.mammapps.domain.usecases.GetWarnerUseCase
-import com.mamm.mammapps.ui.common.UIState
+import com.mamm.mammapps.domain.usecases.pin.ShouldRequestPinUseCase
+import com.mamm.mammapps.domain.usecases.pin.ValidatePinUseCase
+import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.mapper.toContentEntityUI
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.ContentRowUI
+import com.mamm.mammapps.ui.model.uistate.HomeContentUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,6 +53,8 @@ class HomeViewModel @Inject constructor(
     private val getAcontraUseCase: GetAcontraUseCase,
     private val findContentEntityUseCase: FindContentEntityUseCase,
     private val findLiveEventOnChannelUseCase: FindLiveEventOnChannelUseCase,
+    private val shouldRequestPinUseCase: ShouldRequestPinUseCase,
+    private val validatePinUseCase: ValidatePinUseCase,
     private val logger: Logger
 ) : ViewModel() {
 
@@ -57,7 +62,7 @@ class HomeViewModel @Inject constructor(
         const val TAG = "HomeViewModel"
     }
 
-    var homeContentUIState by mutableStateOf<UIState<List<ContentRowUI>>>(UIState.Idle)
+    var homeContentUIState by mutableStateOf<HomeContentUIState>(HomeContentUIState.Loading)
         private set
 
     var homeContentUI by mutableStateOf<List<ContentRowUI>>(emptyList())
@@ -68,6 +73,24 @@ class HomeViewModel @Inject constructor(
 
     private val _focusedContent = MutableStateFlow<ContentEntityUI?>(null)
     val focusedContent: StateFlow<ContentEntityUI?> = _focusedContent.asStateFlow()
+
+    fun checkRestrictedScreen(routeTag: AppRoute) {
+        when (routeTag) {
+            AppRoute.ADULTS -> {
+                homeContentUIState =
+                    if (shouldRequestPinUseCase()) HomeContentUIState.Restricted else HomeContentUIState.RequestContent
+            }
+            else -> homeContentUIState = HomeContentUIState.RequestContent
+        }
+    }
+
+    fun validatePin(pin: String) {
+        homeContentUIState = if (validatePinUseCase(pin)) {
+            HomeContentUIState.RequestContent
+        } else {
+            HomeContentUIState.IncorrectPin
+        }
+    }
 
     fun content(routeTag: AppRoute) {
         when (routeTag) {
@@ -92,15 +115,15 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun loadContent(useCase: suspend () -> Result<List<ContentRowUI>>) {
-        homeContentUIState = UIState.Loading
+        homeContentUIState = HomeContentUIState.Loading
         viewModelScope.launch(Dispatchers.IO) {
             useCase()
                 .onSuccess { response ->
                     homeContentUI = response
-                    homeContentUIState = UIState.Success(homeContentUI)
+                    homeContentUIState = HomeContentUIState.Success(homeContentUI)
                 }
                 .onFailure { exception ->
-                    homeContentUIState = UIState.Error(
+                    homeContentUIState = HomeContentUIState.Error(
                         exception.message ?: "Unknown error occurred"
                     )
                 }

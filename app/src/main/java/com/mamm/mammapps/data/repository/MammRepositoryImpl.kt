@@ -11,11 +11,12 @@ import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
-import com.mamm.mammapps.data.model.login.LocatorResponse
-import com.mamm.mammapps.data.model.login.LoginResponse
 import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.domain.interfaces.MammRepository
 import com.mamm.mammapps.ui.model.ContentIdentifier
+import com.mamm.mammapps.util.AppConstants
+import java.time.Duration
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 class MammRepositoryImpl @Inject constructor(
@@ -246,6 +247,57 @@ class MammRepositoryImpl @Inject constructor(
                 ?.find { it.id == id }
                 ?: throw NoSuchElementException("Channel with id $id not found")
         }
+    }
+
+    override fun shouldRequestPin(): Boolean {
+        // 1. Obtener la última fecha guardada desde el LocalDataSource.
+        val lastPinTime: ZonedDateTime? = localDataSource.getLastTimePinWasCorrect()
+
+        // 2. Si nunca se ha guardado una fecha (es nulo), debemos solicitar el PIN.
+        if (lastPinTime == null) {
+            logger.debug(TAG, "No ZonedDateTime found, PIN request is needed.")
+            return true
+        }
+
+        // 3. Obtener la hora actual con la misma zona horaria.
+        val currentTime = ZonedDateTime.now(lastPinTime.zone)
+
+        // 4. Calcular la duración entre la fecha guardada y la actual.
+        val duration = Duration.between(lastPinTime, currentTime)
+
+        // 5. Comparar la duración con 15 minutos.
+        val shouldRequest = duration.toMinutes() > AppConstants.PIN_REQUEST_MINS
+
+        if (shouldRequest) {
+            logger.debug(TAG, "More than 15 minutes have passed, PIN request is needed.")
+        } else {
+            logger.debug(TAG, "Less than 15 minutes have passed, no PIN request needed.")
+        }
+
+        return shouldRequest
+    }
+
+
+    override fun validatePin(pin: String): Boolean {
+        // La lógica de validación real.
+        // Asumo que el PIN correcto está en el SessionManager.
+        val correctPin = sessionManager.pinParental
+        val isCorrect = pin == correctPin
+
+        if (isCorrect) {
+            logger.debug(TAG, "PIN validation successful.")
+        } else {
+            logger.error(TAG, "PIN validation failed.")
+        }
+
+        return isCorrect
+    }
+
+    override fun savePinSuccessTimestamp() {
+        // Guarda la marca de tiempo actual en el LocalDataSource.
+        val currentTime = ZonedDateTime.now()
+        localDataSource.setLastTimePinWasCorrect(currentTime)
+        logger.debug(TAG, "Saved new PIN success timestamp: $currentTime")
     }
 
 }

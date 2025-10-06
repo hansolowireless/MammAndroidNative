@@ -1,5 +1,6 @@
 package com.mamm.mammapps.ui.screen
 
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,13 +16,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mamm.mammapps.ui.common.UIState
+import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.component.HomeGridBottom
 import com.mamm.mammapps.ui.component.HomeGridTop
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.navigation.model.AppRoute
+import com.mamm.mammapps.ui.component.dialog.PinDialog
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
+import com.mamm.mammapps.ui.model.uistate.HomeContentUIState
 import com.mamm.mammapps.ui.viewmodel.HomeViewModel
 
 @Composable
@@ -37,17 +40,27 @@ fun HomeScreen(
     val hasNavigated = remember { mutableStateOf(false) }
 
     val columnListState = rememberLazyListState()
-
     var lastClickedItemIndex by remember { mutableStateOf<Int?>(null) }
-
     val focusedContent by viewModel.focusedContent.collectAsStateWithLifecycle()
+
+    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+
+    LaunchedEffect (homeContentState) {
+        when (homeContentState) {
+            is HomeContentUIState.RequestContent -> viewModel.content(routeTag = routeTag)
+            is HomeContentUIState.IncorrectPin -> backDispatcher?.onBackPressed()
+            else -> {}
+        }
+    }
 
     LaunchedEffect(homeContent) {
         viewModel.setFirstFocusedContent()
     }
 
     LaunchedEffect(Unit) {
-        viewModel.content(routeTag)
+        //viewModel.content(routeTag)
+        viewModel.checkRestrictedScreen(routeTag)
     }
 
     LaunchedEffect(lastClickedItemIndex) {
@@ -72,18 +85,29 @@ fun HomeScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         when (homeContentState) {
-            is UIState.Loading -> {
+            is HomeContentUIState.Loading -> {
                 LoadingSpinner()
             }
 
-            is UIState.Error -> {
+            is HomeContentUIState.Error -> {
                 Text(
                     text = homeContentState.message,
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
 
-            is UIState.Success -> {
+            is HomeContentUIState.Restricted -> {
+                PinDialog(
+                    onConfirm = {
+                        viewModel.validatePin(pin = it)
+                    },
+                    onDismissRequest = {
+                        backDispatcher?.onBackPressed()
+                    }
+                )
+            }
+
+            is HomeContentUIState.Success -> {
                 Column {
                     focusedContent?.let {
                         HomeGridTop(
@@ -114,9 +138,11 @@ fun HomeScreen(
                 }
             }
 
-            is UIState.Idle -> {
+            is HomeContentUIState.Idle -> {
                 //TODO Initial state
             }
+
+            else -> {}
         }
     }
 }

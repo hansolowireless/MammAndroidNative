@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mamm.mammapps.domain.usecases.login.AutoLoginUseCase
 import com.mamm.mammapps.domain.usecases.login.LoginUseCase
-import com.mamm.mammapps.ui.common.UIState
+import com.mamm.mammapps.ui.model.uistate.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

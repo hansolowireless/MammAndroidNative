@@ -37,4 +37,8 @@ interface MammRepository {
 
     fun findGenreWithId(id: Int): Result<Genre>
     fun findChannelWithId(id: Int): Result<Channel>
+
+    fun shouldRequestPin(): Boolean
+    fun validatePin(pin: String): Boolean
+    fun savePinSuccessTimestamp()
 }

@@ -23,9 +23,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.bookmark.Bookmark
-import com.mamm.mammapps.ui.common.UIState
+import com.mamm.mammapps.ui.component.common.LoadingSpinner
+import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.component.common.TextInput
-import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.viewmodel.SearchViewModel
 import com.mamm.mammapps.ui.component.search.InitialPrompt
 import com.mamm.mammapps.ui.component.search.SearchResultsGrid
@@ -83,9 +83,7 @@ fun SearchScreen(
                 // Si no hay sugerencias, manejamos los estados de la búsqueda final
                 when (val state = uiState.resultsState) {
                     is UIState.Loading -> {
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator()
-                        }
+                        LoadingSpinner()
                     }
 
                     is UIState.Error -> {

@@ -36,7 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.mamm.mammapps.R
 import com.mamm.mammapps.navigation.model.AppRoute
-import com.mamm.mammapps.ui.common.UIState
+import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.component.common.DurationYearRatingRow
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.ui.component.common.PrimaryButton

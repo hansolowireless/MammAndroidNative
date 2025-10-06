@@ -21,8 +21,9 @@ fun TextInput(
     value: String,
     onValueChange: (String) -> Unit,
     keyboardType: KeyboardType,
-    imeAction: ImeAction = ImeAction.Default, // Parámetro para la acción del teclado
-    onSearch: () -> Unit = {}, // Lambda para la acción de búsqueda
+    imeAction: ImeAction = ImeAction.Default,
+    onSearch: () -> Unit = {},
+    onDone: () -> Unit = {},
     isPassword: Boolean = false
 ) {
     TextField(
@@ -36,7 +37,8 @@ fun TextInput(
             imeAction = imeAction
         ),
         keyboardActions = KeyboardActions(
-            onSearch = { onSearch() }
+            onSearch = { onSearch() },
+            onDone = { onDone() }
         ),
         modifier = Modifier.fillMaxWidth(),
         colors = TextFieldDefaults.colors(
