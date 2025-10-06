@@ -113,7 +113,7 @@ interface ApiService {
     )
     suspend fun getAdults(
         @Path("jsonParam") jsonParam: String
-    ): Response<GetOtherContentResponse>
+    ): Response<GetBrandedContentResponse>
 
     // ---------- WARNER ----------
     @GET("epg_files/wb_pkg_{jsonParam}")

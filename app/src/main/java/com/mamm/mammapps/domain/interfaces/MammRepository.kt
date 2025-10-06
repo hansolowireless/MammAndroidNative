@@ -14,7 +14,7 @@ interface MammRepository {
 
     suspend fun getHomeContent() : Result<GetHomeContentResponse>
     suspend fun getMovies(): Result<GetOtherContentResponse>
-    suspend fun getAdults(): Result<GetOtherContentResponse>
+    suspend fun getAdults(): Result<GetBrandedContentResponse>
     suspend fun getDocumentaries(): Result<GetOtherContentResponse>
     suspend fun getKids(): Result<GetOtherContentResponse>
     suspend fun getSports(): Result<GetOtherContentResponse>

@@ -79,7 +79,7 @@ class RemoteDatasource @Inject constructor(
     private var cachedSportsContent: GetOtherContentResponse? = null
 
     @Volatile
-    private var cachedAdultsContent: GetOtherContentResponse? = null
+    private var cachedAdultsContent: GetBrandedContentResponse? = null
 
     @Volatile
     private var cachedKidsContent: GetOtherContentResponse? = null
@@ -235,7 +235,7 @@ class RemoteDatasource @Inject constructor(
     }
 
     //----------ADULTS---------//
-    suspend fun getAdults(jsonParam: String): GetOtherContentResponse {
+    suspend fun getAdults(jsonParam: String): GetBrandedContentResponse {
         return withContext(Dispatchers.IO) {
 
             cachedAdultsContent?.let { return@withContext it }
@@ -250,7 +250,7 @@ class RemoteDatasource @Inject constructor(
         }
     }
 
-    fun getCachedAdults(): GetOtherContentResponse? {
+    fun getCachedAdults(): GetBrandedContentResponse? {
         return cachedAdultsContent
     }
 

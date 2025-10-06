@@ -61,7 +61,7 @@ class MammRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAdults(): Result<GetOtherContentResponse> {
+    override suspend fun getAdults(): Result<GetBrandedContentResponse> {
         val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
             ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
 
@@ -170,6 +170,7 @@ class MammRepositoryImpl @Inject constructor(
         val content: Any? = when (identifier) {
             is ContentIdentifier.VoD -> remoteDatasource.getCachedAdults()?.vods?.find { it.getId() == identifier.id }
             is ContentIdentifier.Event -> remoteDatasource.getCachedAdults()?.events?.find { it.getId() == identifier.id }
+            is ContentIdentifier.Channel -> remoteDatasource.getCachedHomeContent()?.channels?.find { it.id == identifier.id }
             else -> null
         }
 

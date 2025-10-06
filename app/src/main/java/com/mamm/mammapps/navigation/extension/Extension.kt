@@ -48,7 +48,12 @@ fun NavGraphBuilder.homeScreenRoute(
                     addRoute(appRoute)
                 }
             },
-            onPlay = {}
+            onPlay = {
+                navController.navigate(AppRoute.PLAYER.route) {
+                    launchSingleTop = true
+                }
+                navController.currentBackStackEntry?.savedStateHandle?.addContentClass(it)
+            }
         )
     }
 }

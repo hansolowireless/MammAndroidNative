@@ -375,8 +375,7 @@ fun GetHomeContentResponse.toContentUIRows(): List<ContentRowUI> {
 }
 
 fun GetOtherContentResponse.toContentUIRows(
-    genre: Genre,
-    isAdult: Boolean = false
+    genre: Genre
 ): List<ContentRowUI> {
     val rows = mutableListOf<ContentRowUI>()
 
@@ -386,8 +385,8 @@ fun GetOtherContentResponse.toContentUIRows(
         val subVods = vods.orEmpty().filter { it.idSubgenre == sub.id.toString() }
 
         // Convertimos a ContentEntityUI
-        val items = subEvents.map { it.toContentEntityUI(isAdult = isAdult) } +
-                subVods.map { it.toContentEntityUI(isAdult = isAdult) }
+        val items = subEvents.map { it.toContentEntityUI() } +
+                subVods.map { it.toContentEntityUI() }
 
         if (items.isNotEmpty()) {
             rows.add(
@@ -401,7 +400,10 @@ fun GetOtherContentResponse.toContentUIRows(
     return rows
 }
 
-fun GetBrandedContentResponse.toContentUIRows(genre: Genre): List<ContentRowUI> {
+fun GetBrandedContentResponse.toContentUIRows(
+    genre: Genre,
+    isAdult: Boolean = false
+): List<ContentRowUI> {
     val rows = mutableListOf<ContentRowUI>()
 
     // Add "Eventos Destacados" row without subgenre filtering
@@ -419,12 +421,12 @@ fun GetBrandedContentResponse.toContentUIRows(genre: Genre): List<ContentRowUI> 
         val subVods = vods.orEmpty().filter { it.idSubgenre == sub.id.toString() }
 
         // Convertimos a ContentEntityUI
-        val items = subVods.map { it.toContentEntityUI() }
+        val items = subVods.mapNotNull { it.toContentEntityUI(isAdult = isAdult) }
 
         if (items.isNotEmpty()) {
             rows.add(
                 ContentRowUI(
-                    categoryName = sub.ds ?: "",
+                    categoryName = sub.ds.orEmpty(),
                     items = items
                 )
             )
@@ -503,11 +505,11 @@ fun GetSeasonInfoResponse.toSeasonUIList(): List<SeasonUI> {
 //----------------endregion SERIE DETAIL---------------------
 
 //----------------region SIMILAR CONTENT---------------------
-fun List<Bookmark>.toSimilarContentRow() : ContentRowUI {
+fun List<Bookmark>.toSimilarContentRow(): ContentRowUI {
     ContentRowUI(
         categoryName = "Contenido Similar",
         items = this.mapNotNull { it.toContentEntityUI() }
     ).let {
-       return it
+        return it
     }
 }
