@@ -42,7 +42,7 @@ fun HomeGridBottom(
         ) {
             itemsIndexed(
                 items = content,
-                key = { _, item -> "${item.categoryName}_${UUID.randomUUID()}"  }
+                key = { index, item -> "${item.categoryName}_$index"  }
             ) { index, contentRow ->
 
                 Column(

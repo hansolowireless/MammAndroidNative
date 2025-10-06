@@ -493,5 +493,16 @@ class RemoteDatasource @Inject constructor(
         return response
     }
 
+    //----------SEARCH---------//
+    suspend fun search(query: String) : List<Bookmark> {
+        return withContext(Dispatchers.IO) {
+            val response = customContentApi.search(query)
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()?.string()?.toResponseBody()
+                throw HttpException(Response.error<Any>(response.code(), errorBody))
+            }
+            response.body() ?: throw IllegalStateException("Response body is null")
+        }
+    }
 
 }

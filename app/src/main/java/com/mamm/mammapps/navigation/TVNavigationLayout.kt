@@ -61,7 +61,8 @@ fun TVNavigationLayout(navController: NavHostController) {
         AppRoute.SEARCH.route,
         AppRoute.DIAGNOSTICS.route,
         AppRoute.LASTSEVENDAYS.route,
-        AppRoute.ADULTS.route
+        AppRoute.ADULTS.route,
+        AppRoute.SEARCH.route
     )
     val showNavigationRail = currentRoute in sectionsWithMenu
     var hasItemFocused by remember { mutableStateOf(false) }

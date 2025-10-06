@@ -1,6 +1,7 @@
 package com.mamm.mammapps.ui.component.common
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -9,6 +10,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -19,6 +21,8 @@ fun TextInput(
     value: String,
     onValueChange: (String) -> Unit,
     keyboardType: KeyboardType,
+    imeAction: ImeAction = ImeAction.Default, // Parámetro para la acción del teclado
+    onSearch: () -> Unit = {}, // Lambda para la acción de búsqueda
     isPassword: Boolean = false
 ) {
     TextField(
@@ -26,7 +30,14 @@ fun TextInput(
         onValueChange = onValueChange,
         label = { Text(label) },
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        // Usamos los nuevos parámetros aquí
+        keyboardOptions = KeyboardOptions(
+            keyboardType = keyboardType,
+            imeAction = imeAction
+        ),
+        keyboardActions = KeyboardActions(
+            onSearch = { onSearch() }
+        ),
         modifier = Modifier.fillMaxWidth(),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = Color.White.copy(alpha = 0.1f),    // Fondo cuando tiene foco
@@ -34,6 +45,7 @@ fun TextInput(
             focusedIndicatorColor = Color.Transparent,                  // Sin línea inferior
             unfocusedIndicatorColor = Color.Transparent,                // Sin línea inferior
             disabledIndicatorColor = Color.Transparent                  // Sin línea inferior cuando está deshabilitado
-        )
+        ),
+        singleLine = true
     )
 }

@@ -49,10 +49,12 @@ fun getCurrentDate() : ZonedDateTime {
     return ZonedDateTime.now()
 }
 
-fun String.toZonedDateTimeEPG(): ZonedDateTime {
-    val isoString = this.replace(" ", "T") + "Z"
-    val instant = Instant.parse(isoString)
-    return instant.atZone(ZoneOffset.UTC)
+fun String.toZonedDateTimeEPG(): ZonedDateTime? {
+    return runCatching {
+        val isoString = this.replace(" ", "T") + "Z"
+        val instant = Instant.parse(isoString)
+        instant.atZone(ZoneOffset.UTC)
+    }.getOrNull()
 }
 
 fun Response<*>.isRedirect(): Boolean {

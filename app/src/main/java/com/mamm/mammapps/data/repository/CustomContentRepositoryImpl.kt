@@ -2,9 +2,7 @@ package com.mamm.mammapps.data.repository
 
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.Subgenre
 import com.mamm.mammapps.data.model.bookmark.Bookmark
-import com.mamm.mammapps.data.model.bookmark.GetBookmarksResponse
 import com.mamm.mammapps.data.model.bookmark.SetBookmarkRequest
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
@@ -83,6 +81,14 @@ class CustomContentRepositoryImpl @Inject constructor(
         }
 
         return content?.let { Result.success(it) }
+    }
+
+    override suspend fun searchContent (query: String): Result<List<Bookmark>> {
+        return runCatching {
+            remoteDatasource.search(query = query)
+        }.onFailure {
+            logger.error(TAG, "searchContent failed: ${it.message}, $it")
+        }
     }
 
 }

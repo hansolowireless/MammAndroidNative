@@ -25,7 +25,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -36,23 +35,20 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.mamm.mammapps.R
+import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.common.UIState
 import com.mamm.mammapps.ui.component.common.DurationYearRatingRow
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.ui.component.common.PrimaryButton
 import com.mamm.mammapps.ui.component.detail.SeasonTabs
-import com.mamm.mammapps.ui.component.metadata.ActorCard
-import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.component.detail.SimilarContentRow
+import com.mamm.mammapps.ui.component.metadata.ActorCard
 import com.mamm.mammapps.ui.mapper.toSimilarContentRow
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.viewmodel.DetailViewModel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlin.coroutines.coroutineContext
-import kotlin.math.max
 
 
 @Composable

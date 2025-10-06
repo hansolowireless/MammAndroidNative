@@ -10,6 +10,7 @@ import com.mamm.mammapps.domain.usecases.GetSeasonsInfoUseCase
 import com.mamm.mammapps.domain.usecases.GetSimilarContentUseCase
 import com.mamm.mammapps.ui.common.UIState
 import com.mamm.mammapps.navigation.model.AppRoute
+import com.mamm.mammapps.ui.mapper.toSeasonUIList
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.ContentRowUI
@@ -49,9 +50,9 @@ class DetailViewModel @Inject constructor(
     fun getSeasonInfo(content: ContentEntityUI) {
         if (content.identifier is ContentIdentifier.Serie) {
             viewModelScope.launch(Dispatchers.IO) {
-                getSeasonsInfoUseCase(content.identifier.id).onSuccess { seasonList ->
-                    _seasonInfoUIState.value = UIState.Success(seasonList.first)
-                    seasonListOriginal = seasonList.second
+                getSeasonsInfoUseCase(content.identifier.id).onSuccess { seasonInfoResponse ->
+                    _seasonInfoUIState.value = UIState.Success(seasonInfoResponse.toSeasonUIList())
+                    seasonInfoResponse.tbSeasons?.let {seasonListOriginal = it}
                 }.onFailure {
                     _seasonInfoUIState.value = UIState.Error(it.message.orEmpty())
                 }

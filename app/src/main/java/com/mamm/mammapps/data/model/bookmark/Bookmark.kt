@@ -6,11 +6,6 @@ import com.mamm.mammapps.data.extension.toZonedDateTimeEPG
 import kotlinx.parcelize.Parcelize
 import java.time.ZonedDateTime
 
-data class GetBookmarksResponse(
-    @SerializedName("bookmarks")
-    val bookmarks: List<Bookmark>? = null
-)
-
 @Parcelize
 data class Bookmark(
     @SerializedName("type")
@@ -24,7 +19,7 @@ data class Bookmark(
     @SerializedName("longDesc")
     val longDesc: String? = null,
     @SerializedName("duration")
-    val duration: Int? = null,
+    val duration: String? = null,
     @SerializedName("startDate")
     val startDate: String? = null,
     @SerializedName("expiryDate")

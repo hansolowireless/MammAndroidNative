@@ -225,8 +225,18 @@ interface ApiService {
         "Accept: application/json"
     )
     suspend fun getSimilarContent(
-        @Query("subgenre") subgenreId: Int,
+        @Query("subgenre") subgenreId: Int
     ): GetRecommendedResponse
+
+    // ---------- Search ----------
+    @GET("/content/search")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun search(
+        @Query("chain") searchQuery: String
+    ): Response<List<Bookmark>>
 
     // ---------- Tickers ----------
     @GET
@@ -238,11 +248,6 @@ interface ApiService {
         @Url url: String
     ): Response<GetTickersResponse>
 
-    // ---------- Search ----------
-//    @GET("search")
-//    suspend fun searchContent(
-//        @Query("q") query: String
-//    ): SearchResponse
-//
+
 
 }

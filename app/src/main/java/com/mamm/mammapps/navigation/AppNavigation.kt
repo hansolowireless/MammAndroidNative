@@ -34,6 +34,7 @@ import com.mamm.mammapps.ui.screen.DetailScreen
 import com.mamm.mammapps.ui.screen.EPGScreen
 import com.mamm.mammapps.ui.screen.HomeScreen
 import com.mamm.mammapps.ui.screen.LoginScreen
+import com.mamm.mammapps.ui.screen.SearchScreen
 import com.mamm.mammapps.ui.screen.VideoPlayerScreen
 
 @Composable
@@ -103,7 +104,6 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                 navController.navigate(AppRoute.DETAIL.route) {
                     launchSingleTop = true
                 }
-                navController.currentBackStackEntry?.savedStateHandle?.addContentUI(content.toContentEntityUI())
                 navController.currentBackStackEntry?.savedStateHandle?.addContentClass(content)
                 navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.EPG)
             },
@@ -115,6 +115,16 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                 navController.currentBackStackEntry?.savedStateHandle?.addContentClass(content)
             }
         )
+    }
+
+    composable(AppRoute.SEARCH.route) {
+        SearchScreen(onContentClick = {
+            navController.navigate(AppRoute.DETAIL.route) {
+                launchSingleTop = true
+            }
+            navController.currentBackStackEntry?.savedStateHandle?.addContentClass(it)
+            navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.SEARCH)
+        })
     }
 
     composable(AppRoute.DETAIL.route) { backStackEntry ->
@@ -184,6 +194,8 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
             )
         }
     }
+
+
 
 
 }

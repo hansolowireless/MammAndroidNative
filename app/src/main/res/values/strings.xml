@@ -20,6 +20,12 @@
     <string name="live">Directo</string>
     <!--endregion EPG-->
 
+    <!-- region SEARCH -->
+    <string name="search_field_label">Buscar películas, series y más…</string>
+    <string name="search_initial_prompt">Encuentra tu contenido favorito.</string>
+    <string name="search_no_results">No se encontraron resultados para \"%1$s\"</string>
+    <!--endregion SEARCH-->
+
     <!-- Content descriptions for accessibility -->
     <string name="rating_content_description">Rating</string>
     <string name="play_icon_content_description">Play icon</string>

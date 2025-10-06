@@ -1,14 +1,9 @@
 package com.mamm.mammapps.domain.interfaces
 
 import com.mamm.mammapps.data.model.bookmark.Bookmark
-import com.mamm.mammapps.data.model.bookmark.GetBookmarksResponse
 import com.mamm.mammapps.data.model.bookmark.SetBookmarkRequest
-import com.mamm.mammapps.data.model.login.LocatorResponse
-import com.mamm.mammapps.data.model.login.LoginResponse
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
-import com.mamm.mammapps.data.model.section.SectionVod
-import com.mamm.mammapps.domain.usecases.GetSimilarContentUseCase
 import com.mamm.mammapps.ui.model.CustomizedContent
 
 interface CustomContentRepository {
@@ -28,5 +23,7 @@ interface CustomContentRepository {
         contentId: Int,
         contentType: CustomizedContent
     ): Result<Any>?
+
+    suspend fun searchContent (query: String): Result<List<Bookmark>>
 
 }
