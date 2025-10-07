@@ -56,7 +56,7 @@ class LoginViewModel @Inject constructor(
                 },
                 onFailure = { error ->
                     Log.e(TAG, "Login failed", error)
-                    _loginState.update { UIState.Error(error.message ?: "Error desconocido") }
+                    _loginState.update { UIState.Error(throwable = error) }
                 }
             )
         }

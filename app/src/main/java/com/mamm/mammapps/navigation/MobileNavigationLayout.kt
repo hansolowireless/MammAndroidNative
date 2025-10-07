@@ -1,11 +1,15 @@
 package com.mamm.mammapps.navigation
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -13,65 +17,102 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.mamm.mammapps.R
 import com.mamm.mammapps.navigation.model.AppRoute
+import com.mamm.mammapps.ui.component.icon.BulletedList
+import com.mamm.mammapps.ui.component.icon.Fire
+import com.mamm.mammapps.ui.component.icon.Football
+import com.mamm.mammapps.ui.component.icon.WifiSignal
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MobileNavigationLayout(navController: NavHostController) {
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
+    // La misma lista de secciones que en TV
+    val sectionsWithMenu = listOf(
+        AppRoute.HOME.route, AppRoute.EPG.route, AppRoute.CHANNELS.route,
+        AppRoute.MOVIES.route, AppRoute.DOCUMENTARIES.route, AppRoute.KIDS.route,
+        AppRoute.SERIES.route, AppRoute.SPORTS.route, AppRoute.WARNER.route,
+        AppRoute.ACONTRA.route, AppRoute.AMC.route, AppRoute.SEARCH.route,
+        AppRoute.DIAGNOSTICS.route, AppRoute.LASTSEVENDAYS.route, AppRoute.ADULTS.route
+    )
+    val showNavigationDrawer = currentRoute in sectionsWithMenu
 
     ModalNavigationDrawer(
         drawerState = drawerState,
+        // Habilitar/deshabilitar gestos para abrir el cajón
+        gesturesEnabled = showNavigationDrawer,
         drawerContent = {
             ModalDrawerSheet {
-                NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.Home, null) },
-                    label = { Text("Inicio") },
-                    selected = false,
-                    onClick = {
-                        navController.navigate("home")
-                        scope.launch { drawerState.close() }
-                    }
+                Spacer(modifier = Modifier.padding(12.dp))
+
+                val menuItems = listOf(
+                    AppRoute.HOME, AppRoute.EPG, AppRoute.CHANNELS, AppRoute.MOVIES,
+                    AppRoute.DOCUMENTARIES, AppRoute.SERIES, AppRoute.WARNER, AppRoute.ACONTRA,
+                    AppRoute.AMC, AppRoute.SPORTS, AppRoute.ADULTS, AppRoute.KIDS, AppRoute.SEARCH,
+                    AppRoute.DIAGNOSTICS, AppRoute.LOGOUT
                 )
-                NavigationDrawerItem(
-                    icon = { Icon(Icons.Default.Person, null) },
-                    label = { Text("Perfil") },
-                    selected = false,
-                    onClick = {
-                        navController.navigate("profile")
-                        scope.launch { drawerState.close() }
-                    }
-                )
+
+                menuItems.forEach { item ->
+                    NavigationDrawerItem(
+                        icon = { GetIconForRoute(route = item) },
+                        label = { Text(stringResource(id = getTitleForRoute(route = item.route))) },
+                        selected = currentRoute == item.route,
+                        onClick = {
+                            scope.launch { drawerState.close() }
+                            navController.navigate(item.route)
+                        },
+                        modifier = Modifier.padding(horizontal = 12.dp)
+                    )
+                }
             }
         }
     ) {
-        Column {
-            TopAppBar(
-                title = { Text("Mi App") },
-                navigationIcon = {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(Icons.Default.Menu, null)
-                    }
+        Scaffold(
+            topBar = {
+                // Solo mostramos la TopAppBar (y el menú hamburguesa) si el cajón debe mostrarse
+                if (showNavigationDrawer) {
+                    TopAppBar(
+                        title = { Text(text = currentRoute?.let { stringResource(getTitleForRoute(it)) } ?: "") },
+                        navigationIcon = {
+                            IconButton(onClick = {
+                                scope.launch {
+                                    if (drawerState.isClosed) drawerState.open() else drawerState.close()
+                                }
+                            }) {
+                                Icon(Icons.Default.Menu, contentDescription = "Toggle Drawer")
+                            }
+                        }
+                    )
                 }
-            )
-
+            }
+        ) { paddingValues ->
+            // El NavHost contiene las pantallas reales de la app
             NavHost(
                 navController = navController,
-                startDestination = AppRoute.LOGIN.route,
-                modifier = Modifier.fillMaxSize()
+                startDestination = AppRoute.LOGIN.route, // Tu ruta de inicio
+                modifier = Modifier.padding(paddingValues) // Aplicamos el padding del Scaffold
             ) {
                 navigationGraph(navController)
             }
         }
     }
 }
+

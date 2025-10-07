@@ -16,6 +16,8 @@ fun configureCustomFlavor(
     appId: String,
     icon: String,
     iconMobile: String,
+    iconRound: String,
+    banner: String,
     locatorUrl: String,
     baseUrl: String,
     idmUrl: String,
@@ -30,6 +32,8 @@ fun configureCustomFlavor(
         applicationId = appId
         manifestPlaceholders["appIcon"] = icon
         manifestPlaceholders["appIconMobile"] = iconMobile
+        manifestPlaceholders["appIconRound"] = iconRound
+        manifestPlaceholders["banner"] = banner
 
         buildConfigField("String", "LOCATOR_URL", "\"$locatorUrl\"")
         buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
@@ -47,10 +51,18 @@ fun configureFlavorWithMasmediaUrls(
     name: String,
     appId: String,
     icon: String,
-    iconMobile: String
+    iconMobile: String,
+    iconRound: String,
+    banner: String
 ) {
     configureCustomFlavor(
-        flavors, name, appId, icon, iconMobile,
+        flavors = flavors,
+        name = name,
+        appId = appId,
+        icon = icon,
+        iconMobile = iconMobile,
+        iconRound = iconRound,
+        banner = banner,
         "https://locator.service.openstream.es/",
         "https://dyncont.masmediatv.es/",
         "https://idm.masmediatv.es/",
@@ -109,8 +121,10 @@ android {
             this,
             "masmedia",
             "masmedia.openstream.com",
-            "@drawable/banner_masmedia",
-            "@mipmap/ic_launcher_masmedia"
+            "@mipmap/ic_launcher_masmedia",
+            "@mipmap/ic_launcher_masmedia",
+            "@mipmap/ic_launcher_masmedia_round",
+            "@drawable/banner_masmedia"
         )
 
         configureCustomFlavor(
@@ -119,6 +133,8 @@ android {
             "app.openstream.com",
             "@drawable/banner_openstream",
             "@mipmap/ic_launcher_openstream",
+            "@mipmap/ic_launcher_openstream_round",
+            "@drawable/banner_openstream",
             "http://locator.service.openstream.es/",
             "https://dyncont.openstream.es/",
             "https://idm.openstream.es/",

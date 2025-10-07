@@ -44,9 +44,10 @@ class GetHomeContentUseCase @Inject constructor(
                 }
 
                 // Use successful results, fallback for optional content
+                // Bookmarks y recomendados tienen la misma estructura de json
                 val contentRows = homeResult.getOrThrow().toContentUIRows()
-                    .insertBookmarks(bookmarksResult.getOrElse { emptyList() })
-                    .insertBookmarks(recommendedResult.getOrElse { emptyList() })
+                    .insertBookmarks(bookmarksResult.getOrElse { emptyList() }, rowTitle = "Seguir viendo")
+                    .insertBookmarks(recommendedResult.getOrElse { emptyList() }, rowTitle = "Recomendado para ti")
                     .insertMostWatched(mostWatchedResult.getOrElse { emptyList() })
 
                 Result.success(contentRows)

@@ -435,9 +435,9 @@ fun GetBrandedContentResponse.toContentUIRows(
     return rows
 }
 
-fun List<ContentRowUI>.insertBookmarks(bookmarks: List<Bookmark>): List<ContentRowUI> {
+fun List<ContentRowUI>.insertBookmarks(bookmarks: List<Bookmark>, rowTitle: String): List<ContentRowUI> {
     ContentRowUI(
-        categoryName = "Seguir viendo",
+        categoryName = rowTitle,
         items = bookmarks.mapNotNull { it.toContentEntityUI() }
     ).let {
         return listOf(it) + this
