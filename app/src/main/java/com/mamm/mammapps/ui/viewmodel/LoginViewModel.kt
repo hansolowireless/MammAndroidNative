@@ -1,15 +1,16 @@
 package com.mamm.mammapps.ui.viewmodel
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mamm.mammapps.domain.usecases.login.AutoLoginUseCase
 import com.mamm.mammapps.domain.usecases.login.LoginUseCase
 import com.mamm.mammapps.ui.model.uistate.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,21 +24,21 @@ class LoginViewModel @Inject constructor(
         const val TAG = "LoginViewModel"
     }
 
-    var loginState by mutableStateOf<UIState<Unit>>(UIState.Loading)
-        private set
+    private val _loginState = MutableStateFlow<UIState<Unit>>(UIState.Loading)
+    val loginState: StateFlow<UIState<Unit>> = _loginState.asStateFlow()
 
     fun trytoAutoLogin() {
         viewModelScope.launch {
-            loginState =  UIState.Loading
+            _loginState.update { UIState.Loading }
             val result = autologinUseCase()
 
             result.fold(
                 onSuccess = { data ->
                     Log.d(TAG, "Autologin successful")
-                    loginState = UIState.Success(data)
+                    _loginState.update { UIState.Success(data) }
                 },
                 onFailure = {
-                    loginState = UIState.Idle
+                    _loginState.update { UIState.Idle }
                 }
             )
         }
@@ -45,18 +46,17 @@ class LoginViewModel @Inject constructor(
 
     fun login(username: String, password: String) {
         viewModelScope.launch {
-            loginState = UIState.Loading
+            _loginState.update { UIState.Loading }
             val result = loginUseCase(username, password)
-
-            loginState =  UIState.Loading
 
             result.fold(
                 onSuccess = { data ->
                     Log.d(TAG, "Login successful")
-                    loginState = UIState.Success(data)
+                    _loginState.update { UIState.Success(data) }
                 },
                 onFailure = { error ->
-                    loginState = UIState.Error(error.message ?: "Error desconocido")
+                    Log.e(TAG, "Login failed", error)
+                    _loginState.update { UIState.Error(error.message ?: "Error desconocido") }
                 }
             )
         }

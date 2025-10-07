@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
@@ -27,6 +28,7 @@ import com.mamm.mammapps.ui.theme.ButtonColor
 fun PrimaryButton(
     modifier: Modifier = Modifier,
     text: String,
+    height: Dp = if (LocalIsTV.current) 40.dp else 48.dp,
     icon: @Composable (() -> Unit)? = null,
     onClick: () -> Unit,
     onRegainFocus: (() -> Unit)? = null,
@@ -43,7 +45,7 @@ fun PrimaryButton(
         shape = ButtonDefaults.shape(RectangleShape),
         modifier = modifier
             .fillMaxWidth()
-            .height(if (LocalIsTV.current) 40.dp else 48.dp),
+            .height(height),
         glow = ButtonDefaults.glow(),
         colors = ButtonDefaults.colors(
             containerColor = ButtonColor.background,

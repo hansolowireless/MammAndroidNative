@@ -49,9 +49,9 @@ fun ChannelsColumn(
             var isFocused by remember { mutableStateOf(false) }
 
             val containerColor = when {
-                isFocused -> MaterialTheme.colorScheme.primaryContainer // Color cuando tiene foco
+                isFocused -> MaterialTheme.colorScheme.secondaryContainer
                 isSelected -> Color.Transparent
-                else -> MaterialTheme.colorScheme.surface // Color por defecto
+                else -> Color.Transparent
             }
 
             ListItem(
@@ -80,7 +80,7 @@ fun ChannelsColumn(
                         contentScale = ContentScale.Fit
                     )
                 },
-                trailingContent = if (isSelected) { // El trailing content puede seguir dependiendo de 'isSelected'
+                trailingContent = if (isSelected) {
                     {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,

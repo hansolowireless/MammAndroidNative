@@ -2,19 +2,27 @@ package com.mamm.mammapps.ui.component.login
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.Text
+import com.mamm.mammapps.R
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.common.PrimaryButton
 import com.mamm.mammapps.ui.component.common.TextInput
+import com.mamm.mammapps.ui.theme.Dimensions
+import com.mamm.mammapps.ui.theme.TextPrimary
 
 
 @Composable
@@ -25,24 +33,30 @@ fun LoginForm(
     var password by remember { mutableStateOf("") }
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(if (LocalIsTV.current) 32.dp else 16.dp),
+        verticalArrangement = Arrangement.spacedBy(if (LocalIsTV.current) Dimensions.paddingLarge else Dimensions.paddingSmall),
         modifier = Modifier.fillMaxWidth()
     ) {
+        Text(
+            text = stringResource(R.string.type_credentials),
+            style = MaterialTheme.typography.headlineMedium,
+            color = TextPrimary
+        )
         TextInput(
-            label = "Email",
+            label = stringResource(R.string.email),
             value = email,
             onValueChange = { email = it },
             keyboardType = KeyboardType.Email
         )
         TextInput(
-            label = "Password",
+            label = stringResource(R.string.password),
             value = password,
             onValueChange = { password = it },
             keyboardType = KeyboardType.Password,
             isPassword = true
         )
         PrimaryButton(
-            text = "Login",
+            text = stringResource(R.string.login),
+            height = 55.dp,
             onClick = { onLogin(email, password) }
         )
     }

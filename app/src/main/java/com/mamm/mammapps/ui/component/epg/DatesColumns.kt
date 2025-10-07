@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,6 +19,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.tv.material3.Card
 import androidx.tv.material3.CardDefaults
+import androidx.tv.material3.ListItem
+import androidx.tv.material3.ListItemDefaults
 import com.mamm.mammapps.R
 import com.mamm.mammapps.ui.theme.Dimensions
 import java.time.LocalDate
@@ -40,32 +45,64 @@ fun DatesColumn(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         datesMap.forEach { (date, stringResId) ->
-            Card (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                colors = CardDefaults.colors(
-                    containerColor = if (date == selectedDate) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
-                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer
+
+            ListItem(
+                colors = ListItemDefaults.colors(
+                    containerColor = Color.Transparent,
+                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    selectedContainerColor = Color.Transparent
                 ),
-                onClick = {
-                    onDateSelected(date)
-                }
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(Dimensions.paddingMedium),
-                    contentAlignment = Alignment.Center
-                ) {
+                headlineContent = {
                     Text(
                         text = stringResource(id = stringResId),
                         style = MaterialTheme.typography.titleMedium,
-                        color = if (date == selectedDate) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSecondaryContainer,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
                         textAlign = TextAlign.Center
                     )
-                }
-            }
+                },
+                trailingContent = {
+                    if (date == selectedDate) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                },
+                onClick = {
+                    onDateSelected(date)
+                },
+                selected = date == selectedDate
+            )
+
+
+
+//            Card(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .weight(1f),
+//                colors = CardDefaults.colors(
+//                    containerColor = if (date == selectedDate) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+//                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer
+//                ),
+//                onClick = {
+//                    onDateSelected(date)
+//                }
+//            ) {
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                        .padding(Dimensions.paddingMedium),
+//                    contentAlignment = Alignment.Center
+//                ) {
+//                    Text(
+//                        text = stringResource(id = stringResId),
+//                        style = MaterialTheme.typography.titleMedium,
+//                        color = if (date == selectedDate) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSecondaryContainer,
+//                        textAlign = TextAlign.Center
+//                    )
+//                }
+//            }
         }
     }
 }

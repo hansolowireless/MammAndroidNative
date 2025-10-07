@@ -300,7 +300,7 @@ fun TVNavigationLayout(navController: NavHostController) {
                     label = stringResource(R.string.nav_change_user),
                     parentIsFocused = hasItemFocused,
                     selected = currentRoute == AppRoute.LOGOUT.route,
-                    onClick = { navController.navigate(AppRoute.LOGOUT.route) }
+                    onClick = { navController.navigate(AppRoute.LOGIN.route) }
                 )
 
                 Spacer(modifier = Modifier.height(1000.dp))

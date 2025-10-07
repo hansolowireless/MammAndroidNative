@@ -1,59 +1,60 @@
 package com.mamm.mammapps.ui.theme
 
-import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
+private val NetflixColorScheme = darkColorScheme(
+    primary = Color(0xFFF0ED00),           // Amarillo brillante
+    onPrimary = Color(0xFF141414),
+    primaryContainer = Color(0xFFC4C100),  // Amarillo más oscuro
+    onPrimaryContainer = Color(0xFF141414),
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    secondary = Color(0xFFFFFF33),         // Amarillo claro
+    onSecondary = Color(0xFF141414),
+    secondaryContainer = Color(0xFF999100),
+    onSecondaryContainer = Color(0xFFFFFFC7),
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    tertiary = Color(0xFFD4D100),          // Amarillo dorado
+    onTertiary = Color(0xFF141414),
+
+    background = Color(0xFF141414),        // Negro Netflix
+    onBackground = Color(0xFFE5E5E5),      // Texto gris claro
+
+    surface = Color(0xFF1F1F1F),           // Gris muy oscuro para cards
+    onSurface = Color(0xFFE5E5E5),
+    surfaceVariant = Color(0xFF2F2F2F),    // Variante un poco más clara
+    onSurfaceVariant = Color(0xFFB3B3B3),
+
+    error = Color(0xFFFFB4AB),
+    onError = Color(0xFF690005),
+
+    outline = Color(0xFF3A3A3A),           // Bordes sutiles
+    outlineVariant = Color(0xFF2A2A2A),
 )
 
 @Composable
 fun MammAppsTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
-
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = NetflixColorScheme,
         typography = Typography,
         content = content
     )
+}
 
+@Composable
+fun MammAppsTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    dynamicColor: Boolean = false,
+    content: @Composable () -> Unit
+) {
+    MaterialTheme(
+        colorScheme = NetflixColorScheme,
+        typography = Typography,
+        content = content
+    )
 }

@@ -1,6 +1,13 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">MammApps</string>
 
+    <!--region EPG-->
+    <string name="type_credentials">Introduce tus datos de acceso</string>
+    <string name="email">E-mail</string>
+    <string name="password">Contraseña</string>
+    <string name="login">Iniciar sesión</string>
+    <!--endregion EPG-->
+
     <!--Details-->
     <string name="duration_minutes">%1$s min.</string>
     <string name="separator">|</string>

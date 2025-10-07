@@ -104,7 +104,7 @@ fun EPGEvent.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
     imageUrl = (posterLogo?.takeIf { it.isNotBlank() }
         ?: eventLogoUrl500?.takeIf { it.isNotBlank() })
         .orEmpty().adult(isAdult),
-    horizontalImageUrl = eventLogoTitleUrl.orEmpty(),
+    horizontalImageUrl = eventLogoUrl.orEmpty(),
     title = getTitle(),
     aspectRatio = Ratios.VERTICAL,
     height = Dimensions.contentEntityHeight,

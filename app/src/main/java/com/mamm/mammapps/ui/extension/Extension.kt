@@ -33,6 +33,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
+import kotlin.math.floor
 
 fun Modifier.glow(
     enabled: Boolean = true,
@@ -103,6 +104,21 @@ fun String.squared() = this.replace(".png", "_x4.png").replace(".jpg", "_x4.jpg"
 fun String.landscape() = this.replace(".png", "_viewer.png").replace(".jpg", "_viewer.jpg")
 fun String.adult(isAdult: Boolean = false) : String {
     return if (isAdult) this.replace(".png", "_p.png").replace(".jpg", "_p.jpg") else this
+}
+
+fun String.buildThumbnailUrl(position: Long?): String {
+    requireNotNull(position) { "buildThumbnailUrl position cannot be null" }
+    val urlPattern = when {
+        contains("smil:") -> "smil:"
+        contains("nopack03-") -> "nopack03-"
+        else -> "nopack-"
+    }
+
+    val contentID = substringAfter(urlPattern).substringBefore("_", substringBefore("/"))
+    val thumbnailNumber = (floor(position / 500000.0) + 1).toInt()
+    val thumbnailNumberString = thumbnailNumber.toString().padStart(3, '0')
+
+    return "${substringBefore("/$urlPattern")}-img/${contentID}_mf$thumbnailNumberString.jpg"
 }
 
 fun ImageView.loadWatermarkOrHide(watermarkInfo: WatermarkInfo) {
