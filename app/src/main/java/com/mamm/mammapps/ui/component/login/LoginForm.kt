@@ -32,6 +32,11 @@ fun LoginForm(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    // --- INICIO DEL CAMBIO ---
+    // 1. Variable que calcula si el formulario es válido
+    val isFormValid = email.isNotBlank() && password.isNotBlank()
+    // --- FIN DEL CAMBIO ---
+
     Column(
         verticalArrangement = Arrangement.spacedBy(if (LocalIsTV.current) Dimensions.paddingLarge else Dimensions.paddingSmall),
         modifier = Modifier.fillMaxWidth()
@@ -57,7 +62,11 @@ fun LoginForm(
         PrimaryButton(
             text = stringResource(R.string.login),
             height = 55.dp,
-            onClick = { onLogin(email, password) }
+            onClick = { onLogin(email, password) },
+            // --- INICIO DEL CAMBIO ---
+            // 2. Pasamos el estado de validez al botón
+            enabled = isFormValid
+            // --- FIN DEL CAMBIO ---
         )
     }
 }

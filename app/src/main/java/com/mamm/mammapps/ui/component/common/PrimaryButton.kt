@@ -32,6 +32,7 @@ fun PrimaryButton(
     icon: @Composable (() -> Unit)? = null,
     onClick: () -> Unit,
     onRegainFocus: (() -> Unit)? = null,
+    enabled: Boolean = true
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
@@ -53,7 +54,8 @@ fun PrimaryButton(
             contentColor = ButtonColor.unfocusedContent,
             focusedContentColor = ButtonColor.focusedContent
         ),
-        interactionSource = interactionSource // Pasar el interactionSource
+        interactionSource = interactionSource,
+        enabled = enabled
     ) {
         Row(
             modifier = Modifier.fillMaxSize(),

@@ -45,7 +45,6 @@ fun HomeScreen(
 
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
-
     LaunchedEffect (homeContentState) {
         when (homeContentState) {
             is HomeContentUIState.RequestContent -> viewModel.content(routeTag = routeTag)
@@ -59,7 +58,6 @@ fun HomeScreen(
     }
 
     LaunchedEffect(Unit) {
-        //viewModel.content(routeTag)
         viewModel.checkRestrictedScreen(routeTag)
     }
 

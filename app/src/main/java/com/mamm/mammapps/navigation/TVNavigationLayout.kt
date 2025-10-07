@@ -3,6 +3,7 @@ package com.mamm.mammapps.navigation
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -27,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.painterResource
@@ -76,7 +78,7 @@ fun TVNavigationLayout(navController: NavHostController) {
     LaunchedEffect(hasItemFocused) {
         scrollState.scrollTo(0)
         if (hasItemFocused) {
-            kotlinx.coroutines.delay(50) // Espera a que se estabilice
+            kotlinx.coroutines.delay(50)
             focusRequester.requestFocus()
         }
     }

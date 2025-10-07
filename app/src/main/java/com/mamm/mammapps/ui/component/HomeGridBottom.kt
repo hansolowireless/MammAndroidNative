@@ -12,7 +12,11 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
@@ -29,10 +33,20 @@ fun HomeGridBottom(
     onContentClicked: (Int, ContentEntityUI) -> Unit,
     onFocus: (ContentEntityUI) -> Unit = {}
 ) {
+
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        // pequeño delay para que Compose reactive el árbol tras popBackStack()
+        kotlinx.coroutines.delay(100)
+        focusRequester.requestFocus()
+    }
+
     ProvideLazyListPivotOffset(parentFraction = 0.249f) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
+                .focusRequester(focusRequester)
                 .padding(
                     horizontal = Dimensions.paddingLarge,
                 )
