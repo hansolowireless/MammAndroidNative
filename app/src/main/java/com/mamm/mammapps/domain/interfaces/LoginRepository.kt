@@ -8,4 +8,5 @@ interface LoginRepository {
     suspend fun checkLocator(username: String): Result<LocatorResponse>
     suspend fun saveUserCredentials(username: String, password: String) : Result<Unit>
     suspend fun getUserCredentials(): Result<Pair<String?, String?>>
+    fun logout() : Result<Unit>
 }

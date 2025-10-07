@@ -4,7 +4,6 @@ import com.mamm.mammapps.data.config.Config
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.domain.interfaces.LoginRepository
-import com.mamm.mammapps.domain.interfaces.MammRepository
 import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(

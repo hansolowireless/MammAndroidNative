@@ -3,9 +3,7 @@ package com.mamm.mammapps.domain.usecases
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.interfaces.MammRepository
 import com.mamm.mammapps.ui.mapper.toContentEntityUI
-import com.mamm.mammapps.ui.mapper.toContentUIRows
 import com.mamm.mammapps.ui.model.ContentEntityUI
-import com.mamm.mammapps.ui.model.ContentRowUI
 import javax.inject.Inject
 
 class GetChannelsUseCase @Inject constructor(

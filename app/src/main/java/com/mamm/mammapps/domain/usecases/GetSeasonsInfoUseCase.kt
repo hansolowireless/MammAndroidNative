@@ -2,10 +2,7 @@ package com.mamm.mammapps.domain.usecases
 
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
-import com.mamm.mammapps.data.model.serie.TbSeason
 import com.mamm.mammapps.domain.interfaces.MammRepository
-import com.mamm.mammapps.ui.mapper.toSeasonUIList
-import com.mamm.mammapps.ui.model.SeasonUI
 import javax.inject.Inject
 
 class GetSeasonsInfoUseCase @Inject constructor(

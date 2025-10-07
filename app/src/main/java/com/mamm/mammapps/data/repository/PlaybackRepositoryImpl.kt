@@ -12,9 +12,7 @@ import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.domain.interfaces.PlaybackRepository
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import java.net.URLEncoder
-import java.text.SimpleDateFormat
 import java.time.ZonedDateTime
-import java.util.Locale
 import javax.crypto.Cipher
 import javax.crypto.Mac
 import javax.crypto.spec.IvParameterSpec

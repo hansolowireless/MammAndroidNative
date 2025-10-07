@@ -34,6 +34,7 @@ import com.mamm.mammapps.ui.screen.DetailScreen
 import com.mamm.mammapps.ui.screen.EPGScreen
 import com.mamm.mammapps.ui.screen.HomeScreen
 import com.mamm.mammapps.ui.screen.LoginScreen
+import com.mamm.mammapps.ui.screen.LogoutScreen
 import com.mamm.mammapps.ui.screen.SearchScreen
 import com.mamm.mammapps.ui.screen.VideoPlayerScreen
 
@@ -195,7 +196,15 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
         }
     }
 
-
+    composable(AppRoute.LOGOUT.route) {
+        LogoutScreen(
+            onNavigateToLogin = {
+                navController.navigate(AppRoute.LOGIN.route) {
+                    popUpTo(AppRoute.LOGOUT.route) { inclusive = true }
+                }
+            }
+        )
+    }
 
 
 }

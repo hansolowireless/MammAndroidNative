@@ -1,15 +1,11 @@
 package com.mamm.mammapps.domain.usecases
 
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.repository.CustomContentRepositoryImpl
 import com.mamm.mammapps.domain.interfaces.CustomContentRepository
-import com.mamm.mammapps.domain.interfaces.EPGRepository
 import com.mamm.mammapps.domain.interfaces.MammRepository
 import com.mamm.mammapps.navigation.model.AppRoute
-import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.CustomizedContent
-import java.time.LocalDate
 import javax.inject.Inject
 
 class FindContentEntityUseCase @Inject constructor(

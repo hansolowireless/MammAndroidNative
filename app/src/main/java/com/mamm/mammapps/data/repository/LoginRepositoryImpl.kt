@@ -2,6 +2,7 @@ package com.mamm.mammapps.data.repository
 
 import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
+import com.mamm.mammapps.data.local.SecurePreferencesManager
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginResponse
@@ -13,6 +14,7 @@ class LoginRepositoryImpl @Inject constructor(
     private val remoteDatasource: RemoteDatasource,
     private val localDataSource: LocalDataSource,
     private val sessionManager: SessionManager,
+    private val securePreferencesManager: SecurePreferencesManager,
     private val logger: Logger
 ) : LoginRepository {
 
@@ -42,6 +44,14 @@ class LoginRepositoryImpl @Inject constructor(
                 throw IllegalStateException("Invalid credentials: username or password is null/empty")
             }
             username to password
+        }
+    }
+
+    override fun logout() : Result<Unit> {
+        return runCatching {
+            sessionManager.clear()
+            remoteDatasource.clearCache()
+            securePreferencesManager.clearCredentials()
         }
     }
 }
