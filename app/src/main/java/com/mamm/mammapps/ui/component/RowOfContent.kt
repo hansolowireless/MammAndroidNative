@@ -19,6 +19,7 @@ import com.mamm.mammapps.ui.component.common.ContentEntity
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
+import com.mamm.mammapps.ui.model.CustomizedContent
 import com.mamm.mammapps.ui.theme.Dimensions
 
 @Composable
@@ -40,12 +41,13 @@ fun RowOfContent(
             horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
         ) {
             itemsIndexed(
-                contentList) { _, contentEntity ->
+                contentList) { index, contentEntity ->
 
                 ContentEntity(
                     contentEntityUI = contentEntity,
                     onClick = { onContentClick(contentEntity) },
-                    onFocus = { onFocus(contentEntity) }
+                    onFocus = { onFocus(contentEntity) },
+                    mostWatchedOrder = if (contentEntity.customContentType is CustomizedContent.MostWatchedType) (index + 1) else null
                 )
             }
             item {

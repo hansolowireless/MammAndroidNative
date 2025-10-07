@@ -1,5 +1,7 @@
 package com.mamm.mammapps
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -12,6 +14,8 @@ import com.mamm.mammapps.navigation.AppNavigation
 import com.mamm.mammapps.ui.component.DeviceProvider
 import com.mamm.mammapps.ui.theme.MammAppsTheme
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.core.graphics.toColorInt
+import androidx.core.graphics.drawable.toDrawable
 
 
 @AndroidEntryPoint
@@ -19,6 +23,7 @@ class MainActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
         setContent {
             MammAppsTheme {

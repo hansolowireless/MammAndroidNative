@@ -42,7 +42,7 @@ import com.mamm.mammapps.ui.mapper.toLiveEventInfoUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import com.mamm.mammapps.ui.model.player.LiveEventInfoUI
-import com.mamm.mammapps.ui.model.player.PlayerUIState
+import com.mamm.mammapps.ui.model.uistate.PlayerUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers

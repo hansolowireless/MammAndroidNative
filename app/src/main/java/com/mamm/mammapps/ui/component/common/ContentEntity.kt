@@ -48,6 +48,7 @@ import com.mamm.mammapps.ui.theme.Dimensions
 fun ContentEntity(
     modifier: Modifier = Modifier,
     contentEntityUI: ContentEntityUI,
+    mostWatchedOrder: Int? = null,
     onClick: () -> Unit,
     onFocus: () -> Unit = {}
 ) {
@@ -88,12 +89,28 @@ fun ContentEntity(
         Box(
             modifier = Modifier.clip(RoundedCornerShape(Dimensions.cornerRadius))
         ) {
+
             AsyncImage(
                 model = contentEntityUI.imageUrl,
                 contentDescription = contentEntityUI.title,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
             )
+
+            mostWatchedOrder?.let {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .background(Color.Black)
+                        .padding(Dimensions.paddingXSmall)
+                ) {
+                    Text(
+                        text = it.toString(),
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
 
             if (contentEntityUI.title.isNotBlank())
                 Box(
