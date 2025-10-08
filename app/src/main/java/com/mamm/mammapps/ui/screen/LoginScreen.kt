@@ -24,9 +24,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamm.mammapps.R
+import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.ui.component.common.deviceAdaptivePadding
 import com.mamm.mammapps.ui.component.login.LoginForm
+import com.mamm.mammapps.ui.component.login.LoginMobile
+import com.mamm.mammapps.ui.component.login.LoginTV
 import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.viewmodel.LoginViewModel
 
@@ -48,11 +51,12 @@ fun LoginScreen(
         }
     }
 
-    LaunchedEffect (loginState) {
+    LaunchedEffect(loginState) {
         when (val state = loginState) {
             is UIState.Error -> {
                 Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
             }
+
             else -> {}
         }
     }
@@ -63,45 +67,12 @@ fun LoginScreen(
             is UIState.Loading -> {
                 LoadingSpinner(modifier = Modifier.align(Alignment.Center))
             }
+
             else -> {
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier.weight(0.4f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.logo_masmedia),
-                            contentDescription = "Logo",
-                            modifier = Modifier
-                                .fillMaxWidth(0.6f)
-                                .fillMaxHeight(0.5f),
-                            contentScale = ContentScale.Fit
-                        )
-                    }
-
-                    VerticalDivider(
-                        modifier = Modifier
-                            .fillMaxHeight(0.6f)
-                            .width(1.dp),
-                        color = MaterialTheme.colorScheme.outlineVariant
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .weight(0.6f)
-                            .fillMaxHeight()
-                            .padding(deviceAdaptivePadding()),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        LoginForm(
-                            onLogin = { email, password ->
-                                viewModel.login(email, password)
-                            }
-                        )
-                    }
+                if (LocalIsTV.current) {
+                    LoginTV(onLogin = { email, password -> viewModel.login(email, password) })
+                } else {
+                    LoginMobile(onLogin = { email, password -> viewModel.login(email, password) })
                 }
             }
         }

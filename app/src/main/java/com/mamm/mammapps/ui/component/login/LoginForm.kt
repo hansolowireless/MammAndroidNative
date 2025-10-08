@@ -27,25 +27,25 @@ import com.mamm.mammapps.ui.theme.TextPrimary
 
 @Composable
 fun LoginForm(
-    onLogin: (email: String, password: String) -> Unit
+    onLogin: (email: String, password: String) -> Unit,
+    showInitialText: Boolean = true,
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    // --- INICIO DEL CAMBIO ---
-    // 1. Variable que calcula si el formulario es válido
     val isFormValid = email.isNotBlank() && password.isNotBlank()
-    // --- FIN DEL CAMBIO ---
 
     Column(
         verticalArrangement = Arrangement.spacedBy(if (LocalIsTV.current) Dimensions.paddingLarge else Dimensions.paddingSmall),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Text(
-            text = stringResource(R.string.type_credentials),
-            style = MaterialTheme.typography.headlineMedium,
-            color = TextPrimary
-        )
+        if (showInitialText) {
+            Text(
+                text = stringResource(R.string.type_credentials),
+                style = MaterialTheme.typography.headlineMedium,
+                color = TextPrimary
+            )
+        }
         TextInput(
             label = stringResource(R.string.email),
             value = email,
@@ -63,10 +63,7 @@ fun LoginForm(
             text = stringResource(R.string.login),
             height = 55.dp,
             onClick = { onLogin(email, password) },
-            // --- INICIO DEL CAMBIO ---
-            // 2. Pasamos el estado de validez al botón
             enabled = isFormValid
-            // --- FIN DEL CAMBIO ---
         )
     }
 }

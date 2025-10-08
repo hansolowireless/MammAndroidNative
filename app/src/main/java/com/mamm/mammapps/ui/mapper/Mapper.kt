@@ -19,6 +19,7 @@ import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.ui.extension.adult
 import com.mamm.mammapps.ui.extension.landscape
 import com.mamm.mammapps.ui.extension.squared
+import com.mamm.mammapps.ui.extension.toBookmarkStartTimeMs
 import com.mamm.mammapps.ui.model.ContentEPGUI
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
@@ -312,6 +313,7 @@ fun Bookmark.toContentToPlayUI(): ContentToPlayUI? {
         deliveryURL = this.deliveryURL.orEmpty(),
         title = this.title.orEmpty(),
         imageUrl = this.logoURL.orEmpty(),
+        initialPlayPositionMs = this.currentTime.toBookmarkStartTimeMs(),
         epgEventInfo = LiveEventInfoUI(
             title = this.title.orEmpty(),
             eventStart = this.startDateTime,

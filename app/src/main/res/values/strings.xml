@@ -6,6 +6,7 @@
     <string name="email">E-mail</string>
     <string name="password">Contraseña</string>
     <string name="login">Iniciar sesión</string>
+    <string name="forgot_password">¿Olvidaste tu contraseña?</string>
     <!--endregion EPG-->
 
     <!--Details-->

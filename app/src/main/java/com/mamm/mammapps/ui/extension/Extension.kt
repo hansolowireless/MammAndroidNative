@@ -135,7 +135,6 @@ fun ImageView.loadWatermarkOrHide(watermarkInfo: WatermarkInfo) {
         .into(this)
 }
 
-
 fun ZonedDateTime.toDate(): Date {
     return Date(this.toInstant().toEpochMilli())
 }
@@ -145,5 +144,9 @@ fun TextView.setHourText(date: ZonedDateTime?) {
         ?.withZoneSameInstant(ZoneId.systemDefault()) // Convierte a la zona horaria del dispositivo
         ?.format(DateTimeFormatter.ofPattern("HH:mm"))
         ?: ""
+}
+
+fun Int?.toBookmarkStartTimeMs() : Long {
+    return this?.times(1000)?.toLong() ?: 0
 }
 
