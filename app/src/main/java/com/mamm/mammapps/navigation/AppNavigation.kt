@@ -12,11 +12,10 @@ import com.mamm.mammapps.data.model.Event
 import com.mamm.mammapps.data.model.VoD
 import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.branded.BrandedVod
-import com.mamm.mammapps.data.model.branded.Featured
+import com.mamm.mammapps.data.model.branded.BrandedFeatured
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.data.model.section.SectionVod
-import com.mamm.mammapps.data.model.serie.Episode
 import com.mamm.mammapps.data.model.serie.TbContentSeason
 import com.mamm.mammapps.navigation.extension.addContentClass
 import com.mamm.mammapps.navigation.extension.addContentUI
@@ -182,7 +181,7 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
             is EPGEvent -> contentItem.toContentToPlayUI()
             is SectionVod -> contentItem.toContentToPlayUI()
             is BrandedVod -> contentItem.toContentToPlayUI()
-            is Featured -> contentItem.toContentToPlayUI()
+            is BrandedFeatured -> contentItem.toContentToPlayUI()
             is TbContentSeason -> contentItem.contentDetails?.toContentToPlayUI()
             is Bookmark -> contentItem.toContentToPlayUI()
             is MostWatchedContent -> contentItem.toContentToPlayUI()

@@ -20,6 +20,14 @@ sealed class ContentIdentifier : Parcelable {
             "serie" -> Serie(id)
             else -> throw IllegalArgumentException("Unknown type: $format")
         }
+
+        fun fromFeaturedFormat(format: String, id: Int): ContentIdentifier = when (format.lowercase()) {
+            "live" -> Channel(id)
+            "vod" -> VoD(id)
+            "cutv" -> Event(id)
+            "still" -> VoD(id)
+            else -> throw IllegalArgumentException("Unknown type: $format")
+        }
     }
 
     fun getIdValue(): Int {

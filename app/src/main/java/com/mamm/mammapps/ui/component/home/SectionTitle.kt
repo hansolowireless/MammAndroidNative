@@ -1,4 +1,4 @@
-package com.mamm.mammapps.ui.component.common
+package com.mamm.mammapps.ui.component.home
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding

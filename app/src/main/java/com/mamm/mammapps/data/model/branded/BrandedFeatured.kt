@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class Featured(
+data class BrandedFeatured(
     @SerializedName("subgenreById")
     val subgenreById: String? = null,
 

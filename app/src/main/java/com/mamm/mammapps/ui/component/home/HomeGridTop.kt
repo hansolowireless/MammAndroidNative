@@ -1,4 +1,4 @@
-package com.mamm.mammapps.ui.component
+package com.mamm.mammapps.ui.component.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

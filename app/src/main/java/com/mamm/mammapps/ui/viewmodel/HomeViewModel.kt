@@ -68,6 +68,9 @@ class HomeViewModel @Inject constructor(
     var homeContentUI by mutableStateOf<List<ContentRowUI>>(emptyList())
         private set
 
+    var featuredList by mutableStateOf<List<ContentEntityUI>>(emptyList())
+        private set
+
     private val _clickedContent = MutableStateFlow<Any?>(null)
     val clickedContent: StateFlow<Any?> = _clickedContent.asStateFlow()
 
@@ -75,12 +78,12 @@ class HomeViewModel @Inject constructor(
     val focusedContent: StateFlow<ContentEntityUI?> = _focusedContent.asStateFlow()
 
     fun checkRestrictedScreen(routeTag: AppRoute) {
-        when (routeTag) {
+        homeContentUIState = when (routeTag) {
             AppRoute.ADULTS -> {
-                homeContentUIState =
-                    if (shouldRequestPinUseCase()) HomeContentUIState.Restricted else HomeContentUIState.RequestContent
+                if (shouldRequestPinUseCase()) HomeContentUIState.Restricted else HomeContentUIState.RequestContent
             }
-            else -> homeContentUIState = HomeContentUIState.RequestContent
+
+            else -> HomeContentUIState.RequestContent
         }
     }
 

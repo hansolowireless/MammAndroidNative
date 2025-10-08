@@ -6,11 +6,12 @@ import com.mamm.mammapps.data.model.Genre
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
+import com.mamm.mammapps.data.model.HomeFeatured
 import com.mamm.mammapps.data.model.Serie
 import com.mamm.mammapps.data.model.VoD
 import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.branded.BrandedVod
-import com.mamm.mammapps.data.model.branded.Featured
+import com.mamm.mammapps.data.model.branded.BrandedFeatured
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.data.model.section.SectionVod
@@ -34,6 +35,7 @@ import com.mamm.mammapps.ui.model.player.LiveEventInfoUI
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.Ratios
 import com.mamm.mammapps.util.orRandom
+import kotlin.math.log
 
 fun Any.toContentEntityUI(isAdult: Boolean = false): ContentEntityUI? {
     return when (this) {
@@ -44,9 +46,10 @@ fun Any.toContentEntityUI(isAdult: Boolean = false): ContentEntityUI? {
         is EPGEvent -> this.toContentEntityUI(isAdult)
         is SectionVod -> this.toContentEntityUI(isAdult)
         is BrandedVod -> this.toContentEntityUI()
-        is Featured -> this.toContentEntityUI()
+        is BrandedFeatured -> this.toContentEntityUI()
         is Bookmark -> this.toContentEntityUI()
         is MostWatchedContent -> this.toContentEntityUI()
+        is HomeFeatured -> this.toContentEntityUI()
         else -> null
     }
 }
@@ -100,6 +103,18 @@ fun Serie.toContentEntityUI() = ContentEntityUI(
     height = Dimensions.channelEntityHeight,
 )
 
+fun HomeFeatured.toContentEntityUI(): ContentEntityUI? {
+    val format = format ?: return null
+    val id = id ?: return null
+
+    return ContentEntityUI(
+        identifier = ContentIdentifier.fromFeaturedFormat(format = format, id = id),
+        imageUrl = logoURL.orEmpty(),
+        horizontalImageUrl = logoURL.orEmpty(),
+        title = title.orEmpty()
+    )
+}
+
 fun EPGEvent.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
     identifier = ContentIdentifier.Event(getId()),
     imageUrl = (posterLogo?.takeIf { it.isNotBlank() }
@@ -117,9 +132,7 @@ fun EPGEvent.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
 )
 
 fun SectionVod.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
-    identifier = ContentIdentifier.VoD(
-        getId()
-    ),
+    identifier = ContentIdentifier.VoD(getId()),
     imageUrl = (posterLogo?.takeIf { it.isNotBlank() }
         ?: eventLogoUrl500?.takeIf { it.isNotBlank() })
         .orEmpty().adult(isAdult),
@@ -135,9 +148,7 @@ fun SectionVod.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
 )
 
 fun BrandedVod.toContentEntityUI() = ContentEntityUI(
-    identifier = ContentIdentifier.VoD(
-        getId()
-    ),
+    identifier = ContentIdentifier.VoD(getId()),
     imageUrl = contentLogo.orEmpty(),
     horizontalImageUrl = contentLogo.orEmpty(),
     title = getTitle(),
@@ -148,7 +159,7 @@ fun BrandedVod.toContentEntityUI() = ContentEntityUI(
     )
 )
 
-fun Featured.toContentEntityUI(): ContentEntityUI? {
+fun BrandedFeatured.toContentEntityUI(): ContentEntityUI? {
     val format = format ?: return null
     val id = id ?: return null
 
@@ -286,7 +297,7 @@ fun BrandedVod.toContentToPlayUI() = ContentToPlayUI(
     imageUrl = this.contentLogo.orEmpty(),
 )
 
-fun Featured.toContentToPlayUI(): ContentToPlayUI? {
+fun BrandedFeatured.toContentToPlayUI(): ContentToPlayUI? {
     val format = format ?: return null
     val id = id ?: return null
 
@@ -356,7 +367,7 @@ fun List<ContentEntityUI>.repeat(threshold: Int): List<ContentEntityUI> {
 
 fun GetHomeContentResponse.toContentUIRows(): List<ContentRowUI> {
     val orderedCategories = categories?.sortedBy { it.pos }
-    return orderedCategories?.mapNotNull { category ->
+    val rowsWithoutFeatured =  orderedCategories?.mapNotNull { category ->
         val items = category.order?.mapNotNull { orderItem ->
             when (orderItem.type) {
                 "channel" -> channels?.find { it.id == orderItem.id }?.toContentEntityUI()
@@ -374,6 +385,16 @@ fun GetHomeContentResponse.toContentUIRows(): List<ContentRowUI> {
             )
         } else null
     } ?: emptyList()
+
+    return this.featured?.let {
+        listOf(
+            ContentRowUI(
+                categoryName = "Eventos Destacados",
+                items = it.mapNotNull { featured -> featured.toContentEntityUI() },
+                isFeatured = true
+            )
+        ) + rowsWithoutFeatured
+    } ?: rowsWithoutFeatured
 }
 
 fun GetOtherContentResponse.toContentUIRows(
@@ -437,7 +458,10 @@ fun GetBrandedContentResponse.toContentUIRows(
     return rows
 }
 
-fun List<ContentRowUI>.insertBookmarks(bookmarks: List<Bookmark>, rowTitle: String): List<ContentRowUI> {
+fun List<ContentRowUI>.insertBookmarks(
+    bookmarks: List<Bookmark>,
+    rowTitle: String
+): List<ContentRowUI> {
     ContentRowUI(
         categoryName = rowTitle,
         items = bookmarks.mapNotNull { it.toContentEntityUI() }

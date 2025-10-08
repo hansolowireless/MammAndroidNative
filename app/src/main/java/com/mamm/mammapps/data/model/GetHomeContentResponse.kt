@@ -11,7 +11,7 @@ import java.time.ZonedDateTime
 
 data class GetHomeContentResponse(
     @SerializedName("timeGenerated") val timeGenerated: String? = null,
-    @SerializedName("featured") val featured: List<FeaturedItem>? = null,
+    @SerializedName("featured") val featured: List<HomeFeatured>? = null,
     @SerializedName("channels") val channels: List<Channel>? = null,
     @SerializedName("contents") val contents: List<VoD>? = null,
     @SerializedName("genres") val genres: List<Genre>? = null,
@@ -20,7 +20,7 @@ data class GetHomeContentResponse(
     @SerializedName("series") val series: List<Serie>? = null
 )
 
-data class FeaturedItem(
+data class HomeFeatured(
     @SerializedName("subgenreById") val subgenreById: Any? = null,
     @SerializedName("featured") val featured: Int? = null,
     @SerializedName("urlLoop") val urlLoop: String? = null,

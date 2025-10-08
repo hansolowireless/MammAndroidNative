@@ -16,12 +16,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.component.HomeGridBottom
-import com.mamm.mammapps.ui.component.HomeGridTop
+import com.mamm.mammapps.ui.component.home.HomeGridTop
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.navigation.model.AppRoute
+import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.dialog.PinDialog
+import com.mamm.mammapps.ui.component.home.FeaturedCarousel
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.uistate.HomeContentUIState
@@ -107,11 +108,17 @@ fun HomeScreen(
 
             is HomeContentUIState.Success -> {
                 Column {
-                    focusedContent?.let {
-                        HomeGridTop(
-                            event = it
-                        )
+                    if (LocalIsTV.current) {
+                        focusedContent?.let {
+                            HomeGridTop(
+                                event = it
+                            )
+                        }
                     }
+                    else {
+                        //todo()
+                    }
+
                     HomeGridBottom(
                         content = homeContent,
                         columnListState = columnListState,
