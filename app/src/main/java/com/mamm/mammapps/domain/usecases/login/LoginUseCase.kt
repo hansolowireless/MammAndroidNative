@@ -29,7 +29,7 @@ class LoginUseCase @Inject constructor(
                 logger.debug(TAG, "invoke Login successful, ${response.data}")
                 response.data?.let { session.assignLoginData(it) }
 
-                // ✅ Guardar credenciales tras login exitoso
+                // Guardar credenciales tras login exitoso
                 repository.saveUserCredentials(username, password)
                 logger.debug(TAG, "User credentials saved securely")
 

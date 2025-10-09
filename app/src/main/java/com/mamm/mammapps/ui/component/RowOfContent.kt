@@ -33,15 +33,18 @@ fun RowOfContent(
         return
     }
 
-    ProvideLazyListPivotOffset (parentFraction = 0.01f) {
-        LazyRow (
-            modifier = modifier.fillMaxWidth().wrapContentHeight(),
+    ProvideLazyListPivotOffset(parentFraction = 0.01f) {
+        LazyRow(
+            modifier = modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
             verticalAlignment = Alignment.CenterVertically,
-            contentPadding = PaddingValues(horizontal = Dimensions.paddingMediumLarge),
+            contentPadding = PaddingValues(horizontal = Dimensions.paddingXSmall),
             horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
         ) {
             itemsIndexed(
-                contentList) { index, contentEntity ->
+                contentList
+            ) { index, contentEntity ->
 
                 ContentEntity(
                     contentEntityUI = contentEntity,
@@ -51,13 +54,13 @@ fun RowOfContent(
                 )
             }
             item {
-                Spacer(modifier = Modifier.width(1000.dp))
+                if (LocalIsTV.current)
+                    Spacer(modifier = Modifier.width(1000.dp))
             }
         }
     }
 
 }
-
 
 
 // Preview con datos de ejemplo

@@ -25,7 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.mamm.mammapps.data.model.metadata.Metadata
-import com.mamm.mammapps.ui.component.common.DurationYearRatingRow
+import com.mamm.mammapps.ui.component.metadata.DurationYearRatingRow
 import com.mamm.mammapps.ui.constant.UIConstant
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier

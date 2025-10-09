@@ -3,7 +3,9 @@ package com.mamm.mammapps.ui.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,16 +22,19 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
+import com.mamm.mammapps.ui.component.home.FeaturedCarousel
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentRowUI
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.HomeGridBottomColor
+import com.mamm.mammapps.ui.theme.Ratios
 import java.util.UUID
 
 @Composable
 fun HomeGridBottom(
     content: List<ContentRowUI>,
     columnListState: LazyListState,
+    mobileFeatured: List<ContentEntityUI>? = null,
     onContentClicked: (Int, ContentEntityUI) -> Unit,
     onFocus: (ContentEntityUI) -> Unit = {}
 ) {
@@ -47,19 +52,30 @@ fun HomeGridBottom(
             modifier = Modifier
                 .fillMaxSize()
                 .focusRequester(focusRequester)
-                .padding(
-                    horizontal = Dimensions.paddingLarge,
-                )
                 .padding(top = Dimensions.paddingMedium),
             verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge),
             state = columnListState
         ) {
+            item {
+                mobileFeatured?.let {
+                    FeaturedCarousel(
+                        modifier = Modifier.fillMaxWidth(),
+                        content = it,
+                        onItemClick = { entityUI ->
+                        }
+                    )
+                }
+            }
+
             itemsIndexed(
                 items = content,
                 key = { index, item -> "${item.categoryName}_$index"  }
             ) { index, contentRow ->
 
                 Column(
+                    modifier = Modifier.padding(
+                        horizontal = Dimensions.paddingLarge,
+                    ),
                     verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
                 ) {
                     if (contentRow.categoryName.isNotEmpty()) {

@@ -49,3 +49,9 @@ object SeasonSelectorTabs {
 object SectionTitleColor {
     val title = Primary
 }
+
+object DetailColor {
+    val title = Primary
+    val description = Color.White
+    val metadata = Outlined
+}

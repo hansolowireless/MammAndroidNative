@@ -104,11 +104,10 @@ fun MobileNavigationLayout(navController: NavHostController) {
                 }
             }
         ) { paddingValues ->
-            // El NavHost contiene las pantallas reales de la app
             NavHost(
                 navController = navController,
-                startDestination = AppRoute.LOGIN.route, // Tu ruta de inicio
-                modifier = Modifier.padding(paddingValues) // Aplicamos el padding del Scaffold
+                startDestination = AppRoute.LOGIN.route,
+                modifier = Modifier.padding(paddingValues)
             ) {
                 navigationGraph(navController)
             }

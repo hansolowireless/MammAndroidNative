@@ -4,7 +4,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -22,15 +24,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.mamm.mammapps.ui.component.common.ContentEntity
 import com.mamm.mammapps.ui.model.ContentEntityUI
+import com.mamm.mammapps.ui.theme.Dimensions
+import com.mamm.mammapps.ui.theme.Ratios
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FeaturedCarousel(
     modifier: Modifier = Modifier,
-    contents: List<ContentEntityUI>,
+    content: List<ContentEntityUI>,
     onItemClick: (ContentEntityUI) -> Unit = {}
 ) {
-    if (contents.isEmpty()) return
+    if (content.isEmpty()) return
 
     val pageCount = Int.MAX_VALUE
     val pagerState = rememberPagerState(
@@ -38,37 +43,41 @@ fun FeaturedCarousel(
         pageCount = { pageCount }
     )
 
-    LaunchedEffect(key1 = pagerState.currentPage) {
-        delay(5000)
-        pagerState.animateScrollToPage((pagerState.currentPage + 1) % pageCount)
+    LaunchedEffect(pagerState) {
+        while (true) {
+            delay(5000)
+            val nextPage = pagerState.currentPage + 1
+            pagerState.animateScrollToPage(nextPage)
+        }
     }
 
     Box(
-        modifier = modifier.fillMaxWidth(),
-        contentAlignment = Alignment.BottomCenter
+        modifier = modifier.fillMaxWidth().aspectRatio(Ratios.HORIZONTAL),
+        contentAlignment = Alignment.Center
     ) {
         HorizontalPager(
+            contentPadding = PaddingValues(bottom = 0.dp),
             state = pagerState,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxSize().background(Color.Red),
+            pageSpacing = 0.dp
         ) { page ->
-            val itemIndex = page % contents.size
-            val content = remember(itemIndex) { contents[itemIndex] }
+            val itemIndex = page % content.size
+            val item = remember(itemIndex) { content[itemIndex] }
 
             ContentEntity(
-                modifier = Modifier.fillMaxSize(),
-                contentEntityUI = content,
-                onClick = { onItemClick(content) }
+                modifier = Modifier.fillMaxWidth(),
+                contentEntityUI = item,
+                onClick = { onItemClick(item) }
             )
         }
 
         Row(
-            modifier = Modifier
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.Center
+            modifier = Modifier.fillMaxSize().align(Alignment.BottomCenter),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.Bottom
         ) {
-            val selectedIndex = pagerState.currentPage % contents.size
-            contents.forEachIndexed { index, _ ->
-                CarouselIndicatorDot(isSelected = index == selectedIndex)
+            repeat(content.size) { index ->
+                CarouselIndicatorDot(isSelected = index == pagerState.currentPage % content.size)
             }
         }
     }

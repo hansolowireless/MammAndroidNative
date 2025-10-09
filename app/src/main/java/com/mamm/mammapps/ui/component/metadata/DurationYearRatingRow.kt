@@ -1,4 +1,4 @@
-package com.mamm.mammapps.ui.component.common
+package com.mamm.mammapps.ui.component.metadata
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -13,6 +13,7 @@ import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.metadata.Metadata
+import com.mamm.mammapps.ui.theme.DetailColor
 import com.mamm.mammapps.ui.theme.Dimensions
 
 @Composable
@@ -35,7 +36,7 @@ fun DurationYearRatingRow(metadata: Metadata, textcolor: Color = Color.White) {
             items.forEachIndexed { index, item ->
                 Text(text = item, color = Color.White)
                 if (index < items.size - 1) {
-                    Text(text = stringResource(R.string.separator), color = Color.White)
+                    Text(text = stringResource(R.string.separator), color = DetailColor.metadata)
                 }
             }
 
