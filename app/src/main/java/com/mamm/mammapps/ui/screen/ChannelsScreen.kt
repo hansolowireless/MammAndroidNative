@@ -19,6 +19,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamm.mammapps.data.model.Channel
+import com.mamm.mammapps.ui.component.LocalIsTV
+import com.mamm.mammapps.ui.component.channels.ChannelGridMobile
+import com.mamm.mammapps.ui.component.channels.ChannelGridTV
 import com.mamm.mammapps.ui.component.home.HomeGridTop
 import com.mamm.mammapps.ui.component.common.ContentEntity
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
@@ -62,50 +65,32 @@ fun ChannelsScreen(
         }
     }
 
-    Column(
-        modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        liveEvent?.let {
-            HomeGridTop(event = it)
-        }
+    if (LocalIsTV.current) {
+        Column(
+            modifier = modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            liveEvent?.let {
+                HomeGridTop(event = it)
+            }
 
-        ChannelGrid(
+            ChannelGridTV(
+                onChannelClick = viewModel::findChannel,
+                channels = channels,
+                onChannelFocus = viewModel::setFocusedContent
+            )
+        }
+    }
+    else {
+        ChannelGridMobile(
             onChannelClick = viewModel::findChannel,
             channels = channels,
             onChannelFocus = viewModel::setFocusedContent
         )
     }
+
 }
 
-@Composable
-fun ChannelGrid(
-    modifier: Modifier = Modifier,
-    channels: List<ContentEntityUI>,
-    onChannelClick: (ContentEntityUI) -> Unit,
-    onChannelFocus: (ContentEntityUI) -> Unit = {}
-) {
-    ProvideLazyListPivotOffset (parentFraction = 0.15f) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(4),
-            modifier = modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(
-                horizontal = Dimensions.paddingMedium,
-                vertical = Dimensions.paddingSmall
-            ),
-            horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium),
-            verticalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall)
-        ) {
-            items(channels) { channel ->
-                ContentEntity(
-                    contentEntityUI = channel,
-                    onClick = { onChannelClick(channel) },
-                    onFocus = { onChannelFocus(channel) }
-                )
-            }
-        }
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
