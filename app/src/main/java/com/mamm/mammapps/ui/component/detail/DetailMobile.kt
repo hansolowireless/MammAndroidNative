@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
@@ -34,6 +35,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.metadata.Metadata
+import com.mamm.mammapps.ui.component.common.ContentEntityListItem
+import com.mamm.mammapps.ui.component.common.ExpandableText
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.ui.component.metadata.DirectorAndGenreRow
 import com.mamm.mammapps.ui.component.metadata.DurationYearRatingRow
@@ -52,7 +55,7 @@ fun DetailMobile(
     content: ContentEntityUI,
     onClickPlay: () -> Unit,
     seasonInfoUIState: UIState<List<SeasonUI>>? = null,
-    onClickEpisode: (Int, Int) -> Unit = { _, _ -> }
+    onClickEpisode: (Int, Int) -> Unit
 ) {
 
     var selectedTabIndex by remember { mutableStateOf(0) }
@@ -74,16 +77,18 @@ fun DetailMobile(
                     contentScale = ContentScale.Crop
                 )
 
-                IconButton(
-                    onClick = onClickPlay,
-                    modifier = Modifier.size(72.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.PlayArrow,
-                        contentDescription = stringResource(R.string.play),
-                        tint = Color.White.copy(alpha = 0.9f),
-                        modifier = Modifier.fillMaxSize()
-                    )
+                if (content.identifier !is ContentIdentifier.Serie){
+                    IconButton(
+                        onClick = onClickPlay,
+                        modifier = Modifier.size(72.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = stringResource(R.string.play),
+                            tint = Color.White.copy(alpha = 0.9f),
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 }
             }
         }
@@ -109,7 +114,7 @@ fun DetailMobile(
                 }
 
                 content.detailInfo?.let { details ->
-                    Text(
+                    ExpandableText(
                         text = details.description,
                         style = MaterialTheme.typography.bodyMedium,
                         color = DetailColor.description,
@@ -119,20 +124,33 @@ fun DetailMobile(
             }
         }
 
-        item {
-            when (seasonInfoUIState) {
-                is UIState.Success -> SeasonsHeader(
-                    seasons = seasonInfoUIState.data,
-                    selectedTabIndex = selectedTabIndex,
-                    onClickTab = { selectedTabIndex = it },
-                    onFocusTab = { selectedTabIndex = it }
-                )
 
-                UIState.Loading -> LoadingSpinner()
+        when (seasonInfoUIState) {
+            is UIState.Success -> {
+                item {
+                    SeasonsHeaderMobile(
+                        seasons = seasonInfoUIState.data,
+                        selectedTabIndex = selectedTabIndex,
+                        onClickTab = {
+                            selectedTabIndex = it
+                        }
+                    )
+                }
+                items(seasonInfoUIState.data[selectedTabIndex].episodes) { episode ->
+                    ContentEntityListItem(
+                        content = episode,
+                        onClick = {
+                            val currentSeason = seasonInfoUIState.data[selectedTabIndex]
+                            onClickEpisode(currentSeason.order, episode.identifier.id)
+                        }
+                    )
+                }
+            }
+
+            UIState.Loading -> item {
+                LoadingSpinner()
             }
         }
-
-
     }
 }
 
@@ -163,7 +181,8 @@ private fun DetailMobilePreview() {
         DetailMobile(
             modifier = Modifier.fillMaxWidth(),
             content = sampleContent,
-            onClickPlay = {}
+            onClickPlay = {},
+            onClickEpisode = { _, _ -> }
         )
     }
 }

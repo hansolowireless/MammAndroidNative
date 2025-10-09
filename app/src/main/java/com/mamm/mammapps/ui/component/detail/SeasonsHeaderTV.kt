@@ -19,7 +19,7 @@ import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.SeasonSelectorTabs
 
 @Composable
-fun SeasonsHeader(
+fun SeasonsHeaderTV(
     modifier: Modifier = Modifier,
     seasons: List<SeasonUI>,
     selectedTabIndex: Int,
@@ -27,7 +27,7 @@ fun SeasonsHeader(
     onFocusTab: (Int) -> Unit
 ) {
     TabRow(
-        modifier = Modifier.height(50.dp),
+        modifier = modifier.height(50.dp),
         selectedTabIndex = selectedTabIndex
     ) {
         seasons.forEachIndexed { index, season ->

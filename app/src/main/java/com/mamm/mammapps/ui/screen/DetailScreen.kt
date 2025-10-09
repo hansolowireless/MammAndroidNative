@@ -30,7 +30,6 @@ fun DetailScreen(
     val clickedContent by viewModel.clickedContent.collectAsStateWithLifecycle()
     val similarContent by viewModel.similarContent.collectAsStateWithLifecycle()
 
-    val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
 
     LaunchedEffect(clickedContent) {
@@ -78,8 +77,7 @@ fun DetailScreen(
             }
         )
         return
-    }
-    else {
+    } else {
         DetailMobile(
             content = content,
             onClickPlay = {
@@ -92,7 +90,10 @@ fun DetailScreen(
                     routeTag = routeTag
                 )
             },
-            seasonInfoUIState = seasonInfoUIState
+            seasonInfoUIState = seasonInfoUIState,
+            onClickEpisode = { seasonOrder, episodeId ->
+                viewModel.findEpisode(seasonOrder, episodeId)
+            }
         )
     }
 
