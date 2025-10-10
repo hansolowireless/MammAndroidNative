@@ -1,10 +1,12 @@
 package com.mamm.mammapps.ui.screen
 
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
@@ -27,7 +29,6 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -35,17 +36,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.bumptech.glide.Glide
 import com.example.openstream_flutter_rw.ui.manager.watermark.FingerprintController
 import com.github.rubensousa.previewseekbar.PreviewBar
+import com.github.rubensousa.previewseekbar.PreviewLoader
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.mamm.mammapps.R
-import com.mamm.mammapps.data.model.player.Ticker
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
+import com.mamm.mammapps.ui.extension.buildThumbnailUrl
+import com.mamm.mammapps.ui.extension.findActivity
 import com.mamm.mammapps.ui.manager.videoresize.VideoResizeManagerWithTicker
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
-import com.mamm.mammapps.ui.model.player.PlayerUIState
 import com.mamm.mammapps.ui.viewmodel.VideoPlayerViewModel
 
 @Composable
@@ -142,6 +145,19 @@ fun PlayerViewWithControls(
         videoResizeManager?.replaceTickers(tickerList)
     }
 
+    DisposableEffect(Unit) {
+        val activity = context.findActivity()
+        val originalOrientation = activity.requestedOrientation
+
+        // Forzar landscape solo en esta pantalla
+        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+
+        onDispose {
+            // Cuando salgas de esta pantalla, restaurar orientación original
+            activity.requestedOrientation = originalOrientation
+        }
+    }
+
     AndroidView(
         factory = { viewContext ->
             val parentView = FrameLayout(viewContext)
@@ -156,6 +172,14 @@ fun PlayerViewWithControls(
             val styledPlayerView = parentView.findViewById<StyledPlayerView>(R.id.player_view)
             playerViewRef = styledPlayerView
             previewTimeBar = parentView.findViewById<CustomPreviewBar>(R.id.exo_progress)
+
+            previewTimeBar?.setPreviewLoader { currentPosition, max ->
+                parentView.findViewById<ImageView>(R.id.imageView)?.let {
+                    Glide.with(it)
+                        .load(content?.deliveryURL?.buildThumbnailUrl(currentPosition))
+                        .into(it)
+                }
+            }
 
             ccTracksButton = parentView.findViewById<AppCompatImageButton>(R.id.cc_tracks_button)
             audioTracksButton = parentView.findViewById<AppCompatImageButton>(R.id.audio_tracks_button)

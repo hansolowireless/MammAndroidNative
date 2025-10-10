@@ -23,7 +23,7 @@ import com.mamm.mammapps.ui.theme.Dimensions
 import java.time.LocalDate
 
 @Composable
-fun EPGContent(
+fun EPGTV(
     epgContent: List<EPGChannelContent>,
     selectedDate: LocalDate,
     onDateSelected: (LocalDate) -> Unit,

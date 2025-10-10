@@ -1,5 +1,8 @@
 package com.mamm.mammapps.ui.extension
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -148,5 +151,15 @@ fun TextView.setHourText(date: ZonedDateTime?) {
 
 fun Int?.toBookmarkStartTimeMs() : Long {
     return this?.times(1000)?.toLong() ?: 0
+}
+
+// Función auxiliar para obtener la Activity
+fun Context.findActivity(): Activity {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is Activity) return context
+        context = context.baseContext
+    }
+    throw IllegalStateException("No se encontró Activity")
 }
 

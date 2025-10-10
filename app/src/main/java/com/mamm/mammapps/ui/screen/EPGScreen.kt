@@ -20,9 +20,11 @@ import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.epg.EPGChannelContent
 import com.mamm.mammapps.data.model.section.EPGEvent
+import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.ui.model.uistate.UIState
-import com.mamm.mammapps.ui.component.epg.EPGContent
+import com.mamm.mammapps.ui.component.epg.EPGMobile
+import com.mamm.mammapps.ui.component.epg.EPGTV
 import com.mamm.mammapps.ui.viewmodel.EPGViewModel
 import java.time.LocalDate
 
@@ -50,22 +52,27 @@ fun EPGScreen(
             LoadingSpinner()
         }
         is UIState.Success<List<EPGChannelContent>> -> {
-            EPGContent(
-                epgContent = state.data,
-                selectedDate = selectedDate,
-                onDateSelected = { date ->
-                    selectedDate = date
-                    viewModel.getEPGContent(date)
-                },
-                onEventClicked = { event ->
-                    if (event.isLive()) {
-                        viewModel.findChannel(event)
+            if (LocalIsTV.current) {
+                EPGTV(
+                    epgContent = state.data,
+                    selectedDate = selectedDate,
+                    onDateSelected = { date ->
+                        selectedDate = date
+                        viewModel.getEPGContent(date)
+                    },
+                    onEventClicked = { event ->
+                        if (event.isLive()) {
+                            viewModel.findChannel(event)
+                        }
+                        else {
+                            onShowDetails(event)
+                        }
                     }
-                    else {
-                        onShowDetails(event)
-                    }
-                }
-            )
+                )
+            }
+            else {
+                EPGMobile()
+            }
         }
         is UIState.Error -> {
             Box(
