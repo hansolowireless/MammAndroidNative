@@ -50,6 +50,8 @@ fun EPGMobile2(
 
     val now = remember { ZonedDateTime.now() }
     val state = rememberSaveableProgramGuideState()
+
+    // Tu corrección, que es la forma idónea de hacerlo.
     LaunchedEffect(Unit) {
         state.snapToCurrentTime()
     }
@@ -76,10 +78,17 @@ fun EPGMobile2(
                 val localStartTime = program.startDateTime!!.withZoneSameInstant(localZoneId)
                 val localEndTime = program.endDateTime!!.withZoneSameInstant(localZoneId)
 
-                val startHour = localStartTime.hour + localStartTime.minute / 60f
+                var startHour = localStartTime.hour + localStartTime.minute / 60f
                 var endHour = localEndTime.hour + localEndTime.minute / 60f
 
-                if (localEndTime.dayOfYear > localStartTime.dayOfYear || (endHour == 0.0f && localEndTime.dayOfYear > localStartTime.dayOfYear)) {
+                // CASO 1: El programa empezó el día anterior.
+                // Lo ajustamos para que empiece al inicio del día actual (00:00).
+                if (localStartTime.dayOfYear < localEndTime.dayOfYear && localEndTime.dayOfYear == now.dayOfYear) {
+                    startHour = 0.0f
+                }
+                // CASO 2: El programa termina el día siguiente.
+                // Lo cortamos al final del día actual (24:00).
+                else if (localEndTime.dayOfYear > localStartTime.dayOfYear && localStartTime.dayOfYear == now.dayOfYear) {
                     endHour = 24.0f
                 }
 
