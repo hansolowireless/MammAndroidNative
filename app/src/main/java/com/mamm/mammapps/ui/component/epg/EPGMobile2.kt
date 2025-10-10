@@ -2,14 +2,18 @@ package com.mamm.mammapps.ui.component.epg
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
@@ -19,6 +23,7 @@ import coil.compose.AsyncImage
 import com.mamm.mammapps.data.model.epg.EPGChannelContent
 import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.ui.mapper.toContentEPGUI
+import com.mamm.mammapps.ui.theme.Primary
 import eu.wewox.programguide.ProgramGuide
 import eu.wewox.programguide.ProgramGuideItem
 import java.time.LocalDateTime
@@ -28,7 +33,8 @@ import java.time.ZonedDateTime
 @Composable
 fun EPGMobile2(
     modifier: Modifier = Modifier,
-    content: List<EPGChannelContent>
+    content: List<EPGChannelContent>,
+    onEventClicked: (EPGEvent) -> Unit
 ) {
     val programsWithChannelIndex = remember(content) {
         content.flatMapIndexed { channelIndex, channelContent ->
@@ -60,15 +66,20 @@ fun EPGMobile2(
             layoutInfo = { (program, channelIndex) ->
                 val localZoneId = ZoneOffset.systemDefault()
 
-                // --- ESTA ES LA CORRECCIÓN ---
-                // Tu `program.startDateTime` YA es un ZonedDateTime en UTC.
-                // No necesitamos construirlo. Solo lo usamos para convertirlo a la zona local.
                 val localStartTime = program.startDateTime!!.withZoneSameInstant(localZoneId)
                 val localEndTime = program.endDateTime!!.withZoneSameInstant(localZoneId)
-                // --- FIN DE LA CORRECCIÓN ---
 
                 val startHour = localStartTime.hour + localStartTime.minute / 60f
-                val endHour = localEndTime.hour + localEndTime.minute / 60f
+                var endHour = localEndTime.hour + localEndTime.minute / 60f
+
+                // --- INICIO DE LA CORRECCIÓN: Manejo de programas que cruzan la medianoche ---
+                // Si el día de fin es posterior al día de inicio,
+                // o si la hora de fin es 00:00 del día siguiente, cortamos el programa a medianoche.
+                if (localEndTime.dayOfYear > localStartTime.dayOfYear || (endHour == 0.0f && localEndTime.dayOfYear > localStartTime.dayOfYear)) {
+                    endHour = 24.0f // El final del día en el formato de la librería.
+                }
+                // --- FIN DE LA CORRECCIÓN ---
+
 
                 ProgramGuideItem.Program(
                     channelIndex = channelIndex,
@@ -77,7 +88,12 @@ fun EPGMobile2(
                 )
             },
             itemContent = { (program, _) ->
-                ProgramCell(program = program)
+                ProgramCell(
+                    program = program,
+                    onClick = {
+                        onEventClicked(program)
+                    }
+                )
             }
         )
 
@@ -95,6 +111,23 @@ fun EPGMobile2(
                 TimelineCell(hour = timelineHours.toList()[index])
             }
         )
+
+        currentTime(
+            layoutInfo = {
+                val now = ZonedDateTime.now()
+                val currentHour = now.hour + now.minute / 60f
+                ProgramGuideItem.CurrentTime(hour = currentHour)
+            },
+            itemContent = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(2.dp)
+                        .background(Primary)
+                )
+            }
+        )
+
     }
 }
 
@@ -116,13 +149,18 @@ private fun ChannelCell(row: EPGChannelContent, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun ProgramCell(program: EPGEvent, modifier: Modifier = Modifier) {
+private fun ProgramCell(
+    program: EPGEvent,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.Gray)
+            .background(if (program.isLive()) Color.Red else Color.Gray)
             .border(1.dp, Color.White)
-            .padding(4.dp),
+            .padding(4.dp)
+            .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Text(
