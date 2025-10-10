@@ -10,10 +10,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
@@ -26,7 +26,7 @@ import com.mamm.mammapps.ui.mapper.toContentEPGUI
 import com.mamm.mammapps.ui.theme.Primary
 import eu.wewox.programguide.ProgramGuide
 import eu.wewox.programguide.ProgramGuideItem
-import java.time.LocalDateTime
+import eu.wewox.programguide.rememberSaveableProgramGuideState
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
@@ -48,7 +48,14 @@ fun EPGMobile2(
         }
     }
 
+    val now = remember { ZonedDateTime.now() }
+    val state = rememberSaveableProgramGuideState()
+    LaunchedEffect(Unit) {
+        state.snapToCurrentTime()
+    }
+
     ProgramGuide(
+        state = state,
         modifier = modifier.fillMaxSize()
     ) {
         channels(
@@ -72,14 +79,9 @@ fun EPGMobile2(
                 val startHour = localStartTime.hour + localStartTime.minute / 60f
                 var endHour = localEndTime.hour + localEndTime.minute / 60f
 
-                // --- INICIO DE LA CORRECCIÓN: Manejo de programas que cruzan la medianoche ---
-                // Si el día de fin es posterior al día de inicio,
-                // o si la hora de fin es 00:00 del día siguiente, cortamos el programa a medianoche.
                 if (localEndTime.dayOfYear > localStartTime.dayOfYear || (endHour == 0.0f && localEndTime.dayOfYear > localStartTime.dayOfYear)) {
-                    endHour = 24.0f // El final del día en el formato de la librería.
+                    endHour = 24.0f
                 }
-                // --- FIN DE LA CORRECCIÓN ---
-
 
                 ProgramGuideItem.Program(
                     channelIndex = channelIndex,
@@ -114,7 +116,6 @@ fun EPGMobile2(
 
         currentTime(
             layoutInfo = {
-                val now = ZonedDateTime.now()
                 val currentHour = now.hour + now.minute / 60f
                 ProgramGuideItem.CurrentTime(hour = currentHour)
             },
@@ -127,7 +128,6 @@ fun EPGMobile2(
                 )
             }
         )
-
     }
 }
 
