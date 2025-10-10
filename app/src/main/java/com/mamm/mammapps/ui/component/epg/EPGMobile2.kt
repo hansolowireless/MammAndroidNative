@@ -21,21 +21,19 @@ import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.ui.mapper.toContentEPGUI
 import eu.wewox.programguide.ProgramGuide
 import eu.wewox.programguide.ProgramGuideItem
-import java.time.format.DateTimeFormatter
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 
 @Composable
 fun EPGMobile2(
     modifier: Modifier = Modifier,
     content: List<EPGChannelContent>
 ) {
-    // 1. Pre-procesamos la lista para tener los programas y el índice de su canal.
-    // Filtramos los programas con fechas nulas para evitar errores.
     val programsWithChannelIndex = remember(content) {
         content.flatMapIndexed { channelIndex, channelContent ->
             channelContent.events.mapNotNull { program ->
-                // Solo incluimos programas con fechas válidas
                 if (program.startDateTime != null && program.endDateTime != null) {
-                    // Creamos un par: el programa y el índice de su canal
                     program to channelIndex
                 } else {
                     null
@@ -47,7 +45,6 @@ fun EPGMobile2(
     ProgramGuide(
         modifier = modifier.fillMaxSize()
     ) {
-        // SLOT 1: Definir los canales
         channels(
             count = content.size,
             layoutInfo = { channelIndex ->
@@ -58,26 +55,32 @@ fun EPGMobile2(
             }
         )
 
-        // SLOT 2: Definir los programas (eventos)
         programs(
-            items = programsWithChannelIndex, // Usamos la lista pre-procesada
-            layoutInfo = { (program, channelIndex) -> // Desestructuramos el Par
-                // Ahora estamos seguros de que las fechas no son nulas
-                val startHour = program.startDateTime!!.hour + program.startDateTime!!.minute / 60f
-                val endHour = program.endDateTime!!.hour + program.endDateTime!!.minute / 60f
+            items = programsWithChannelIndex,
+            layoutInfo = { (program, channelIndex) ->
+                val localZoneId = ZoneOffset.systemDefault()
+
+                // --- ESTA ES LA CORRECCIÓN ---
+                // Tu `program.startDateTime` YA es un ZonedDateTime en UTC.
+                // No necesitamos construirlo. Solo lo usamos para convertirlo a la zona local.
+                val localStartTime = program.startDateTime!!.withZoneSameInstant(localZoneId)
+                val localEndTime = program.endDateTime!!.withZoneSameInstant(localZoneId)
+                // --- FIN DE LA CORRECCIÓN ---
+
+                val startHour = localStartTime.hour + localStartTime.minute / 60f
+                val endHour = localEndTime.hour + localEndTime.minute / 60f
 
                 ProgramGuideItem.Program(
-                    channelIndex = channelIndex, // Usamos el índice que ya calculamos
+                    channelIndex = channelIndex,
                     startHour = startHour,
                     endHour = endHour,
                 )
             },
-            itemContent = { (program, _) -> // Ignoramos el índice aquí
+            itemContent = { (program, _) ->
                 ProgramCell(program = program)
             }
         )
 
-        // SLOT 3: Definir la línea de tiempo
         val timelineHours = 0..23
         timeline(
             count = timelineHours.count(),
@@ -105,7 +108,7 @@ private fun ChannelCell(row: EPGChannelContent, modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center
     ) {
         AsyncImage(
-            model = row.channel.toContentEPGUI().imageUrl, // Esto ya estaba correcto
+            model = row.channel.toContentEPGUI().imageUrl,
             contentDescription = row.channel.toContentEPGUI().title,
             contentScale = ContentScale.Fit,
         )
