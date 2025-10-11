@@ -1,12 +1,11 @@
 package com.mamm.mammapps.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val NetflixColorScheme = darkColorScheme(
+val NetflixColorScheme = darkColorScheme(
     primary = Color(0xFFF0ED00),           // Amarillo brillante
     onPrimary = Color(0xFF141414),
     primaryContainer = Color(0xFFC4C100),  // Amarillo más oscuro

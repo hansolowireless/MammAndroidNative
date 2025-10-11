@@ -42,15 +42,25 @@ class ChannelsViewModel @Inject constructor(
     private val _clickedContent = MutableStateFlow<Channel?>(null)
     val clickedContent: StateFlow<Channel?> = _clickedContent.asStateFlow()
 
-    private val _channels = MutableStateFlow<List<ContentEntityUI>>(emptyList())
-    val channels: StateFlow<List<ContentEntityUI>> = _channels.asStateFlow()
+    private var channels: List<Channel> = emptyList()
+
+    private val _channelGenres = MutableStateFlow<Set<String>>(emptySet())
+    val channelGenres: StateFlow<Set<String>> = _channelGenres.asStateFlow()
+
+    private val _selectedGenres = MutableStateFlow<Set<String>>(emptySet())
+    val selectedGenres: StateFlow<Set<String>> = _selectedGenres.asStateFlow()
+
+    private val _filteredChannels = MutableStateFlow<List<ContentEntityUI>>(emptyList())
+    val filteredChannels: StateFlow<List<ContentEntityUI>> = _filteredChannels.asStateFlow()
 
     fun getChannels() {
-       viewModelScope.launch (Dispatchers.IO) {
-           getChannelsUseCase().onSuccess { response ->
-               _channels.update { response }
-           }
-       }
+        viewModelScope.launch(Dispatchers.IO) {
+            getChannelsUseCase().onSuccess { response ->
+                channels = response
+                _filteredChannels.update { response.map { it.toContentEntityUI() } }
+                _channelGenres.update { response.mapNotNull { it.channelGenre }.toSet() }
+            }
+        }
     }
 
     fun observeLiveEvents() {
@@ -72,17 +82,49 @@ class ChannelsViewModel @Inject constructor(
     }
 
     fun setFirstFocusedContent() {
-        _focusedContent.update { _channels.value.firstOrNull() }
+        _focusedContent.update { _filteredChannels.value.firstOrNull() }
     }
 
-    fun findChannel (content: ContentEntityUI) {
+    fun findChannel(content: ContentEntityUI) {
         findContentEntityUseCase(content.identifier, routeTag = AppRoute.HOME).onSuccess { entity ->
-            if (entity is Channel) _clickedContent.update { entity } else logger.error(TAG, "findChannel Found entity is not a channel")
+            if (entity is Channel) _clickedContent.update { entity } else logger.error(
+                TAG,
+                "findChannel Found entity is not a channel"
+            )
         }
     }
 
     fun clearClickedContent() {
         _clickedContent.update { null }
+    }
+
+    fun filterChannelsByGenres(genres: Set<String>) {
+        _selectedGenres.update { genres }
+        if (genres.isEmpty()) {
+            _filteredChannels.update { channels.map { it.toContentEntityUI() } }
+        } else {
+            val filteredChannelsDebug = channels.filter { it.channelGenre in genres }
+            logger.debug(TAG, "filterChannelsByGenres Filtered channels: $filteredChannels")
+            _filteredChannels.update {
+                channels.filter { it.channelGenre in genres }.map { it.toContentEntityUI() }
+            }
+        }
+    }
+
+    fun filterChannelsByQuery(query: String) {
+        if (query.isNotBlank()) {
+            _filteredChannels.update {
+                _filteredChannels.value.filter { it.title.contains(query, ignoreCase = true) }
+            }
+        } else {
+            logger.debug(TAG, "filterChannelsByQuery No query, showing all channels")
+            filterChannelsByGenres(_selectedGenres.value)
+        }
+    }
+
+    fun resetSelectedGenres() {
+        _selectedGenres.update { emptySet() }
+        filterChannelsByGenres(emptySet())
     }
 
 }

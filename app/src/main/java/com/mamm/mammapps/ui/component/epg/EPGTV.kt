@@ -39,7 +39,7 @@ fun EPGTV(
                 .fillMaxSize()
                 .padding(Dimensions.paddingMedium)
         ) {
-            ChannelsColumn(
+            ChannelSelector(
                 channels = epgContent.map { it.channel.toContentEPGUI() },
                 modifier = Modifier.weight(1f),
                 selectedChannelId = selectedChannel.id,
@@ -55,7 +55,7 @@ fun EPGTV(
                 thickness = 2.dp
             )
 
-            DatesColumn(
+            DateSelector(
                 modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = Dimensions.paddingSmall),

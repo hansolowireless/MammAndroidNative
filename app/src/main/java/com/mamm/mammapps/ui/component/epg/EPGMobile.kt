@@ -5,12 +5,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,7 +24,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import dev.sajidali.jctvguide.data.Channel
+import com.mamm.mammapps.data.model.epg.EPGChannelContent
 import dev.sajidali.jctvguide.ChannelCell
 import dev.sajidali.jctvguide.ChannelRow
 import dev.sajidali.jctvguide.Channels
@@ -30,28 +32,44 @@ import dev.sajidali.jctvguide.CurrentDay
 import dev.sajidali.jctvguide.EventCell
 import dev.sajidali.jctvguide.Events
 import dev.sajidali.jctvguide.Header
+import dev.sajidali.jctvguide.Selection
 import dev.sajidali.jctvguide.TimeCell
 import dev.sajidali.jctvguide.Timebar
 import dev.sajidali.jctvguide.TvGuide
 import dev.sajidali.jctvguide.data.Event
+import dev.sajidali.jctvguide.data.JctvChannel
 import dev.sajidali.jctvguide.utils.formatToPattern
-import dev.sajidali.jctvguide.utils.generateEvents
 import dev.sajidali.jctvguide.utils.now
 import dev.sajidali.jctvguide.utils.rememberGuideState
-import dev.sajidali.jctvguide.Selection
+import java.util.Calendar
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 @Composable
-fun EPGMobile (modifier: Modifier = Modifier) {
+fun EPGMobile(
+    modifier: Modifier = Modifier,
+    content : List<EPGChannelContent>
+) {
 
-    val startTime = remember {
-        now - 1.days.inWholeMilliseconds
+    val startTime by remember {
+        derivedStateOf {
+            Calendar.getInstance().apply {
+                timeInMillis = now
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+            }.timeInMillis
+        }
     }
 
-    val stopTime = remember {
-        now + 1.days.inWholeMilliseconds
+    val stopTime by remember {
+        derivedStateOf {
+            Calendar.getInstance().apply {
+                timeInMillis = now
+                set(Calendar.HOUR_OF_DAY, 23)
+                set(Calendar.MINUTE, 59)
+            }.timeInMillis
+        }
     }
 
     val guideState = rememberGuideState(
@@ -62,10 +80,27 @@ fun EPGMobile (modifier: Modifier = Modifier) {
         initialOffset = now
     )
 
-    val events = remember {
-        (0..1000).map { position ->
-            Channel(position, "Channel $position", "").also {
-                it.events = generateEvents(position, startTime, stopTime)
+    val channels = remember(content) {
+        content.map { epgRow ->
+            JctvChannel(
+                id = epgRow.channel.id ?: 0,
+                title = epgRow.channel.name.orEmpty(),
+                icon = ""
+            ).also { jctvChannel ->
+                jctvChannel.events = epgRow.events.mapNotNull { event ->
+                    if (event.startDateTime != null && event.endDateTime != null) {
+                        Event(
+                            id = event.getId(),
+                            title = event.getTitle(),
+                            description = event.getDescription(),
+                            start = event.startDateTime!!.toInstant().toEpochMilli(),
+                            end = event.endDateTime!!.toInstant().toEpochMilli()
+                        )
+                    } else {
+                        null
+                    }
+                }
+
             }
         }.toMutableStateList()
     }
@@ -87,10 +122,10 @@ fun EPGMobile (modifier: Modifier = Modifier) {
             }
         }
     ) {
-        Header(height = 20.dp) {
+        Header(height = 40.dp) {
 
             CurrentDay(
-                width = 250.dp,
+                width = 150.dp,
                 modifier = Modifier
                     .padding(vertical = 2.dp, horizontal = 4.dp)
                     .background(color = Color.LightGray)
@@ -111,29 +146,32 @@ fun EPGMobile (modifier: Modifier = Modifier) {
                     .padding(horizontal = 4.dp, vertical = 1.dp)
                     .background(color = Color.LightGray)
             ) {
-                TimeCell(modifier = Modifier) { time ->
+                TimeCell(
+                    modifier = Modifier.fillMaxHeight()
+                ) { time ->
                     Text(
-                        text = time.formatToPattern("HH:mm")
+                        text = time.formatToPattern("HH:mm"),
+                        modifier = Modifier.align(Alignment.Center)
                     )
                 }
             }
         }
 
         Channels(
-            width = 250.dp,
-            channels = events,
+            width = 150.dp,
+            channels = channels,
             key = { it?.id ?: 0 },
             modifier = Modifier
-        ) { channelIndex: Int, channel: Channel?, isSelected ->
+        ) { channelIndex: Int, channel: JctvChannel?, isSelected ->
 
             val channelEvents = remember(channelIndex) {
-                events[channelIndex].events
+                channels[channelIndex].events
             }
 
             ChannelRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(if (isSelected) 40.dp else 32.dp)
+                    .height(if (isSelected) 70.dp else 62.dp)
             ) { _ ->
                 ChannelCell(
                     modifier = Modifier
@@ -175,7 +213,7 @@ fun EPGMobile (modifier: Modifier = Modifier) {
                         onSelected = {
                             selected = Selection(
                                 channelIndex,
-                                events[channelIndex].events.indexOf(event)
+                                channels[channelIndex].events.indexOf(event)
                             )
                         },
                         onClick = {

@@ -11,7 +11,9 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.common.ContentEntity
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.theme.Dimensions
@@ -22,7 +24,7 @@ fun SearchResultsGrid(
     onContentClick: (ContentEntityUI) -> Unit
 ) {
     LazyVerticalGrid (
-        columns = GridCells.Fixed(5),
+        columns = GridCells.Fixed(if (LocalIsTV.current) 5 else 2),
         contentPadding = PaddingValues(top = Dimensions.paddingSmall, start = Dimensions.paddingSmall, end = Dimensions.paddingSmall),
         verticalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall),
         horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingXSmall)

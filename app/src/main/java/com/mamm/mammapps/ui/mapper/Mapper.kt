@@ -216,8 +216,8 @@ fun MostWatchedContent.toContentEntityUI(): ContentEntityUI {
 //-------------------------EPG----------------------------
 fun Channel.toContentEPGUI() = ContentEPGUI(
     identifier = ContentIdentifier.Channel(id.orRandom()),
-    title = name ?: "",
-    imageUrl = logoURL?.squared() ?: ""
+    title = name.orEmpty(),
+    imageUrl = logoTitleURL.orEmpty()
 )
 
 //-------------------------region ContentAsListItem----------------------------

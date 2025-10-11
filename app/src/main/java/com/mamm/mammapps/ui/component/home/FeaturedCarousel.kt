@@ -58,7 +58,7 @@ fun FeaturedCarousel(
         HorizontalPager(
             contentPadding = PaddingValues(bottom = 0.dp),
             state = pagerState,
-            modifier = Modifier.fillMaxSize().background(Color.Red),
+            modifier = Modifier.fillMaxSize(),
             pageSpacing = 0.dp
         ) { page ->
             val itemIndex = page % content.size

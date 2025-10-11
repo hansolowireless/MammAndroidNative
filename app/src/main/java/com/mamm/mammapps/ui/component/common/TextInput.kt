@@ -17,6 +17,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 
 @Composable
 fun TextInput(
+    modifier: Modifier = Modifier,
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
@@ -40,7 +41,7 @@ fun TextInput(
             onSearch = { onSearch() },
             onDone = { onDone() }
         ),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = Color.White.copy(alpha = 0.1f),    // Fondo cuando tiene foco
             unfocusedContainerColor = Color.White.copy(alpha = 0.05f), // Fondo cuando no tiene foco

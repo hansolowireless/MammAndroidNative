@@ -189,8 +189,9 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
-    //--------EPG----------------------
+    //--------EPG ELIMINAR UNA DE LAS 2--------------
     implementation(project(":jctvguide"))
+    implementation(libs.programguide)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -9,6 +9,12 @@
     <string name="forgot_password">¿Olvidaste tu contraseña?</string>
     <!--endregion EPG-->
 
+    <!--region Channels-->
+    <string name="search_channel_placeholder">Buscar canal…</string>
+    <string name="filter_by_genre_action">Filtrar por género</string>
+    <string name="filter_by_genre_title">Filtrar por Género</string>
+    <!--endregion Channels-->
+
     <!--Details-->
     <string name="duration_minutes">%1$s min.</string>
     <string name="separator">|</string>
@@ -76,6 +82,7 @@
 
     <!--Error-->
     <string name="error_loading_epg">Error cargando la Guía</string>
+    <!--endregion Error-->
 
     <!--region PIN DIALOG-->
     <string name="pin_dialog_title">Acceso Restringido</string>
@@ -84,6 +91,10 @@
     <string name="confirm_button_label">Confirmar</string>
     <string name="cancel_button_label">Cancelar</string>
     <!--endregion PIN DIALOG-->
+
+    <!--region Accessibility-->
+    <string name="clear_search_action">Limpiar búsqueda</string>
+    <!--endregion Accessibility-->
 
 
 </resources>

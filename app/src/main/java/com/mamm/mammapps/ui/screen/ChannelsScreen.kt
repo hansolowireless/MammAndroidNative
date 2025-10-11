@@ -20,6 +20,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.ui.component.LocalIsTV
+import com.mamm.mammapps.ui.component.channels.ChannelFilter
 import com.mamm.mammapps.ui.component.channels.ChannelGridMobile
 import com.mamm.mammapps.ui.component.channels.ChannelGridTV
 import com.mamm.mammapps.ui.component.home.HomeGridTop
@@ -39,11 +40,13 @@ fun ChannelsScreen(
 
     val focusedContent by viewModel.focusedContent.collectAsStateWithLifecycle()
     val liveEvent by viewModel.liveEventInfo.collectAsStateWithLifecycle()
-    val channels by viewModel.channels.collectAsStateWithLifecycle()
+    val channels by viewModel.filteredChannels.collectAsStateWithLifecycle()
+    val channelGenres by viewModel.channelGenres.collectAsStateWithLifecycle()
+    val selectedGenres by viewModel.selectedGenres.collectAsStateWithLifecycle()
     val clickedContent by viewModel.clickedContent.collectAsStateWithLifecycle()
     val hasNavigated = remember { mutableStateOf(false) }
 
-    LaunchedEffect (Unit) {
+    LaunchedEffect(Unit) {
         viewModel.getChannels()
     }
 
@@ -80,13 +83,30 @@ fun ChannelsScreen(
                 onChannelFocus = viewModel::setFocusedContent
             )
         }
-    }
-    else {
-        ChannelGridMobile(
-            onChannelClick = viewModel::findChannel,
-            channels = channels,
-            onChannelFocus = viewModel::setFocusedContent
-        )
+    } else {
+        Column(
+            modifier = modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            ChannelFilter(
+                availableGenres = channelGenres,
+                selectedGenres = selectedGenres,
+                onSelectedGenresChanged = {
+                    viewModel.filterChannelsByGenres(it)
+                },
+                onSearchQueryChanged = {
+                    viewModel.filterChannelsByQuery(it)
+                },
+                onClearSearch = {
+                    viewModel.resetSelectedGenres()
+                }
+            )
+            ChannelGridMobile(
+                onChannelClick = viewModel::findChannel,
+                channels = channels,
+                onChannelFocus = viewModel::setFocusedContent
+            )
+        }
     }
 
 }

@@ -24,6 +24,7 @@ import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.component.epg.EPGMobile
+import com.mamm.mammapps.ui.component.epg.EPGMobile2
 import com.mamm.mammapps.ui.component.epg.EPGTV
 import com.mamm.mammapps.ui.viewmodel.EPGViewModel
 import java.time.LocalDate
@@ -38,8 +39,8 @@ fun EPGScreen(
     var selectedDate by remember { mutableStateOf<LocalDate>(LocalDate.now()) }
     val playedChannel by viewModel.playedChannel.collectAsStateWithLifecycle()
 
-    LaunchedEffect (playedChannel) {
-        playedChannel?.let{onPlayClick(it)}
+    LaunchedEffect(playedChannel) {
+        playedChannel?.let { onPlayClick(it) }
         viewModel.clearPlayedChannel()
     }
 
@@ -51,6 +52,7 @@ fun EPGScreen(
         is UIState.Loading -> {
             LoadingSpinner()
         }
+
         is UIState.Success<List<EPGChannelContent>> -> {
             if (LocalIsTV.current) {
                 EPGTV(
@@ -63,17 +65,30 @@ fun EPGScreen(
                     onEventClicked = { event ->
                         if (event.isLive()) {
                             viewModel.findChannel(event)
-                        }
-                        else {
+                        } else {
                             onShowDetails(event)
                         }
                     }
                 )
-            }
-            else {
-                EPGMobile()
+            } else {
+                EPGMobile2(
+                    content = state.data,
+                    selectedDate = selectedDate,
+                    onDateSelected = { date ->
+                        selectedDate = date
+                        viewModel.getEPGContent(date)
+                    },
+                    onEventClicked = {
+                        if (it.isLive()) {
+                            viewModel.findChannel(it)
+                        } else {
+                            onShowDetails(it)
+                        }
+                    }
+                )
             }
         }
+
         is UIState.Error -> {
             Box(
                 modifier = Modifier.fillMaxSize(),

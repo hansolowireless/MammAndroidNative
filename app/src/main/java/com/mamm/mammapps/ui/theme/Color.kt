@@ -2,14 +2,6 @@ package com.mamm.mammapps.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
-
 val Primary = Color(0xFFF0ED00)
 val Secondary = Color.White
 val Outlined = Color(0xFF625b71)
@@ -54,4 +46,18 @@ object DetailColor {
     val title = Primary
     val description = Color.White
     val metadata = Outlined
+}
+
+object EPGMobileColor {
+    val channelCellBackground = NetflixColorScheme.outlineVariant
+    val timelineTextColor = NetflixColorScheme.outlineVariant
+
+    val eventCellBorder = NetflixColorScheme.secondaryContainer
+    val eventCellBackground = NetflixColorScheme.surfaceVariant
+    val eventCellBackgroundLive = NetflixColorScheme.primaryContainer
+    val eventCellText = NetflixColorScheme.onSurfaceVariant
+    val eventCellTextLive = NetflixColorScheme.onPrimaryContainer
+
+    val timeLine = NetflixColorScheme.onError
+
 }

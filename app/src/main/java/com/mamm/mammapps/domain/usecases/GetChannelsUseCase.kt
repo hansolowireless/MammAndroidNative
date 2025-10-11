@@ -1,6 +1,7 @@
 package com.mamm.mammapps.domain.usecases
 
 import com.mamm.mammapps.data.logger.Logger
+import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.domain.interfaces.MammRepository
 import com.mamm.mammapps.ui.mapper.toContentEntityUI
 import com.mamm.mammapps.ui.model.ContentEntityUI
@@ -14,12 +15,12 @@ class GetChannelsUseCase @Inject constructor(
         private const val TAG = "GetChannelsUseCase"
     }
 
-    suspend operator fun invoke(): Result<List<ContentEntityUI>> {
+    suspend operator fun invoke(): Result<List<Channel>> {
         return repository.getHomeContent().fold(
             onSuccess = { response ->
                 logger.debug(TAG, "GetHomeContentUseCase Received successful response")
                 response.channels?.let { channels ->
-                    Result.success(channels.map { it.toContentEntityUI() })
+                    Result.success(channels.map { it })
                 } ?: run {
                     logger.error(TAG, "GetHomeContentUseCase Failed: channels is null")
                     Result.failure(Exception("Channels list is null"))

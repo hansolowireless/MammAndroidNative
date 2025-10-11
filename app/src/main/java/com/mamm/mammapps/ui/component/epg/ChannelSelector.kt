@@ -26,12 +26,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
-import com.mamm.mammapps.ui.extension.onTap
 import com.mamm.mammapps.ui.model.ContentEPGUI
 import com.mamm.mammapps.ui.theme.Dimensions
 
 @Composable
-fun ChannelsColumn(
+fun ChannelSelector(
     modifier: Modifier = Modifier,
     channels: List<ContentEPGUI>,
     selectedChannelId: Int? = null,
