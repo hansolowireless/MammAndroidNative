@@ -1,8 +1,10 @@
 package com.mamm.mammapps.data.repository
 
+import androidx.compose.ui.res.pluralStringResource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.bookmark.Bookmark
+import com.mamm.mammapps.data.model.bookmark.Recommended
 import com.mamm.mammapps.data.model.bookmark.SetBookmarkRequest
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
@@ -50,13 +52,13 @@ class CustomContentRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getRecommended(): Result<List<Bookmark>> {
+    override suspend fun getRecommended(): Result<List<Recommended>> {
         return runCatching {
-            remoteDatasource.getRecommended()?.let { response ->
+            remoteDatasource.getRecommended().let { response ->
                 val vods = response.vods.orEmpty()
                 val cutvs = response.cutvs.orEmpty()
                 vods + cutvs
-            }.orEmpty()
+            }
         }.onFailure {
             logger.error(TAG, "getRecommended failed: ${it.message}, $it")
         }
@@ -77,6 +79,7 @@ class CustomContentRepositoryImpl @Inject constructor(
         val content: Any? = when (contentType) {
             CustomizedContent.BookmarkType -> remoteDatasource.getCachedBookmarks().find { it.id == contentId }
             CustomizedContent.MostWatchedType -> remoteDatasource.getCachedMostWatched().find { it.id == contentId }
+            CustomizedContent.RecommendedType -> remoteDatasource.getCachedRecommended()?.vods?.find { it.id == contentId } ?: remoteDatasource.getCachedRecommended()?.cutvs?.find { it.id == contentId }
             else -> null
         }
 

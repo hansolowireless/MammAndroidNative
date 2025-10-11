@@ -1,6 +1,7 @@
 package com.mamm.mammapps.domain.interfaces
 
 import com.mamm.mammapps.data.model.bookmark.Bookmark
+import com.mamm.mammapps.data.model.bookmark.Recommended
 import com.mamm.mammapps.data.model.bookmark.SetBookmarkRequest
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
@@ -15,7 +16,7 @@ interface CustomContentRepository {
 
     suspend fun getMostWatched(): Result<List<MostWatchedContent>>
 
-    suspend fun getRecommended(): Result<List<Bookmark>>
+    suspend fun getRecommended(): Result<List<Recommended>>
 
     suspend fun getSimilar(subgenreId: Int) : Result<GetRecommendedResponse>
 

@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.bookmark.Bookmark
+import com.mamm.mammapps.data.model.bookmark.Recommended
 import com.mamm.mammapps.ui.component.metadata.DurationYearRatingRow
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.ui.component.common.PrimaryButton
@@ -49,7 +50,7 @@ import kotlinx.coroutines.launch
 fun DetailTV(
     modifier: Modifier = Modifier,
     content: ContentEntityUI,
-    similarContent: List<Bookmark>?,
+    similarContent: List<Recommended>?,
     seasonInfoUIState: UIState<List<SeasonUI>>?,
     onClickPlay: () -> Unit,
     onClickEpisode: (Int, Int) -> Unit,

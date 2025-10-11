@@ -2,7 +2,6 @@ package com.mamm.mammapps.ui.screen
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,10 +21,9 @@ import com.mamm.mammapps.data.model.epg.EPGChannelContent
 import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
-import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.component.epg.EPGMobile
-import com.mamm.mammapps.ui.component.epg.EPGMobile2
 import com.mamm.mammapps.ui.component.epg.EPGTV
+import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.viewmodel.EPGViewModel
 import java.time.LocalDate
 
@@ -71,7 +69,7 @@ fun EPGScreen(
                     }
                 )
             } else {
-                EPGMobile2(
+                EPGMobile(
                     content = state.data,
                     selectedDate = selectedDate,
                     onDateSelected = { date ->

@@ -11,6 +11,7 @@ import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.Event
 import com.mamm.mammapps.data.model.VoD
 import com.mamm.mammapps.data.model.bookmark.Bookmark
+import com.mamm.mammapps.data.model.bookmark.Recommended
 import com.mamm.mammapps.data.model.branded.BrandedVod
 import com.mamm.mammapps.data.model.branded.BrandedFeatured
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
@@ -185,6 +186,7 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
             is TbContentSeason -> contentItem.contentDetails?.toContentToPlayUI()
             is Bookmark -> contentItem.toContentToPlayUI()
             is MostWatchedContent -> contentItem.toContentToPlayUI()
+            is Recommended -> contentItem.toContentToPlayUI()
             else -> null
         }
 

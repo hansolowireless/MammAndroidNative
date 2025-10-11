@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.bookmark.Bookmark
+import com.mamm.mammapps.data.model.bookmark.Recommended
 import com.mamm.mammapps.data.model.serie.TbSeason
 import com.mamm.mammapps.domain.usecases.FindContentEntityUseCase
 import com.mamm.mammapps.domain.usecases.GetSeasonsInfoUseCase
@@ -43,8 +44,8 @@ class DetailViewModel @Inject constructor(
 
     private var seasonListOriginal: List<TbSeason> = mutableListOf()
 
-    private val _similarContent = MutableStateFlow<List<Bookmark>?>(null)
-    val similarContent: StateFlow<List<Bookmark>?> = _similarContent.asStateFlow()
+    private val _similarContent = MutableStateFlow<List<Recommended>?>(null)
+    val similarContent: StateFlow<List<Recommended>?> = _similarContent.asStateFlow()
 
     fun getSeasonInfo(content: ContentEntityUI) {
         if (content.identifier is ContentIdentifier.Serie) {

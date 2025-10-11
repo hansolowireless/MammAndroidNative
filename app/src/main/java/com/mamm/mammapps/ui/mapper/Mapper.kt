@@ -10,6 +10,7 @@ import com.mamm.mammapps.data.model.HomeFeatured
 import com.mamm.mammapps.data.model.Serie
 import com.mamm.mammapps.data.model.VoD
 import com.mamm.mammapps.data.model.bookmark.Bookmark
+import com.mamm.mammapps.data.model.bookmark.Recommended
 import com.mamm.mammapps.data.model.branded.BrandedVod
 import com.mamm.mammapps.data.model.branded.BrandedFeatured
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
@@ -49,6 +50,7 @@ fun Any.toContentEntityUI(isAdult: Boolean = false): ContentEntityUI? {
         is BrandedFeatured -> this.toContentEntityUI()
         is Bookmark -> this.toContentEntityUI()
         is MostWatchedContent -> this.toContentEntityUI()
+        is Recommended -> this.toContentEntityUI()
         is HomeFeatured -> this.toContentEntityUI()
         else -> null
     }
@@ -210,6 +212,23 @@ fun MostWatchedContent.toContentEntityUI(): ContentEntityUI {
     )
 }
 
+fun Recommended.toContentEntityUI(): ContentEntityUI? {
+    val format = type ?: return null
+    val id = id ?: return null
+    return ContentEntityUI(
+        identifier = ContentIdentifier.fromFormat(format = format, id = id),
+        imageUrl = posterLogo.orEmpty(),
+        horizontalImageUrl = logoURL.orEmpty(),
+        title = title.orEmpty(),
+        detailInfo = DetailInfoUI(
+            description = longDesc.orEmpty()
+        ),
+        aspectRatio = Ratios.VERTICAL,
+        height = Dimensions.contentEntityHeight,
+        customContentType = CustomizedContent.RecommendedType
+    )
+}
+
 //--------------------endregion Home------------------------
 
 
@@ -340,6 +359,14 @@ fun MostWatchedContent.toContentToPlayUI() = ContentToPlayUI(
     imageUrl = this.logoURL.orEmpty(),
 )
 
+fun Recommended.toContentToPlayUI() = ContentToPlayUI(
+    identifier = ContentIdentifier.VoD(id.orRandom()),
+    deliveryURL = this.deliveryURL.orEmpty(),
+    title = this.title.orEmpty(),
+    imageUrl = this.logoURL.orEmpty(),
+)
+
+
 //------------------------LIVE EVENT INFO------------------------
 fun EPGEvent.toLiveEventInfoUI(): LiveEventInfoUI = LiveEventInfoUI(
     title = this.getTitle(),
@@ -459,16 +486,27 @@ fun GetBrandedContentResponse.toContentUIRows(
 }
 
 fun List<ContentRowUI>.insertBookmarks(
-    bookmarks: List<Bookmark>,
-    rowTitle: String
+    bookmarks: List<Bookmark>
 ): List<ContentRowUI> {
     ContentRowUI(
-        categoryName = rowTitle,
+        categoryName = "Seguir viendo",
         items = bookmarks.mapNotNull { it.toContentEntityUI() }
     ).let {
         return listOf(it) + this
     }
 }
+
+fun List<ContentRowUI>.insertRecommended(
+    bookmarks: List<Recommended>
+): List<ContentRowUI> {
+    ContentRowUI(
+        categoryName = "Recomendado para ti",
+        items = bookmarks.mapNotNull { it.toContentEntityUI() }
+    ).let {
+        return listOf(it) + this
+    }
+}
+
 
 fun List<ContentRowUI>.insertMostWatched(mostWatched: List<MostWatchedContent>): List<ContentRowUI> {
     ContentRowUI(
@@ -531,7 +569,7 @@ fun GetSeasonInfoResponse.toSeasonUIList(): List<SeasonUI> {
 //----------------endregion SERIE DETAIL---------------------
 
 //----------------region SIMILAR CONTENT---------------------
-fun List<Bookmark>.toSimilarContentRow(): ContentRowUI {
+fun List<Recommended>.toSimilarContentRow(): ContentRowUI {
     ContentRowUI(
         categoryName = "Contenido Similar",
         items = this.mapNotNull { it.toContentEntityUI() }

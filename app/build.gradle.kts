@@ -190,7 +190,6 @@ dependencies {
     implementation(libs.material)
 
     //--------EPG ELIMINAR UNA DE LAS 2--------------
-    implementation(project(":jctvguide"))
     implementation(libs.programguide)
 
     testImplementation(libs.junit)

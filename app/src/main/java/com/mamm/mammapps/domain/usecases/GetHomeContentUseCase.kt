@@ -5,6 +5,7 @@ import com.mamm.mammapps.domain.interfaces.CustomContentRepository
 import com.mamm.mammapps.domain.interfaces.MammRepository
 import com.mamm.mammapps.ui.mapper.insertBookmarks
 import com.mamm.mammapps.ui.mapper.insertMostWatched
+import com.mamm.mammapps.ui.mapper.insertRecommended
 import com.mamm.mammapps.ui.mapper.toContentUIRows
 import com.mamm.mammapps.ui.model.ContentRowUI
 import kotlinx.coroutines.async
@@ -46,8 +47,8 @@ class GetHomeContentUseCase @Inject constructor(
                 // Use successful results, fallback for optional content
                 // Bookmarks y recomendados tienen la misma estructura de json
                 val contentRows = homeResult.getOrThrow().toContentUIRows()
-                    .insertBookmarks(bookmarksResult.getOrElse { emptyList() }, rowTitle = "Seguir viendo")
-                    .insertBookmarks(recommendedResult.getOrElse { emptyList() }, rowTitle = "Recomendado para ti")
+                    .insertBookmarks(bookmarksResult.getOrElse { emptyList() })
+                    .insertRecommended(recommendedResult.getOrElse { emptyList() })
                     .insertMostWatched(mostWatchedResult.getOrElse { emptyList() })
 
                 Result.success(contentRows)

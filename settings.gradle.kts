@@ -21,4 +21,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "MammApps"
 include(":app")
-include(":jctvguide")
