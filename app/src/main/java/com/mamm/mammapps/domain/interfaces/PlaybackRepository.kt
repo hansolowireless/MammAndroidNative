@@ -15,4 +15,6 @@ interface PlaybackRepository {
 
     suspend fun sendQosData (qosData: QosData) : Result<Unit>
 
+    suspend fun setBookmark (content: ContentToPlayUI, time: Long)
+
 }

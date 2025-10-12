@@ -10,8 +10,6 @@ import com.mamm.mammapps.ui.model.CustomizedContent
 interface CustomContentRepository {
     suspend fun getBookmarks(): Result<List<Bookmark>>
 
-    suspend fun saveBookmark(bookmarkRequest: SetBookmarkRequest): Result<Unit>
-
     suspend fun deleteBookmark(contentId: Int, contentType: String): Result<Unit>
 
     suspend fun getMostWatched(): Result<List<MostWatchedContent>>

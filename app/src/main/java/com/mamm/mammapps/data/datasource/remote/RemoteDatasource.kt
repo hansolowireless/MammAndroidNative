@@ -97,10 +97,12 @@ class RemoteDatasource @Inject constructor(
             val homeData = response.body()
                 ?: throw IOException("Home content response body is null")
 
-            cache.setHomeContent( homeData.transformData(
-                channelOrder = sessionManager.channelOrder,
-                userId = sessionManager.loginData?.userId.toString()
-            ))
+            cache.setHomeContent(
+                homeData.transformData(
+                    channelOrder = sessionManager.channelOrder,
+                    userId = sessionManager.loginData?.userId.toString()
+                )
+            )
             cache.getHomeContent()!!
         }
     }
@@ -410,7 +412,7 @@ class RemoteDatasource @Inject constructor(
     }
 
     //----------BOOKMARKS---------//
-    suspend fun getBookmarks() : List<Bookmark> {
+    suspend fun getBookmarks(): List<Bookmark> {
         cache.getBookmarks()?.let {
             return it
         }
@@ -419,12 +421,19 @@ class RemoteDatasource @Inject constructor(
         return response
     }
 
-    fun getCachedBookmarks() : List<Bookmark> {
+    fun getCachedBookmarks(): List<Bookmark> {
         return cache.getBookmarks() ?: emptyList()
     }
 
-    suspend fun saveBookmark(bookmarkRequest: SetBookmarkRequest) =
+    suspend fun saveBookmark(type: String, contentId: Int, time: Long) {
+        val bookmarkRequest = SetBookmarkRequest(
+            type = type,
+            contentId = contentId,
+            time = time,
+            userId = sessionManager.userId?.toIntOrNull()
+        )
         customContentApi.setBookmark(bookmarkRequest)
+    }
 
     suspend fun deleteBookmark(contentId: Int, contentType: String) =
         customContentApi.deleteBookmark(
@@ -442,12 +451,12 @@ class RemoteDatasource @Inject constructor(
         return response
     }
 
-    fun getCachedMostWatched() : List<MostWatchedContent> {
+    fun getCachedMostWatched(): List<MostWatchedContent> {
         return cache.getMostWatched() ?: emptyList()
     }
 
     //----------RECOMMENDED---------//
-    suspend fun getRecommended() : GetRecommendedResponse {
+    suspend fun getRecommended(): GetRecommendedResponse {
         cache.getRecommended()?.let {
             return it
         }
@@ -456,18 +465,18 @@ class RemoteDatasource @Inject constructor(
         return response
     }
 
-    fun getCachedRecommended() : GetRecommendedResponse? {
+    fun getCachedRecommended(): GetRecommendedResponse? {
         return cache.getRecommended()
     }
 
     //----------SIMILAR CONTENT---------//
-    suspend fun getSimilarContent(subgenreId: Int) : GetRecommendedResponse {
+    suspend fun getSimilarContent(subgenreId: Int): GetRecommendedResponse {
         val response = customContentApi.getSimilarContent(subgenreId)
         return response
     }
 
     //----------SEARCH---------//
-    suspend fun search(query: String) : List<Bookmark> {
+    suspend fun search(query: String): List<Bookmark> {
         return withContext(Dispatchers.IO) {
             val response = customContentApi.search(query)
             if (!response.isSuccessful) {

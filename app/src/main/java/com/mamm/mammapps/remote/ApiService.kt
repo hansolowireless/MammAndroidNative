@@ -187,12 +187,12 @@ interface ApiService {
     @GET("keep-watching/get-marks")
     suspend fun getBookmarks(): List<Bookmark>
 
-    @POST("bookmark/set")
+    @POST("keep-watching/set")
     suspend fun setBookmark(
         @Body bookmark: SetBookmarkRequest
     ): Response<Unit>
 
-    @POST("bookmark/{contentId}/{contentType}")
+    @POST("keep-watching/delete-mark/{contentId}/{contentType}")
     @Headers(
         "Content-Type: application/json",
         "Accept: application/json"

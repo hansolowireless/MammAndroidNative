@@ -29,12 +29,6 @@ class CustomContentRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveBookmark(bookmarkRequest: SetBookmarkRequest): Result<Unit> {
-        return runCatching {
-            remoteDatasource.saveBookmark(bookmarkRequest = bookmarkRequest)
-        }
-    }
-
     override suspend fun deleteBookmark(contentId: Int, contentType: String): Result<Unit> {
         return runCatching {
             remoteDatasource.deleteBookmark(

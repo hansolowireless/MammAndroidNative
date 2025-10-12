@@ -1,5 +1,6 @@
 package com.mamm.mammapps.ui.component.detail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,7 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -55,7 +58,8 @@ fun DetailMobile(
     content: ContentEntityUI,
     onClickPlay: () -> Unit,
     seasonInfoUIState: UIState<List<SeasonUI>>? = null,
-    onClickEpisode: (Int, Int) -> Unit
+    onClickEpisode: (Int, Int) -> Unit,
+    onClose: () -> Unit
 ) {
 
     var selectedTabIndex by remember { mutableStateOf(0) }
@@ -89,6 +93,20 @@ fun DetailMobile(
                             modifier = Modifier.fillMaxSize()
                         )
                     }
+                }
+
+                IconButton(
+                    onClick = onClose,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(Dimensions.paddingSmall)
+                        .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = stringResource(R.string.accessibility_close),
+                        tint = Color.White
+                    )
                 }
             }
         }
@@ -182,7 +200,8 @@ private fun DetailMobilePreview() {
             modifier = Modifier.fillMaxWidth(),
             content = sampleContent,
             onClickPlay = {},
-            onClickEpisode = { _, _ -> }
+            onClickEpisode = { _, _ -> },
+            onClose = {}
         )
     }
 }

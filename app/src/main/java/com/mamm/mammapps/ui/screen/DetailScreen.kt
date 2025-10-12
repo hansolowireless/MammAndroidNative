@@ -1,5 +1,6 @@
 package com.mamm.mammapps.ui.screen
 
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -31,6 +32,8 @@ fun DetailScreen(
     val similarContent by viewModel.similarContent.collectAsStateWithLifecycle()
 
     val scrollState = rememberScrollState()
+
+    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     LaunchedEffect(clickedContent) {
         clickedContent?.let(onClickPlay)
@@ -93,6 +96,9 @@ fun DetailScreen(
             seasonInfoUIState = seasonInfoUIState,
             onClickEpisode = { seasonOrder, episodeId ->
                 viewModel.findEpisode(seasonOrder, episodeId)
+            },
+            onClose = {
+                backDispatcher?.onBackPressed()
             }
         )
     }

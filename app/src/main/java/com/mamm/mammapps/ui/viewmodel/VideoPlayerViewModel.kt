@@ -31,6 +31,7 @@ import com.mamm.mammapps.domain.usecases.player.GetJwTokenUseCase
 import com.mamm.mammapps.domain.usecases.player.GetPlayableUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.GetTSTVUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.GetTickersUseCase
+import com.mamm.mammapps.domain.usecases.player.SendBookmarkUseCase
 import com.mamm.mammapps.domain.usecases.player.SendHeartBeatUseCase
 import com.mamm.mammapps.domain.usecases.player.SendQosUseCase
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
@@ -68,11 +69,10 @@ class VideoPlayerViewModel @Inject constructor(
     private val getTSTVUrlUseCase: GetTSTVUrlUseCase,
     private val getJwTokenUseCase: GetJwTokenUseCase,
     private val sendQoSUseCase: SendQosUseCase,
-    //    private val sendBookmarkUseCase: SendBookmarkStampsUseCase,
+    private val sendBookmarkUseCase: SendBookmarkUseCase,
     private val sendHeartbeatUseCase: SendHeartBeatUseCase,
     private val getLiveEventInfoUseCase: FindLiveEventOnChannelUseCase,
     //    private val channelZapUseCase: ChannelZapUseCase,
-    //    private val validatePINUseCase: ValidatePINUseCase,
     private val getTickersUseCase: GetTickersUseCase,
     @ApplicationContext private val context: Context,
     private val logger: Logger
@@ -164,7 +164,6 @@ class VideoPlayerViewModel @Inject constructor(
             }
         }
     }
-
 
 
     private fun createPlayer() {
@@ -270,12 +269,12 @@ class VideoPlayerViewModel @Inject constructor(
     private fun startPeriodicFunctions() {
         startHeartbeat()
         startQoSReporting()
-//        startBookmarkReporting()
+        startBookmarkReporting()
     }
 
     private fun startHeartbeat() {
         heartbeatJob?.cancel()
-        heartbeatJob = viewModelScope.launch (Dispatchers.IO) {
+        heartbeatJob = viewModelScope.launch(Dispatchers.IO) {
             logger.debug(TAG, "startHeartbeat Starting to send heartbeat...")
             sendHeartbeatUseCase()
             while (true) {
@@ -316,51 +315,32 @@ class VideoPlayerViewModel @Inject constructor(
         )
     }
 
-//    private fun startBookmarkReporting() {
-//        val state = _uiState.value
-//
-//        if (state.eventType == "vod" || state.eventType == "cutv") {
-//            bookmarkJob?.cancel()
-//            bookmarkJob = viewModelScope.launch {
-//                delay(120000) // 2 minutos inicial
-//                while (true) {
-//                    sendBookmarkStamps()
-//                    delay(60000) // Cada minuto después
-//                }
-//            }
-//        }
-//    }
+    private fun startBookmarkReporting() {
+        if (_content.value.identifier is ContentIdentifier.VoD || _content.value.identifier is ContentIdentifier.Event) {
+            bookmarkJob?.cancel()
+            bookmarkJob = viewModelScope.launch {
+                logger.debug(TAG, "startBookmarkReporting in 2 minutes...")
+                delay(120000) // 2 minutos inicial
+                while (true) {
+                    sendBookmarkStamps()
+                    delay(60000)
+                }
+            }
+        }
+        else {
+            logger.info(TAG, "startBookmarkReporting Content is not VOD or Event, won't start bookmark report")
+        }
+    }
 
-
-//
-//    private fun sendBookmarkStamps() {
-//        val state = _uiState.value
-//        val player = _player.value
-//
-//        val bookmarkData = BookmarkData(
-//            position = (player?.currentPosition?.times(0.001))?.roundToInt() ?: 0,
-//            duration = player?.duration ?: 0,
-//            id = state.eventID ?: 0,
-//            eventType = state.eventType ?: ""
-//        )
-//
-//        viewModelScope.launch {
-//            sendBookmarkUseCase(bookmarkData)
-//        }
-//    }
-//
-//    private fun startWatermarking() {
-//        val state = _uiState.value
-//        watermarkController.start(
-//            state.fingerprint,
-//            state.fingerprintFrequency,
-//            state.fingerprintDuration,
-//            state.fingerprintPosition,
-//            watermarkInfo = state.watermark
-//        )
-//    }
-
-
+    private fun sendBookmarkStamps() {
+        val player = _player.value
+        viewModelScope.launch {
+            sendBookmarkUseCase(
+                content = _content.value,
+                time = player?.currentPosition ?: 0
+            )
+        }
+    }
 
     private fun handlePlayerError(exception: PlaybackException, context: Context) {
         //TODO SHOW ERROR
@@ -383,7 +363,7 @@ class VideoPlayerViewModel @Inject constructor(
         val liveLabel: View = playerView.findViewById(R.id.live_indicator)
 
         val goToLiveButton: AppCompatImageButton = playerView.findViewById(R.id.go_live_button)
-        val startOverButton : View = playerView.findViewById(R.id.go_beginning_button)
+        val startOverButton: View = playerView.findViewById(R.id.go_beginning_button)
 
         playerView.setShowNextButton(false)
         playerView.setShowPreviousButton(false)
@@ -440,7 +420,10 @@ class VideoPlayerViewModel @Inject constructor(
 
     }
 
-    fun setDialogButtonVisibility(ccTracksButton: AppCompatImageButton?, audioTracksButton: AppCompatImageButton?) {
+    fun setDialogButtonVisibility(
+        ccTracksButton: AppCompatImageButton?,
+        audioTracksButton: AppCompatImageButton?
+    ) {
         runCatching {
             if (TrackSelectionDialog.willHaveCCContent(_player.value)) {
                 ccTracksButton?.visibility = View.VISIBLE
@@ -454,7 +437,10 @@ class VideoPlayerViewModel @Inject constructor(
                 audioTracksButton?.visibility = View.GONE
             }
         }.onFailure {
-            logger.error(TAG, "setDialogButtonVisibility - Error setting button visibility: ${it.message}")
+            logger.error(
+                TAG,
+                "setDialogButtonVisibility - Error setting button visibility: ${it.message}"
+            )
         }
     }
 
@@ -509,18 +495,18 @@ class VideoPlayerViewModel @Inject constructor(
                             }
 
                         }.onFailure {
-                        logger.error(
-                            TAG,
-                            "handleScrubStop Failed to get TSTV url, defaulting to Live Url"
-                        )
+                            logger.error(
+                                TAG,
+                                "handleScrubStop Failed to get TSTV url, defaulting to Live Url"
+                            )
 
-                        previewBar?.isTstvMode = false
-                        _isTstvMode.update { false }
+                            previewBar?.isTstvMode = false
+                            _isTstvMode.update { false }
 
-                        withContext(Dispatchers.Main) {
-                            setPlayerUrls(videoUrl = playableUrl, drmUrl = playableLicenseUrl)
+                            withContext(Dispatchers.Main) {
+                                setPlayerUrls(videoUrl = playableUrl, drmUrl = playableLicenseUrl)
+                            }
                         }
-                    }
                 }
             } else {
                 logger.debug(

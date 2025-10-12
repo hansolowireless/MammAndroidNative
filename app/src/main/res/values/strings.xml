@@ -94,6 +94,7 @@
 
     <!--region Accessibility-->
     <string name="clear_search_action">Limpiar búsqueda</string>
+    <string name="accessibility_close">Cerrar</string>
     <!--endregion Accessibility-->
 
 

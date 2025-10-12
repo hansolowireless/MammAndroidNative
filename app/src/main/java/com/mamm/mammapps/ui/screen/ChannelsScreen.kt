@@ -77,6 +77,20 @@ fun ChannelsScreen(
                 HomeGridTop(event = it)
             }
 
+            ChannelFilter(
+                availableGenres = channelGenres,
+                selectedGenres = selectedGenres,
+                onSelectedGenresChanged = {
+                    viewModel.filterChannelsByGenres(it)
+                },
+                onSearchQueryChanged = {
+                    viewModel.filterChannelsByQuery(it)
+                },
+                onClearSearch = {
+                    viewModel.resetSelectedGenres()
+                }
+            )
+
             ChannelGridTV(
                 onChannelClick = viewModel::findChannel,
                 channels = channels,
@@ -101,6 +115,7 @@ fun ChannelsScreen(
                     viewModel.resetSelectedGenres()
                 }
             )
+
             ChannelGridMobile(
                 onChannelClick = viewModel::findChannel,
                 channels = channels,

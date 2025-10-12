@@ -37,4 +37,13 @@ data class ContentToPlayUI (
         }
     }
 
+    fun getBookmarkTypeString() : String {
+        return when (identifier) {
+            is ContentIdentifier.Channel -> "live"
+            is ContentIdentifier.VoD -> "vod"
+            is ContentIdentifier.Event -> "cutv"
+            else -> ""
+        }
+    }
+
 }

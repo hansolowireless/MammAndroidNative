@@ -145,20 +145,21 @@ fun EPGMobile(
                 }
             )
 
-            currentTime(
-                layoutInfo = {
-                    val currentHour = now.hour + now.minute / 60f
-                    ProgramGuideItem.CurrentTime(hour = currentHour)
-                },
-                itemContent = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .width(2.dp)
-                            .background(EPGMobileColor.timeLine)
-                    )
-                }
-            )
+            if (selectedDate == now.toLocalDate())
+                currentTime(
+                    layoutInfo = {
+                        val currentHour = now.hour + now.minute / 60f
+                        ProgramGuideItem.CurrentTime(hour = currentHour)
+                    },
+                    itemContent = {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .width(2.dp)
+                                .background(EPGMobileColor.timeLine)
+                        )
+                    }
+                )
         }
     }
 }

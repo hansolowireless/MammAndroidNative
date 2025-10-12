@@ -155,4 +155,12 @@ class PlaybackRepositoryImpl @Inject constructor (
             logger.error(TAG, "sendQoSData error sending qos data $it.message")
         }
     }
+
+   override suspend fun setBookmark(content: ContentToPlayUI, time: Long) {
+        remoteDatasource.saveBookmark(
+            contentId = content.identifier.getIdValue(),
+            type = content.getBookmarkTypeString(),
+            time = time
+        )
+    }
 }

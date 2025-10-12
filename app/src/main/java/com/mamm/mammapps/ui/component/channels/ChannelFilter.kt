@@ -82,7 +82,7 @@ fun ChannelFilter(
             label = stringResource(id = R.string.search_channel_placeholder),
             keyboardType = KeyboardType.Text
         )
-        // 2. Botón de filtro con contador
+
         BadgedBox(
             badge = {
                 // Solo muestra el Badge si hay géneros seleccionados
