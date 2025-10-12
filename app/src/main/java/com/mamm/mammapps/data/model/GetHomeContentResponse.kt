@@ -36,7 +36,7 @@ data class HomeFeatured(
     @SerializedName("formatid") val formatid: String? = null,
     @SerializedName("fcEnd") val fcEnd: String? = null,
     @SerializedName("subtitle") val subtitle: String? = null,
-    @SerializedName("channelById") val channelById: Any? = null,
+    @SerializedName("channelById") val channelById: Int? = null,
     @SerializedName("deliveryURL") val deliveryURL: String? = null,
     @SerializedName("id") val id: Int? = null,
     @SerializedName("items") val items: String? = null,

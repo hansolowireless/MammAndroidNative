@@ -21,8 +21,8 @@ sealed class ContentIdentifier : Parcelable {
             else -> throw IllegalArgumentException("Unknown type: $format")
         }
 
-        fun fromFeaturedFormat(format: String, id: Int): ContentIdentifier = when (format.lowercase()) {
-            "live" -> Channel(id)
+        fun fromFeaturedFormat(format: String, id: Int, channelById: Int? = 0): ContentIdentifier = when (format.lowercase()) {
+            "live" -> Channel(channelById ?: 0)
             "vod" -> VoD(id)
             "cutv" -> Event(id)
             "still" -> VoD(id)

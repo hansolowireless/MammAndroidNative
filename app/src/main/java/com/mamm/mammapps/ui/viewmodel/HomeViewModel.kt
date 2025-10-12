@@ -68,6 +68,9 @@ class HomeViewModel @Inject constructor(
     var homeContentUI by mutableStateOf<List<ContentRowUI>>(emptyList())
         private set
 
+    private val _mobileFeatured = MutableStateFlow<List<ContentEntityUI>?>(null)
+    val mobileFeatured: StateFlow<List<ContentEntityUI>?> = _mobileFeatured.asStateFlow()
+
     private val _clickedContent = MutableStateFlow<Any?>(null)
     val clickedContent: StateFlow<Any?> = _clickedContent.asStateFlow()
 

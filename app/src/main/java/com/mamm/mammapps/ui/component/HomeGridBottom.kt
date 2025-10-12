@@ -62,6 +62,7 @@ fun HomeGridBottom(
                         modifier = Modifier.fillMaxWidth(),
                         content = it,
                         onItemClick = { entityUI ->
+                            onContentClicked(0, entityUI)
                         }
                     )
                 }
@@ -95,6 +96,7 @@ fun HomeGridBottom(
                             onFocus(content)
                         }
                     )
+
                 }
             }
             item {

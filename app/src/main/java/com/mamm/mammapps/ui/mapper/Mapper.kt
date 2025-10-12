@@ -110,7 +110,7 @@ fun HomeFeatured.toContentEntityUI(): ContentEntityUI? {
     val id = id ?: return null
 
     return ContentEntityUI(
-        identifier = ContentIdentifier.fromFeaturedFormat(format = format, id = id),
+        identifier = ContentIdentifier.fromFeaturedFormat(format = format, id = id, channelById = channelById),
         imageUrl = logoURL.orEmpty(),
         horizontalImageUrl = logoURL.orEmpty(),
         title = title.orEmpty()
@@ -462,7 +462,8 @@ fun GetBrandedContentResponse.toContentUIRows(
         rows.add(
             ContentRowUI(
                 categoryName = "Eventos Destacados",
-                items = allFeaturedItems
+                items = allFeaturedItems,
+                isFeatured = true
             )
         )
     }
