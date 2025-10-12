@@ -47,6 +47,8 @@ import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
 import com.mamm.mammapps.ui.extension.buildThumbnailUrl
 import com.mamm.mammapps.ui.extension.findActivity
+import com.mamm.mammapps.ui.extension.jump10sBack
+import com.mamm.mammapps.ui.extension.jump10sForward
 import com.mamm.mammapps.ui.manager.videoresize.VideoResizeManagerWithTicker
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import com.mamm.mammapps.ui.viewmodel.VideoPlayerViewModel
@@ -128,6 +130,8 @@ fun PlayerViewWithControls(
     var audioTracksButton by remember { mutableStateOf<AppCompatImageButton?>(null) }
     var videoQualityButton by remember { mutableStateOf<AppCompatImageButton?>(null) }
     var startOverButton by remember { mutableStateOf<AppCompatImageButton?>(null) }
+    var jump_10s_back by remember { mutableStateOf<AppCompatImageButton?>(null) }
+    var jump_10s_forward by remember { mutableStateOf<AppCompatImageButton?>(null) }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -185,6 +189,8 @@ fun PlayerViewWithControls(
             audioTracksButton = parentView.findViewById<AppCompatImageButton>(R.id.audio_tracks_button)
             videoQualityButton = parentView.findViewById<AppCompatImageButton>(R.id.select_tracks_button)
             startOverButton = parentView.findViewById(R.id.go_beginning_button)
+            jump_10s_back = parentView.findViewById(R.id.jump_10s_back)
+            jump_10s_forward = parentView.findViewById(R.id.jump_10s_forward)
 
             audioTracksButton?.setOnClickListener {
                 if (fragmentManager == null || player == null) {
@@ -278,6 +284,14 @@ fun PlayerViewWithControls(
 
             startOverButton?.setOnClickListener {
                 viewModel.triggerTSTVMode(previewTimeBar, forcePosition = 0)
+            }
+
+            jump_10s_back?.setOnClickListener {
+                styledPlayerView?.player?.jump10sBack()
+            }
+
+            jump_10s_forward?.setOnClickListener {
+                styledPlayerView?.player?.jump10sForward()
             }
 
             // Inicializar manager si no existe

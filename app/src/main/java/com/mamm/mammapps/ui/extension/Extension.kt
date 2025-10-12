@@ -30,6 +30,8 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.Glide
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.Player
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.player.WatermarkInfo
 import java.time.ZoneId
@@ -161,5 +163,13 @@ fun Context.findActivity(): Activity {
         context = context.baseContext
     }
     throw IllegalStateException("No se encontró Activity")
+}
+
+fun Player.jump10sForward () {
+    this?.seekTo(this.currentPosition + 10_000L)
+}
+
+fun Player?.jump10sBack () {
+    this?.seekTo(this.currentPosition - 10_000L)
 }
 

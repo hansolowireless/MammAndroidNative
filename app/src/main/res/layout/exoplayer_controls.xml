@@ -20,15 +20,25 @@
     android:layoutDirection="ltr"
     android:orientation="horizontal">
 
+    <View
+        android:id="@+id/scrim_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <LinearLayout
         android:id="@+id/controlsLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/black"
+        android:background="@android:color/transparent"
         android:gravity="center"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"> <!-- Centra los controles verticalmente -->
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/go_beginning_button"
@@ -56,9 +66,21 @@
             android:tooltipText="Ir a Directo"
             app:tint="@color/colorPrimaryDark" />
 
+
         <ImageButton
             android:id="@id/exo_prev"
             style="@style/ExoMediaButton.Previous" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/jump_10s_back"
+            android:layout_width="70dp"
+            android:layout_height="50dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/playerbuttons"
+            android:enabled="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/jump_10s_back"
+            app:tint="@color/colorPrimaryDark" />
 
         <ImageButton
             android:id="@id/exo_rew"
@@ -71,6 +93,17 @@
         <ImageButton
             android:id="@id/exo_ffwd"
             style="@style/ExoMediaButton.FastForward" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/jump_10s_forward"
+            android:layout_width="70dp"
+            android:layout_height="50dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/playerbuttons"
+            android:enabled="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/jump_10s_forward"
+            app:tint="@color/colorPrimaryDark" />
 
         <ImageButton
             android:id="@id/exo_next"
@@ -118,7 +151,8 @@
         android:background="@android:color/transparent"
         android:gravity="start"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="@id/controlsLayout"
+        app:layout_constraintTop_toTopOf="@id/controlsLayout"> <!-- Alinea el indicador LIVE con los controles -->
 
         <Button
             android:id="@+id/live_indicator"
@@ -137,7 +171,8 @@
             tools:text="@string/live_content" />
     </LinearLayout>
 
-    <!--Use to show the begin hour of a TSTV event-->
+    <!-- Use to show the begin hour of a TSTV event -->
+    <!-- MODIFICADO: Anclado a la parte inferior de la pantalla (parent) -->
     <TextView
         android:id="@+id/tstv_hourbegin"
         android:layout_width="wrap_content"
@@ -148,10 +183,11 @@
         android:textColor="#FFBEBEBE"
         android:textSize="12sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/controlsLayout"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="18:21" />
 
+    <!-- MODIFICADO: Anclado a la parte inferior de la pantalla (parent) -->
     <TextView
         android:id="@id/exo_position"
         android:layout_width="wrap_content"
@@ -161,7 +197,7 @@
         android:textColor="#FFBEBEBE"
         android:textSize="12sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/controlsLayout"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="18:20" />
 
@@ -330,52 +366,24 @@
         android:id="@+id/channel_number_zap_display"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:gravity="end"
+        android:gravity="center"
         android:orientation="horizontal"
-        android:paddingTop="4dp"
-        app:layout_constraintRight_toRightOf="parent"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="100dp"
-            android:layout_height="60dp"
-            android:layout_gravity="center"
-            app:cardBackgroundColor="@android:color/transparent"
-            app:cardCornerRadius="5dp"
-            app:cardElevation="0dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_gravity="center_vertical"
-                android:background="@android:color/transparent"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingTop="0dp"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <TextView
-                    android:id="@+id/channel_zap_number"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginBottom="0dp"
-                    android:background="@android:color/transparent"
-                    android:includeFontPadding="false"
-                    android:paddingLeft="0dp"
-                    android:paddingRight="0dp"
-                    android:text=""
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
+        <TextView
+            android:id="@+id/zapping_channel_number_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/black"
+            android:text="1"
+            android:textColor="@color/white"
+            android:textSize="90sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
