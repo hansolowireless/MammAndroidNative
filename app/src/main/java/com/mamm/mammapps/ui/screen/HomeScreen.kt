@@ -46,7 +46,6 @@ fun HomeScreen(
 ) {
     val homeContentState = viewModel.homeContentUIState
     val homeContent = viewModel.homeContentUI
-    val mobileFeatured by viewModel.mobileFeatured.collectAsStateWithLifecycle()
     val clickedContent by viewModel.clickedContent.collectAsStateWithLifecycle()
     val hasNavigated = remember { mutableStateOf(false) }
 

@@ -47,6 +47,7 @@ import com.mamm.mammapps.R
 import com.mamm.mammapps.ui.component.player.ZappingScreen
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
+import com.mamm.mammapps.ui.constant.PlayerConstant
 import com.mamm.mammapps.ui.extension.buildThumbnailUrl
 import com.mamm.mammapps.ui.extension.findActivity
 import com.mamm.mammapps.ui.extension.jump10sBack
@@ -329,7 +330,7 @@ fun PlayerViewWithControls(
                 playerView.player = player
                 playerView.controllerAutoShow = !showZappingLayer
                 playerView.useController = true
-                playerView.controllerShowTimeoutMs = 10000
+                playerView.controllerShowTimeoutMs = PlayerConstant.MILLISECONDS_SHOW_PLAYER_CONTROLS
 
                 // Solo agregar listener si no existe
                 if (scrubListener == null) {
@@ -361,8 +362,6 @@ fun PlayerViewWithControls(
             }
         },
         modifier = modifier
-//            .focusRequester(focusRequester)
-//            .focusable(enabled = false)
             .onKeyEvent { keyEvent ->
                 if (keyEvent.type == KeyEventType.KeyDown) {
 

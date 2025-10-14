@@ -395,7 +395,7 @@ class VideoPlayerViewModel @Inject constructor(
         if (_content.value.isTimeshift) {
             if (_liveEventInfo.value != null) {
                 tstvHourBeginView.visibility = View.VISIBLE
-                positionView.visibility = View.GONE
+                positionView.visibility = View.INVISIBLE
                 startOverButton.visibility = View.VISIBLE
                 tstvHourBeginView.setHourText(_liveEventInfo.value?.eventStart)
 
