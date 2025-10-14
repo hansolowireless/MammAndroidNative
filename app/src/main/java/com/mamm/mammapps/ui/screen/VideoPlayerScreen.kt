@@ -315,7 +315,7 @@ fun PlayerViewWithControls(
             if (videoResizeManager == null) {
                 val dummyFragment = object : Fragment() {
                     override fun getView(): View = parentView
-                    override fun getContext(): Context? = context
+                    override fun getContext(): Context = context
                     override fun getViewLifecycleOwner(): LifecycleOwner = lifecycleOwner
                 }
 
@@ -417,6 +417,7 @@ fun PlayerViewWithControls(
                 .focusRequester(zappingFocusRequester)
                 .focusable(),
             zappingInfo = zappingInfo,
+            currentChannel = content,
             onChannelClick = {
                 viewModel.findAndPlayChannel(it)
             },

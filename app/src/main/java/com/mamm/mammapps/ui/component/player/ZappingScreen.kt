@@ -2,7 +2,6 @@ package com.mamm.mammapps.ui.component.player
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,12 +18,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onInterceptKeyBeforeSoftKeyboard
 import androidx.compose.ui.unit.dp
 import com.mamm.mammapps.ui.component.common.ContentEntityListItem
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
 import com.mamm.mammapps.ui.constant.PlayerConstant
-import com.mamm.mammapps.ui.constant.UIConstant
 import com.mamm.mammapps.ui.model.ContentEntityUI
+import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import com.mamm.mammapps.ui.model.player.ZappingInfoUI
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -33,45 +35,51 @@ import kotlinx.coroutines.flow.first
 fun ZappingScreen(
     modifier: Modifier = Modifier,
     zappingInfo: List<ZappingInfoUI>,
+    currentChannel: ContentToPlayUI?,
     onChannelClick: (ContentEntityUI) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val listState = rememberLazyListState()
+    val initialIndex = remember(zappingInfo, currentChannel) {
+        zappingInfo.indexOfFirst {
+            it.channel.identifier.id == currentChannel?.identifier?.id
+        }.coerceAtLeast(0)
+    }
+
+    val listState = rememberLazyListState(initialFirstVisibleItemIndex = initialIndex)
+
     val focusRequesters = remember(zappingInfo.size) {
         List(zappingInfo.size) { FocusRequester() }
     }
 
-    BackHandler(enabled = true) {
-        onDismiss()
-    }
-
-    // Este LaunchedEffect ahora se basa en el ÍNDICE del elemento enfocado,
-    // que es un valor más estable que el objeto de layout.
     LaunchedEffect(listState.firstVisibleItemIndex) {
-        // Establece el tiempo de espera por inactividad (ej. 10 segundos)
         delay(PlayerConstant.MILLISECONDS_SHOW_ZAPPER)
-        // Si el 'delay' termina (porque no hubo cambio de foco), llamamos a onDismiss.
         onDismiss()
     }
 
-    LaunchedEffect(focusRequesters) {
-        // Solo actuamos si hay requesters para evitar errores
+    // 4. ELIMINAMOS EL SCROLL Y SOLO DAMOS EL FOCO
+    LaunchedEffect(Unit) { // Se ejecuta solo una vez
         if (focusRequesters.isNotEmpty()) {
-            // Esperamos a que la lista esté lista de forma segura
-            snapshotFlow { listState.layoutInfo.visibleItemsInfo }
-                .first { it.isNotEmpty() }
+            // Esperamos a que la lista se haya compuesto en su estado inicial
+            snapshotFlow { listState.layoutInfo.visibleItemsInfo.isNotEmpty() }
+                .first { it }
 
-            // Un delay corto para asegurar que la composición ha terminado
-            delay(100)
-            focusRequesters[0].requestFocus()
-            listState.animateScrollToItem(0)
+            // La lista ya está en la posición correcta, solo pedimos el foco.
+            focusRequesters[initialIndex].requestFocus()
         }
     }
 
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.7f)),
+            .background(Color.Black.copy(alpha = 0.7f))
+            .onInterceptKeyBeforeSoftKeyboard {
+                if (it.key == Key.Back) {
+                    onDismiss()
+                    true
+                } else {
+                    false
+                }
+            },
         contentAlignment = Alignment.BottomCenter
     ) {
         ProvideLazyListPivotOffset(parentFraction = 0.80f) {
@@ -87,7 +95,8 @@ fun ZappingScreen(
                     key = { _, info -> "${info.channel.identifier.id}_${info.channel.title}" }
                 ) { index, zappingInfoItem ->
                     ContentEntityListItem(
-                        modifier = Modifier.focusRequester(focusRequesters[index]),
+                        modifier = Modifier
+                            .focusRequester(focusRequesters[index]),
                         channelInfo = zappingInfoItem.channel,
                         content = zappingInfoItem.liveEvent,
                         showLiveIndicator = false,
