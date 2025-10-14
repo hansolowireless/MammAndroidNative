@@ -32,6 +32,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.mamm.mammapps.R
 import com.mamm.mammapps.navigation.model.AppRoute
+import com.mamm.mammapps.ui.component.chromecast.CastButton
 import com.mamm.mammapps.ui.component.icon.BulletedList
 import com.mamm.mammapps.ui.component.icon.Fire
 import com.mamm.mammapps.ui.component.icon.Football
@@ -99,6 +100,9 @@ fun MobileNavigationLayout(navController: NavHostController) {
                             }) {
                                 Icon(Icons.Default.Menu, contentDescription = "Toggle Drawer")
                             }
+                        },
+                        actions = {
+                            CastButton()
                         }
                     )
                 }

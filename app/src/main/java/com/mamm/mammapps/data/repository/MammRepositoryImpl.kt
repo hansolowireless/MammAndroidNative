@@ -32,7 +32,7 @@ class MammRepositoryImpl @Inject constructor(
 
     override suspend fun getHomeContent(): Result<GetHomeContentResponse> {
         return runCatching {
-            remoteDatasource.getHomeContent().transformData(sessionManager.channelOrder)
+            remoteDatasource.getHomeContent()
         }.onSuccess { response ->
             logger.debug(TAG, "getHomeContent Received and saved successful response")
         }.onFailure {

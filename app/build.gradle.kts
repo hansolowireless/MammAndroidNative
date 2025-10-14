@@ -189,8 +189,11 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
-    //--------EPG ELIMINAR UNA DE LAS 2--------------
+    //--------EPG--------------
     implementation(libs.programguide)
+
+    //--------CHROMECAST--------------
+    implementation(libs.play.services.cast.framework)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

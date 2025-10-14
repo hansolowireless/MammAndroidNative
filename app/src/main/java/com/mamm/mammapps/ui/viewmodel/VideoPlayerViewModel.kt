@@ -20,12 +20,17 @@ import com.google.android.exoplayer2.source.dash.DashMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.util.MimeTypes
+import com.google.android.gms.cast.framework.CastSession
+import com.google.android.gms.cast.framework.SessionManagerListener
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.extension.getCurrentDate
 import com.mamm.mammapps.data.logger.Logger
+import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.model.player.Ticker
+import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
+import com.mamm.mammapps.domain.usecases.GetChannelsUseCase
 import com.mamm.mammapps.domain.usecases.player.GetDRMUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.GetJwTokenUseCase
 import com.mamm.mammapps.domain.usecases.player.GetPlayableUrlUseCase
@@ -39,10 +44,16 @@ import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
 import com.mamm.mammapps.ui.constant.PlayerConstant
 import com.mamm.mammapps.ui.extension.setHourText
 import com.mamm.mammapps.ui.extension.toDate
+import com.mamm.mammapps.ui.mapper.toContentEntityUI
+import com.mamm.mammapps.ui.mapper.toContentListUI
+import com.mamm.mammapps.ui.mapper.toContentToPlayUI
 import com.mamm.mammapps.ui.mapper.toLiveEventInfoUI
+import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
+import com.mamm.mammapps.ui.model.ContentListUI
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import com.mamm.mammapps.ui.model.player.LiveEventInfoUI
+import com.mamm.mammapps.ui.model.player.ZappingInfoUI
 import com.mamm.mammapps.ui.model.uistate.PlayerUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -72,7 +83,7 @@ class VideoPlayerViewModel @Inject constructor(
     private val sendBookmarkUseCase: SendBookmarkUseCase,
     private val sendHeartbeatUseCase: SendHeartBeatUseCase,
     private val getLiveEventInfoUseCase: FindLiveEventOnChannelUseCase,
-    //    private val channelZapUseCase: ChannelZapUseCase,
+    private val getChannelsUseCase: GetChannelsUseCase,
     private val getTickersUseCase: GetTickersUseCase,
     @ApplicationContext private val context: Context,
     private val logger: Logger
@@ -90,6 +101,14 @@ class VideoPlayerViewModel @Inject constructor(
 
     private val _content = MutableStateFlow<ContentToPlayUI>(getInitialContent())
     val content = _content.asStateFlow()
+
+    //Mostrar el layer de zapping
+    private val _showZappingLayer = MutableStateFlow<Boolean>(false)
+    val showZappingLayer = _showZappingLayer.asStateFlow()
+
+    //Lista de canales para zapping
+    private val _zappingInfo = MutableStateFlow<List<ZappingInfoUI>>(emptyList())
+    val zappingInfo = _zappingInfo.asStateFlow()
 
     //Información del evento en directo cuando se está reproduciendo un canal
     private val _liveEventInfo = MutableStateFlow<LiveEventInfoUI?>(null)
@@ -164,7 +183,6 @@ class VideoPlayerViewModel @Inject constructor(
             }
         }
     }
-
 
     private fun createPlayer() {
 
@@ -326,9 +344,11 @@ class VideoPlayerViewModel @Inject constructor(
                     delay(60000)
                 }
             }
-        }
-        else {
-            logger.info(TAG, "startBookmarkReporting Content is not VOD or Event, won't start bookmark report")
+        } else {
+            logger.info(
+                TAG,
+                "startBookmarkReporting Content is not VOD or Event, won't start bookmark report"
+            )
         }
     }
 
@@ -539,4 +559,44 @@ class VideoPlayerViewModel @Inject constructor(
         _player.value?.release()
         _player.value = null
     }
+
+    fun showZappingLayer() {
+        _showZappingLayer.update { true }
+    }
+
+    fun hideZappingLayer() {
+        _showZappingLayer.update { false }
+    }
+
+    fun updateChannelList() {
+        if (_content.value.identifier is ContentIdentifier.Channel) {
+            viewModelScope.launch(Dispatchers.IO) {
+                getChannelsUseCase().onSuccess { channels ->
+                    _zappingInfo.update {
+                        channels.map { channel ->
+                            ZappingInfoUI(
+                                channel = channel.toContentEntityUI(),
+                                liveEvent = getLiveEventInfoUseCase(channelId = channel.id)?.toContentListUI() ?:
+                                ContentListUI(identifier = ContentIdentifier.Event(0), title = channel.name.orEmpty(), imageUrl = "")
+                            )
+                        }
+                    }
+                }.onFailure {
+                    logger.error(TAG, "updateChannelList Error getting channels for Zapping List")
+                }
+            }
+        }
+    }
+
+    fun findAndPlayChannel(content: ContentEntityUI) {
+        viewModelScope.launch (Dispatchers.IO) {
+            getChannelsUseCase().onSuccess { channels ->
+                val channel = channels.find { it.id == content.identifier.id }
+                channel?.let {
+                    initializeWithContent(it.toContentToPlayUI())
+                } ?: logger.error(TAG, "findAndPlayChannel - Channel not found")
+            }
+        }
+    }
+
 }

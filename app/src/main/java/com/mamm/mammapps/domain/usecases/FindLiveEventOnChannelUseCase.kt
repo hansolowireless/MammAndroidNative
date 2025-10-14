@@ -21,7 +21,8 @@ class FindLiveEventOnChannelUseCase @Inject constructor(
         private const val TAG = "FindLiveEventOnChannelUseCase"
     }
 
-    operator fun invoke (channelId: Int) : EPGEvent? {
+    operator fun invoke (channelId: Int?) : EPGEvent? {
+        if (channelId == null) return null
         return epgRepository.getLiveEventForChannel(channelId)
     }
 

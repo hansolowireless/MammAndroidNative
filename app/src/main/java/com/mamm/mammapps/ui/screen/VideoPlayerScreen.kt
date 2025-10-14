@@ -5,6 +5,7 @@ import android.content.pm.ActivityInfo
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageButton
@@ -43,6 +44,7 @@ import com.github.rubensousa.previewseekbar.PreviewLoader
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.mamm.mammapps.R
+import com.mamm.mammapps.ui.component.player.ZappingScreen
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
 import com.mamm.mammapps.ui.extension.buildThumbnailUrl
@@ -69,6 +71,7 @@ fun VideoPlayerScreen(
     LaunchedEffect(content) {
         viewModel.observeLiveEvents()
         viewModel.observeTickers()
+        viewModel.updateChannelList()
     }
 
     DisposableEffect(Unit) {
@@ -104,7 +107,12 @@ fun PlayerViewWithControls(
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
 
     val focusRequester = remember { FocusRequester() }
+    val zappingFocusRequester = remember { FocusRequester() }
     var playerViewRef by remember { mutableStateOf<StyledPlayerView?>(null) }
+
+    //layer de zapping
+    val showZappingLayer by viewModel.showZappingLayer.collectAsStateWithLifecycle()
+    val zappingInfo by viewModel.zappingInfo.collectAsStateWithLifecycle()
 
     //Watermark y fingerprinting
     val fingerprintController = remember { FingerprintController() }
@@ -130,22 +138,19 @@ fun PlayerViewWithControls(
     var audioTracksButton by remember { mutableStateOf<AppCompatImageButton?>(null) }
     var videoQualityButton by remember { mutableStateOf<AppCompatImageButton?>(null) }
     var startOverButton by remember { mutableStateOf<AppCompatImageButton?>(null) }
-    var jump_10s_back by remember { mutableStateOf<AppCompatImageButton?>(null) }
-    var jump_10s_forward by remember { mutableStateOf<AppCompatImageButton?>(null) }
+    var jump10sback by remember { mutableStateOf<AppCompatImageButton?>(null) }
+    var jump10sforward by remember { mutableStateOf<AppCompatImageButton?>(null) }
 
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
 
     LaunchedEffect(liveEventInfo, content, isTstvMode) {
-        playerViewRef?.let { playerView -> viewModel.setControlVisibility(playerView)  }
+        playerViewRef?.let { playerView -> viewModel.setControlVisibility(playerView) }
     }
 
-    LaunchedEffect (playerState){
+    LaunchedEffect(playerState) {
         viewModel.setDialogButtonVisibility(ccTracksButton, audioTracksButton)
     }
 
-    LaunchedEffect (tickerList) {
+    LaunchedEffect(tickerList) {
         videoResizeManager?.replaceTickers(tickerList)
     }
 
@@ -173,6 +178,7 @@ fun PlayerViewWithControls(
             parentView
         },
         update = { parentView ->
+
             val styledPlayerView = parentView.findViewById<StyledPlayerView>(R.id.player_view)
             playerViewRef = styledPlayerView
             previewTimeBar = parentView.findViewById<CustomPreviewBar>(R.id.exo_progress)
@@ -186,11 +192,13 @@ fun PlayerViewWithControls(
             }
 
             ccTracksButton = parentView.findViewById<AppCompatImageButton>(R.id.cc_tracks_button)
-            audioTracksButton = parentView.findViewById<AppCompatImageButton>(R.id.audio_tracks_button)
-            videoQualityButton = parentView.findViewById<AppCompatImageButton>(R.id.select_tracks_button)
+            audioTracksButton =
+                parentView.findViewById<AppCompatImageButton>(R.id.audio_tracks_button)
+            videoQualityButton =
+                parentView.findViewById<AppCompatImageButton>(R.id.select_tracks_button)
             startOverButton = parentView.findViewById(R.id.go_beginning_button)
-            jump_10s_back = parentView.findViewById(R.id.jump_10s_back)
-            jump_10s_forward = parentView.findViewById(R.id.jump_10s_forward)
+            jump10sback = parentView.findViewById(R.id.jump_10s_back)
+            jump10sforward = parentView.findViewById(R.id.jump_10s_forward)
 
             audioTracksButton?.setOnClickListener {
                 if (fragmentManager == null || player == null) {
@@ -199,7 +207,10 @@ fun PlayerViewWithControls(
                 }
 
                 if (fragmentManager.isStateSaved || fragmentManager.isDestroyed) {
-                    Log.e("AudioDialog", "FragmentManager invalid state: saved=${fragmentManager.isStateSaved}, destroyed=${fragmentManager.isDestroyed}")
+                    Log.e(
+                        "AudioDialog",
+                        "FragmentManager invalid state: saved=${fragmentManager.isStateSaved}, destroyed=${fragmentManager.isDestroyed}"
+                    )
                     return@setOnClickListener
                 }
 
@@ -229,7 +240,10 @@ fun PlayerViewWithControls(
                 }
 
                 if (fragmentManager.isStateSaved || fragmentManager.isDestroyed) {
-                    Log.e("CCDialog", "FragmentManager invalid state: saved=${fragmentManager.isStateSaved}, destroyed=${fragmentManager.isDestroyed}")
+                    Log.e(
+                        "CCDialog",
+                        "FragmentManager invalid state: saved=${fragmentManager.isStateSaved}, destroyed=${fragmentManager.isDestroyed}"
+                    )
                     return@setOnClickListener
                 }
 
@@ -259,7 +273,10 @@ fun PlayerViewWithControls(
                 }
 
                 if (fragmentManager.isStateSaved || fragmentManager.isDestroyed) {
-                    Log.e("VideoQualityDialog", "FragmentManager invalid state: saved=${fragmentManager.isStateSaved}, destroyed=${fragmentManager.isDestroyed}")
+                    Log.e(
+                        "VideoQualityDialog",
+                        "FragmentManager invalid state: saved=${fragmentManager.isStateSaved}, destroyed=${fragmentManager.isDestroyed}"
+                    )
                     return@setOnClickListener
                 }
 
@@ -276,8 +293,7 @@ fun PlayerViewWithControls(
                     )
 
                     trackSelectionDialog.show(fragmentManager, "video_quality_dialog")
-                }
-                catch (e: Exception) {
+                } catch (e: Exception) {
                     Log.e("VideoQualityDialog", "ERROR showing dialog", e)
                 }
             }
@@ -286,11 +302,11 @@ fun PlayerViewWithControls(
                 viewModel.triggerTSTVMode(previewTimeBar, forcePosition = 0)
             }
 
-            jump_10s_back?.setOnClickListener {
+            jump10sback?.setOnClickListener {
                 styledPlayerView?.player?.jump10sBack()
             }
 
-            jump_10s_forward?.setOnClickListener {
+            jump10sforward?.setOnClickListener {
                 styledPlayerView?.player?.jump10sForward()
             }
 
@@ -311,6 +327,7 @@ fun PlayerViewWithControls(
 
             styledPlayerView?.let { playerView ->
                 playerView.player = player
+                playerView.controllerAutoShow = !showZappingLayer
                 playerView.useController = true
                 playerView.controllerShowTimeoutMs = 10000
 
@@ -344,8 +361,8 @@ fun PlayerViewWithControls(
             }
         },
         modifier = modifier
-            .focusRequester(focusRequester)
-            .focusable()
+//            .focusRequester(focusRequester)
+//            .focusable(enabled = false)
             .onKeyEvent { keyEvent ->
                 if (keyEvent.type == KeyEventType.KeyDown) {
 
@@ -354,8 +371,6 @@ fun PlayerViewWithControls(
                     when (keyEvent.key) {
                         Key.DirectionCenter,
                         Key.Enter,
-                        Key.DirectionUp,
-                        Key.DirectionDown,
                         Key.DirectionLeft,
                         Key.DirectionRight -> {
                             Log.d(
@@ -372,37 +387,48 @@ fun PlayerViewWithControls(
                             }
                         }
 
+                        Key.DirectionUp,
+                        Key.DirectionDown -> {
+                            if (!showZappingLayer && !isControllerVisible) {
+                                viewModel.showZappingLayer()
+                                true
+                            } else {
+                                false
+                            }
+                        }
+
                         else -> false
                     }
                 } else false
             }
     )
 
+    LaunchedEffect(showZappingLayer) {
+        if (showZappingLayer) {
+            zappingFocusRequester.requestFocus()
+        } else {
+            focusRequester.requestFocus()
+        }
+    }
+
+    if (showZappingLayer) {
+        ZappingScreen(
+            modifier = Modifier
+                .fillMaxSize()
+                .focusRequester(zappingFocusRequester)
+                .focusable(),
+            zappingInfo = zappingInfo,
+            onChannelClick = {
+                viewModel.findAndPlayChannel(it)
+            },
+            onDismiss = {
+                viewModel.hideZappingLayer()
+            }
+        )
+    }
 }
 
-//
-//@Composable
-//fun ChannelZapDisplay(
-//    channelNumber: String,
-//    modifier: Modifier = Modifier
-//) {
-//    Box(
-//        modifier = modifier
-//            .background(
-//                Color.Black.copy(alpha = 0.8f),
-//                RoundedCornerShape(Dimensions.cornerRadius)
-//            )
-//            .padding(Dimensions.paddingLarge)
-//    ) {
-//        Text(
-//            text = channelNumber,
-//            color = Color.White,
-//            style = MaterialTheme.typography.displayLarge,
-//            fontWeight = FontWeight.Bold
-//        )
-//    }
-//}
-//
+
 //@Composable
 //fun ErrorDisplay(
 //    message: String,
