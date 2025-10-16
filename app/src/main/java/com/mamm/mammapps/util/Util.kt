@@ -17,6 +17,17 @@ fun isAndroidTV(context: Context): Boolean {
     }
 }
 
+/**
+ * Comprueba si el dispositivo es considerado una tablet.
+ *
+ * El umbral común es de 600dp para el ancho de pantalla más pequeño.
+ * @return `true` si es una tablet, `false` en caso contrario.
+ */
+fun Context.isTablet(): Boolean {
+    val smallestScreenWidthDp = this.resources.configuration.smallestScreenWidthDp
+    return smallestScreenWidthDp >= 600
+}
+
 fun Uri.replaceQueryParameter(key: String, newValue: String): Uri {
     val existingQuery = this.encodedQuery ?: ""
     val queryParams = mutableListOf<Pair<String, String>>()
