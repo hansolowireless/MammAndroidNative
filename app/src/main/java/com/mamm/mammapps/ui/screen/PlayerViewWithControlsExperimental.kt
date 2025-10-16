@@ -10,6 +10,7 @@ import android.widget.ImageView
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -21,12 +22,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.requestFocus
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.viewinterop.AndroidView
@@ -49,8 +50,8 @@ import com.mamm.mammapps.ui.extension.jump10sBack
 import com.mamm.mammapps.ui.extension.jump10sForward
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import com.mamm.mammapps.ui.viewmodel.VideoPlayerViewModel
+import kotlin.math.abs
 
-//todo, si funciona bien ponerlo de player definitivo, PROBAR TICKERS
 @Composable
 fun PlayerViewWithControlsExperimental(
     modifier: Modifier = Modifier,
@@ -68,10 +69,8 @@ fun PlayerViewWithControlsExperimental(
     val fingerprintController = remember { FingerprintController() }
     val playerViewRef = remember { mutableStateOf<StyledPlayerView?>(null) }
 
-    // Replicamos la gestión de foco que tenías
     val playerFocusRequester = remember { FocusRequester() }
     val zappingFocusRequester = remember { FocusRequester() }
-
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     // --- EFECTOS DE PANTALLA COMPLETA Y ORIENTACIÓN ---
@@ -136,116 +135,141 @@ fun PlayerViewWithControlsExperimental(
                 } else false
             }
     ) {
-        AndroidView(
-            modifier = Modifier.fillMaxSize(),
-            factory = { viewContext ->
-                // --- BLOQUE FACTORY (SE EJECUTA UNA VEZ) ---
-                val parentView = LayoutInflater.from(viewContext).inflate(
-                    R.layout.activity_video_player_thumbnail_mobile,
-                    FrameLayout(viewContext),
-                    false
-                )
+        // --- CAPA 1: REPRODUCTOR DE VÍDEO (CON DETECCIÓN DE GESTOS) ---
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectVerticalDragGestures { change, dragAmount ->
+                        // dragAmount es la cantidad de píxeles que se ha arrastrado.
+                        // Positivo hacia abajo, negativo hacia arriba.
 
-                val styledPlayerView =
-                    parentView.findViewById<StyledPlayerView>(R.id.player_view).also {
-                        playerViewRef.value = it
-                    }
+                        val playerView = playerViewRef.value ?: return@detectVerticalDragGestures
+                        val isControllerVisible = playerView.isControllerFullyVisible
 
-                val previewTimeBar = parentView.findViewById<CustomPreviewBar>(R.id.exo_progress)
-                val audioTracksButton =
-                    parentView.findViewById<AppCompatImageButton>(R.id.audio_tracks_button)
-                val ccTracksButton =
-                    parentView.findViewById<AppCompatImageButton>(R.id.cc_tracks_button)
-                val videoQualityButton =
-                    parentView.findViewById<AppCompatImageButton>(R.id.select_tracks_button)
-                val startOverButton =
-                    parentView.findViewById<AppCompatImageButton>(R.id.go_beginning_button)
-                val jump10sback =
-                    parentView.findViewById<AppCompatImageButton>(R.id.jump_10s_back)
-                val jump10sforward =
-                    parentView.findViewById<AppCompatImageButton>(R.id.jump_10s_forward)
-                val closeButton =
-                    parentView.findViewById<ImageButton>(R.id.close_button)
-
-                previewTimeBar.setPreviewLoader { currentPosition, _ ->
-                    val currentContent = parentView.tag as? ContentToPlayUI
-                    parentView.findViewById<ImageView>(R.id.imageView)?.let {
-                        Glide.with(it)
-                            .load(currentContent?.deliveryURL?.buildThumbnailUrl(currentPosition))
-                            .into(it)
-                    }
-                }
-
-                val showTrackDialog: (TrackType) -> Unit = showTrackDialog@{ trackType ->
-                    val currentPlayer = styledPlayerView.player ?: return@showTrackDialog
-                    if (fragmentManager == null || fragmentManager.isStateSaved) return@showTrackDialog
-                    try {
-                        val dialog = when (trackType) {
-                            TrackType.AUDIO -> TrackSelectionDialog.createAudioTrackDialogForPlayer(currentPlayer) {}
-                            TrackType.CC -> TrackSelectionDialog.createCCDialogForPlayer(currentPlayer) {}
-                            TrackType.VIDEO -> TrackSelectionDialog.createForPlayer(currentPlayer) {}
+                        // Condiciones para abrir el zapping con swipe:
+                        // 1. La capa de zapping NO debe estar visible.
+                        // 2. Los controles del player NO deben estar visibles.
+                        // 3. Debe haber un arrastre vertical significativo.
+                        if (!showZappingLayer && !isControllerVisible && abs(dragAmount) > 1.0f) {
+                            viewModel.showZappingLayer()
+                            change.consume() // Consume el evento para que no se propague
                         }
-                        dialog.setStyle(
-                            TrackSelectionDialog.STYLE_NORMAL,
-                            R.style.TrackSelectionDialogThemeOverlay
-                        )
-                        dialog.show(fragmentManager, "${trackType.name}_track_dialog")
-                    } catch (e: Exception) {
-                        Log.e("TrackDialog", "Error showing ${trackType.name} dialog", e)
                     }
                 }
+        ) {
+            AndroidView(
+                modifier = Modifier.fillMaxSize(),
+                factory = { viewContext ->
+                    // --- BLOQUE FACTORY (SE EJECUTA UNA VEZ) ---
+                    val parentView = LayoutInflater.from(viewContext).inflate(
+                        R.layout.activity_video_player_thumbnail_mobile,
+                        FrameLayout(viewContext),
+                        false
+                    )
 
-                audioTracksButton.setOnClickListener { showTrackDialog(TrackType.AUDIO) }
-                ccTracksButton.setOnClickListener { showTrackDialog(TrackType.CC) }
-                videoQualityButton.setOnClickListener { showTrackDialog(TrackType.VIDEO) }
+                    val styledPlayerView =
+                        parentView.findViewById<StyledPlayerView>(R.id.player_view).also {
+                            playerViewRef.value = it
+                        }
 
-                startOverButton.setOnClickListener { viewModel.triggerTSTVMode(previewTimeBar, forcePosition = 0) }
-                jump10sback.setOnClickListener { styledPlayerView.player?.jump10sBack() }
-                jump10sforward.setOnClickListener { styledPlayerView.player?.jump10sForward() }
+                    val previewTimeBar = parentView.findViewById<CustomPreviewBar>(R.id.exo_progress)
+                    val audioTracksButton =
+                        parentView.findViewById<AppCompatImageButton>(R.id.audio_tracks_button)
+                    val ccTracksButton =
+                        parentView.findViewById<AppCompatImageButton>(R.id.cc_tracks_button)
+                    val videoQualityButton =
+                        parentView.findViewById<AppCompatImageButton>(R.id.select_tracks_button)
+                    val startOverButton =
+                        parentView.findViewById<AppCompatImageButton>(R.id.go_beginning_button)
+                    val jump10sback =
+                        parentView.findViewById<AppCompatImageButton>(R.id.jump_10s_back)
+                    val jump10sforward =
+                        parentView.findViewById<AppCompatImageButton>(R.id.jump_10s_forward)
+                    val closeButton =
+                        parentView.findViewById<ImageButton>(R.id.close_button)
 
-                closeButton.setOnClickListener { backDispatcher?.onBackPressed() }
-
-                parentView
-            },
-            update = { parentView ->
-                val styledPlayerView =
-                    parentView.findViewById<StyledPlayerView>(R.id.player_view)
-                val audioTracksButton =
-                    parentView.findViewById<AppCompatImageButton>(R.id.audio_tracks_button)
-                val ccTracksButton =
-                    parentView.findViewById<AppCompatImageButton>(R.id.cc_tracks_button)
-
-                var playerChanged = false
-                if (styledPlayerView.player != player) {
-                    styledPlayerView.player = player
-                    if (player != null) {
-                        styledPlayerView.requestLayout()
+                    previewTimeBar.setPreviewLoader { currentPosition, _ ->
+                        val currentContent = parentView.tag as? ContentToPlayUI
+                        parentView.findViewById<ImageView>(R.id.imageView)?.let {
+                            Glide.with(it)
+                                .load(currentContent?.deliveryURL?.buildThumbnailUrl(currentPosition))
+                                .into(it)
+                        }
                     }
-                    playerChanged = true
-                }
 
-                var contentChanged = false
-                if (parentView.tag != content) {
-                    parentView.tag = content
-                    contentChanged = true
-                }
-
-                styledPlayerView.controllerAutoShow = !showZappingLayer
-                viewModel.setDialogButtonVisibility(ccTracksButton, audioTracksButton)
-
-                if (playerChanged || contentChanged) {
-                    (parentView as? ViewGroup)?.let { viewGroup ->
-                        fingerprintController.setup(viewGroup, styledPlayerView)
-                        fingerprintController.start(
-                            fingerPrintInfo = content?.fingerprintInfo,
-                            watermarkInfo = content?.watermarkInfo
-                        )
+                    val showTrackDialog: (TrackType) -> Unit = showTrackDialog@{ trackType ->
+                        val currentPlayer = styledPlayerView.player ?: return@showTrackDialog
+                        if (fragmentManager == null || fragmentManager.isStateSaved) return@showTrackDialog
+                        try {
+                            val dialog = when (trackType) {
+                                TrackType.AUDIO -> TrackSelectionDialog.createAudioTrackDialogForPlayer(currentPlayer) {}
+                                TrackType.CC -> TrackSelectionDialog.createCCDialogForPlayer(currentPlayer) {}
+                                TrackType.VIDEO -> TrackSelectionDialog.createForPlayer(currentPlayer) {}
+                            }
+                            dialog.setStyle(
+                                TrackSelectionDialog.STYLE_NORMAL,
+                                R.style.TrackSelectionDialogThemeOverlay
+                            )
+                            dialog.show(fragmentManager, "${trackType.name}_track_dialog")
+                        } catch (e: Exception) {
+                            Log.e("TrackDialog", "Error showing ${trackType.name} dialog", e)
+                        }
                     }
-                }
-                viewModel.setControlVisibility(styledPlayerView)
-            }
-        )
 
+                    audioTracksButton.setOnClickListener { showTrackDialog(TrackType.AUDIO) }
+                    ccTracksButton.setOnClickListener { showTrackDialog(TrackType.CC) }
+                    videoQualityButton.setOnClickListener { showTrackDialog(TrackType.VIDEO) }
+
+                    startOverButton.setOnClickListener { viewModel.triggerTSTVMode(previewTimeBar, forcePosition = 0) }
+                    jump10sback.setOnClickListener { styledPlayerView.player?.jump10sBack() }
+                    jump10sforward.setOnClickListener { styledPlayerView.player?.jump10sForward() }
+
+                    closeButton.setOnClickListener { backDispatcher?.onBackPressed() }
+
+                    parentView
+                },
+                update = { parentView ->
+                    val styledPlayerView =
+                        parentView.findViewById<StyledPlayerView>(R.id.player_view)
+                    val audioTracksButton =
+                        parentView.findViewById<AppCompatImageButton>(R.id.audio_tracks_button)
+                    val ccTracksButton =
+                        parentView.findViewById<AppCompatImageButton>(R.id.cc_tracks_button)
+
+                    var playerChanged = false
+                    if (styledPlayerView.player != player) {
+                        styledPlayerView.player = player
+                        if (player != null) {
+                            styledPlayerView.requestLayout()
+                        }
+                        playerChanged = true
+                    }
+
+                    var contentChanged = false
+                    if (parentView.tag != content) {
+                        parentView.tag = content
+                        contentChanged = true
+                    }
+
+                    styledPlayerView.controllerAutoShow = !showZappingLayer
+                    viewModel.setDialogButtonVisibility(ccTracksButton, audioTracksButton)
+
+                    if (playerChanged || contentChanged) {
+                        (parentView as? ViewGroup)?.let { viewGroup ->
+                            fingerprintController.setup(viewGroup, styledPlayerView)
+                            fingerprintController.start(
+                                fingerPrintInfo = content?.fingerprintInfo,
+                                watermarkInfo = content?.watermarkInfo
+                            )
+                        }
+                    }
+                    viewModel.setControlVisibility(styledPlayerView)
+                }
+            )
+        }
+
+        // --- CAPA 2: PANTALLA DE ZAPPING ---
         if (showZappingLayer) {
             ZappingScreen(
                 modifier = Modifier
@@ -265,9 +289,4 @@ fun PlayerViewWithControlsExperimental(
     }
 }
 
-// Un enum simple para hacer el código de diálogo más limpio
 private enum class TrackType { AUDIO, CC, VIDEO }
-
-
-
-
