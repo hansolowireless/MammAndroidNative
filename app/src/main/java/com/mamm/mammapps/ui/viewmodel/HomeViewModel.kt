@@ -77,6 +77,9 @@ class HomeViewModel @Inject constructor(
     private val _focusedContent = MutableStateFlow<ContentEntityUI?>(null)
     val focusedContent: StateFlow<ContentEntityUI?> = _focusedContent.asStateFlow()
 
+    private val _lastClickedItemIndex = MutableStateFlow<Int?>(null)
+    val lastClickedItemIndex: StateFlow<Int?> = _lastClickedItemIndex.asStateFlow()
+
     fun checkRestrictedScreen(routeTag: AppRoute) {
         homeContentUIState = when (routeTag) {
             AppRoute.ADULTS -> {
@@ -160,6 +163,14 @@ class HomeViewModel @Inject constructor(
 
             else -> _focusedContent.update { content }
         }
+    }
+
+    fun setLastClickedIndex(index: Int) {
+        _lastClickedItemIndex.update { index }
+    }
+
+    fun reset() {
+        _lastClickedItemIndex.update { null }
     }
 
 }

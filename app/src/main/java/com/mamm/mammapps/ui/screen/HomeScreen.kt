@@ -49,11 +49,15 @@ fun HomeScreen(
     val clickedContent by viewModel.clickedContent.collectAsStateWithLifecycle()
     val hasNavigated = remember { mutableStateOf(false) }
 
-    val columnListState = rememberLazyListState()
-    var lastClickedItemIndex by remember { mutableStateOf<Int?>(null) }
+    val lastClickedItemIndex by viewModel.lastClickedItemIndex.collectAsStateWithLifecycle()
+    val columnListState = rememberLazyListState(initialFirstVisibleItemIndex = lastClickedItemIndex ?: 0)
     val focusedContent by viewModel.focusedContent.collectAsStateWithLifecycle()
 
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+    LaunchedEffect(Unit) {
+        viewModel.checkRestrictedScreen(routeTag)
+    }
 
     LaunchedEffect(homeContentState) {
         when (homeContentState) {
@@ -65,18 +69,6 @@ fun HomeScreen(
 
     LaunchedEffect(homeContent) {
         viewModel.setFirstFocusedContent()
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.checkRestrictedScreen(routeTag)
-    }
-
-    LaunchedEffect(lastClickedItemIndex) {
-        lastClickedItemIndex?.let { index ->
-            if (index >= 0 && index < homeContent.size) {
-                columnListState.scrollToItem(index)
-            }
-        }
     }
 
     LaunchedEffect(clickedContent) {
@@ -130,7 +122,7 @@ fun HomeScreen(
                         columnListState = columnListState,
                         mobileFeatured = if (!LocalIsTV.current) homeContent.find { it.isFeatured }?.items else null,
                         onContentClicked = { index, entityUI ->
-                            lastClickedItemIndex = index
+                            viewModel.setLastClickedIndex(index)
 
                             if (entityUI.identifier is ContentIdentifier.Channel) {
                                 viewModel.findContent(
@@ -144,7 +136,8 @@ fun HomeScreen(
                         },
                         onFocus = { content ->
                             viewModel.setFocusedContent(content)
-                        }
+                        },
+                        focusedRowIndex = lastClickedItemIndex
                     )
                 }
             }

@@ -36,7 +36,8 @@ fun HomeGridBottom(
     columnListState: LazyListState,
     mobileFeatured: List<ContentEntityUI>? = null,
     onContentClicked: (Int, ContentEntityUI) -> Unit,
-    onFocus: (ContentEntityUI) -> Unit = {}
+    onFocus: (ContentEntityUI) -> Unit = {},
+    focusedRowIndex: Int?
 ) {
 
     val focusRequester = remember { FocusRequester() }
@@ -73,6 +74,20 @@ fun HomeGridBottom(
                 key = { index, item -> "${item.categoryName}_$index"  }
             ) { index, contentRow ->
 
+                // 1. Creamos un FocusRequester para esta fila.
+                val rowFocusRequester = remember { FocusRequester() }
+
+                // 2. Si el índice de esta fila coincide con el que queremos enfocar,
+                //    lanzamos un efecto para solicitar el foco.
+                LaunchedEffect(Unit) {
+                    if (index == focusedRowIndex) {
+                        // Un pequeño delay es útil para asegurar que todo esté compuesto
+                        // antes de pedir el foco.
+                        kotlinx.coroutines.delay(100)
+                        rowFocusRequester.requestFocus()
+                    }
+                }
+
                 Column(
                     modifier = Modifier.padding(
                         horizontal = Dimensions.paddingLarge,
@@ -88,6 +103,7 @@ fun HomeGridBottom(
                     }
 
                     RowOfContent(
+                        modifier = Modifier.focusRequester(rowFocusRequester),
                         contentList = contentRow.items,
                         onContentClick = { content ->
                             onContentClicked(index, content)
