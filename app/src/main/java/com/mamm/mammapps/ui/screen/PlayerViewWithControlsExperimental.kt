@@ -5,7 +5,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.ImageView
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
@@ -69,6 +71,8 @@ fun PlayerViewWithControlsExperimental(
     // Replicamos la gestión de foco que tenías
     val playerFocusRequester = remember { FocusRequester() }
     val zappingFocusRequester = remember { FocusRequester() }
+
+    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     // --- EFECTOS DE PANTALLA COMPLETA Y ORIENTACIÓN ---
     DisposableEffect(Unit) {
@@ -161,7 +165,7 @@ fun PlayerViewWithControlsExperimental(
                 val jump10sforward =
                     parentView.findViewById<AppCompatImageButton>(R.id.jump_10s_forward)
                 val closeButton =
-                    parentView.
+                    parentView.findViewById<ImageButton>(R.id.close_button)
 
                 previewTimeBar.setPreviewLoader { currentPosition, _ ->
                     val currentContent = parentView.tag as? ContentToPlayUI
@@ -198,6 +202,8 @@ fun PlayerViewWithControlsExperimental(
                 startOverButton.setOnClickListener { viewModel.triggerTSTVMode(previewTimeBar, forcePosition = 0) }
                 jump10sback.setOnClickListener { styledPlayerView.player?.jump10sBack() }
                 jump10sforward.setOnClickListener { styledPlayerView.player?.jump10sForward() }
+
+                closeButton.setOnClickListener { backDispatcher?.onBackPressed() }
 
                 parentView
             },
