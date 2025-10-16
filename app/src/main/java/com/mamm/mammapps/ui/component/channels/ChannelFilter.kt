@@ -72,17 +72,6 @@ fun ChannelFilter(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
 
-        TextInput(
-            modifier = Modifier.weight(1f),
-            value = searchQuery,
-            onValueChange = {
-                searchQuery = it
-                onSearchQueryChanged(it)
-            },
-            label = stringResource(id = R.string.search_channel_placeholder),
-            keyboardType = KeyboardType.Text
-        )
-
         BadgedBox(
             badge = {
                 // Solo muestra el Badge si hay géneros seleccionados
@@ -100,6 +89,18 @@ fun ChannelFilter(
                 )
             }
         }
+
+        TextInput(
+            modifier = Modifier.weight(1f),
+            value = searchQuery,
+            onValueChange = {
+                searchQuery = it
+                onSearchQueryChanged(it)
+            },
+            label = stringResource(id = R.string.search_channel_placeholder),
+            keyboardType = KeyboardType.Text
+        )
+
         AnimatedVisibility(
             visible = searchQuery.isNotEmpty() || selectedGenres.isNotEmpty(),
             enter = fadeIn(),
