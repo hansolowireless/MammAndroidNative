@@ -46,9 +46,11 @@ class TokenParamDataSourceFactory @Inject constructor (
                 // Determina el modo una vez (basado en la URI inicial)
                 if (tokenMode == TokenMode.NONE) {
                     if (modifiedUri.toString().contains(RTOKEN)) {
+                        d("createDataSource Canal en modo R TOKEN")
                         tokenMode = TokenMode.RTOKEN
                         rtoken = modifiedUri.getQueryParameter(RTOKEN) ?: ""
                     } else if (modifiedUri.toString().contains(STOKEN)) {
+                        d("createDataSource Canal en modo S TOKEN")
                         tokenMode = TokenMode.STOKEN
                     }
                 }
