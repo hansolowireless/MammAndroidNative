@@ -1,4 +1,7 @@
+import com.android.build.api.dsl.ApkSigningConfig
 import com.android.build.api.dsl.ApplicationProductFlavor
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -25,7 +28,8 @@ fun configureCustomFlavor(
     searchUrl: String,
     passwordUrl: String,
     dynamicUrls: Boolean,
-    operatorNameDRM: String
+    operatorNameDRM: String,
+    signingConfig: ApkSigningConfig? = null
 ) {
     flavors.create(name) {
         dimension = "app"
@@ -43,6 +47,10 @@ fun configureCustomFlavor(
         buildConfigField("String", "PASSWORD_REC_URL", "\"$passwordUrl\"")
         buildConfigField("boolean", "DYNAMIC_URLS", "$dynamicUrls")
         buildConfigField("String", "OPERATORNAME_DRM", "\"$operatorNameDRM\"")
+
+        if (signingConfig != null) {
+            this.signingConfig = signingConfig
+        }
     }
 }
 
@@ -53,7 +61,8 @@ fun configureFlavorWithMasmediaUrls(
     icon: String,
     iconMobile: String,
     iconRound: String,
-    banner: String
+    banner: String,
+    signingConfig: ApkSigningConfig? = null
 ) {
     configureCustomFlavor(
         flavors = flavors,
@@ -70,7 +79,8 @@ fun configureFlavorWithMasmediaUrls(
         "https://indexsrv-masmediatv.service.openstream.es/",
         "https://gestionclientes.masmediatv.es/masmediatv_mngr/",
         true,
-        "masmediatv"
+        "masmediatv",
+        signingConfig = signingConfig
     )
 }
 
@@ -82,12 +92,52 @@ android {
         applicationId = "com.mamm.mammapps"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 493
+        versionName = "4.7.522"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
     }
+
+    signingConfigs {
+        create("keystoreMamm") {
+            val keystoreProperties = Properties() // Línea corregida
+            val keystorePropertiesFile = rootProject.file("key.properties")
+
+            if (keystorePropertiesFile.exists()) {
+                keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+            }
+
+            keyAlias = keystoreProperties.getProperty("keyAlias")
+            keyPassword = keystoreProperties.getProperty("keyPassword")
+            storePassword = keystoreProperties.getProperty("storePassword")
+
+            val storeFilePath = keystoreProperties.getProperty("storeFile")
+            if (storeFilePath != null) {
+                storeFile = file(storeFilePath)
+            }
+        }
+
+        create("keystoreDiego") {
+            val keystoreProperties = Properties()
+            val keystorePropertiesFile = rootProject.file("key_keystorediego.properties")
+
+            if (keystorePropertiesFile.exists()) {
+                keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+            }
+
+            keyAlias = keystoreProperties.getProperty("keyAlias")
+            keyPassword = keystoreProperties.getProperty("keyPassword")
+            storePassword = keystoreProperties.getProperty("storePassword")
+
+            val storeFilePath = keystoreProperties.getProperty("storeFile")
+            if (storeFilePath != null) {
+                storeFile = file(storeFilePath)
+            }
+        }
+    }
+
+
 
     buildTypes {
         release {
@@ -96,6 +146,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
         }
     }
 
@@ -124,7 +175,8 @@ android {
             "@mipmap/ic_launcher_masmedia",
             "@mipmap/ic_launcher_masmedia",
             "@mipmap/ic_launcher_masmedia_round",
-            "@drawable/banner_masmedia"
+            "@drawable/banner_masmedia",
+            signingConfig = signingConfigs.getByName("keystoreDiego")
         )
 
         configureCustomFlavor(
