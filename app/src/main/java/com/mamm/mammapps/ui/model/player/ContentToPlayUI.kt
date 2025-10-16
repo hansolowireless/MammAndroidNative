@@ -10,6 +10,7 @@ data class ContentToPlayUI (
     val subtitle: String? = null,
     val description: String? = null,
     val deliveryURL: String,
+    val drmUrl: String? = null,
     val isTimeshift: Boolean = false,
     val isRadio: Boolean = false,
     val initialPlayPositionMs: Long = 0,

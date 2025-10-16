@@ -265,6 +265,7 @@ fun Episode.toContentListUI() = ContentListUI(
 fun Channel.toContentToPlayUI() = ContentToPlayUI(
     identifier = ContentIdentifier.Channel(id.orRandom()),
     deliveryURL = this.deliveryURL.orEmpty(),
+    drmUrl = this.drmUrl,
     title = name.orEmpty(),
     imageUrl = logoURL?.squared().orEmpty(),
     isTimeshift = this.timeshift ?: false,

@@ -1,5 +1,6 @@
 package com.mamm.mammapps.data.repository
 
+import android.net.Uri
 import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.di.DeviceSerialQualifier
@@ -116,11 +117,11 @@ class PlaybackRepositoryImpl @Inject constructor (
             )
 
             // License URL construction (always widevine for Android)
-            val licenseURL = "${drmUrl}widevine/getLicense?" +
+            val licenseURL = (content.drmUrl) ?: ("${drmUrl}widevine/getLicense?" +
                     "userID=$userID&" +
                     "authenticationString=$encryptedString&" +
                     "streamName=$streamID&" +
-                    "operator=$operatorName"
+                    "operator=$operatorName")
 
             logger.debug(TAG, "getDRMUrl - $licenseURL")
 
