@@ -408,8 +408,10 @@ fun GetHomeContentResponse.toContentUIRows(): List<ContentRowUI> {
 
         if (items.isNotEmpty()) {
             ContentRowUI(
-                categoryName = category.name ?: "",
-                items = items.repeat(threshold = 5)
+                categoryId = category.id ?: 0,
+                categoryName = category.name.orEmpty(),
+                items = items.repeat(threshold = 5),
+                loadMore = category.loadMore ?: false
             )
         } else null
     } ?: emptyList()
@@ -509,7 +511,6 @@ fun List<ContentRowUI>.insertRecommended(
     }
 }
 
-
 fun List<ContentRowUI>.insertMostWatched(mostWatched: List<MostWatchedContent>): List<ContentRowUI> {
     ContentRowUI(
         categoryName = "Más visto",
@@ -529,6 +530,10 @@ fun List<ContentRowUI>.insertChannelRow(recommended: List<Channel>?): List<Conte
         }
     }
     return this
+}
+
+fun GetOtherContentResponse.toContentEntityUIList() : List<ContentEntityUI> {
+    return this.vods.orEmpty().map { it.toContentEntityUI() } + this.events.orEmpty().map { it.toContentEntityUI() }
 }
 
 //----------------region SERIE DETAIL---------------------

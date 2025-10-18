@@ -32,6 +32,14 @@ fun SavedStateHandle.addRoute(route: AppRoute) {
     this["route"] = route
 }
 
+fun SavedStateHandle.addCategoryId(categoryId: Int) {
+    this["categoryId"] = categoryId
+}
+
+fun SavedStateHandle.retrieveCategoryId() : Int {
+    return this.get<Int>("categoryId") ?: 0
+}
+
 fun NavGraphBuilder.homeScreenRoute(
     appRoute: AppRoute,
     navController: NavController

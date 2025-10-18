@@ -20,7 +20,7 @@ fun GetHomeContentResponse.transformData(
         content.copy(metadata = Metadata.fromTbContentItems(content.tbContentItems ?: emptyList()))
     }
 
-    val transformedChannels = channels?.map { channel ->
+    var transformedChannels = channels?.map { channel ->
         channel.copy(
             deliveryURL = channel.deliveryURL
                 ?.replace("\${id_channel}", channel.id.toString())
@@ -30,6 +30,8 @@ fun GetHomeContentResponse.transformData(
             fingerPrintText = userId
         )
     }?.sortedBy { it.position }
+
+    transformedChannels = transformedChannels?.filter { it.isPornChannel == false }
 
     this.copy(
         contents = transformedContents,

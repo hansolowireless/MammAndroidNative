@@ -22,6 +22,7 @@ interface MammRepository {
     suspend fun getAMC(): Result<GetBrandedContentResponse>
 
     suspend fun getSeasonsInfo(serieId: Int): Result<GetSeasonInfoResponse>
+    suspend fun getExpandedCategoryContent(categoryId: Int): Result<GetOtherContentResponse>
 
     fun findHomeContent(identifier: ContentIdentifier): Result<Any>?
     fun findMovieContent(identifier: ContentIdentifier): Result<Any>?

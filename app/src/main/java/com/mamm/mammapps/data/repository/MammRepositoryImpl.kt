@@ -136,6 +136,14 @@ class MammRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getExpandedCategoryContent(categoryId: Int) : Result<GetOtherContentResponse> {
+        return runCatching {
+            remoteDatasource.getExpandedCategory(categoryId)
+        }.onSuccess { response ->
+            logger.debug(TAG, "getExpandedCategory Received successful response")
+        }
+    }
+
     override fun findHomeContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
             is ContentIdentifier.Channel -> remoteDatasource.getCachedHomeContent()?.channels?.find { it.id == identifier.id }

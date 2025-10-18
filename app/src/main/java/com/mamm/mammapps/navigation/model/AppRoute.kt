@@ -18,6 +18,7 @@ enum class AppRoute {
     DIAGNOSTICS,
     PLAYER,
     DETAIL,
+    EXPANDCATEGORY,
     LOGIN,
     LOGOUT;
 

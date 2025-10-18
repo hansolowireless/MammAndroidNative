@@ -248,6 +248,17 @@ interface ApiService {
         @Url url: String
     ): Response<GetTickersResponse>
 
+    // ------- Expand Category ----------
+    @GET("epg_files/cat_{categoryId}_pkg_{jsonParam}")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getExpandCategory(
+        @Path("categoryId") categoryId: String,
+        @Path("jsonParam") jsonParam: String
+    ): Response<GetOtherContentResponse>
+
 
 
 }

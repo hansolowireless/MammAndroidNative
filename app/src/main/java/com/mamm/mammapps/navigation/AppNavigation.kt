@@ -18,11 +18,13 @@ import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.data.model.section.SectionVod
 import com.mamm.mammapps.data.model.serie.TbContentSeason
+import com.mamm.mammapps.navigation.extension.addCategoryId
 import com.mamm.mammapps.navigation.extension.addContentClass
 import com.mamm.mammapps.navigation.extension.addContentUI
 import com.mamm.mammapps.navigation.extension.addRoute
 import com.mamm.mammapps.navigation.extension.homeScreenRoute
 import com.mamm.mammapps.navigation.extension.removeContentUI
+import com.mamm.mammapps.navigation.extension.retrieveCategoryId
 import com.mamm.mammapps.navigation.extension.retrieveContentClass
 import com.mamm.mammapps.navigation.extension.retrieveContentUI
 import com.mamm.mammapps.navigation.model.AppRoute
@@ -32,6 +34,7 @@ import com.mamm.mammapps.ui.mapper.toContentToPlayUI
 import com.mamm.mammapps.ui.screen.ChannelsScreen
 import com.mamm.mammapps.ui.screen.DetailScreen
 import com.mamm.mammapps.ui.screen.EPGScreen
+import com.mamm.mammapps.ui.screen.ExpandCategoryScreen
 import com.mamm.mammapps.ui.screen.HomeScreen
 import com.mamm.mammapps.ui.screen.LoginScreen
 import com.mamm.mammapps.ui.screen.LogoutScreen
@@ -74,6 +77,12 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                     launchSingleTop = true
                 }
                 navController.currentBackStackEntry?.savedStateHandle?.addContentClass(content)
+            },
+            onExpandCategory = { categoryId ->
+                navController.navigate(AppRoute.EXPANDCATEGORY.route) {
+                    launchSingleTop = true
+                }
+                navController.currentBackStackEntry?.savedStateHandle?.addCategoryId(categoryId)
             }
         )
     }
@@ -195,6 +204,19 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                 playedContent = playableContent
             )
         }
+    }
+
+    composable (AppRoute.EXPANDCATEGORY.route) {
+        val categoryId = remember(it) {
+            it.savedStateHandle.retrieveCategoryId()
+        }
+
+        ExpandCategoryScreen(
+            categoryId = categoryId,
+            onContentClick = {
+                //TODO
+            }
+        )
     }
 
     composable(AppRoute.LOGOUT.route) {

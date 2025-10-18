@@ -1,5 +1,6 @@
 package com.mamm.mammapps.data.datasource.remote
 
+import androidx.core.net.toUri
 import com.mamm.mammapps.data.cache.Cache
 import com.mamm.mammapps.data.di.BaseUrlApi
 import com.mamm.mammapps.data.di.CustomContentApi
@@ -111,6 +112,23 @@ class RemoteDatasource @Inject constructor(
         return cache.getHomeContent()
     }
 
+    suspend fun getExpandedCategory(categoryId: Int) : GetOtherContentResponse {
+       return withContext(Dispatchers.IO) {
+           val jsonFile = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
+           require(jsonFile != null) {
+               "JSON file is required to get Home Content, but was null"
+           }
+           val response = baseUrlApi.getExpandCategory(categoryId.toString(), jsonFile)
+           if (!response.isSuccessful) {
+               val errorBody = response.errorBody()?.string()?.toResponseBody()
+               throw HttpException(Response.error<Any>(response.code(), errorBody))
+           }
+
+           response.body() ?: throw IllegalStateException("Response body is null")
+       }
+    }
+
+    //----------EPG---------//
     suspend fun getChannelEPG(channelId: Int, date: LocalDate): GetEPGResponse {
         return withContext(Dispatchers.IO) {
             val response = baseUrlApi.getEPG(channelId, date.toEPGRequestDate())
