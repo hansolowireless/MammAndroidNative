@@ -26,4 +26,9 @@
         <item name="android:background">@drawable/playerbuttons</item>
     </style>
 
+    <style name="CustomMediaRouteButtonStyle" parent="Widget.MediaRouter.MediaRouteButton">
+        <!-- Cambia el color del ícono del botón de Cast -->
+        <item name="mediaRouteButtonTint">@color/colorPrimaryDark</item>
+    </style>
+
 </resources>

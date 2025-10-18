@@ -93,8 +93,9 @@
     <!--endregion PIN DIALOG-->
 
     <!--region Accessibility-->
-    <string name="clear_search_action">Limpiar búsqueda</string>
+    <string name="accessibility_clear_search_action">Limpiar búsqueda</string>
     <string name="accessibility_close">Cerrar</string>
+    <string name="accessibility_expandcategory">Expandir categoría</string>
     <!--endregion Accessibility-->
 
 
