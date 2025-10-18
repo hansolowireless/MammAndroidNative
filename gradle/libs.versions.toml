@@ -30,6 +30,7 @@ okhttp-logging = "5.1.0"
 previewseekbar = "3.1.0"
 glide = "4.14.2"
 exoplayer = "2.19.0"
+playServicesCastFramework = "21.5.0"
 previewseekbar-exoplayer = "2.18.1.0"
 jjwt = "0.12.6"
 
@@ -75,6 +76,7 @@ okhttp-logging-interceptor = { module = "com.squareup.okhttp3:logging-intercepto
 previewseekbar = { group = "com.github.rubensousa", name = "previewseekbar", version.ref = "previewseekbar" }
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 exoplayer = { group = "com.google.android.exoplayer", name = "exoplayer", version.ref = "exoplayer" }
+play-services-cast-framework = { group = "com.google.android.gms", name = "play-services-cast-framework", version.ref = "playServicesCastFramework" }
 previewseekbar-exoplayer = { group = "com.github.rubensousa", name = "previewseekbar-exoplayer", version.ref = "previewseekbar-exoplayer" }
 
 [plugins]
