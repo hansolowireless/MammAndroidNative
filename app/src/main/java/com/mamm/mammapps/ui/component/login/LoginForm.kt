@@ -2,16 +2,20 @@ package com.mamm.mammapps.ui.component.login
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,6 +39,14 @@ fun LoginForm(
 
     val isFormValid = email.isNotBlank() && password.isNotBlank()
 
+    // 1. Crear los FocusRequesters
+    val (emailFocusRequester, passwordFocusRequester) = remember { FocusRequester.createRefs() }
+
+    // 2. Solicitar el foco para el email cuando el composable aparece
+    LaunchedEffect(Unit) {
+        emailFocusRequester.requestFocus()
+    }
+
     Column(
         verticalArrangement = Arrangement.spacedBy(if (LocalIsTV.current) Dimensions.paddingLarge else Dimensions.paddingSmall),
         modifier = Modifier.fillMaxWidth()
@@ -50,14 +62,24 @@ fun LoginForm(
             label = stringResource(R.string.email),
             value = email,
             onValueChange = { email = it },
-            keyboardType = KeyboardType.Email
+            keyboardType = KeyboardType.Email,
+            modifier = Modifier.focusRequester(emailFocusRequester),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions(
+                onNext = { passwordFocusRequester.requestFocus() }
+            )
         )
         TextInput(
             label = stringResource(R.string.password),
             value = password,
             onValueChange = { password = it },
             keyboardType = KeyboardType.Password,
-            isPassword = true
+            isPassword = true,
+            modifier = Modifier.focusRequester(passwordFocusRequester),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(
+                onDone = { if(isFormValid) onLogin(email, password) }
+            )
         )
         PrimaryButton(
             text = stringResource(R.string.login),

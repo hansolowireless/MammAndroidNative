@@ -3,6 +3,8 @@ package com.mamm.mammapps.ui.component.dialog
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -40,15 +42,19 @@ fun PinDialog(
                     value = pinValue,
                     onValueChange = { pinValue = it },
                     label = stringResource(R.string.pin_field_label),
-                    keyboardType = KeyboardType.NumberPassword, // Teclado numérico
-                    isPassword = true,                          // Oculta los números
-                    imeAction = ImeAction.Done,
-                    onDone = {
-                        // Permite confirmar pulsando "Hecho" en el teclado
-                        if (pinValue.isNotBlank()) {
-                            onConfirm(pinValue)
+                    keyboardType = KeyboardType.NumberPassword,
+                    isPassword = true,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.NumberPassword
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            if (pinValue.isNotBlank()) {
+                                onConfirm(pinValue)
+                            }
                         }
-                    }
+                    )
                 )
             }
         },

@@ -22,25 +22,19 @@ fun TextInput(
     value: String,
     onValueChange: (String) -> Unit,
     keyboardType: KeyboardType,
-    imeAction: ImeAction = ImeAction.Default,
-    onSearch: () -> Unit = {},
-    onDone: () -> Unit = {},
-    isPassword: Boolean = false
+    isPassword: Boolean = false,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default
 ) {
     TextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
-        // Usamos los nuevos parámetros aquí
-        keyboardOptions = KeyboardOptions(
-            keyboardType = keyboardType,
-            imeAction = imeAction
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType).copy(
+            imeAction = keyboardOptions.imeAction
         ),
-        keyboardActions = KeyboardActions(
-            onSearch = { onSearch() },
-            onDone = { onDone() }
-        ),
+        keyboardActions = keyboardActions,
         modifier = modifier.fillMaxWidth(),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = Color.White.copy(alpha = 0.1f),    // Fondo cuando tiene foco
