@@ -51,6 +51,7 @@ fun DetailTV(
     modifier: Modifier = Modifier,
     content: ContentEntityUI,
     similarContent: List<Recommended>?,
+    showPlayButton: Boolean = true,
     seasonInfoUIState: UIState<List<SeasonUI>>?,
     onClickPlay: () -> Unit,
     onClickEpisode: (Int, Int) -> Unit,
@@ -131,7 +132,7 @@ fun DetailTV(
                     Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
 
                     // Botón de reproducir, solo si no es serie
-                    if (content.identifier !is ContentIdentifier.Serie) {
+                    if (showPlayButton) {
                         PrimaryButton(
                             text = stringResource(R.string.play),
                             icon = {

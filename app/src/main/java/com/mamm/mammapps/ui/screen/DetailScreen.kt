@@ -27,6 +27,7 @@ fun DetailScreen(
     onSimilarContentClick: (Any) -> Unit
 ) {
 
+    val showPlayButton by viewModel.showPlayButton.collectAsStateWithLifecycle()
     val seasonInfoUIState by viewModel.seasonInfoUIState.collectAsStateWithLifecycle()
     val clickedContent by viewModel.clickedContent.collectAsStateWithLifecycle()
     val similarContent by viewModel.similarContent.collectAsStateWithLifecycle()
@@ -34,6 +35,10 @@ fun DetailScreen(
     val scrollState = rememberScrollState()
 
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+    LaunchedEffect (Unit) {
+        viewModel.setShowPlayButton(content)
+    }
 
     LaunchedEffect(clickedContent) {
         clickedContent?.let(onClickPlay)
@@ -60,6 +65,7 @@ fun DetailScreen(
     if (LocalIsTV.current) {
         DetailTV(
             content = content,
+            showPlayButton = showPlayButton,
             similarContent = similarContent,
             seasonInfoUIState = seasonInfoUIState,
             onClickPlay = {
@@ -83,6 +89,7 @@ fun DetailScreen(
     } else {
         DetailMobile(
             content = content,
+            showPlayButton = showPlayButton,
             onClickPlay = {
                 if (prefoundContent != null) {
                     onClickPlay(prefoundContent)

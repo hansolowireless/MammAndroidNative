@@ -56,6 +56,7 @@ import kotlinx.coroutines.flow.merge
 fun DetailMobile(
     modifier: Modifier = Modifier,
     content: ContentEntityUI,
+    showPlayButton: Boolean = true,
     onClickPlay: () -> Unit,
     seasonInfoUIState: UIState<List<SeasonUI>>? = null,
     onClickEpisode: (Int, Int) -> Unit,
@@ -81,7 +82,7 @@ fun DetailMobile(
                     contentScale = ContentScale.Crop
                 )
 
-                if (content.identifier !is ContentIdentifier.Serie){
+                if (showPlayButton){
                     IconButton(
                         onClick = onClickPlay,
                         modifier = Modifier.size(72.dp)

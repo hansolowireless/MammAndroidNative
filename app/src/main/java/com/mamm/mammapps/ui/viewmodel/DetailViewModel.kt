@@ -36,6 +36,9 @@ class DetailViewModel @Inject constructor(
         private const val TAG = "DetailViewModel"
     }
 
+    private val _showPlayButton = MutableStateFlow<Boolean>(false)
+    val showPlayButton: StateFlow<Boolean> = _showPlayButton.asStateFlow()
+
     private val _clickedContent = MutableStateFlow<Any?>(null)
     val clickedContent: StateFlow<Any?> = _clickedContent.asStateFlow()
 
@@ -46,6 +49,10 @@ class DetailViewModel @Inject constructor(
 
     private val _similarContent = MutableStateFlow<List<Recommended>?>(null)
     val similarContent: StateFlow<List<Recommended>?> = _similarContent.asStateFlow()
+
+    fun setShowPlayButton (content: ContentEntityUI) {
+        _showPlayButton.update { content.identifier !is ContentIdentifier.Serie || (content.liveEventInfo?.isFuture() == false) }
+    }
 
     fun getSeasonInfo(content: ContentEntityUI) {
         if (content.identifier is ContentIdentifier.Serie) {
