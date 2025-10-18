@@ -112,7 +112,7 @@ fun ChannelFilter(
             }) {
                 Icon(
                     imageVector = Icons.Default.Clear,
-                    contentDescription = stringResource(id = R.string.clear_search_action)
+                    contentDescription = stringResource(id = R.string.accessibility_clear_search_action)
                 )
             }
         }
