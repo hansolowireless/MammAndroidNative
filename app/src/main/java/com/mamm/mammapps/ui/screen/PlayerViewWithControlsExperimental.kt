@@ -252,7 +252,7 @@ fun PlayerViewWithControlsExperimental(
                         contentChanged = true
                     }
 
-                    styledPlayerView.controllerAutoShow = !showZappingLayer
+                    styledPlayerView.controllerAutoShow = false
                     viewModel.setDialogButtonVisibility(ccTracksButton, audioTracksButton)
 
                     if (playerChanged || contentChanged) {
