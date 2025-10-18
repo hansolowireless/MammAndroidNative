@@ -30,28 +30,28 @@ object LineHeights {
 // Set of Material typography styles to start with
 val Typography = Typography(
     bodySmall = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = AppFontFamily,
         fontWeight = FontWeight.Normal,
         fontSize = FontSizes.small,
         lineHeight = LineHeights.small,
         letterSpacing = 0.5.sp
     ),
     bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = AppFontFamily,
         fontWeight = FontWeight.Normal,
         fontSize = FontSizes.large,
         lineHeight = LineHeights.large,
         letterSpacing = 0.5.sp
     ),
     titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = AppFontFamily,
         fontWeight = FontWeight.Bold,
         fontSize = FontSizes.XL,
         lineHeight = LineHeights.XL,
         letterSpacing = 0.sp
     ),
     titleMedium = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = AppFontFamily,
         fontWeight = FontWeight.Bold,
         fontSize = FontSizes.medium,
         lineHeight = LineHeights.medium,
