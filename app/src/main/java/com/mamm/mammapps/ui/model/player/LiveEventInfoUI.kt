@@ -1,6 +1,7 @@
 package com.mamm.mammapps.ui.model.player
 
 import android.os.Parcelable
+import com.mamm.mammapps.data.extension.getCurrentDate
 import kotlinx.parcelize.Parcelize
 import java.time.ZonedDateTime
 
@@ -11,4 +12,9 @@ data class LiveEventInfoUI (
     val deliveryURL: String = "",
     val eventStart: ZonedDateTime?,
     val eventEnd: ZonedDateTime?
-) : Parcelable
+) : Parcelable {
+
+    fun isFuture() : Boolean {
+        return eventStart?.isAfter(getCurrentDate()) ?: false
+    }
+}
