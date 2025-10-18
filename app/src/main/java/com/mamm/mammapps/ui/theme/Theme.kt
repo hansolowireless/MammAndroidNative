@@ -44,16 +44,3 @@ fun MammAppsTheme(
         content = content
     )
 }
-
-//@Composable
-//fun MammAppsTheme(
-//    darkTheme: Boolean = isSystemInDarkTheme(),
-//    dynamicColor: Boolean = false,
-//    content: @Composable () -> Unit
-//) {
-//    MaterialTheme(
-//        colorScheme = NetflixColorScheme,
-//        typography = Typography,
-//        content = content
-//    )
-//}
