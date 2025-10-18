@@ -66,7 +66,7 @@ fun ChannelSelector(
                 headlineContent = {
                     Text(
                         text = channel.title,
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 },
                 leadingContent = {

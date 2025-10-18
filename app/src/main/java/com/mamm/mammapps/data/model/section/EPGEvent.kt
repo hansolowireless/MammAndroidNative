@@ -100,10 +100,6 @@ data class EPGEvent(
         return (now.isAfter(start) || now.isEqual(start)) && now.isBefore(end)
     }
 
-    fun isInFuture() : Boolean {
-        return startDateTime?.let { getCurrentDate().isBefore(it) } ?: false
-    }
-
     fun getMetadata(): Metadata {
         return Metadata.fromTbEventItems(tbEventItems ?: emptyList())
     }

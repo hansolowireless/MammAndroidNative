@@ -26,13 +26,13 @@ import java.time.LocalDate
 fun EPGTV(
     epgContent: List<EPGChannelContent>,
     selectedDate: LocalDate,
+    selectedChannel: Channel?,
     onDateSelected: (LocalDate) -> Unit,
+    onChannelSelected: (Channel) -> Unit,
     onEventClicked: (EPGEvent) -> Unit
 ) {
 
-    var selectedChannel by remember { mutableStateOf<Channel>(epgContent.first().channel) }
-
-    Column {
+    Column(modifier = Modifier.padding(top = Dimensions.paddingSmall)) {
         SectionTitle(title = stringResource(R.string.nav_epg))
         Row(
             modifier = Modifier
@@ -42,10 +42,10 @@ fun EPGTV(
             ChannelSelector(
                 channels = epgContent.map { it.channel.toContentEPGUI() },
                 modifier = Modifier.weight(1f),
-                selectedChannelId = selectedChannel.id,
+                selectedChannelId = selectedChannel?.id,
                 onChannelSelected = { channel ->
                     epgContent.find { it.channel.id == channel.id }?.channel?.let {
-                        selectedChannel = it
+                        onChannelSelected(it)
                     }
                 }
             )
@@ -74,9 +74,9 @@ fun EPGTV(
                 modifier = Modifier
                     .weight(2f)
                     .padding(horizontal = Dimensions.paddingSmall),
-                events = epgContent.find { it.channel.id == selectedChannel.id }?.events
+                events = epgContent.find { it.channel.id == selectedChannel?.id }?.events
                     ?: emptyList(),
-                channel = selectedChannel,
+                catchupHours = selectedChannel?.catchupHours,
                 onEventClicked = onEventClicked
             )
         }

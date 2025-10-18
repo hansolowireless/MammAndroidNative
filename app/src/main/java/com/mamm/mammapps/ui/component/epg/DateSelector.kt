@@ -21,6 +21,7 @@ import androidx.tv.material3.ListItem
 import androidx.tv.material3.ListItemDefaults
 import com.mamm.mammapps.R
 import com.mamm.mammapps.ui.component.LocalIsTV
+import com.mamm.mammapps.ui.mapper.toDateSelectorResId
 import java.time.LocalDate
 
 @Composable
@@ -50,7 +51,6 @@ private fun MobileDateSelector(
     selectedDate: LocalDate,
     onDateSelected: (LocalDate) -> Unit
 ) {
-    // 1. Crear la lista de pestañas en el orden correcto
     val tabs = remember {
         listOf(
             LocalDate.now().minusDays(2),
@@ -78,7 +78,7 @@ private fun MobileDateSelector(
                 onClick = { onDateSelected(date) },
                 text = {
                     Text(
-                        text = stringResource(id = date.toStringResource()),
+                        text = stringResource(id = date.toDateSelectorResId()),
                         color = if (selectedTabIndex == index) {
                             MaterialTheme.colorScheme.primary
                         } else {
@@ -97,22 +97,22 @@ private fun TvDateSelector(
     selectedDate: LocalDate,
     onDateSelected: (LocalDate) -> Unit
 ) {
-    val datesMap = remember {
-        mapOf(
-            LocalDate.now().minusDays(2) to R.string.day_before_yesterday,
-            LocalDate.now().minusDays(1) to R.string.yesterday,
-            LocalDate.now() to R.string.today,
-            LocalDate.now().plusDays(1) to R.string.tomorrow,
-            LocalDate.now().plusDays(2) to R.string.day_after_tomorrow
+    val dates = remember {
+        listOf(
+            LocalDate.now().minusDays(2),
+            LocalDate.now().minusDays(1),
+            LocalDate.now(),
+            LocalDate.now().plusDays(1),
+            LocalDate.now().plusDays(2)
         )
     }
 
     Column(
         modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.SpaceAround,
+        verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        datesMap.forEach { (date, stringResId) ->
+        dates.forEach { date ->
             ListItem(
                 colors = ListItemDefaults.colors(
                     containerColor = Color.Transparent,
@@ -121,7 +121,7 @@ private fun TvDateSelector(
                 ),
                 headlineContent = {
                     Text(
-                        text = stringResource(id = stringResId),
+                        text = stringResource(id = date.toDateSelectorResId()),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                         textAlign = TextAlign.Center
@@ -142,18 +142,5 @@ private fun TvDateSelector(
                 selected = date == selectedDate
             )
         }
-    }
-}
-
-// Función de extensión para mantener la lógica de mapeo en un solo lugar
-private fun LocalDate.toStringResource(): Int {
-    val now = LocalDate.now()
-    return when {
-        this == now.minusDays(2) -> R.string.day_before_yesterday
-        this == now.minusDays(1) -> R.string.yesterday
-        this == now -> R.string.today
-        this == now.plusDays(1) -> R.string.tomorrow
-        this == now.plusDays(2) -> R.string.day_after_tomorrow
-        else -> R.string.today // Un fallback por si acaso
     }
 }

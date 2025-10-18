@@ -85,15 +85,15 @@ fun ContentEntityListItem(
                 if (showLiveIndicator) {
                     Text(
                         text = stringResource(R.string.live),
-                        style = MaterialTheme.typography.titleSmall,
+                        style = MaterialTheme.typography.bodySmall,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .background(
                                 color = Color.Red,
                                 shape = RectangleShape
                             )
-                            .padding(horizontal = Dimensions.paddingXSmall)
-                            .weight(0.3f)
+                            .padding(horizontal = 2.dp)
+                            .weight(0.4f)
                     )
                 } else if (showCatchupIndicator) {
                     Icon(

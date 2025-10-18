@@ -35,6 +35,7 @@ fun EPGScreen(
 ) {
     val uiState by viewModel.epgUIState.collectAsStateWithLifecycle()
     var selectedDate by remember { mutableStateOf<LocalDate>(LocalDate.now()) }
+    val selectedChannel by viewModel.selectedChannel.collectAsStateWithLifecycle()
     val playedChannel by viewModel.playedChannel.collectAsStateWithLifecycle()
 
     LaunchedEffect(playedChannel) {
@@ -59,6 +60,10 @@ fun EPGScreen(
                     onDateSelected = { date ->
                         selectedDate = date
                         viewModel.getEPGContent(date)
+                    },
+                    selectedChannel = selectedChannel,
+                    onChannelSelected = { channel ->
+                        viewModel.setSelectedChannel(channel)
                     },
                     onEventClicked = { event ->
                         if (event.isLive()) {

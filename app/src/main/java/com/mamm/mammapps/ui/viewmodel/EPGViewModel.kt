@@ -32,6 +32,9 @@ class EPGViewModel @Inject constructor(
     private val _epgUIState = MutableStateFlow<UIState<List<EPGChannelContent>>>(UIState.Loading)
     val epgUIState: StateFlow<UIState<List<EPGChannelContent>>> = _epgUIState.asStateFlow()
 
+    private val _selectedChannel = MutableStateFlow<Channel?>(null)
+    val selectedChannel: StateFlow<Channel?> = _selectedChannel.asStateFlow()
+
     private val _playedChannel = MutableStateFlow<Channel?>(null)
     val playedChannel: StateFlow<Channel?> = _playedChannel.asStateFlow()
 
@@ -60,6 +63,10 @@ class EPGViewModel @Inject constructor(
         ).onSuccess { entity ->
             if (entity is Channel) _playedChannel.update { entity } else logger.error(TAG, "findChannel Found entity is not a channel")
         }
+    }
+
+    fun setSelectedChannel (channel: Channel) {
+        _selectedChannel.update{ channel }
     }
 
     fun clearPlayedChannel() {

@@ -22,7 +22,7 @@ import com.mamm.mammapps.ui.theme.Dimensions
 @Composable
 fun EventsColumn(
     events: List<EPGEvent>,
-    channel: Channel,
+    catchupHours: Int?,
     modifier: Modifier = Modifier,
     onEventClicked: (EPGEvent) -> Unit = {}
 ) {
@@ -35,7 +35,7 @@ fun EventsColumn(
         }
     }
 
-    ProvideLazyListPivotOffset(parentFraction = 0.01f) {
+    ProvideLazyListPivotOffset(parentFraction = 0.00f) {
         LazyColumn(
             state = listState,
             modifier = modifier,
@@ -47,7 +47,7 @@ fun EventsColumn(
                     ContentEntityListItem(
                         content = event.toContentListUI(),
                         showLiveIndicator = event.isLive(),
-                        showCatchupIndicator = event.catchupIsAvailable(availableCatchupHours = channel.catchupHours ?: 0),
+                        showCatchupIndicator = event.catchupIsAvailable(availableCatchupHours = catchupHours ?: 0),
                         onClick = { onEventClicked(event) }
                     )
                 }

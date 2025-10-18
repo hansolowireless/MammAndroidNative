@@ -1,5 +1,6 @@
 package com.mamm.mammapps.ui.mapper
 
+import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.Event
 import com.mamm.mammapps.data.model.Genre
@@ -36,6 +37,7 @@ import com.mamm.mammapps.ui.model.player.LiveEventInfoUI
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.Ratios
 import com.mamm.mammapps.util.orRandom
+import java.time.LocalDate
 import kotlin.math.log
 
 fun Any.toContentEntityUI(isAdult: Boolean = false): ContentEntityUI? {
@@ -585,3 +587,18 @@ fun List<Recommended>.toSimilarContentRow(): ContentRowUI {
         return it
     }
 }
+
+//---------------region EPG-------------
+fun LocalDate.toDateSelectorResId(): Int {
+    val now = LocalDate.now()
+    return when {
+        this == now.minusDays(2) -> R.string.day_before_yesterday
+        this == now.minusDays(1) -> R.string.yesterday
+        this == now -> R.string.today
+        this == now.plusDays(1) -> R.string.tomorrow
+        this == now.plusDays(2) -> R.string.day_after_tomorrow
+        else -> R.string.today // Un fallback por si acaso
+    }
+}
+//----------------endregion EPG--------------
+
