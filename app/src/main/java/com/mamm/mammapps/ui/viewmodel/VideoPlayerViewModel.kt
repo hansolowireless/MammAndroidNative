@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import com.example.openstream_flutter_rw.data.model.customdatasourcefactory.TokenParamDataSourceFactory
 import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.MediaMetadata
@@ -20,15 +21,11 @@ import com.google.android.exoplayer2.source.dash.DashMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.util.MimeTypes
-import com.google.android.gms.cast.framework.CastSession
-import com.google.android.gms.cast.framework.SessionManagerListener
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.extension.getCurrentDate
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.model.player.Ticker
-import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
 import com.mamm.mammapps.domain.usecases.GetChannelsUseCase
 import com.mamm.mammapps.domain.usecases.player.GetDRMUrlUseCase
@@ -193,6 +190,16 @@ class VideoPlayerViewModel @Inject constructor(
 
         _player.update { oldPlayer ->
             oldPlayer?.release()
+
+            val loadControl = DefaultLoadControl.Builder()
+                .setBufferDurationsMs(
+                    DefaultLoadControl.DEFAULT_MIN_BUFFER_MS,
+                    DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
+                    DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS,
+                    DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
+                )
+                .build()
+
             ExoPlayer.Builder(context)
                 .setTrackSelector(trackSelector!!)
                 .build()
@@ -363,7 +370,14 @@ class VideoPlayerViewModel @Inject constructor(
     }
 
     private fun handlePlayerError(exception: PlaybackException, context: Context) {
-        //TODO SHOW ERROR
+        when (exception.errorCode) {
+            PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW -> {
+                logger.error(TAG, "handlePlayerError - ERROR_CODE_BEHIND_LIVE_WINDOW")
+                // Re-initialize player at the live edge.
+                _player.value?.seekToDefaultPosition()
+                _player.value?.prepare()
+            }
+        }
     }
 
     private fun getInitialContent(): ContentToPlayUI {
@@ -561,7 +575,9 @@ class VideoPlayerViewModel @Inject constructor(
     }
 
     fun showZappingLayer() {
-        _showZappingLayer.update { true }
+        if (_content.value.identifier is ContentIdentifier.Channel) {
+            _showZappingLayer.update { true }
+        }
     }
 
     fun hideZappingLayer() {
@@ -576,8 +592,12 @@ class VideoPlayerViewModel @Inject constructor(
                         channels.map { channel ->
                             ZappingInfoUI(
                                 channel = channel.toContentEntityUI(),
-                                liveEvent = getLiveEventInfoUseCase(channelId = channel.id)?.toContentListUI() ?:
-                                ContentListUI(identifier = ContentIdentifier.Event(0), title = channel.name.orEmpty(), imageUrl = "")
+                                liveEvent = getLiveEventInfoUseCase(channelId = channel.id)?.toContentListUI()
+                                    ?: ContentListUI(
+                                        identifier = ContentIdentifier.Event(0),
+                                        title = channel.name.orEmpty(),
+                                        imageUrl = ""
+                                    )
                             )
                         }
                     }
@@ -589,7 +609,7 @@ class VideoPlayerViewModel @Inject constructor(
     }
 
     fun findAndPlayChannel(content: ContentEntityUI) {
-        viewModelScope.launch (Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) {
             getChannelsUseCase().onSuccess { channels ->
                 val channel = channels.find { it.id == content.identifier.id }
                 channel?.let {
