@@ -126,6 +126,7 @@ fun EPGEvent.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
     title = getTitle(),
     aspectRatio = Ratios.VERTICAL,
     height = Dimensions.contentEntityHeight,
+    liveEventInfo = this.toLiveEventInfoUI(),
     detailInfo = DetailInfoUI(
         metadata = getMetadata(),
         description = getDescription(),
