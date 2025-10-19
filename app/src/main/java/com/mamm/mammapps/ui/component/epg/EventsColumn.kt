@@ -42,7 +42,6 @@ fun EventsColumn(
             verticalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall)
         ) {
             items(events) { event ->
-
                 Box {
                     ContentEntityListItem(
                         content = event.toContentListUI(),

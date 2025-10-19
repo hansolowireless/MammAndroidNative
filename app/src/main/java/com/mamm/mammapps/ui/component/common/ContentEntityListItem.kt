@@ -61,8 +61,8 @@ fun ContentEntityListItem(
         modifier = modifier
             .onFocusChanged { isFocused = it.isFocused }
             .clickable(onClick = onClick),
-        leadingContent = {
-            channelInfo?.let{
+        leadingContent = channelInfo?.let {
+            {
                 AsyncImage(
                     model = it.detailInfo?.squareLogo,
                     contentDescription = it.title,
@@ -105,7 +105,7 @@ fun ContentEntityListItem(
                 }
             }
         },
-        supportingContent = if (isFocused) {
+        supportingContent = if (isFocused || showLiveIndicator) {
             content.detailInfo?.description?.let { description ->
                 if (description.isNotBlank()) {
                     {

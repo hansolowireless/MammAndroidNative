@@ -105,11 +105,19 @@ fun HomeGridTop(event: ContentEntityUI) {
                     )
                 }
 
-                event.detailInfo?.metadata?.let { metadata ->
-                    DurationYearRatingRow(
-                        metadata = metadata,
-                        textcolor = HomeGridTopColor.metadata
+                if (event.isLive()) {
+                    EventStartEndDuration(
+                        liveEventInfo = event.liveEventInfo,
+                        duration = event.detailInfo?.metadata?.durationMin,
                     )
+                }
+                else {
+                    event.detailInfo?.metadata?.let { metadata ->
+                        DurationYearRatingRow(
+                            metadata = metadata,
+                            textcolor = HomeGridTopColor.metadata
+                        )
+                    }
                 }
 
                 // Event description from ContentEntityUI subtitle
@@ -131,7 +139,7 @@ fun HomeGridTop(event: ContentEntityUI) {
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 fun HomeGridTopPreview() {
-    CompositionLocalProvider {
+    MaterialTheme {
         HomeGridTop(
             event = ContentEntityUI(
                 title = "Malas lenguas: Episodio 153",

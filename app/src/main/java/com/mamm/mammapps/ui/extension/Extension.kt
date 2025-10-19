@@ -166,10 +166,15 @@ fun Context.findActivity(): Activity {
 }
 
 fun Player.jump10sForward () {
-    this?.seekTo(this.currentPosition + 10_000L)
+    this.seekTo(this.currentPosition + 10_000L)
 }
 
 fun Player?.jump10sBack () {
     this?.seekTo(this.currentPosition - 10_000L)
+}
+
+fun ZonedDateTime.toHHmmString () : String {
+    val formatter = DateTimeFormatter.ofPattern("HH:mm")
+    return this.format(formatter)
 }
 

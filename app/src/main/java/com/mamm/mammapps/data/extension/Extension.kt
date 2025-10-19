@@ -1,6 +1,5 @@
 package com.mamm.mammapps.data.extension
 
-import android.util.Log
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.metadata.Metadata
 import com.mamm.mammapps.data.model.section.EPGEvent
