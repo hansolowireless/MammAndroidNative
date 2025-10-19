@@ -3,6 +3,7 @@ package com.mamm.mammapps.ui.extension
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -30,10 +31,17 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.mamm.mammapps.R
+import com.mamm.mammapps.data.logger.SimpleLogger
+import com.mamm.mammapps.data.model.player.GlideThumbnailTransformation
 import com.mamm.mammapps.data.model.player.WatermarkInfo
+import com.mamm.mammapps.ui.constant.PlayerConstant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -79,51 +87,33 @@ fun Modifier.onTap(onTap: () -> Unit): Modifier {
     }
 }
 
-@Composable
-fun Modifier.focusableWithColors(
-    isSelected: Boolean = false,
-    focusedColor: Color = MaterialTheme.colorScheme.primaryContainer,
-    selectedColor: Color = MaterialTheme.colorScheme.secondaryContainer,
-    defaultColor: Color = MaterialTheme.colorScheme.surface,
-    onFocusChanged: (Boolean) -> Unit = {}
-): Modifier {
-    var isFocused by remember { mutableStateOf(false) }
-
-    return this
-        .onFocusChanged { focusState ->
-            isFocused = focusState.isFocused
-            onFocusChanged(focusState.isFocused)
-        }
-        .focusable()
-        .background(
-            color = when {
-                isFocused -> focusedColor
-                isSelected -> selectedColor
-                else -> defaultColor
-            },
-            shape = RoundedCornerShape(12.dp)
-        )
-}
-
 fun String.squared() = this.replace(".png", "_x4.png").replace(".jpg", "_x4.jpg")
 fun String.landscape() = this.replace(".png", "_viewer.png").replace(".jpg", "_viewer.jpg")
-fun String.adult(isAdult: Boolean = false) : String {
+fun String.adult(isAdult: Boolean = false): String {
     return if (isAdult) this.replace(".png", "_p.png").replace(".jpg", "_p.jpg") else this
 }
 
 fun String.buildThumbnailUrl(position: Long?): String {
     requireNotNull(position) { "buildThumbnailUrl position cannot be null" }
-    val urlPattern = when {
-        contains("smil:") -> "smil:"
-        contains("nopack03-") -> "nopack03-"
-        else -> "nopack-"
+
+    val contentID = when {
+        contains("smil:") -> substringAfter("smil:").substringBefore("_")
+        contains("nopack03-") -> substringAfter("nopack03-").substringBefore("/")
+        else -> substringAfter("nopack-").substringBefore("/")
     }
 
-    val contentID = substringAfter(urlPattern).substringBefore("_", substringBefore("/"))
-    val thumbnailNumber = (floor(position / 500000.0) + 1).toInt()
+    val thumbnailNumber =
+        (floor(position / PlayerConstant.THUMBNAIL_UPDATE_INTERVAL.toDouble()) + 1).toInt()
     val thumbnailNumberString = thumbnailNumber.toString().padStart(3, '0')
 
-    return "${substringBefore("/$urlPattern")}-img/${contentID}_mf$thumbnailNumberString.jpg"
+    val baseUrl = when {
+        contains("smil:") -> substringBefore("/smil:")
+        contains("nopack03-") -> substringBefore("/nopack03-")
+        else -> substringBefore("/nopack-")
+    }
+    val thumbnail = "$baseUrl-img/${contentID}_mf$thumbnailNumberString.jpg"
+    SimpleLogger().debug("buildThumbnailUrl", "thumbnail: $thumbnail")
+    return "$baseUrl-img/${contentID}_mf$thumbnailNumberString.jpg"
 }
 
 fun ImageView.loadWatermarkOrHide(watermarkInfo: WatermarkInfo) {
@@ -151,7 +141,7 @@ fun TextView.setHourText(date: ZonedDateTime?) {
         ?: ""
 }
 
-fun Int?.toBookmarkStartTimeMs() : Long {
+fun Int?.toBookmarkStartTimeMs(): Long {
     return this?.times(1000)?.toLong() ?: 0
 }
 
@@ -165,16 +155,53 @@ fun Context.findActivity(): Activity {
     throw IllegalStateException("No se encontró Activity")
 }
 
-fun Player.jump10sForward () {
+fun Player.jump10sForward() {
     this.seekTo(this.currentPosition + 10_000L)
 }
 
-fun Player?.jump10sBack () {
+fun Player?.jump10sBack() {
     this?.seekTo(this.currentPosition - 10_000L)
 }
 
-fun ZonedDateTime.toHHmmString () : String {
+fun ZonedDateTime.toHHmmString(): String {
     val formatter = DateTimeFormatter.ofPattern("HH:mm")
     return this.format(formatter)
 }
 
+fun ImageView.insertThumbnail(url: String?, position: Long, onError: (() -> Unit)? = null) {
+    Glide.with(this)
+        .load(
+            url.toString()
+                .buildThumbnailUrl(position)
+        )
+        .override(
+            Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL
+        )
+        .transform(
+            GlideThumbnailTransformation(
+                position.mod(PlayerConstant.THUMBNAIL_UPDATE_INTERVAL)
+            )
+        )
+        .listener(object : RequestListener<Drawable> {
+            override fun onLoadFailed(
+                e: GlideException?,
+                model: Any?,
+                target: Target<Drawable>,
+                isFirstResource: Boolean
+            ): Boolean {
+                onError?.invoke()
+                return false // Permite que Glide maneje el placeholder/error drawable
+            }
+
+            override fun onResourceReady(
+                resource: Drawable,
+                model: Any,
+                target: Target<Drawable>?,
+                dataSource: DataSource,
+                isFirstResource: Boolean
+            ): Boolean {
+                return false
+            }
+        })
+        .into(this)
+}

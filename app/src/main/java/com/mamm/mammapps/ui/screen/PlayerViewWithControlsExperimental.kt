@@ -37,17 +37,23 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.Target
 import com.example.openstream_flutter_rw.ui.manager.watermark.FingerprintController
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.mamm.mammapps.R
+import com.mamm.mammapps.data.logger.SimpleLogger
+import com.mamm.mammapps.data.model.player.GlideThumbnailTransformation
 import com.mamm.mammapps.ui.component.player.ZappingScreen
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
+import com.mamm.mammapps.ui.constant.PlayerConstant
 import com.mamm.mammapps.ui.extension.buildThumbnailUrl
 import com.mamm.mammapps.ui.extension.findActivity
+import com.mamm.mammapps.ui.extension.insertThumbnail
 import com.mamm.mammapps.ui.extension.jump10sBack
 import com.mamm.mammapps.ui.extension.jump10sForward
+import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import com.mamm.mammapps.ui.viewmodel.VideoPlayerViewModel
 import kotlin.math.abs
@@ -122,6 +128,7 @@ fun PlayerViewWithControlsExperimental(
                                 false // Dejar pasar al sistema (ExoPlayer o ZappingScreen)
                             }
                         }
+
                         Key.DirectionUp, Key.DirectionDown -> {
                             if (!showZappingLayer && !isControllerVisible) {
                                 viewModel.showZappingLayer()
@@ -130,6 +137,7 @@ fun PlayerViewWithControlsExperimental(
                                 false
                             }
                         }
+
                         else -> false
                     }
                 } else false
@@ -168,12 +176,15 @@ fun PlayerViewWithControlsExperimental(
                         false
                     )
 
+                    val playingContent = parentView.tag as? ContentToPlayUI
+
                     val styledPlayerView =
                         parentView.findViewById<StyledPlayerView>(R.id.player_view).also {
                             playerViewRef.value = it
                         }
 
-                    val previewTimeBar = parentView.findViewById<CustomPreviewBar>(R.id.exo_progress)
+                    val previewTimeBar =
+                        parentView.findViewById<CustomPreviewBar>(R.id.exo_progress)
                     val audioTracksButton =
                         parentView.findViewById<AppCompatImageButton>(R.id.audio_tracks_button)
                     val ccTracksButton =
@@ -189,11 +200,12 @@ fun PlayerViewWithControlsExperimental(
                     val closeButton =
                         parentView.findViewById<ImageButton>(R.id.close_button)
 
+                    styledPlayerView.controllerAutoShow = false
+
                     previewTimeBar.setPreviewLoader { currentPosition, _ ->
-                        val currentContent = parentView.tag as? ContentToPlayUI
                         parentView.findViewById<ImageView>(R.id.imageView)?.let {
                             Glide.with(it)
-                                .load(currentContent?.deliveryURL?.buildThumbnailUrl(currentPosition))
+                                .load(playingContent?.deliveryURL?.buildThumbnailUrl(currentPosition))
                                 .into(it)
                         }
                     }
@@ -203,9 +215,17 @@ fun PlayerViewWithControlsExperimental(
                         if (fragmentManager == null || fragmentManager.isStateSaved) return@showTrackDialog
                         try {
                             val dialog = when (trackType) {
-                                TrackType.AUDIO -> TrackSelectionDialog.createAudioTrackDialogForPlayer(currentPlayer) {}
-                                TrackType.CC -> TrackSelectionDialog.createCCDialogForPlayer(currentPlayer) {}
-                                TrackType.VIDEO -> TrackSelectionDialog.createForPlayer(currentPlayer) {}
+                                TrackType.AUDIO -> TrackSelectionDialog.createAudioTrackDialogForPlayer(
+                                    currentPlayer
+                                ) {}
+
+                                TrackType.CC -> TrackSelectionDialog.createCCDialogForPlayer(
+                                    currentPlayer
+                                ) {}
+
+                                TrackType.VIDEO -> TrackSelectionDialog.createForPlayer(
+                                    currentPlayer
+                                ) {}
                             }
                             dialog.setStyle(
                                 TrackSelectionDialog.STYLE_NORMAL,
@@ -221,7 +241,12 @@ fun PlayerViewWithControlsExperimental(
                     ccTracksButton.setOnClickListener { showTrackDialog(TrackType.CC) }
                     videoQualityButton.setOnClickListener { showTrackDialog(TrackType.VIDEO) }
 
-                    startOverButton.setOnClickListener { viewModel.triggerTSTVMode(previewTimeBar, forcePosition = 0) }
+                    startOverButton.setOnClickListener {
+                        viewModel.triggerTSTVMode(
+                            previewTimeBar,
+                            forcePosition = 0
+                        )
+                    }
                     jump10sback.setOnClickListener { styledPlayerView.player?.jump10sBack() }
                     jump10sforward.setOnClickListener { styledPlayerView.player?.jump10sForward() }
 
@@ -236,6 +261,8 @@ fun PlayerViewWithControlsExperimental(
                         parentView.findViewById<AppCompatImageButton>(R.id.audio_tracks_button)
                     val ccTracksButton =
                         parentView.findViewById<AppCompatImageButton>(R.id.cc_tracks_button)
+                    val previewTimeBar =
+                        parentView.findViewById<CustomPreviewBar>(R.id.exo_progress)
 
                     var playerChanged = false
                     if (styledPlayerView.player != player) {
@@ -252,9 +279,6 @@ fun PlayerViewWithControlsExperimental(
                         contentChanged = true
                     }
 
-                    styledPlayerView.controllerAutoShow = false
-                    viewModel.setDialogButtonVisibility(ccTracksButton, audioTracksButton)
-
                     if (playerChanged || contentChanged) {
                         (parentView as? ViewGroup)?.let { viewGroup ->
                             fingerprintController.setup(viewGroup, styledPlayerView)
@@ -265,6 +289,20 @@ fun PlayerViewWithControlsExperimental(
                         }
                     }
                     viewModel.setControlVisibility(styledPlayerView)
+                    viewModel.setDialogButtonVisibility(ccTracksButton, audioTracksButton)
+
+
+                    previewTimeBar.isPreviewEnabled =
+                        (content?.identifier !is ContentIdentifier.Channel)
+                    previewTimeBar.setPreviewLoader { currentPosition, _ ->
+                        parentView.findViewById<ImageView>(R.id.imageView)?.insertThumbnail(
+                            url = styledPlayerView.player?.currentMediaItem?.playbackProperties?.uri.toString(),
+                            position = currentPosition,
+                            onError = {
+                                previewTimeBar.isPreviewEnabled = false
+                            }
+                        )
+                    }
                 }
             )
         }

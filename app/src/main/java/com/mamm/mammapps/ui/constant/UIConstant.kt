@@ -8,5 +8,5 @@ object PlayerConstant {
     const val MILLISECONDS_TO_BE_LIVE = 60000L
     const val MILLISECONDS_SHOW_PLAYER_CONTROLS = 8000
     const val MILLISECONDS_SHOW_ZAPPER = 8000L
-
+    const val THUMBNAIL_UPDATE_INTERVAL = 500000L
 }

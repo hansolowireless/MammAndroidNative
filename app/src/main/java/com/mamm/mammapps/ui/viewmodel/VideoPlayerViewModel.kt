@@ -399,6 +399,11 @@ class VideoPlayerViewModel @Inject constructor(
         val goToLiveButton: AppCompatImageButton = playerView.findViewById(R.id.go_live_button)
         val startOverButton: View = playerView.findViewById(R.id.go_beginning_button)
 
+        val jump10sback =
+            playerView.findViewById<AppCompatImageButton>(R.id.jump_10s_back)
+        val jump10sforward =
+            playerView.findViewById<AppCompatImageButton>(R.id.jump_10s_forward)
+
         playerView.setShowNextButton(false)
         playerView.setShowPreviousButton(false)
 
@@ -407,6 +412,11 @@ class VideoPlayerViewModel @Inject constructor(
         configureTimeBar(previewBar)
 
         if (_content.value.isTimeshift) {
+            jump10sback.visibility = View.GONE
+            jump10sforward.visibility = View.GONE
+            playerView.setShowRewindButton(false)
+            playerView.setShowFastForwardButton(false)
+
             if (_liveEventInfo.value != null) {
                 tstvHourBeginView.visibility = View.VISIBLE
                 positionView.visibility = View.INVISIBLE
@@ -435,10 +445,18 @@ class VideoPlayerViewModel @Inject constructor(
                 positionView.visibility = View.VISIBLE
                 tstvHourBeginView.visibility = View.GONE
                 liveLabel.visibility = View.GONE
+                jump10sback.visibility = View.VISIBLE
+                jump10sforward.visibility = View.VISIBLE
+                playerView.setShowRewindButton(true)
+                playerView.setShowFastForwardButton(true)
             } else {
                 positionView.visibility = View.GONE
                 tstvHourBeginView.visibility = View.GONE
                 liveLabel.visibility = View.VISIBLE
+                jump10sback.visibility = View.GONE
+                jump10sforward.visibility = View.GONE
+                playerView.setShowRewindButton(false)
+                playerView.setShowFastForwardButton(false)
             }
         }
 
