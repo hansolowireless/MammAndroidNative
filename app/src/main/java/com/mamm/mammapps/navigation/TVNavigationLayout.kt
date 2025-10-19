@@ -4,12 +4,15 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -21,15 +24,14 @@ import androidx.compose.material3.NavigationRail
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.res.painterResource
@@ -39,6 +41,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.mamm.mammapps.R
+import com.mamm.mammapps.data.logger.Logger
+import com.mamm.mammapps.data.logger.SimpleLogger
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
 import com.mamm.mammapps.ui.component.icon.BulletedList
@@ -47,63 +51,76 @@ import com.mamm.mammapps.ui.component.icon.Football
 import com.mamm.mammapps.ui.component.icon.WifiSignal
 import com.mamm.mammapps.ui.component.navigation.CustomTVNavigationItem
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun TVNavigationLayout(navController: NavHostController) {
+
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
-    val sectionsWithMenu = listOf(
-        AppRoute.HOME.route,
-        AppRoute.EPG.route,
-        AppRoute.CHANNELS.route,
-        AppRoute.MOVIES.route,
-        AppRoute.DOCUMENTARIES.route,
-        AppRoute.KIDS.route,
-        AppRoute.SERIES.route,
-        AppRoute.SPORTS.route,
-        AppRoute.WARNER.route,
-        AppRoute.ACONTRA.route,
-        AppRoute.AMC.route,
-        AppRoute.SEARCH.route,
-        AppRoute.DIAGNOSTICS.route,
-        AppRoute.ADULTS.route,
-        AppRoute.LOGOUT.route
-    ).distinct()
+    val sectionsWithMenu = remember {
+        listOf(
+            AppRoute.HOME.route,
+            AppRoute.EPG.route,
+            AppRoute.CHANNELS.route,
+            AppRoute.MOVIES.route,
+            AppRoute.DOCUMENTARIES.route,
+            AppRoute.KIDS.route,
+            AppRoute.SERIES.route,
+            AppRoute.SPORTS.route,
+            AppRoute.WARNER.route,
+            AppRoute.ACONTRA.route,
+            AppRoute.AMC.route,
+            AppRoute.SEARCH.route,
+            AppRoute.DIAGNOSTICS.route,
+            AppRoute.ADULTS.route,
+            AppRoute.LOGOUT.route
+        ).distinct()
+    }
 
     val showNavigationRail = currentRoute in sectionsWithMenu
-    var hasItemFocused by remember { mutableStateOf(false) }
-    val railWidth by animateDpAsState(
-        targetValue = if (hasItemFocused) 200.dp else 60.dp,
-        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
-    )
-    val scrollState = rememberScrollState()
 
-    val focusRequesters = remember {
-        sectionsWithMenu.associateWith { FocusRequester() }
-    }
+    var isNavRailFocused by remember { mutableStateOf(false) }
     var isInitialFocusSet by remember { mutableStateOf(false) }
-    val navRailRequester = remember { FocusRequester() }
-    val itemPositions = remember { mutableStateMapOf<String, Float>() }
 
-    // Se ejecuta cuando el menú gana el foco para establecer el foco inicial.
-    LaunchedEffect(hasItemFocused, currentRoute) {
-        if (hasItemFocused && currentRoute != null && !isInitialFocusSet) {
-            delay(50)
-            focusRequesters[currentRoute]?.requestFocus()
-            isInitialFocusSet = true
-        }
-    }
+    val railWidth by animateDpAsState(
+        targetValue = if (isNavRailFocused) 200.dp else 60.dp,
+        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
+        label = "NavRailWidthAnimation"
+    )
 
-    // Se ejecuta cuando el estado de foco del menú cambia.
-    LaunchedEffect(hasItemFocused, currentRoute) {
-        // Cuando el menú pierde el foco (se sale de él)...
-        if (!hasItemFocused) {
+    val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
+
+    val focusRequesters = remember { sectionsWithMenu.associateWith { FocusRequester() } }
+    val bringIntoViewRequesters =
+        remember { sectionsWithMenu.associateWith { BringIntoViewRequester() } }
+    val itemPositions = remember { mutableMapOf<String, Float>() }
+
+    // --- LÓGICA DE FOCO Y SCROLL ---
+    LaunchedEffect(isNavRailFocused, currentRoute) {
+        if (isNavRailFocused) {
+            // El menú GANA foco
+            if (currentRoute != null && !isInitialFocusSet) {
+                // 1. Mueve el foco lógico al ítem correcto
+                focusRequesters[currentRoute]?.requestFocus()
+                // 2. Lanza una subtarea para ajustar el scroll
+                coroutineScope.launch {
+                    // Este delay es CRUCIAL. Evita la "guerra de scrolls".
+                    delay(100)
+                    bringIntoViewRequesters[currentRoute]?.bringIntoView()
+                }
+                isInitialFocusSet = true
+            }
+        } else {
+            // El menú PIERDE foco. Reseteamos todo.
             isInitialFocusSet = false
-            // ...y tenemos una ruta actual y su posición...
             if (currentRoute != null) {
-                itemPositions[currentRoute]?.let { position ->
-                    // ...reseteamos el scroll a la posición de ese item.
-                    scrollState.scrollTo(position.toInt())
+                itemPositions[currentRoute]?.let {
+                    // Usamos corrutina para asegurar que el scroll se haga
+                    coroutineScope.launch {
+                        scrollState.scrollTo(it.toInt())
+                    }
                 }
             }
         }
@@ -112,283 +129,287 @@ fun TVNavigationLayout(navController: NavHostController) {
     Row(modifier = Modifier.fillMaxSize()) {
         if (showNavigationRail) {
             ProvideLazyListPivotOffset(parentFraction = 0.01f) {
+                // CAMBIO ARQUITECTÓNICO: El NavigationRail solo es un contenedor, ya no es scrollable.
                 NavigationRail(
                     modifier = Modifier
                         .width(railWidth)
                         .fillMaxHeight()
-                        .verticalScroll(scrollState, enabled = isInitialFocusSet)
-                        .padding(top = 5.dp, bottom = 500.dp)
-                        .onFocusChanged { hasItemFocused = it.hasFocus }
-                        .focusRequester(navRailRequester)
-                        .focusProperties {
-                            // Al entrar al NavRail desde fuera, cancelamos el foco automático
-                            // para que nuestro LaunchedEffect decida a dónde va.
-                            onEnter = { FocusRequester.Cancel }
-
-                            if (!isInitialFocusSet) {
-                                down = navRailRequester
-                                up = navRailRequester
-                                left = navRailRequester
-                                right = navRailRequester
-                            }
+                        // El onFocusEvent ahora está en el padre, que es quien tiene el foco lógico.
+                        .onFocusEvent { focusState ->
+                            isNavRailFocused = focusState.hasFocus
                         }
+                        .focusable() // Es focusable para que onFocusEvent funcione.
                 ) {
-                    sectionsWithMenu.forEach { route ->
+                    // CAMBIO ARQUITECTÓNICO: La Column interna es la que se encarga del scroll.
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .verticalScroll(scrollState)
+                            .padding(top = 5.dp, bottom = 500.dp)
+                    ) {
+                        sectionsWithMenu.forEach { route ->
+                            val itemModifier = Modifier
+                                .focusRequester(focusRequesters.getValue(route))
+                                .bringIntoViewRequester(bringIntoViewRequesters.getValue(route))
+                                .onGloballyPositioned { coordinates ->
+                                    itemPositions[route] = coordinates.positionInParent().y
+                                }
 
-                        val itemModifier = Modifier
-                            .focusRequester(focusRequesters.getValue(route))
-                            .onGloballyPositioned { coordinates ->
-                                itemPositions[route] = coordinates.positionInParent().y
-                            }
+                            when (route) {
+                                AppRoute.HOME.route -> {
+                                    CustomTVNavigationItem(
+                                        modifier = itemModifier,
+                                        icon = {
+                                            Icon(
+                                                Icons.Default.Home,
+                                                null,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        },
+                                        label = stringResource(R.string.nav_home),
+                                        parentIsFocused = isNavRailFocused,
+                                        selected = currentRoute == route,
+                                        onClick = { navController.navigate(route) }
+                                    )
+                                }
 
-                        when (route) {
-                            AppRoute.HOME.route -> {
-                                CustomTVNavigationItem(
-                                    modifier = itemModifier,
-                                    icon = {
-                                        Icon(
-                                            Icons.Default.Home,
-                                            null,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    },
-                                    label = stringResource(R.string.nav_home),
-                                    parentIsFocused = hasItemFocused,
-                                    selected = currentRoute == route,
-                                    onClick = { navController.navigate(route) }
-                                )
-                            }
+                                AppRoute.EPG.route -> {
+                                    CustomTVNavigationItem(
+                                        modifier = itemModifier,
+                                        icon = {
+                                            Icon(
+                                                BulletedList,
+                                                null,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        },
+                                        label = stringResource(R.string.nav_epg),
+                                        parentIsFocused = isNavRailFocused,
+                                        selected = currentRoute == route,
+                                        onClick = { navController.navigate(route) }
+                                    )
+                                }
 
-                            AppRoute.EPG.route -> {
-                                CustomTVNavigationItem(
-                                    modifier = itemModifier,
-                                    icon = {
-                                        Icon(
-                                            BulletedList,
-                                            null,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    },
-                                    label = stringResource(R.string.nav_epg),
-                                    parentIsFocused = hasItemFocused,
-                                    selected = currentRoute == route,
-                                    onClick = { navController.navigate(route) }
-                                )
-                            }
+                                AppRoute.CHANNELS.route -> {
+                                    CustomTVNavigationItem(
+                                        modifier = itemModifier,
+                                        icon = {
+                                            Icon(
+                                                painterResource(id = R.drawable.menu_channelsicon),
+                                                null,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        },
+                                        label = stringResource(R.string.nav_channels),
+                                        parentIsFocused = isNavRailFocused,
+                                        selected = currentRoute == route,
+                                        onClick = { navController.navigate(route) }
+                                    )
+                                }
 
-                            AppRoute.CHANNELS.route -> {
-                                CustomTVNavigationItem(
-                                    modifier = itemModifier,
-                                    icon = {
-                                        Icon(
-                                            painterResource(id = R.drawable.menu_channelsicon),
-                                            null,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    },
-                                    label = stringResource(R.string.nav_channels),
-                                    parentIsFocused = hasItemFocused,
-                                    selected = currentRoute == route,
-                                    onClick = { navController.navigate(route) }
-                                )
-                            }
+                                AppRoute.MOVIES.route -> {
+                                    CustomTVNavigationItem(
+                                        modifier = itemModifier,
+                                        icon = {
+                                            Icon(
+                                                painterResource(id = R.drawable.menu_cinemaicon),
+                                                null,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        },
+                                        label = stringResource(R.string.nav_movies),
+                                        parentIsFocused = isNavRailFocused,
+                                        selected = currentRoute == route,
+                                        onClick = { navController.navigate(route) }
+                                    )
+                                }
 
-                            AppRoute.MOVIES.route -> {
-                                CustomTVNavigationItem(
-                                    modifier = itemModifier,
-                                    icon = {
-                                        Icon(
-                                            painterResource(id = R.drawable.menu_cinemaicon),
-                                            null,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    },
-                                    label = stringResource(R.string.nav_movies),
-                                    parentIsFocused = hasItemFocused,
-                                    selected = currentRoute == route,
-                                    onClick = { navController.navigate(route) }
-                                )
-                            }
+                                AppRoute.DOCUMENTARIES.route -> {
+                                    CustomTVNavigationItem(
+                                        modifier = itemModifier,
+                                        icon = {
+                                            Icon(
+                                                painterResource(id = R.drawable.menu_documentariesicon),
+                                                null,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        },
+                                        label = stringResource(R.string.nav_documentaries),
+                                        parentIsFocused = isNavRailFocused,
+                                        selected = currentRoute == route,
+                                        onClick = { navController.navigate(route) }
+                                    )
+                                }
 
-                            AppRoute.DOCUMENTARIES.route -> {
-                                CustomTVNavigationItem(
-                                    modifier = itemModifier,
-                                    icon = {
-                                        Icon(
-                                            painterResource(id = R.drawable.menu_documentariesicon),
-                                            null,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    },
-                                    label = stringResource(R.string.nav_documentaries),
-                                    parentIsFocused = hasItemFocused,
-                                    selected = currentRoute == route,
-                                    onClick = { navController.navigate(route) }
-                                )
-                            }
+                                AppRoute.KIDS.route -> {
+                                    CustomTVNavigationItem(
+                                        modifier = itemModifier,
+                                        icon = {
+                                            Icon(
+                                                Icons.Default.Person,
+                                                null,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        },
+                                        label = stringResource(R.string.nav_kids),
+                                        parentIsFocused = isNavRailFocused,
+                                        selected = currentRoute == route,
+                                        onClick = { navController.navigate(route) }
+                                    )
+                                }
 
-                            AppRoute.SERIES.route -> {
-                                CustomTVNavigationItem(
-                                    modifier = itemModifier,
-                                    icon = {
-                                        Icon(
-                                            painterResource(id = R.drawable.menu_serieslogoicon),
-                                            null,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    },
-                                    label = stringResource(R.string.nav_series),
-                                    parentIsFocused = hasItemFocused,
-                                    selected = currentRoute == route,
-                                    onClick = { navController.navigate(route) }
-                                )
-                            }
+                                AppRoute.SERIES.route -> {
+                                    CustomTVNavigationItem(
+                                        modifier = itemModifier,
+                                        icon = {
+                                            Icon(
+                                                painterResource(id = R.drawable.menu_serieslogoicon),
+                                                null,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        },
+                                        label = stringResource(R.string.nav_series),
+                                        parentIsFocused = isNavRailFocused,
+                                        selected = currentRoute == route,
+                                        onClick = { navController.navigate(route) }
+                                    )
+                                }
 
-                            AppRoute.WARNER.route -> {
-                                CustomTVNavigationItem(
-                                    modifier = itemModifier,
-                                    icon = {
-                                        Icon(
-                                            painterResource(id = R.drawable.menu_wblogoicon),
-                                            null,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    },
-                                    label = stringResource(R.string.nav_warner),
-                                    parentIsFocused = hasItemFocused,
-                                    selected = currentRoute == route,
-                                    onClick = { navController.navigate(route) }
-                                )
-                            }
+                                AppRoute.SPORTS.route -> {
+                                    CustomTVNavigationItem(
+                                        modifier = itemModifier,
+                                        icon = {
+                                            Icon(
+                                                Football,
+                                                null,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        },
+                                        label = stringResource(R.string.nav_sports),
+                                        parentIsFocused = isNavRailFocused,
+                                        selected = currentRoute == route,
+                                        onClick = { navController.navigate(route) }
+                                    )
+                                }
 
-                            AppRoute.ACONTRA.route -> {
-                                CustomTVNavigationItem(
-                                    modifier = itemModifier,
-                                    icon = {
-                                        Icon(
-                                            painterResource(id = R.drawable.menu_acontralogoicon),
-                                            null,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    },
-                                    label = stringResource(R.string.nav_acontra),
-                                    parentIsFocused = hasItemFocused,
-                                    selected = currentRoute == route,
-                                    onClick = { navController.navigate(route) }
-                                )
-                            }
+                                AppRoute.WARNER.route -> {
+                                    CustomTVNavigationItem(
+                                        modifier = itemModifier,
+                                        icon = {
+                                            Icon(
+                                                painterResource(id = R.drawable.menu_wblogoicon),
+                                                null,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        },
+                                        label = stringResource(R.string.nav_warner),
+                                        parentIsFocused = isNavRailFocused,
+                                        selected = currentRoute == route,
+                                        onClick = { navController.navigate(route) }
+                                    )
+                                }
 
-                            AppRoute.AMC.route -> {
-                                CustomTVNavigationItem(
-                                    modifier = itemModifier,
-                                    icon = {
-                                        Icon(
-                                            painterResource(id = R.drawable.menu_amclogoicon),
-                                            null,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    },
-                                    label = stringResource(R.string.nav_amc),
-                                    parentIsFocused = hasItemFocused,
-                                    selected = currentRoute == route,
-                                    onClick = { navController.navigate(route) }
-                                )
-                            }
+                                AppRoute.ACONTRA.route -> {
+                                    CustomTVNavigationItem(
+                                        modifier = itemModifier,
+                                        icon = {
+                                            Icon(
+                                                painterResource(id = R.drawable.menu_acontralogoicon),
+                                                null,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        },
+                                        label = stringResource(R.string.nav_acontra),
+                                        parentIsFocused = isNavRailFocused,
+                                        selected = currentRoute == route,
+                                        onClick = { navController.navigate(route) }
+                                    )
+                                }
 
-                            AppRoute.SPORTS.route -> {
-                                CustomTVNavigationItem(
-                                    modifier = itemModifier,
-                                    icon = {
-                                        Icon(
-                                            Football,
-                                            null,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    },
-                                    label = stringResource(R.string.nav_sports),
-                                    parentIsFocused = hasItemFocused,
-                                    selected = currentRoute == route,
-                                    onClick = { navController.navigate(route) }
-                                )
-                            }
+                                AppRoute.AMC.route -> {
+                                    CustomTVNavigationItem(
+                                        modifier = itemModifier,
+                                        icon = {
+                                            Icon(
+                                                painterResource(id = R.drawable.menu_amclogoicon),
+                                                null,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        },
+                                        label = stringResource(R.string.nav_amc),
+                                        parentIsFocused = isNavRailFocused,
+                                        selected = currentRoute == route,
+                                        onClick = { navController.navigate(route) }
+                                    )
+                                }
 
-                            AppRoute.ADULTS.route -> {
-                                CustomTVNavigationItem(
-                                    modifier = itemModifier,
-                                    icon = { Icon(Fire, null, modifier = Modifier.size(24.dp)) },
-                                    label = stringResource(R.string.nav_adults),
-                                    parentIsFocused = hasItemFocused,
-                                    selected = currentRoute == route,
-                                    onClick = { navController.navigate(route) }
-                                )
-                            }
+                                AppRoute.SEARCH.route -> {
+                                    CustomTVNavigationItem(
+                                        modifier = itemModifier,
+                                        icon = {
+                                            Icon(
+                                                Icons.Default.Search,
+                                                null,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        },
+                                        label = stringResource(R.string.nav_search),
+                                        parentIsFocused = isNavRailFocused,
+                                        selected = currentRoute == route,
+                                        onClick = { navController.navigate(route) }
+                                    )
+                                }
 
-                            AppRoute.KIDS.route -> {
-                                CustomTVNavigationItem(
-                                    modifier = itemModifier,
-                                    icon = {
-                                        Icon(
-                                            Icons.Default.Person,
-                                            null,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    },
-                                    label = stringResource(R.string.nav_kids),
-                                    parentIsFocused = hasItemFocused,
-                                    selected = currentRoute == route,
-                                    onClick = { navController.navigate(route) }
-                                )
-                            }
+                                AppRoute.DIAGNOSTICS.route -> {
+                                    CustomTVNavigationItem(
+                                        modifier = itemModifier,
+                                        icon = {
+                                            Icon(
+                                                WifiSignal,
+                                                null,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        },
+                                        label = stringResource(R.string.nav_diagnostics),
+                                        parentIsFocused = isNavRailFocused,
+                                        selected = currentRoute == route,
+                                        onClick = { navController.navigate(route) }
+                                    )
+                                }
 
-                            AppRoute.SEARCH.route -> {
-                                CustomTVNavigationItem(
-                                    modifier = itemModifier,
-                                    icon = {
-                                        Icon(
-                                            Icons.Default.Search,
-                                            null,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    },
-                                    label = stringResource(R.string.nav_search),
-                                    parentIsFocused = hasItemFocused,
-                                    selected = currentRoute == route,
-                                    onClick = { navController.navigate(route) }
-                                )
-                            }
+                                AppRoute.ADULTS.route -> {
+                                    CustomTVNavigationItem(
+                                        modifier = itemModifier,
+                                        icon = {
+                                            Icon(
+                                                Fire,
+                                                null,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        },
+                                        label = stringResource(R.string.nav_adults),
+                                        parentIsFocused = isNavRailFocused,
+                                        selected = currentRoute == route,
+                                        onClick = { navController.navigate(route) }
+                                    )
+                                }
 
-                            AppRoute.DIAGNOSTICS.route -> {
-                                CustomTVNavigationItem(
-                                    modifier = itemModifier,
-                                    icon = {
-                                        Icon(
-                                            WifiSignal,
-                                            null,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    },
-                                    label = stringResource(R.string.nav_diagnostics),
-                                    parentIsFocused = hasItemFocused,
-                                    selected = currentRoute == route,
-                                    onClick = { navController.navigate(route) }
-                                )
-                            }
-
-                            AppRoute.LOGOUT.route -> {
-                                CustomTVNavigationItem(
-                                    modifier = itemModifier,
-                                    icon = {
-                                        Icon(
-                                            Icons.Default.Person,
-                                            null,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    },
-                                    label = stringResource(R.string.nav_change_user),
-                                    parentIsFocused = hasItemFocused,
-                                    selected = currentRoute == route,
-                                    onClick = { navController.navigate(route) }
-                                )
+                                AppRoute.LOGOUT.route -> {
+                                    CustomTVNavigationItem(
+                                        modifier = itemModifier,
+                                        icon = {
+                                            Icon(
+                                                Icons.Default.Person,
+                                                null,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        },
+                                        label = stringResource(R.string.nav_change_user),
+                                        parentIsFocused = isNavRailFocused,
+                                        selected = currentRoute == route,
+                                        onClick = { navController.navigate(route) }
+                                    )
+                                }
                             }
                         }
                     }
@@ -397,10 +418,11 @@ fun TVNavigationLayout(navController: NavHostController) {
         }
         NavHost(
             navController = navController,
-            startDestination = "login",
+            startDestination = AppRoute.LOGIN.route,
             modifier = Modifier.weight(1f)
         ) {
             navigationGraph(navController)
         }
     }
 }
+
