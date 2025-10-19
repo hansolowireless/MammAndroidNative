@@ -38,13 +38,13 @@ fun EPGScreen(
     val selectedChannel by viewModel.selectedChannel.collectAsStateWithLifecycle()
     val playedChannel by viewModel.playedChannel.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        viewModel.getEPGContent(LocalDate.now())
+    }
+
     LaunchedEffect(playedChannel) {
         playedChannel?.let { onPlayClick(it) }
         viewModel.clearPlayedChannel()
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.getEPGContent(LocalDate.now())
     }
 
     when (val state = uiState) {

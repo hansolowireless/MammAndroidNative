@@ -69,7 +69,8 @@
 
         <ImageButton
             android:id="@id/exo_prev"
-            style="@style/ExoMediaButton.Previous" />
+            style="@style/ExoMediaButton.Previous"
+            android:background="@drawable/playerbuttons"/>
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/jump_10s_back"
@@ -84,15 +85,18 @@
 
         <ImageButton
             android:id="@id/exo_rew"
-            style="@style/ExoMediaButton.Rewind" />
+            style="@style/ExoMediaButton.Rewind"
+            android:background="@drawable/playerbuttons"/>
 
         <ImageButton
             android:id="@id/exo_play_pause"
-            style="@style/ExoMediaButton.Play" />
+            style="@style/ExoMediaButton.Play"
+            android:background="@drawable/playerbuttons"/>
 
         <ImageButton
             android:id="@id/exo_ffwd"
-            style="@style/ExoMediaButton.FastForward" />
+            style="@style/ExoMediaButton.FastForward"
+            android:background="@drawable/playerbuttons"/>
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/jump_10s_forward"
@@ -107,7 +111,8 @@
 
         <ImageButton
             android:id="@id/exo_next"
-            style="@style/ExoMediaButton.Next" />
+            style="@style/ExoMediaButton.Next"
+            android:background="@drawable/playerbuttons"/>
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/select_tracks_button"
