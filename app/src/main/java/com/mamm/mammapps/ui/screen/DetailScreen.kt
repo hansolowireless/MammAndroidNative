@@ -37,6 +37,7 @@ fun DetailScreen(
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     LaunchedEffect (Unit) {
+        viewModel.setRouteTag(routeTag)
         viewModel.setShowPlayButton(content)
     }
 
@@ -74,8 +75,7 @@ fun DetailScreen(
                     return@DetailTV
                 }
                 viewModel.findContent(
-                    entityUI = content,
-                    routeTag = routeTag
+                    entityUI = content
                 )
             },
             onClickEpisode = { seasonOrder, episodeId ->
@@ -96,8 +96,7 @@ fun DetailScreen(
                     return@DetailMobile
                 }
                 viewModel.findContent(
-                    entityUI = content,
-                    routeTag = routeTag
+                    entityUI = content
                 )
             },
             seasonInfoUIState = seasonInfoUIState,

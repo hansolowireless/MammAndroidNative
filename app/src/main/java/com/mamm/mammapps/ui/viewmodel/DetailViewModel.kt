@@ -3,6 +3,7 @@ package com.mamm.mammapps.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mamm.mammapps.data.logger.Logger
+import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.bookmark.Recommended
 import com.mamm.mammapps.data.model.serie.TbSeason
@@ -11,6 +12,7 @@ import com.mamm.mammapps.domain.usecases.GetSeasonsInfoUseCase
 import com.mamm.mammapps.domain.usecases.GetSimilarContentUseCase
 import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.navigation.model.AppRoute
+import com.mamm.mammapps.ui.extension.catchupIsAvailable
 import com.mamm.mammapps.ui.mapper.toSeasonUIList
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
@@ -36,6 +38,8 @@ class DetailViewModel @Inject constructor(
         private const val TAG = "DetailViewModel"
     }
 
+    private var routeTag: AppRoute = AppRoute.HOME
+
     private val _showPlayButton = MutableStateFlow<Boolean>(false)
     val showPlayButton: StateFlow<Boolean> = _showPlayButton.asStateFlow()
 
@@ -50,7 +54,28 @@ class DetailViewModel @Inject constructor(
     private val _similarContent = MutableStateFlow<List<Recommended>?>(null)
     val similarContent: StateFlow<List<Recommended>?> = _similarContent.asStateFlow()
 
-    fun setShowPlayButton (content: ContentEntityUI) {
+    fun setRouteTag(routeTag: AppRoute) {
+        this.routeTag = routeTag
+    }
+
+    fun setShowPlayButton(content: ContentEntityUI) {
+        if (content.identifier is ContentIdentifier.Event && routeTag == AppRoute.EPG) {
+            content.detailInfo?.channelId?.let {
+                findContentEntityUseCase(identifier = ContentIdentifier.Channel(id = it))
+                    .onSuccess { channel ->
+                        val catchupHours = (channel as Channel).catchupHours ?: 0
+                        _showPlayButton.update { content.catchupIsAvailable(catchupHours) }
+                        return
+                    }.onFailure {
+                        logger.error(
+                            TAG,
+                            "setShowPlayButton channel for content was not found ${it.message}"
+                        )
+                        _showPlayButton.update { false }
+                        return
+                    }
+            }
+        }
         _showPlayButton.update { content.identifier !is ContentIdentifier.Serie && !content.isFuture() }
     }
 
@@ -59,7 +84,7 @@ class DetailViewModel @Inject constructor(
             viewModelScope.launch(Dispatchers.IO) {
                 getSeasonsInfoUseCase(content.identifier.id).onSuccess { seasonInfoResponse ->
                     _seasonInfoUIState.value = UIState.Success(seasonInfoResponse.toSeasonUIList())
-                    seasonInfoResponse.tbSeasons?.let {seasonListOriginal = it}
+                    seasonInfoResponse.tbSeasons?.let { seasonListOriginal = it }
                 }.onFailure {
                     _seasonInfoUIState.value = UIState.Error(it.message.orEmpty())
                 }
@@ -67,7 +92,7 @@ class DetailViewModel @Inject constructor(
         }
     }
 
-    fun findContent(entityUI: ContentEntityUI, routeTag: AppRoute) {
+    fun findContent(entityUI: ContentEntityUI) {
         findContentEntityUseCase(
             identifier = entityUI.identifier,
             customContent = entityUI.customContentType,

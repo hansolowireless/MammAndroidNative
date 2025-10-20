@@ -10,5 +10,6 @@ data class DetailInfoUI (
     val subtitle: String = "",
     val description: String = "",
     val subgenreId: Int? = null,
-    val metadata: Metadata? = null
+    val metadata: Metadata? = null,
+    val channelId: Int? = null
 ) : Parcelable
