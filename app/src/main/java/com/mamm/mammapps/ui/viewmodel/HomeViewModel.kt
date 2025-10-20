@@ -8,20 +8,20 @@ import androidx.lifecycle.viewModelScope
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.usecases.FindContentEntityUseCase
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
-import com.mamm.mammapps.domain.usecases.GetAMCUseCase
-import com.mamm.mammapps.domain.usecases.GetAcontraUseCase
-import com.mamm.mammapps.domain.usecases.GetAdultsUseCase
-import com.mamm.mammapps.domain.usecases.GetDocumentariesUseCase
-import com.mamm.mammapps.domain.usecases.GetEPGContentUseCase
-import com.mamm.mammapps.domain.usecases.GetHomeContentUseCase
-import com.mamm.mammapps.domain.usecases.GetKidsUseCase
-import com.mamm.mammapps.domain.usecases.GetMoviesUseCase
-import com.mamm.mammapps.domain.usecases.GetSeriesUseCase
-import com.mamm.mammapps.domain.usecases.GetSportsUseCase
-import com.mamm.mammapps.domain.usecases.GetWarnerUseCase
+import com.mamm.mammapps.domain.usecases.content.GetAMCUseCase
+import com.mamm.mammapps.domain.usecases.content.GetAcontraUseCase
+import com.mamm.mammapps.domain.usecases.content.GetAdultsUseCase
+import com.mamm.mammapps.domain.usecases.content.GetDocumentariesUseCase
+import com.mamm.mammapps.domain.usecases.content.GetEPGContentUseCase
+import com.mamm.mammapps.domain.usecases.content.GetHomeContentUseCase
+import com.mamm.mammapps.domain.usecases.content.GetKidsUseCase
+import com.mamm.mammapps.domain.usecases.content.GetMoviesUseCase
+import com.mamm.mammapps.domain.usecases.content.GetSeriesUseCase
+import com.mamm.mammapps.domain.usecases.content.GetSportsUseCase
+import com.mamm.mammapps.domain.usecases.content.GetWarnerUseCase
+import com.mamm.mammapps.domain.usecases.login.GetOperatorLogoUseCase
 import com.mamm.mammapps.domain.usecases.pin.ShouldRequestPinUseCase
 import com.mamm.mammapps.domain.usecases.pin.ValidatePinUseCase
-import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.mapper.toContentEntityUI
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.model.ContentEntityUI
@@ -40,6 +40,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    private val getOperatorLogoUrlUseCase: GetOperatorLogoUseCase,
     private val getHomeContentUseCase: GetHomeContentUseCase,
     private val getEPGContentUseCase: GetEPGContentUseCase,
     private val getSeriesUseCase: GetSeriesUseCase,
@@ -62,7 +63,7 @@ class HomeViewModel @Inject constructor(
         const val TAG = "HomeViewModel"
     }
 
-    var homeContentUIState by mutableStateOf<HomeContentUIState>(HomeContentUIState.Loading)
+    var homeContentUIState by mutableStateOf<HomeContentUIState>(HomeContentUIState.Idle)
         private set
 
     var homeContentUI by mutableStateOf<List<ContentRowUI>>(emptyList())
@@ -79,6 +80,17 @@ class HomeViewModel @Inject constructor(
 
     private val _lastClickedItemIndex = MutableStateFlow<Int?>(null)
     val lastClickedItemIndex: StateFlow<Int?> = _lastClickedItemIndex.asStateFlow()
+
+
+    private fun setLoadingStateWithLogo() {
+        viewModelScope.launch(Dispatchers.IO) {
+            getOperatorLogoUrlUseCase().onSuccess {
+                homeContentUIState = HomeContentUIState.Loading(it)
+            }.onFailure {
+                homeContentUIState = HomeContentUIState.Loading(null)
+            }
+        }
+    }
 
     fun checkRestrictedScreen(routeTag: AppRoute) {
         homeContentUIState = when (routeTag) {
@@ -107,6 +119,7 @@ class HomeViewModel @Inject constructor(
                     }
                 }
             }
+
             AppRoute.SERIES -> loadContent { getSeriesUseCase() }
             AppRoute.MOVIES -> loadContent { getMoviesUseCase() }
             AppRoute.DOCUMENTARIES -> loadContent { getDocumentariesUseCase() }
@@ -121,8 +134,8 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun loadContent(useCase: suspend () -> Result<List<ContentRowUI>>) {
-        homeContentUIState = HomeContentUIState.Loading
         viewModelScope.launch(Dispatchers.IO) {
+            setLoadingStateWithLogo()
             useCase()
                 .onSuccess { response ->
                     homeContentUI = response

@@ -4,7 +4,7 @@ import com.mamm.mammapps.ui.model.ContentRowUI
 
 sealed class HomeContentUIState : UIState<Nothing>() {
     data object Idle : HomeContentUIState()
-    data object Loading : HomeContentUIState()
+    data class Loading(val logo: String?) : HomeContentUIState()
     data object Restricted : HomeContentUIState()
     data object RequestContent: HomeContentUIState()
     data object IncorrectPin : HomeContentUIState()

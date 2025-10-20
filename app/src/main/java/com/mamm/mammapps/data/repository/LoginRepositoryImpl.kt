@@ -36,6 +36,12 @@ class LoginRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun getOperatorLogoUrl() : Result<String> {
+        return runCatching {
+            remoteDatasource.getOperatorLogoUrl() ?: throw IllegalStateException("Operator logo URL is null")
+        }
+    }
+
     override suspend fun getUserCredentials(): Result<Pair<String?, String?>> {
         return runCatching {
             val credentials = localDataSource.getUserCredentials()

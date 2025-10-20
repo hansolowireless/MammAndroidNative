@@ -14,14 +14,12 @@ fun LoadingSpinner(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = Modifier.fillMaxSize()
-    )
-    {
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
         CircularProgressIndicator(
-            modifier = modifier.align(Alignment.Center),
             strokeWidth = 2.dp,
             color = Primary
         )
     }
-
 }

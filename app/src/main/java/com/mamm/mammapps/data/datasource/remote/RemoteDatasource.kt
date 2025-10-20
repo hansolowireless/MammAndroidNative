@@ -75,6 +75,10 @@ class RemoteDatasource @Inject constructor(
         return locatorApi.checkLocator(userName)
     }
 
+    fun getOperatorLogoUrl () : String? {
+        return sessionManager.operatorLogoUrl
+    }
+
     suspend fun getHomeContent(): GetHomeContentResponse {
         return withContext(Dispatchers.IO) {
             // Return cached content if available
