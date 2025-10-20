@@ -24,6 +24,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
@@ -204,4 +205,42 @@ fun ImageView.insertThumbnail(url: String?, position: Long, onError: (() -> Unit
             }
         })
         .into(this)
+}
+
+/**
+ * Comprueba si la tecla corresponde a un número del teclado numérico (Numpad).
+ */
+fun Key.isNumpadNumber(): Boolean {
+    // La forma segura y recomendada es comprobar contra una lista explícita,
+    // ya que los valores de 'Key' no son necesariamente secuenciales.
+    return this in listOf(
+        Key.NumPad0, Key.NumPad1, Key.NumPad2, Key.NumPad3, Key.NumPad4,
+        Key.NumPad5, Key.NumPad6, Key.NumPad7, Key.NumPad8, Key.NumPad9
+    )
+}
+
+/**
+ * Convierte una tecla del Numpad a su representación como String.
+ * Devuelve el dígito ("0"-"9") si la tecla es del Numpad, o null en caso contrario.
+ *
+ * Ejemplo: Key.NumPad7.toDigitString() devuelve "7"
+ */
+fun Key.toDigitString(): String? {
+    // Si la tecla no es del Numpad, no hacemos nada.
+    if (!this.isNumpadNumber()) return null
+
+    // Usa 'when' para un mapeo seguro y legible.
+    return when (this) {
+        Key.NumPad0 -> "0"
+        Key.NumPad1 -> "1"
+        Key.NumPad2 -> "2"
+        Key.NumPad3 -> "3"
+        Key.NumPad4 -> "4"
+        Key.NumPad5 -> "5"
+        Key.NumPad6 -> "6"
+        Key.NumPad7 -> "7"
+        Key.NumPad8 -> "8"
+        Key.NumPad9 -> "9"
+        else -> null // Seguridad extra, aunque isNumpadNumber() ya protege.
+    }
 }

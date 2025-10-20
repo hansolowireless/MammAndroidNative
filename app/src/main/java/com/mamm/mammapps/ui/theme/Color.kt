@@ -61,3 +61,7 @@ object EPGMobileColor {
     val timeLine = NetflixColorScheme.onError
 
 }
+
+object PlayerColor {
+    val channelZappingText = Color.White
+}

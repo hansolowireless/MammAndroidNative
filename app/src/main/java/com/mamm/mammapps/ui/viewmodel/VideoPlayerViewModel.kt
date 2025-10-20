@@ -115,6 +115,10 @@ class VideoPlayerViewModel @Inject constructor(
     private val _tickerList = MutableStateFlow<List<Ticker>>(emptyList())
     val tickerList = _tickerList.asStateFlow()
 
+    //
+    private val _zappingNumberDisplay = MutableStateFlow<String>("")
+    val zappingNumberDisplay = _zappingNumberDisplay.asStateFlow()
+
     // ExoPlayer y componentes
     private var trackSelector: DefaultTrackSelector? = null
     private val statsListener: PlaybackStatsListener by lazy { PlaybackStatsListener(false) { _, _ -> } }
@@ -600,6 +604,30 @@ class VideoPlayerViewModel @Inject constructor(
 
     fun hideZappingLayer() {
         _showZappingLayer.update { false }
+    }
+
+    fun showZappingNumberDisplay(newDigit: String) {
+        if (newDigit.isEmpty()) {
+            _zappingNumberDisplay.update { newDigit }
+        } else {
+            val newValue = _zappingNumberDisplay.value + newDigit
+            if (newValue.length == 3) {
+                _zappingNumberDisplay.update { "" }
+            }
+            else {
+                _zappingNumberDisplay.update { newValue }
+            }
+        }
+    }
+
+    fun navigateToChannel (number: String) {
+        runCatching {
+            _zappingNumberDisplay.update { "" }
+            val channel = _zappingInfo.value[number.toInt()].channel
+            findAndPlayChannel(content = channel)
+        }.onFailure {
+            logger.error(TAG, "navigateToChannel - Error navigating to channel: ${it.message}")
+        }
     }
 
     fun updateChannelList() {
