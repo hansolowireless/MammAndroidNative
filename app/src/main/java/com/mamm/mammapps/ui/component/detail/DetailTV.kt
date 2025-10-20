@@ -134,6 +134,7 @@ fun DetailTV(
                     // Botón de reproducir, solo si no es serie
                     if (showPlayButton) {
                         PrimaryButton(
+                            modifier = Modifier.fillMaxWidth(0.5f),
                             text = stringResource(R.string.play),
                             icon = {
                                 Icon(

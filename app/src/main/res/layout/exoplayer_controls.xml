@@ -236,6 +236,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="25:23" />
 
+    <TextView
+        android:id="@+id/tstv_hourend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:includeFontPadding="false"
+        android:text="18:21"
+        android:textColor="#FFBEBEBE"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintBaseline_toBaselineOf="@id/exo_position"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="18:21" />
 
     <FrameLayout
         android:id="@+id/previewFrameLayout"

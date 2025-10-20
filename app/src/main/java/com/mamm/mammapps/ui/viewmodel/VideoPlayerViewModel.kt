@@ -398,6 +398,8 @@ class VideoPlayerViewModel @Inject constructor(
     fun setControlVisibility(playerView: StyledPlayerView) {
         val positionView: View = playerView.findViewById(R.id.exo_position)
         val tstvHourBeginView: TextView = playerView.findViewById(R.id.tstv_hourbegin)
+        val tstvHourEndView: TextView = playerView.findViewById(R.id.tstv_hourend)
+        val exoDuration: TextView = playerView.findViewById(com.google.android.exoplayer2.ui.R.id.exo_duration)
         val liveLabel: View = playerView.findViewById(R.id.live_indicator)
 
         val goToLiveButton: AppCompatImageButton = playerView.findViewById(R.id.go_live_button)
@@ -423,9 +425,13 @@ class VideoPlayerViewModel @Inject constructor(
 
             if (_liveEventInfo.value != null) {
                 tstvHourBeginView.visibility = View.VISIBLE
+                tstvHourEndView.visibility = View.VISIBLE
+                exoDuration.visibility = View.INVISIBLE
+                tstvHourBeginView.setHourText(_liveEventInfo.value?.eventStart)
+                tstvHourEndView.setHourText(_liveEventInfo.value?.eventEnd)
+
                 positionView.visibility = View.INVISIBLE
                 startOverButton.visibility = View.VISIBLE
-                tstvHourBeginView.setHourText(_liveEventInfo.value?.eventStart)
 
                 if (previewBar?.isTstvMode == true) {
                     liveLabel.visibility = View.GONE
@@ -438,6 +444,7 @@ class VideoPlayerViewModel @Inject constructor(
             } else {
                 positionView.visibility = View.GONE
                 tstvHourBeginView.visibility = View.GONE
+                tstvHourEndView.visibility = View.GONE
                 liveLabel.visibility = View.VISIBLE
                 startOverButton.visibility = View.GONE
             }
@@ -448,6 +455,8 @@ class VideoPlayerViewModel @Inject constructor(
             if (!_content.value.isLive) {
                 positionView.visibility = View.VISIBLE
                 tstvHourBeginView.visibility = View.GONE
+                tstvHourEndView.visibility = View.GONE
+                exoDuration.visibility = View.VISIBLE
                 liveLabel.visibility = View.GONE
                 jump10sback.visibility = View.VISIBLE
                 jump10sforward.visibility = View.VISIBLE
@@ -456,6 +465,8 @@ class VideoPlayerViewModel @Inject constructor(
             } else {
                 positionView.visibility = View.GONE
                 tstvHourBeginView.visibility = View.GONE
+                tstvHourEndView.visibility = View.GONE
+                exoDuration.visibility = View.INVISIBLE
                 liveLabel.visibility = View.VISIBLE
                 jump10sback.visibility = View.GONE
                 jump10sforward.visibility = View.GONE

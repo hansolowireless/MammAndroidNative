@@ -51,7 +51,7 @@ class DetailViewModel @Inject constructor(
     val similarContent: StateFlow<List<Recommended>?> = _similarContent.asStateFlow()
 
     fun setShowPlayButton (content: ContentEntityUI) {
-        _showPlayButton.update { content.identifier !is ContentIdentifier.Serie || !content.isFuture() }
+        _showPlayButton.update { content.identifier !is ContentIdentifier.Serie && !content.isFuture() }
     }
 
     fun getSeasonInfo(content: ContentEntityUI) {

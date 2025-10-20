@@ -286,8 +286,6 @@ fun PlayerViewWithControlsExperimental(
                         parentView.findViewById<AppCompatImageButton>(R.id.cc_tracks_button)
                     val previewTimeBar =
                         parentView.findViewById<CustomPreviewBar>(R.id.exo_progress)
-                    val zappingNumberDisplayView =
-                        parentView.findViewById<TextView>(R.id.zapping_channel_number_text)
 
                     var playerChanged = false
                     if (styledPlayerView.player != player) {
