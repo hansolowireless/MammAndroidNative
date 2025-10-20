@@ -39,13 +39,17 @@ import com.bumptech.glide.request.target.Target
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.mamm.mammapps.R
+import com.mamm.mammapps.data.extension.getCurrentDate
 import com.mamm.mammapps.data.logger.SimpleLogger
 import com.mamm.mammapps.data.model.player.GlideThumbnailTransformation
 import com.mamm.mammapps.data.model.player.WatermarkInfo
+import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.ui.constant.PlayerConstant
+import com.mamm.mammapps.ui.model.ContentEntityUI
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.Date
 import kotlin.math.floor
 
@@ -243,4 +247,15 @@ fun Key.toDigitString(): String? {
         Key.NumPad9 -> "9"
         else -> null // Seguridad extra, aunque isNumpadNumber() ya protege.
     }
+}
+
+fun ContentEntityUI.catchupIsAvailable(availableCatchupHours: Int): Boolean {
+    val startInstant = liveEventInfo?.eventStart?.toInstant()
+    val nowInstant = getCurrentDate().toInstant()
+    val differenceInMinutes = ChronoUnit.MINUTES.between(startInstant, nowInstant)
+    val differenceInHours = differenceInMinutes / 60.0
+
+    return availableCatchupHours > 0 &&
+            differenceInHours > 0 &&
+            differenceInHours < availableCatchupHours
 }

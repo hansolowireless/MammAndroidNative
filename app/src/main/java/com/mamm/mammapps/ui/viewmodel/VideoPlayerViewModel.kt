@@ -27,7 +27,7 @@ import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.model.player.Ticker
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
-import com.mamm.mammapps.domain.usecases.GetChannelsUseCase
+import com.mamm.mammapps.domain.usecases.content.GetChannelsUseCase
 import com.mamm.mammapps.domain.usecases.player.GetDRMUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.GetJwTokenUseCase
 import com.mamm.mammapps.domain.usecases.player.GetPlayableUrlUseCase

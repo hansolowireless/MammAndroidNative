@@ -1,10 +1,8 @@
-package com.mamm.mammapps.domain.usecases
+package com.mamm.mammapps.domain.usecases.content
 
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.domain.interfaces.MammRepository
-import com.mamm.mammapps.ui.mapper.toContentEntityUI
-import com.mamm.mammapps.ui.model.ContentEntityUI
 import javax.inject.Inject
 
 class GetChannelsUseCase @Inject constructor(

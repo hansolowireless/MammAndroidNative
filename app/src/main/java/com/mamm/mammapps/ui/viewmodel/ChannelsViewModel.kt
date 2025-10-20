@@ -6,7 +6,7 @@ import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.domain.usecases.FindContentEntityUseCase
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
-import com.mamm.mammapps.domain.usecases.GetChannelsUseCase
+import com.mamm.mammapps.domain.usecases.content.GetChannelsUseCase
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.mapper.toContentEntityUI
 import com.mamm.mammapps.ui.model.ContentEntityUI

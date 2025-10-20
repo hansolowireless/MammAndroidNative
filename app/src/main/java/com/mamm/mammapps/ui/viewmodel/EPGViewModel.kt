@@ -7,7 +7,7 @@ import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.epg.EPGChannelContent
 import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.domain.usecases.FindContentEntityUseCase
-import com.mamm.mammapps.domain.usecases.GetEPGContentUseCase
+import com.mamm.mammapps.domain.usecases.content.GetEPGContentUseCase
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.model.ContentIdentifier

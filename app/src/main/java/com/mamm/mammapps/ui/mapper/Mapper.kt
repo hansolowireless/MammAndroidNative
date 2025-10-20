@@ -132,7 +132,8 @@ fun EPGEvent.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
     detailInfo = DetailInfoUI(
         metadata = getMetadata(),
         description = getDescription(),
-        subgenreId = this.idSubgenre?.toInt()
+        subgenreId = this.idSubgenre?.toInt(),
+        channelId = this.getChannelId()
     )
 )
 

@@ -1,4 +1,4 @@
-package com.mamm.mammapps.domain.usecases
+package com.mamm.mammapps.domain.usecases.content
 
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.interfaces.MammRepository
@@ -6,31 +6,31 @@ import com.mamm.mammapps.ui.mapper.toContentUIRows
 import com.mamm.mammapps.ui.model.ContentRowUI
 import javax.inject.Inject
 
-class GetKidsUseCase @Inject constructor(
+class GetDocumentariesUseCase @Inject constructor(
     private val mammRepository: MammRepository,
     private val logger: Logger
 ){
 
     companion object {
-        private const val TAG = "GetKidsUseCase"
+        private const val TAG = "GetDocumentariesUseCase"
     }
 
     suspend operator fun invoke(): Result<List<ContentRowUI>> {
-        return mammRepository.findGenreWithId(15).fold(
+        return mammRepository.findGenreWithId(9).fold(
             onSuccess = { genreResult ->
-                mammRepository.getKids().fold(
+                mammRepository.getDocumentaries().fold(
                     onSuccess = { response ->
-                        logger.debug(TAG, "GetKidsUseCase Received successful response")
+                        logger.debug(TAG, "GetDocumentariesUseCase Received successful response")
                         Result.success(response.toContentUIRows(genreResult))
                     },
                     onFailure = { exception ->
-                        logger.error(TAG, "GetKidsUseCase Failed: ${exception.message}")
+                        logger.error(TAG, "GetDocumentariesUseCase Failed: ${exception.message}")
                         Result.failure(exception)
                     }
                 )
             },
             onFailure = { exception ->
-                logger.error(TAG, "GetKidsUseCase Genre lookup failed: ${exception.message}")
+                logger.error(TAG, "GetDocumentariesUseCase Genre lookup failed: ${exception.message}")
                 Result.failure(exception)
             }
         )
