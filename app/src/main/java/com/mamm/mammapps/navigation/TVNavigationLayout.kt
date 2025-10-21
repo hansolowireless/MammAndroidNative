@@ -65,15 +65,15 @@ fun TVNavigationLayout(navController: NavHostController) {
             AppRoute.CHANNELS.route,
             AppRoute.MOVIES.route,
             AppRoute.DOCUMENTARIES.route,
+            AppRoute.SPORTS.route,
             AppRoute.KIDS.route,
             AppRoute.SERIES.route,
-            AppRoute.SPORTS.route,
             AppRoute.WARNER.route,
             AppRoute.ACONTRA.route,
             AppRoute.AMC.route,
+            AppRoute.ADULTS.route,
             AppRoute.SEARCH.route,
             AppRoute.DIAGNOSTICS.route,
-            AppRoute.ADULTS.route,
             AppRoute.LOGOUT.route
         ).distinct()
     }
@@ -241,6 +241,23 @@ fun TVNavigationLayout(navController: NavHostController) {
                                     )
                                 }
 
+                                AppRoute.SPORTS.route -> {
+                                    CustomTVNavigationItem(
+                                        modifier = itemModifier,
+                                        icon = {
+                                            Icon(
+                                                Football,
+                                                null,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        },
+                                        label = stringResource(R.string.nav_sports),
+                                        parentIsFocused = isNavRailFocused,
+                                        selected = currentRoute == route,
+                                        onClick = { navController.navigate(route) }
+                                    )
+                                }
+
                                 AppRoute.KIDS.route -> {
                                     CustomTVNavigationItem(
                                         modifier = itemModifier,
@@ -269,23 +286,6 @@ fun TVNavigationLayout(navController: NavHostController) {
                                             )
                                         },
                                         label = stringResource(R.string.nav_series),
-                                        parentIsFocused = isNavRailFocused,
-                                        selected = currentRoute == route,
-                                        onClick = { navController.navigate(route) }
-                                    )
-                                }
-
-                                AppRoute.SPORTS.route -> {
-                                    CustomTVNavigationItem(
-                                        modifier = itemModifier,
-                                        icon = {
-                                            Icon(
-                                                Football,
-                                                null,
-                                                modifier = Modifier.size(24.dp)
-                                            )
-                                        },
-                                        label = stringResource(R.string.nav_sports),
                                         parentIsFocused = isNavRailFocused,
                                         selected = currentRoute == route,
                                         onClick = { navController.navigate(route) }
@@ -343,6 +343,23 @@ fun TVNavigationLayout(navController: NavHostController) {
                                     )
                                 }
 
+                                AppRoute.ADULTS.route -> {
+                                    CustomTVNavigationItem(
+                                        modifier = itemModifier,
+                                        icon = {
+                                            Icon(
+                                                Fire,
+                                                null,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                        },
+                                        label = stringResource(R.string.nav_adults),
+                                        parentIsFocused = isNavRailFocused,
+                                        selected = currentRoute == route,
+                                        onClick = { navController.navigate(route) }
+                                    )
+                                }
+
                                 AppRoute.SEARCH.route -> {
                                     CustomTVNavigationItem(
                                         modifier = itemModifier,
@@ -376,23 +393,6 @@ fun TVNavigationLayout(navController: NavHostController) {
 //                                        onClick = { navController.navigate(route) }
 //                                    )
 //                                }
-
-                                AppRoute.ADULTS.route -> {
-                                    CustomTVNavigationItem(
-                                        modifier = itemModifier,
-                                        icon = {
-                                            Icon(
-                                                Fire,
-                                                null,
-                                                modifier = Modifier.size(24.dp)
-                                            )
-                                        },
-                                        label = stringResource(R.string.nav_adults),
-                                        parentIsFocused = isNavRailFocused,
-                                        selected = currentRoute == route,
-                                        onClick = { navController.navigate(route) }
-                                    )
-                                }
 
                                 AppRoute.LOGOUT.route -> {
                                     CustomTVNavigationItem(

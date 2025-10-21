@@ -155,7 +155,7 @@ fun SectionVod.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
 
 fun BrandedVod.toContentEntityUI() = ContentEntityUI(
     identifier = ContentIdentifier.VoD(getId()),
-    imageUrl = contentLogo.orEmpty(),
+    imageUrl = posterLogo.orEmpty(),
     horizontalImageUrl = contentLogo.orEmpty(),
     title = getTitle(),
     aspectRatio = Ratios.VERTICAL,

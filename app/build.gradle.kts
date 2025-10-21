@@ -92,8 +92,8 @@ android {
         applicationId = "com.mamm.mammapps"
         minSdk = 24
         targetSdk = 35
-        versionCode = 493
-        versionName = "4.7.522"
+        versionCode = 494
+        versionName = "4.7.523"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -146,7 +146,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-
         }
     }
 
@@ -197,6 +196,21 @@ android {
             "openstream"
         )
 
+    }
+
+}
+
+androidComponents {
+    onVariants(selector().withBuildType("release")) { variant ->
+        val flavorName = variant.flavorName ?: "app"
+        val versionName = variant.outputs.first().versionName.get() ?: "0.0"
+        val versionCode = variant.outputs.first().versionCode.get() ?: 0
+
+        variant.outputs.forEach { output ->
+            if (output is com.android.build.api.variant.impl.VariantOutputImpl) {
+                output.outputFileName.set("${flavorName}-release-${versionName}-${versionCode}.apk")
+            }
+        }
     }
 }
 
