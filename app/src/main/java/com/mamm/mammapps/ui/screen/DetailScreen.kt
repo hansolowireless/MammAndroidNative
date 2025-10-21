@@ -90,6 +90,7 @@ fun DetailScreen(
         DetailMobile(
             content = content,
             showPlayButton = showPlayButton,
+            similarContent = similarContent,
             onClickPlay = {
                 if (prefoundContent != null) {
                     onClickPlay(prefoundContent)
@@ -102,6 +103,9 @@ fun DetailScreen(
             seasonInfoUIState = seasonInfoUIState,
             onClickEpisode = { seasonOrder, episodeId ->
                 viewModel.findEpisode(seasonOrder, episodeId)
+            },
+            onSimilarContentClick = {
+                onSimilarContentClick(it)
             },
             onClose = {
                 backDispatcher?.onBackPressed()

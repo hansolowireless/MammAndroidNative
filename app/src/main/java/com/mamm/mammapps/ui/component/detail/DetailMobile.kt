@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -37,12 +38,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.mamm.mammapps.R
+import com.mamm.mammapps.data.model.bookmark.Recommended
 import com.mamm.mammapps.data.model.metadata.Metadata
 import com.mamm.mammapps.ui.component.common.ContentEntityListItem
 import com.mamm.mammapps.ui.component.common.ExpandableText
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
+import com.mamm.mammapps.ui.component.metadata.ActorCard
 import com.mamm.mammapps.ui.component.metadata.DirectorAndGenreRow
 import com.mamm.mammapps.ui.component.metadata.DurationYearRatingRow
+import com.mamm.mammapps.ui.mapper.toSimilarContentRow
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.DetailInfoUI
@@ -56,10 +60,12 @@ import kotlinx.coroutines.flow.merge
 fun DetailMobile(
     modifier: Modifier = Modifier,
     content: ContentEntityUI,
+    similarContent: List<Recommended>?,
     showPlayButton: Boolean = true,
     onClickPlay: () -> Unit,
     seasonInfoUIState: UIState<List<SeasonUI>>? = null,
     onClickEpisode: (Int, Int) -> Unit,
+    onSimilarContentClick: (Any) -> Unit,
     onClose: () -> Unit
 ) {
 
@@ -140,6 +146,40 @@ fun DetailMobile(
                         textAlign = TextAlign.Justify
                     )
                 }
+
+                // Sección de reparto
+                content.detailInfo?.metadata?.let { metadata ->
+                    if (metadata.actors.isNotEmpty()) {
+                        Text(
+                            text = stringResource(R.string.cast),
+                            color = Color.White,
+                            modifier = Modifier.padding(bottom = Dimensions.paddingSmall)
+                        )
+
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall)
+                        ) {
+                            items(metadata.actors) { actor ->
+                                ActorCard(actor = actor)
+                            }
+                        }
+                    }
+                }
+
+                similarContent?.let { it ->
+                    SimilarContentRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = Dimensions.paddingSmall),
+                        content = it.toSimilarContentRow(),
+                        onContentClicked = { content ->
+                            //Buscamos el contenido que mandamos a la siguiente vista detalle
+                            similarContent.find { it.id == content.identifier.id }?.let {
+                                onSimilarContentClick(it)
+                            }
+                        }
+                    )
+                }
             }
         }
 
@@ -202,6 +242,8 @@ private fun DetailMobilePreview() {
             content = sampleContent,
             onClickPlay = {},
             onClickEpisode = { _, _ -> },
+            onSimilarContentClick = {},
+            similarContent = null,
             onClose = {}
         )
     }

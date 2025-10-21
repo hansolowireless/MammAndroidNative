@@ -40,7 +40,7 @@ fun RowOfContent(
                 .wrapContentHeight(),
             verticalAlignment = Alignment.CenterVertically,
             contentPadding = PaddingValues(horizontal = Dimensions.paddingXSmall),
-            horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
+            horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall)
         ) {
             itemsIndexed(
                 contentList

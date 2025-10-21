@@ -31,7 +31,7 @@ object HomeGridTopColor {
 }
 
 object HomeGridBottomColor {
-    val rowTitle = Outlined
+    val rowTitle = Color.White
 }
 
 object SeasonSelectorTabs {
