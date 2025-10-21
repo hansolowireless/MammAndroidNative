@@ -360,22 +360,22 @@ fun TVNavigationLayout(navController: NavHostController) {
                                     )
                                 }
 
-                                AppRoute.DIAGNOSTICS.route -> {
-                                    CustomTVNavigationItem(
-                                        modifier = itemModifier,
-                                        icon = {
-                                            Icon(
-                                                WifiSignal,
-                                                null,
-                                                modifier = Modifier.size(24.dp)
-                                            )
-                                        },
-                                        label = stringResource(R.string.nav_diagnostics),
-                                        parentIsFocused = isNavRailFocused,
-                                        selected = currentRoute == route,
-                                        onClick = { navController.navigate(route) }
-                                    )
-                                }
+//                                AppRoute.DIAGNOSTICS.route -> {
+//                                    CustomTVNavigationItem(
+//                                        modifier = itemModifier,
+//                                        icon = {
+//                                            Icon(
+//                                                WifiSignal,
+//                                                null,
+//                                                modifier = Modifier.size(24.dp)
+//                                            )
+//                                        },
+//                                        label = stringResource(R.string.nav_diagnostics),
+//                                        parentIsFocused = isNavRailFocused,
+//                                        selected = currentRoute == route,
+//                                        onClick = { navController.navigate(route) }
+//                                    )
+//                                }
 
                                 AppRoute.ADULTS.route -> {
                                     CustomTVNavigationItem(

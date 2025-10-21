@@ -65,10 +65,21 @@ fun MobileNavigationLayout(navController: NavHostController) {
                 Spacer(modifier = Modifier.padding(12.dp))
 
                 val menuItems = listOf(
-                    AppRoute.HOME, AppRoute.EPG, AppRoute.CHANNELS, AppRoute.MOVIES,
-                    AppRoute.DOCUMENTARIES, AppRoute.SERIES, AppRoute.WARNER, AppRoute.ACONTRA,
-                    AppRoute.AMC, AppRoute.SPORTS, AppRoute.ADULTS, AppRoute.KIDS, AppRoute.SEARCH,
-                    AppRoute.DIAGNOSTICS, AppRoute.LOGOUT
+                    AppRoute.HOME,
+                    AppRoute.EPG,
+                    AppRoute.CHANNELS,
+                    AppRoute.MOVIES,
+                    AppRoute.DOCUMENTARIES,
+                    AppRoute.SERIES,
+                    AppRoute.WARNER,
+                    AppRoute.ACONTRA,
+                    AppRoute.AMC,
+                    AppRoute.SPORTS,
+                    AppRoute.ADULTS,
+                    AppRoute.KIDS,
+                    AppRoute.SEARCH,
+//                    AppRoute.DIAGNOSTICS,
+                    AppRoute.LOGOUT
                 )
 
                 menuItems.forEach { item ->
@@ -91,7 +102,10 @@ fun MobileNavigationLayout(navController: NavHostController) {
                 // Solo mostramos la TopAppBar (y el menú hamburguesa) si el cajón debe mostrarse
                 if (showNavigationDrawer) {
                     TopAppBar(
-                        title = { Text(text = currentRoute?.let { stringResource(getTitleForRoute(it)) } ?: "") },
+                        title = {
+                            Text(text = currentRoute?.let { stringResource(getTitleForRoute(it)) }
+                                ?: "")
+                        },
                         navigationIcon = {
                             IconButton(onClick = {
                                 scope.launch {
