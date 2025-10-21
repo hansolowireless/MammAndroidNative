@@ -115,7 +115,7 @@ class VideoPlayerViewModel @Inject constructor(
     private val _tickerList = MutableStateFlow<List<Ticker>>(emptyList())
     val tickerList = _tickerList.asStateFlow()
 
-    //
+    //Display del número del canal para hacer zapping
     private val _zappingNumberDisplay = MutableStateFlow<String>("")
     val zappingNumberDisplay = _zappingNumberDisplay.asStateFlow()
 
@@ -547,25 +547,19 @@ class VideoPlayerViewModel @Inject constructor(
                 viewModelScope.launch(Dispatchers.IO) {
                     getTSTVUrlUseCase.invoke(liveEventInfo = _liveEventInfo.value)
                         .onSuccess { url ->
-                            logger.debug(
-                                TAG,
-                                "handleScrubStop Success getting TSTV Url, setting it now..."
-                            )
+                            logger.debug(TAG, "handleScrubStop Success getting TSTV Url, setting it now...")
 
                             previewBar?.isTstvMode = true
-                            _isTstvMode.update { true }
                             previewBar?.setTstvPoint(_liveEventInfo.value?.eventStart?.toDate())
                             tstvInitialPlayPositionMs = progress
+                            _isTstvMode.update { true }
 
                             withContext(Dispatchers.Main) {
                                 setPlayerUrls(videoUrl = url)
                             }
 
                         }.onFailure {
-                            logger.error(
-                                TAG,
-                                "handleScrubStop Failed to get TSTV url, defaulting to Live Url"
-                            )
+                            logger.error(TAG, "handleScrubStop Failed to get TSTV url, defaulting to Live Url")
 
                             previewBar?.isTstvMode = false
                             _isTstvMode.update { false }
@@ -576,10 +570,7 @@ class VideoPlayerViewModel @Inject constructor(
                         }
                 }
             } else {
-                logger.debug(
-                    TAG,
-                    "handleScrubStop Difference is not sufficient to get into TSTV Mode! Still in live..."
-                )
+                logger.debug(TAG, "handleScrubStop Difference is not sufficient to get into TSTV Mode! Still in live...")
                 previewBar?.isTstvMode = false
                 _isTstvMode.update { false }
                 setPlayerUrls(videoUrl = playableUrl, drmUrl = playableLicenseUrl)
@@ -587,6 +578,12 @@ class VideoPlayerViewModel @Inject constructor(
         } else {
             logger.debug(TAG, "handleScrubStop No action needed after scrub stop")
         }
+    }
+
+    fun setLivePosition (previewBar: CustomPreviewBar?) {
+        val currentLivePosition = Duration.between(_liveEventInfo.value?.eventStart, getCurrentDate())
+            .toMillis()
+        triggerTSTVMode(previewBar, forcePosition = currentLivePosition)
     }
 
     fun releaseVariables() {

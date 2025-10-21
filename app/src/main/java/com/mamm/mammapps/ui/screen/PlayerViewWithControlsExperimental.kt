@@ -85,6 +85,8 @@ fun PlayerViewWithControlsExperimental(
     val showZappingLayer by viewModel.showZappingLayer.collectAsStateWithLifecycle()
     val zappingInfo by viewModel.zappingInfo.collectAsStateWithLifecycle()
     val zappingNumberDisplay by viewModel.zappingNumberDisplay.collectAsStateWithLifecycle()
+    val isTstvMode by viewModel.isTstvMode.collectAsStateWithLifecycle()
+
     val context = LocalContext.current
     val view = LocalView.current
     val fragmentManager = (context as? FragmentActivity)?.supportFragmentManager
@@ -216,6 +218,8 @@ fun PlayerViewWithControlsExperimental(
                         parentView.findViewById<AppCompatImageButton>(R.id.select_tracks_button)
                     val startOverButton =
                         parentView.findViewById<AppCompatImageButton>(R.id.go_beginning_button)
+                    val returnToLivePointButton =
+                        parentView.findViewById<AppCompatImageButton>(R.id.go_live_button)
                     val jump10sback =
                         parentView.findViewById<AppCompatImageButton>(R.id.jump_10s_back)
                     val jump10sforward =
@@ -270,6 +274,10 @@ fun PlayerViewWithControlsExperimental(
                             forcePosition = 0
                         )
                     }
+                    returnToLivePointButton.setOnClickListener{
+                        viewModel.setLivePosition(previewTimeBar)
+                    }
+
                     jump10sback.setOnClickListener { styledPlayerView.player?.jump10sBack() }
                     jump10sforward.setOnClickListener { styledPlayerView.player?.jump10sForward() }
 
@@ -286,6 +294,8 @@ fun PlayerViewWithControlsExperimental(
                         parentView.findViewById<AppCompatImageButton>(R.id.cc_tracks_button)
                     val previewTimeBar =
                         parentView.findViewById<CustomPreviewBar>(R.id.exo_progress)
+
+                    Log.d("AndroidViewUpdate", "Update ejecutado. isTstvMode = $isTstvMode")
 
                     var playerChanged = false
                     if (styledPlayerView.player != player) {
@@ -371,7 +381,6 @@ fun PlayerViewWithControlsExperimental(
                 )
             }
         }
-
 
 
     }
