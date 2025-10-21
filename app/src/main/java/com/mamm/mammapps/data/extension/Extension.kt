@@ -30,8 +30,6 @@ fun GetHomeContentResponse.transformData(
         )
     }?.sortedBy { it.position }
 
-    transformedChannels = transformedChannels?.filter { it.isPornChannel == false }
-
     this.copy(
         contents = transformedContents,
         channels = transformedChannels

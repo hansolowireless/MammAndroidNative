@@ -44,7 +44,8 @@ class EPGViewModel @Inject constructor(
 
             getEPGContentUseCase(date)
                 .onSuccess { epgData ->
-                    _epgUIState.update { UIState.Success(epgData) }
+                    val filteredData = epgData.filter { it.channel.isPornChannel == false }
+                    _epgUIState.update { UIState.Success(filteredData) }
                 }
                 .onFailure { exception ->
                     _epgUIState.update {

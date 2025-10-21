@@ -23,9 +23,10 @@ class GetAdultsUseCase @Inject constructor(
                     onSuccess = { response ->
                         logger.debug(TAG, "GetAdultsUseCase Received successful response")
 
-                        val adultChannels = mammRepository.getHomeContent().getOrNull()?.channels?.filter { it.isPornChannel == true }
-
-                        Result.success(response.toContentUIRows(genreResult, isAdult = true).insertChannelRow(adultChannels))
+                        Result.success(response
+                            .toContentUIRows(genreResult, isAdult = true)
+                            .insertChannelRow(response.channels)
+                        )
                     },
                     onFailure = { exception ->
                         logger.error(TAG, "GetAdultsUseCase Failed: ${exception.message}")

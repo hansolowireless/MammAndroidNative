@@ -56,8 +56,10 @@ class ChannelsViewModel @Inject constructor(
     fun getChannels() {
         viewModelScope.launch(Dispatchers.IO) {
             getChannelsUseCase().onSuccess { response ->
-                channels = response
-                _filteredChannels.update { response.map { it.toContentEntityUI() } }
+                channels = response.filter{ it.isPornChannel == false}
+                _filteredChannels.update {
+                    channels.map { it.toContentEntityUI() }
+                }
                 _channelGenres.update { response.mapNotNull { it.channelGenre }.toSet() }
             }
         }
@@ -101,12 +103,16 @@ class ChannelsViewModel @Inject constructor(
     fun filterChannelsByGenres(genres: Set<String>) {
         _selectedGenres.update { genres }
         if (genres.isEmpty()) {
-            _filteredChannels.update { channels.map { it.toContentEntityUI() } }
+            _filteredChannels.update {
+                channels.map { it.toContentEntityUI() }
+            }
         } else {
             val filteredChannelsDebug = channels.filter { it.channelGenre in genres }
             logger.debug(TAG, "filterChannelsByGenres Filtered channels: $filteredChannels")
             _filteredChannels.update {
-                channels.filter { it.channelGenre in genres }.map { it.toContentEntityUI() }
+                channels
+                    .filter { it.channelGenre in genres }
+                    .map {it.toContentEntityUI() }
             }
         }
     }

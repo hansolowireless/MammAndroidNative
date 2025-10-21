@@ -322,7 +322,7 @@ fun PlayerViewWithControlsExperimental(
                         }
 
                         previewTimeBar.isPreviewEnabled =
-                            (content?.identifier !is ContentIdentifier.Channel)
+                            (content?.identifier is ContentIdentifier.VoD)
                         previewTimeBar.setPreviewLoader { currentPosition, _ ->
                             parentView.findViewById<ImageView>(R.id.imageView)?.insertThumbnail(
                                 url = styledPlayerView.player?.currentMediaItem?.playbackProperties?.uri.toString(),

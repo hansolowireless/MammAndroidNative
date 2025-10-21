@@ -10,6 +10,9 @@ data class GetBrandedContentResponse(
     @SerializedName("featured")
     val featured: List<BrandedFeatured>? = null,
 
+    @SerializedName("channels")
+    val channels: List<Channel>? = null,
+
     @SerializedName("vods")
     val vods: List<BrandedVod>? = null,
 

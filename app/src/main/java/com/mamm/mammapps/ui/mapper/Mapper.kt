@@ -47,8 +47,8 @@ fun Any.toContentEntityUI(isAdult: Boolean = false): ContentEntityUI? {
         is Event -> this.toContentEntityUI()
         is Serie -> this.toContentEntityUI()
         is EPGEvent -> this.toContentEntityUI(isAdult)
-        is SectionVod -> this.toContentEntityUI(isAdult)
-        is BrandedVod -> this.toContentEntityUI()
+        is SectionVod -> this.toContentEntityUI()
+        is BrandedVod -> this.toContentEntityUI(isAdult)
         is BrandedFeatured -> this.toContentEntityUI()
         is Bookmark -> this.toContentEntityUI()
         is MostWatchedContent -> this.toContentEntityUI()
@@ -137,11 +137,11 @@ fun EPGEvent.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
     )
 )
 
-fun SectionVod.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
+fun SectionVod.toContentEntityUI() = ContentEntityUI(
     identifier = ContentIdentifier.VoD(getId()),
     imageUrl = (posterLogo?.takeIf { it.isNotBlank() }
         ?: eventLogoUrl500?.takeIf { it.isNotBlank() })
-        .orEmpty().adult(isAdult),
+        .orEmpty(),
     horizontalImageUrl = eventLogoTitleUrl.orEmpty(),
     title = getTitle(),
     aspectRatio = Ratios.VERTICAL,
@@ -153,9 +153,9 @@ fun SectionVod.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
     )
 )
 
-fun BrandedVod.toContentEntityUI() = ContentEntityUI(
+fun BrandedVod.toContentEntityUI(isAdult: Boolean) = ContentEntityUI(
     identifier = ContentIdentifier.VoD(getId()),
-    imageUrl = posterLogo.orEmpty(),
+    imageUrl = posterLogo.orEmpty().adult(isAdult),
     horizontalImageUrl = contentLogo.orEmpty(),
     title = getTitle(),
     aspectRatio = Ratios.VERTICAL,
