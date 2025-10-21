@@ -49,7 +49,7 @@ fun EPGScreen(
 
     when (val state = uiState) {
         is UIState.Loading -> {
-            LoadingSpinner()
+            LoadingSpinner(modifier = Modifier.fillMaxSize())
         }
 
         is UIState.Success<List<EPGChannelContent>> -> {

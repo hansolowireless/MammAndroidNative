@@ -85,30 +85,12 @@ fun HomeScreen(
         }
     }
 
-//    Box(
-//        modifier = Modifier.fillMaxSize()
-//    ) {
     when (homeContentState) {
         is HomeContentUIState.Loading -> {
-            Box(
+            LoadingSpinner(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    AsyncImage(
-                        model = homeContentState.logo,
-                        contentDescription = null,
-                        fallback = painterResource(R.drawable.logo_masmedia),
-                        modifier = Modifier
-                            .size(width = 300.dp, height = 110.dp)
-                            .align(Alignment.CenterHorizontally)
-                    )
-                    Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
-                    LoadingSpinner()
-                }
-            }
+                logoUrl = homeContentState.logo
+            )
         }
 
 
@@ -176,6 +158,5 @@ fun HomeScreen(
 
         else -> {}
     }
-//    }
 }
 

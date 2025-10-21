@@ -97,6 +97,8 @@ data class EPGEvent(
         val end = endDateTime ?: return false
         val now = ZonedDateTime.now()
 
+        val isLive = (now.isAfter(start) || now.isEqual(start)) && now.isBefore(end)
+
         return (now.isAfter(start) || now.isEqual(start)) && now.isBefore(end)
     }
 
