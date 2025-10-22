@@ -649,7 +649,7 @@ class VideoPlayerViewModel @Inject constructor(
                                 liveEvent = getLiveEventInfoUseCase(channelId = channel.id)?.toContentListUI()
                                     ?: ContentListUI(
                                         identifier = ContentIdentifier.Event(0),
-                                        title = channel.name.orEmpty(),
+                                        title = "",
                                         imageUrl = ""
                                     )
                             )

@@ -42,7 +42,7 @@ import drawable.Clock
 
 @Composable
 fun ContentEntityListItem(
-    modifier : Modifier = Modifier,
+    modifier: Modifier = Modifier,
     content: ContentListUI,
     channelInfo: ContentEntityUI? = null,
     showLiveIndicator: Boolean = false,
@@ -77,7 +77,11 @@ fun ContentEntityListItem(
             Row {
                 Text(
                     modifier = Modifier.weight(1f),
-                    text = content.title,
+                    text = content.title.ifBlank {
+                        channelInfo?.title?.let { "$it: " } + stringResource(
+                            R.string.no_event_info
+                        )
+                    },
                     style = MaterialTheme.typography.titleSmall,
                     maxLines = if (isFocused) 2 else 1,
                     overflow = TextOverflow.Ellipsis
@@ -149,7 +153,11 @@ private fun ContentEntityListItemPreview() {
 
     Column(modifier = Modifier.padding(16.dp)) {
         // --- Preview del estado normal (sin foco) ---
-        Text(text = "Estado Normal (Sin Foco):", style = MaterialTheme.typography.labelMedium, color = Color.White)
+        Text(
+            text = "Estado Normal (Sin Foco):",
+            style = MaterialTheme.typography.labelMedium,
+            color = Color.White
+        )
         ContentEntityListItem(
             content = sampleContent,
             onClick = {}
@@ -161,7 +169,11 @@ private fun ContentEntityListItemPreview() {
         // Para simular el foco, podrías crear una versión modificada
         // o simplemente documentar que el estado 'isFocused' interno lo maneja.
         // Aquí lo mostramos con el indicador de "En Vivo".
-        Text(text = "Estado con Foco y 'En Vivo':", style = MaterialTheme.typography.labelMedium, color = Color.White)
+        Text(
+            text = "Estado con Foco y 'En Vivo':",
+            style = MaterialTheme.typography.labelMedium,
+            color = Color.White
+        )
         ContentEntityListItem(
             content = sampleContent,
             showLiveIndicator = true,
@@ -171,7 +183,11 @@ private fun ContentEntityListItemPreview() {
         Spacer(modifier = Modifier.height(24.dp))
 
         // --- Preview con indicador de Catch-up ---
-        Text(text = "Estado con Indicador de Catch-up:", style = MaterialTheme.typography.labelMedium, color = Color.White)
+        Text(
+            text = "Estado con Indicador de Catch-up:",
+            style = MaterialTheme.typography.labelMedium,
+            color = Color.White
+        )
         ContentEntityListItem(
             content = sampleContent,
             showCatchupIndicator = true,

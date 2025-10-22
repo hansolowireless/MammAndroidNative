@@ -58,8 +58,10 @@
     <string name="error_instantiating_decoder">Unable to instantiate decoder <xliff:g id="decoder_name">%1$s</xliff:g></string>
     <string name="error_generic">Playback failed</string>
 
-    <!--Player Strings-->
+    <!--region Player-->
     <string name="live_content">Live</string>
+    <string name="no_event_info">No hay información de evento</string>
+    <!--endregion Player-->
 
     <!-- Navigation Labels -->
     <string name="nav_home">Inicio</string>
