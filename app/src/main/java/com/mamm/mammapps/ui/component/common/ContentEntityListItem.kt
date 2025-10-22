@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -38,6 +39,7 @@ import com.mamm.mammapps.ui.model.ContentListUI
 import com.mamm.mammapps.ui.model.DetailInfoUI
 import com.mamm.mammapps.ui.theme.ContentEntityListItemColor
 import com.mamm.mammapps.ui.theme.Dimensions
+import com.mamm.mammapps.ui.theme.Ratios
 import drawable.Clock
 
 @Composable
@@ -129,7 +131,8 @@ fun ContentEntityListItem(
                     model = imageUrl,
                     contentDescription = content.detailInfo?.description,
                     modifier = Modifier
-                        .size(56.dp)
+                        .height(56.dp)
+                        .aspectRatio(Ratios.HORIZONTAL)
                         .clip(RoundedCornerShape(8.dp)),
                     contentScale = ContentScale.Crop
                 )

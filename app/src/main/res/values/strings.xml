@@ -13,6 +13,7 @@
     <string name="search_channel_placeholder">Buscar canal…</string>
     <string name="filter_by_genre_action">Filtrar por género</string>
     <string name="filter_by_genre_title">Filtrar por Género</string>
+    <string name="all">Todos</string>
     <!--endregion Channels-->
 
     <!--Details-->

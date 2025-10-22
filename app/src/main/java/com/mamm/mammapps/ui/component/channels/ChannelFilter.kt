@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -16,15 +17,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,14 +29,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.Button
+import androidx.tv.material3.ButtonDefaults
+import androidx.tv.material3.ButtonShape
 import com.mamm.mammapps.R
 import com.mamm.mammapps.ui.component.LocalIsTV
+import com.mamm.mammapps.ui.component.common.PrimaryButton
 import com.mamm.mammapps.ui.component.common.TextInput
-import com.mamm.mammapps.ui.component.icon.FilterList
+import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.MammAppsTheme
 
 /**
@@ -65,28 +67,17 @@ fun ChannelFilter(
     var searchQuery by remember { mutableStateOf("") }
 
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = if (LocalIsTV.current) Dimensions.paddingSmall else 0.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-
-        BadgedBox(
-            badge = {
-                // Solo muestra el Badge si hay géneros seleccionados
-                if (selectedGenres.isNotEmpty()) {
-                    Badge {
-                        Text(text = selectedGenres.size.toString())
-                    }
-                }
-            }
-        ) {
-            IconButton(onClick = { showGenreDialog = true }) {
-                Icon(
-                    imageVector = FilterList,
-                    contentDescription = stringResource(id = R.string.filter_by_genre_action)
-                )
-            }
-        }
+        PrimaryButton(
+            modifier = if (LocalIsTV.current) Modifier.fillMaxWidth(0.2f) else Modifier,
+            text = if (selectedGenres.isEmpty()) stringResource(id = R.string.all) else selectedGenres.first(),
+            onClick = { showGenreDialog = true }
+        )
 
         if (!LocalIsTV.current) {
             TextInput(
@@ -99,23 +90,23 @@ fun ChannelFilter(
                 label = stringResource(id = R.string.search_channel_placeholder),
                 keyboardType = KeyboardType.Text
             )
-
-            AnimatedVisibility(
-                visible = searchQuery.isNotEmpty() || selectedGenres.isNotEmpty(),
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                IconButton(onClick = {
-                    searchQuery = ""
-                    onClearSearch()
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Clear,
-                        contentDescription = stringResource(id = R.string.accessibility_clear_search_action)
-                    )
-                }
+        }
+        AnimatedVisibility(
+            visible = searchQuery.isNotEmpty() || selectedGenres.isNotEmpty(),
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            IconButton(onClick = {
+                searchQuery = ""
+                onClearSearch()
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = stringResource(id = R.string.accessibility_clear_search_action)
+                )
             }
         }
+
 
     }
 
@@ -153,17 +144,18 @@ private fun GenreSelectionDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                tempSelectedGenres = if (tempSelectedGenres.contains(genre)) {
-                                    tempSelectedGenres - genre
-                                } else {
-                                    tempSelectedGenres + genre
-                                }
+//                                tempSelectedGenres = if (tempSelectedGenres.contains(genre)) {
+//                                    tempSelectedGenres - genre
+//                                } else {
+//                                    tempSelectedGenres + genre
+//                                }
+                                onConfirm(setOf(genre))
                             }
                             .padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Checkbox(
-                            checked = tempSelectedGenres.contains(genre),
+                            checked = initiallySelectedGenres.contains(genre),
                             onCheckedChange = null // La lógica está en el `clickable` del Row
                         )
                         Spacer(modifier = Modifier.width(16.dp))
@@ -173,14 +165,15 @@ private fun GenreSelectionDialog(
             }
         },
         confirmButton = {
-            Button(onClick = { onConfirm(tempSelectedGenres) }) {
-                Text(text = stringResource(id = android.R.string.ok))
-            }
+//            Button(onClick = { onConfirm(tempSelectedGenres) }) {
+//                Text(text = stringResource(id = android.R.string.ok))
+//            }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = stringResource(id = android.R.string.cancel))
-            }
+//            TextButton(onClick = onDismiss) {
+//                Text(text = stringResource(id = android.R.string.cancel))
+//            }
+
         }
     )
 }
