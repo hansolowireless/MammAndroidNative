@@ -20,14 +20,12 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -90,32 +88,35 @@ fun ChannelFilter(
             }
         }
 
-        TextInput(
-            modifier = Modifier.weight(1f),
-            value = searchQuery,
-            onValueChange = {
-                searchQuery = it
-                onSearchQueryChanged(it)
-            },
-            label = stringResource(id = R.string.search_channel_placeholder),
-            keyboardType = KeyboardType.Text
-        )
+        if (!LocalIsTV.current) {
+            TextInput(
+                modifier = Modifier.weight(1f),
+                value = searchQuery,
+                onValueChange = {
+                    searchQuery = it
+                    onSearchQueryChanged(it)
+                },
+                label = stringResource(id = R.string.search_channel_placeholder),
+                keyboardType = KeyboardType.Text
+            )
 
-        AnimatedVisibility(
-            visible = searchQuery.isNotEmpty() || selectedGenres.isNotEmpty(),
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            IconButton(onClick = {
-                searchQuery = ""
-                onClearSearch()
-            }) {
-                Icon(
-                    imageVector = Icons.Default.Clear,
-                    contentDescription = stringResource(id = R.string.accessibility_clear_search_action)
-                )
+            AnimatedVisibility(
+                visible = searchQuery.isNotEmpty() || selectedGenres.isNotEmpty(),
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                IconButton(onClick = {
+                    searchQuery = ""
+                    onClearSearch()
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Clear,
+                        contentDescription = stringResource(id = R.string.accessibility_clear_search_action)
+                    )
+                }
             }
         }
+
     }
 
     // 3. Diálogo de selección de géneros

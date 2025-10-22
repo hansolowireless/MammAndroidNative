@@ -1,13 +1,7 @@
 package com.mamm.mammapps.ui.screen
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,10 +18,6 @@ import com.mamm.mammapps.ui.component.channels.ChannelFilter
 import com.mamm.mammapps.ui.component.channels.ChannelGridMobile
 import com.mamm.mammapps.ui.component.channels.ChannelGridTV
 import com.mamm.mammapps.ui.component.home.HomeGridTop
-import com.mamm.mammapps.ui.component.common.ContentEntity
-import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
-import com.mamm.mammapps.ui.model.ContentEntityUI
-import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.MammAppsTheme
 import com.mamm.mammapps.ui.viewmodel.ChannelsViewModel
 
