@@ -67,12 +67,10 @@ fun CustomTVNavigationItem(
         },
         colors = ListItemDefaults.colors(
             containerColor = when {
-                selected -> MaterialTheme.colorScheme.secondaryContainer
                 else -> Color.Transparent
             },
             contentColor = when {
                 isFocused -> MaterialTheme.colorScheme.primary
-                selected -> MaterialTheme.colorScheme.onSecondaryContainer
                 else -> MaterialTheme.colorScheme.onSurface
             }
         ),
