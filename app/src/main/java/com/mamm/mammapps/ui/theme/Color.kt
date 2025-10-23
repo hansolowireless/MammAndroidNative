@@ -11,7 +11,7 @@ val Background = Color.Black
 object ButtonColor {
     val focusedContent = Color.Black
     val unfocusedContent = Color.Black
-    val background = Primary
+    val background = Color(0xFF4A90E2)
 }
 
 object ContentEntityListItemColor {
@@ -64,4 +64,8 @@ object EPGMobileColor {
 
 object PlayerColor {
     val channelZappingText = Color.White
+}
+
+object ExpandCategoryColor {
+    val title = Color.White
 }
