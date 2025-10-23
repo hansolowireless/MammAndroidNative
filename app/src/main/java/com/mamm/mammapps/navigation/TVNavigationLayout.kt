@@ -41,14 +41,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.mamm.mammapps.R
-import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.logger.SimpleLogger
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
 import com.mamm.mammapps.ui.component.icon.BulletedList
 import com.mamm.mammapps.ui.component.icon.Fire
 import com.mamm.mammapps.ui.component.icon.Football
-import com.mamm.mammapps.ui.component.icon.WifiSignal
+import com.mamm.mammapps.ui.component.icon.Puzzle
 import com.mamm.mammapps.ui.component.navigation.CustomTVNavigationItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -263,7 +261,7 @@ fun TVNavigationLayout(navController: NavHostController) {
                                         modifier = itemModifier,
                                         icon = {
                                             Icon(
-                                                Icons.Default.Person,
+                                                Puzzle,
                                                 null,
                                                 modifier = Modifier.size(24.dp)
                                             )
@@ -376,23 +374,6 @@ fun TVNavigationLayout(navController: NavHostController) {
                                         onClick = { navController.navigate(route) }
                                     )
                                 }
-
-//                                AppRoute.DIAGNOSTICS.route -> {
-//                                    CustomTVNavigationItem(
-//                                        modifier = itemModifier,
-//                                        icon = {
-//                                            Icon(
-//                                                WifiSignal,
-//                                                null,
-//                                                modifier = Modifier.size(24.dp)
-//                                            )
-//                                        },
-//                                        label = stringResource(R.string.nav_diagnostics),
-//                                        parentIsFocused = isNavRailFocused,
-//                                        selected = currentRoute == route,
-//                                        onClick = { navController.navigate(route) }
-//                                    )
-//                                }
 
                                 AppRoute.LOGOUT.route -> {
                                     CustomTVNavigationItem(

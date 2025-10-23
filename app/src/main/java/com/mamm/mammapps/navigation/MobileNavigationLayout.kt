@@ -1,15 +1,9 @@
 package com.mamm.mammapps.navigation
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -24,19 +18,13 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.mamm.mammapps.R
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.component.chromecast.CastButton
-import com.mamm.mammapps.ui.component.icon.BulletedList
-import com.mamm.mammapps.ui.component.icon.Fire
-import com.mamm.mammapps.ui.component.icon.Football
-import com.mamm.mammapps.ui.component.icon.WifiSignal
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,7 +66,6 @@ fun MobileNavigationLayout(navController: NavHostController) {
                     AppRoute.AMC,
                     AppRoute.ADULTS,
                     AppRoute.SEARCH,
-//                    AppRoute.DIAGNOSTICS,
                     AppRoute.LOGOUT
                 )
 
