@@ -136,7 +136,7 @@ class MammRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getExpandedCategoryContent(categoryId: Int) : Result<GetOtherContentResponse> {
+    override suspend fun getExpandedCategoryContent(categoryId: Int) : Result<GetBrandedContentResponse> {
         return runCatching {
             remoteDatasource.getExpandedCategory(categoryId)
         }.onSuccess { response ->

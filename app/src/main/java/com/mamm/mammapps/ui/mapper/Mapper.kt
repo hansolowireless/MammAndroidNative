@@ -548,9 +548,20 @@ fun List<ContentRowUI>.insertChannelRow(recommended: List<Channel>?): List<Conte
     return this
 }
 
-fun GetOtherContentResponse.toContentEntityUIList() : List<ContentEntityUI> {
-    return this.vods.orEmpty().map { it.toContentEntityUI() } + this.events.orEmpty().map { it.toContentEntityUI() }
+
+//-------------region EXPANDED CATEGORY-----------------
+fun GetBrandedContentResponse.toContentEntityUIList() : List<ContentEntityUI> {
+    return this.vods.orEmpty().mapNotNull { it.toContentEntityUI() } + this.events.orEmpty().map { it.toContentEntityUI() }
 }
+
+fun GetBrandedContentResponse.findContent(identifier: ContentIdentifier): Any? {
+    return when (identifier) {
+        is ContentIdentifier.VoD -> this.vods?.find { it.getId() == identifier.id }
+        is ContentIdentifier.Event -> this.events?.find { it.getId() == identifier.id }
+        else -> null
+    }
+}
+//-------------endregion EXPANDED CATEGORY-----------------
 
 //----------------region SERIE DETAIL---------------------
 fun List<Serie>.toContentUIRows(genre: Genre): List<ContentRowUI> {

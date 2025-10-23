@@ -116,7 +116,7 @@ class RemoteDatasource @Inject constructor(
         return cache.getHomeContent()
     }
 
-    suspend fun getExpandedCategory(categoryId: Int) : GetOtherContentResponse {
+    suspend fun getExpandedCategory(categoryId: Int) : GetBrandedContentResponse {
        return withContext(Dispatchers.IO) {
            val jsonFile = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
            require(jsonFile != null) {
