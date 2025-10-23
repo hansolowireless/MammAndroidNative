@@ -66,8 +66,8 @@ class HomeViewModel @Inject constructor(
     var homeContentUIState by mutableStateOf<HomeContentUIState>(HomeContentUIState.Idle)
         private set
 
-    var homeContentUI by mutableStateOf<List<ContentRowUI>>(emptyList())
-        private set
+    private val _homeContentUI = MutableStateFlow<List<ContentRowUI>>(emptyList())
+    val homeContentUI: StateFlow<List<ContentRowUI>> = _homeContentUI.asStateFlow()
 
     private val _mobileFeatured = MutableStateFlow<List<ContentEntityUI>?>(null)
     val mobileFeatured: StateFlow<List<ContentEntityUI>?> = _mobileFeatured.asStateFlow()
@@ -138,8 +138,8 @@ class HomeViewModel @Inject constructor(
             setLoadingStateWithLogo()
             useCase()
                 .onSuccess { response ->
-                    homeContentUI = response
-                    homeContentUIState = HomeContentUIState.Success(homeContentUI)
+                    _homeContentUI.update { response }
+                    homeContentUIState = HomeContentUIState.Success(_homeContentUI.value)
                 }
                 .onFailure { exception ->
                     homeContentUIState = HomeContentUIState.Error(
@@ -150,8 +150,8 @@ class HomeViewModel @Inject constructor(
     }
 
     fun setFirstFocusedContent() {
-        if (homeContentUI.isNotEmpty() && homeContentUI.first().items.isNotEmpty())
-            _focusedContent.update { homeContentUI.first().items.first() }
+        if (_homeContentUI.value.isNotEmpty() && _homeContentUI.value.first().items.isNotEmpty())
+            _focusedContent.update { _homeContentUI.value.first().items.first() }
     }
 
     fun findContent(entityUI: ContentEntityUI, routeTag: AppRoute) {

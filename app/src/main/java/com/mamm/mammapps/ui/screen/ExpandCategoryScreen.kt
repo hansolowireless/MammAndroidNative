@@ -1,10 +1,12 @@
 package com.mamm.mammapps.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,13 +20,22 @@ import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.viewmodel.ExpandCategoryViewModel
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.mamm.mammapps.ui.mapper.findContent
 import com.mamm.mammapps.ui.mapper.toContentEntityUIList
+import com.mamm.mammapps.ui.theme.ExpandCategoryColor
 
 @Composable
 fun ExpandCategoryScreen(
     modifier: Modifier = Modifier,
     viewModel: ExpandCategoryViewModel = hiltViewModel(),
+    categoryName: String,
     categoryId: Int? = null,
     onContentClick: (Any) -> Unit
 ) {
@@ -41,21 +52,45 @@ fun ExpandCategoryScreen(
         }
 
         is UIState.Success -> {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(100.dp),
-                modifier = modifier.fillMaxWidth().padding(horizontal = Dimensions.paddingXSmall),
-                contentPadding = PaddingValues(
-                    horizontal = Dimensions.paddingMedium,
-                    vertical = Dimensions.paddingSmall
-                ),
-                horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall),
-                verticalArrangement = Arrangement.spacedBy(Dimensions.paddingXSmall)
-            ) {
-                items(items = state.data.toContentEntityUIList()) { item ->
-                    ContentEntity(
-                        contentEntityUI = item,
-                        onClick = { onContentClick(item) }
+            Column(modifier = modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(horizontal = Dimensions.paddingMedium)) {
+                    Text(
+                        text = categoryName,
+                        color = ExpandCategoryColor.title,
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.padding(
+                            top = Dimensions.paddingSmall,
+                            bottom = Dimensions.paddingSmall
+                        )
                     )
+                    HorizontalDivider(
+                        color = ExpandCategoryColor.title.copy(alpha = 0.2f),
+                        modifier = Modifier.padding(
+                            bottom = Dimensions.paddingSmall
+                        )
+                    )
+                }
+
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(100.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(
+                        horizontal = Dimensions.paddingMedium,
+                        vertical = Dimensions.paddingSmall
+                    ),
+                    horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall),
+                    verticalArrangement = Arrangement.spacedBy(Dimensions.paddingXSmall)
+                ) {
+                    items(items = state.data.toContentEntityUIList()) { item ->
+                        ContentEntity(
+                            contentEntityUI = item,
+                            onClick = {
+                                state.data.findContent(item.identifier)?.let {
+                                    onContentClick(it)
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }

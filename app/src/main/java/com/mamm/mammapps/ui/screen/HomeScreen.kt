@@ -45,10 +45,10 @@ fun HomeScreen(
     routeTag: AppRoute = AppRoute.HOME,
     onShowDetails: (item: ContentEntityUI) -> Unit,
     onPlay: (item: Any) -> Unit,
-    onExpandCategory: (categoryId: Int) -> Unit = {}
+    onExpandCategory: (categoryId: Int, categoryName: String) -> Unit = {_, _ -> }
 ) {
     val homeContentState = viewModel.homeContentUIState
-    val homeContent = viewModel.homeContentUI
+    val homeContent by viewModel.homeContentUI.collectAsStateWithLifecycle()
     val clickedContent by viewModel.clickedContent.collectAsStateWithLifecycle()
     val hasNavigated = remember { mutableStateOf(false) }
 
@@ -145,8 +145,11 @@ fun HomeScreen(
                         viewModel.setFocusedContent(content)
                     },
                     focusedRowIndex = lastClickedItemIndex,
-                    onExpandCategory = { categoryId ->
-                        onExpandCategory(categoryId)
+                    onExpandCategory = { categoryId, categoryName ->
+                        onExpandCategory(
+                            categoryId,
+                            categoryName
+                        )
                     }
                 )
             }

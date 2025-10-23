@@ -43,7 +43,7 @@ fun HomeGridBottom(
     columnListState: LazyListState,
     mobileFeatured: List<ContentEntityUI>? = null,
     onContentClicked: (Int, ContentEntityUI) -> Unit,
-    onExpandCategory: (Int) -> Unit,
+    onExpandCategory: (Int, String) -> Unit,
     onFocus: (ContentEntityUI) -> Unit = {},
     focusedRowIndex: Int?
 ) {
@@ -111,7 +111,10 @@ fun HomeGridBottom(
                         Spacer(modifier = Modifier.width(2.dp))
                         if (contentRow.loadMore && !LocalIsTV.current) {
                             IconButton(onClick = {
-                                onExpandCategory(contentRow.categoryId)
+                                onExpandCategory(
+                                    contentRow.categoryId,
+                                    contentRow.categoryName
+                                )
                             }) {
                                 Icon(
                                     imageVector = Icons.Default.PlayArrow,

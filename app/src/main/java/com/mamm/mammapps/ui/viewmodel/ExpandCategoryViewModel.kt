@@ -2,6 +2,7 @@ package com.mamm.mammapps.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.domain.usecases.content.GetCategoryContentUseCase
 import com.mamm.mammapps.ui.model.uistate.UIState
@@ -19,8 +20,8 @@ class ExpandCategoryViewModel @Inject constructor(
     private val getCategoryContentUseCase: GetCategoryContentUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<UIState<GetOtherContentResponse>>(UIState.Loading)
-    val uiState: StateFlow<UIState<GetOtherContentResponse>> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<UIState<GetBrandedContentResponse>>(UIState.Loading)
+    val uiState: StateFlow<UIState<GetBrandedContentResponse>> = _uiState.asStateFlow()
 
     fun getContent (categoryId: Int?) {
         if (categoryId == null) {
