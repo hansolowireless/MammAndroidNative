@@ -20,14 +20,17 @@ import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.data.model.section.SectionVod
 import com.mamm.mammapps.data.model.serie.TbContentSeason
 import com.mamm.mammapps.navigation.extension.addCategoryId
+import com.mamm.mammapps.navigation.extension.addCategoryName
 import com.mamm.mammapps.navigation.extension.addContentClass
 import com.mamm.mammapps.navigation.extension.addContentUI
 import com.mamm.mammapps.navigation.extension.addRoute
 import com.mamm.mammapps.navigation.extension.homeScreenRoute
 import com.mamm.mammapps.navigation.extension.removeContentUI
 import com.mamm.mammapps.navigation.extension.retrieveCategoryId
+import com.mamm.mammapps.navigation.extension.retrieveCategoryName
 import com.mamm.mammapps.navigation.extension.retrieveContentClass
 import com.mamm.mammapps.navigation.extension.retrieveContentUI
+import com.mamm.mammapps.navigation.extension.retrieveRoute
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.mapper.toContentEntityUI
@@ -79,11 +82,13 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                 }
                 navController.currentBackStackEntry?.savedStateHandle?.addContentClass(content)
             },
-            onExpandCategory = { categoryId ->
+            onExpandCategory = { categoryId, categoryName ->
                 navController.navigate(AppRoute.EXPANDCATEGORY.route) {
                     launchSingleTop = true
                 }
                 navController.currentBackStackEntry?.savedStateHandle?.addCategoryId(categoryId)
+                navController.currentBackStackEntry?.savedStateHandle?.addCategoryName(categoryName)
+                navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.HOME)
             }
         )
     }
@@ -115,8 +120,8 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                 navController.navigate(AppRoute.DETAIL.route) {
                     launchSingleTop = true
                 }
-                navController.currentBackStackEntry?.savedStateHandle?.addContentClass(content)
                 navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.EPG)
+                navController.currentBackStackEntry?.savedStateHandle?.addContentClass(content)
             },
             onPlayClick = { content ->
                 navController.navigate(AppRoute.PLAYER.route) {
@@ -133,8 +138,8 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
             navController.navigate(AppRoute.DETAIL.route) {
                 launchSingleTop = true
             }
-            navController.currentBackStackEntry?.savedStateHandle?.addContentClass(it)
             navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.SEARCH)
+            navController.currentBackStackEntry?.savedStateHandle?.addContentClass(it)
         })
     }
 
@@ -213,10 +218,23 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
             it.savedStateHandle.retrieveCategoryId()
         }
 
+        val categoryName = remember(it) {
+            it.savedStateHandle.retrieveCategoryName()
+        }
+
+        val routeName = remember(it) {
+            it.savedStateHandle.retrieveRoute()
+        }
+
         ExpandCategoryScreen(
             categoryId = categoryId,
-            onContentClick = {
-                //TODO
+            categoryName = categoryName,
+            onContentClick = { content ->
+                navController.navigate(AppRoute.DETAIL.route) {
+                    launchSingleTop = true
+                }
+                navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.EXPANDCATEGORY)
+                navController.currentBackStackEntry?.savedStateHandle?.addContentClass(content)
             }
         )
     }
