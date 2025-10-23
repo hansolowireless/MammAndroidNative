@@ -73,6 +73,24 @@ fun HomeGridTop(event: ContentEntityUI) {
                 )
         )
 
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth(UIConstant.HOMEGRIDTOP_IMAGE_WIDTH_FRACTION)
+                .align(Alignment.CenterEnd)
+                .clip(RectangleShape)
+                .background(
+                    Brush.horizontalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.background,
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
+                            Color.Transparent,
+                            Color.Transparent
+                        )
+                    )
+                )
+        )
+
         // Content overlay - Left side only (transparent background)
         Box(
             modifier = Modifier
@@ -110,8 +128,7 @@ fun HomeGridTop(event: ContentEntityUI) {
                         liveEventInfo = event.liveEventInfo,
                         duration = event.detailInfo?.metadata?.durationMin,
                     )
-                }
-                else {
+                } else {
                     event.detailInfo?.metadata?.let { metadata ->
                         DurationYearRatingRow(
                             metadata = metadata,
