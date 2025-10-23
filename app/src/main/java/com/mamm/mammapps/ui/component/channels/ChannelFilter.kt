@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -29,14 +28,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.tv.material3.Button
-import androidx.tv.material3.ButtonDefaults
-import androidx.tv.material3.ButtonShape
 import com.mamm.mammapps.R
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.common.PrimaryButton
@@ -131,9 +126,6 @@ private fun GenreSelectionDialog(
     onDismiss: () -> Unit,
     onConfirm: (Set<String>) -> Unit
 ) {
-    // Estado temporal para manejar la selección dentro del diálogo
-    var tempSelectedGenres by remember { mutableStateOf(initiallySelectedGenres) }
-
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(text = stringResource(id = R.string.filter_by_genre_title)) },
@@ -144,11 +136,6 @@ private fun GenreSelectionDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-//                                tempSelectedGenres = if (tempSelectedGenres.contains(genre)) {
-//                                    tempSelectedGenres - genre
-//                                } else {
-//                                    tempSelectedGenres + genre
-//                                }
                                 onConfirm(setOf(genre))
                             }
                             .padding(vertical = 8.dp),
@@ -165,15 +152,8 @@ private fun GenreSelectionDialog(
             }
         },
         confirmButton = {
-//            Button(onClick = { onConfirm(tempSelectedGenres) }) {
-//                Text(text = stringResource(id = android.R.string.ok))
-//            }
         },
         dismissButton = {
-//            TextButton(onClick = onDismiss) {
-//                Text(text = stringResource(id = android.R.string.cancel))
-//            }
-
         }
     )
 }
