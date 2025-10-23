@@ -59,6 +59,7 @@ class DetailViewModel @Inject constructor(
     }
 
     fun setShowPlayButton(content: ContentEntityUI) {
+        //Caso de venir en la EPG
         if (content.identifier is ContentIdentifier.Event && routeTag == AppRoute.EPG) {
             content.detailInfo?.channelId?.let {
                 findContentEntityUseCase(identifier = ContentIdentifier.Channel(id = it))
@@ -76,6 +77,8 @@ class DetailViewModel @Inject constructor(
                     }
             }
         }
+
+        //Si no venimos de la EPG
         _showPlayButton.update { content.identifier !is ContentIdentifier.Serie && !content.isFuture() }
     }
 
