@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.Glow
 import androidx.tv.material3.Surface
 import androidx.tv.material3.SurfaceDefaults
 import coil.compose.AsyncImage
@@ -42,6 +43,7 @@ import com.mamm.mammapps.ui.extension.glow
 import com.mamm.mammapps.ui.extension.onTap
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
+import com.mamm.mammapps.ui.theme.ContentEntityColor
 import com.mamm.mammapps.ui.theme.Dimensions
 
 @Composable
@@ -69,7 +71,7 @@ fun ContentEntity(
                 scaleX = if (isFocused) 0.98f else 0.92f
                 scaleY = if (isFocused) 0.98f else 0.92f
             }
-            .glow(enabled = isFocused, alpha = glowAlpha)
+//            .glow(enabled = isFocused, alpha = glowAlpha)
             .onFocusChanged { focusState ->
                 isFocused = focusState.isFocused
                 if (isFocused) onFocus()
@@ -79,10 +81,10 @@ fun ContentEntity(
             .clickable {
                 onClick()
             },
-//        glow = Glow(
-//            elevationColor = ContentEntityColor.glow,
-//            elevation = 12.dp
-//        ),
+        glow = Glow(
+            elevationColor = if (isFocused) ContentEntityColor.glow else Color.Transparent,
+            elevation = 12.dp
+        ),
         shape = RoundedCornerShape(Dimensions.cornerRadius),
         colors = SurfaceDefaults.colors(containerColor = Color.Transparent)
     ) {
