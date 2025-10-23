@@ -82,6 +82,7 @@ fun LoginForm(
             )
         )
         PrimaryButton(
+            modifier = Modifier.fillMaxWidth(),
             text = stringResource(R.string.login),
             height = 55.dp,
             onClick = { onLogin(email, password) },
