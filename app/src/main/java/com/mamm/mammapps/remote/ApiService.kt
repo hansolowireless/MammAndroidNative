@@ -257,7 +257,7 @@ interface ApiService {
     suspend fun getExpandCategory(
         @Path("categoryId") categoryId: String,
         @Path("jsonParam") jsonParam: String
-    ): Response<GetOtherContentResponse>
+    ): Response<GetBrandedContentResponse>
 
 
 
