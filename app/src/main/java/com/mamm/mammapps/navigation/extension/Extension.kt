@@ -12,20 +12,8 @@ fun SavedStateHandle.addContentUI(content: ContentEntityUI) {
     this["contentUI"] = content
 }
 
-fun SavedStateHandle.removeContentUI() {
-    this.remove<ContentEntityUI>("contentUI")
-}
-
 fun SavedStateHandle.addContentClass(content: Any) {
     this["contentClass"] = content
-}
-
-fun SavedStateHandle.retrieveContentUI(): ContentEntityUI? {
-    return this.get<ContentEntityUI>("contentUI")
-}
-
-fun SavedStateHandle.retrieveContentClass(): Any? {
-    return this.get<Any>("contentClass")
 }
 
 fun SavedStateHandle.addRoute(route: AppRoute) {
@@ -36,8 +24,32 @@ fun SavedStateHandle.addCategoryId(categoryId: Int) {
     this["categoryId"] = categoryId
 }
 
+fun SavedStateHandle.addCategoryName(categoryName: String) {
+    this["categoryName"] = categoryName
+}
+
+fun SavedStateHandle.retrieveContentUI(): ContentEntityUI? {
+    return this.get<ContentEntityUI>("contentUI")
+}
+
+fun SavedStateHandle.retrieveContentClass(): Any? {
+    return this.get<Any>("contentClass")
+}
+
+fun SavedStateHandle.retrieveRoute(): AppRoute? {
+    return this.get<AppRoute>("route")
+}
+
 fun SavedStateHandle.retrieveCategoryId() : Int {
     return this.get<Int>("categoryId") ?: 0
+}
+
+fun SavedStateHandle.retrieveCategoryName() : String {
+    return this.get<String>("categoryName") ?: ""
+}
+
+fun SavedStateHandle.removeContentUI() {
+    this.remove<ContentEntityUI>("contentUI")
 }
 
 fun NavGraphBuilder.homeScreenRoute(
