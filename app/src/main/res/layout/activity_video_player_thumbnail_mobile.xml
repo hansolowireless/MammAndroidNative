@@ -28,7 +28,6 @@
         android:focusable="true"
         android:keepScreenOn="true"
 
-        app:layout_constraintDimensionRatio="W,16:9"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -50,7 +49,7 @@
             android:focusable="true"
             android:orientation="horizontal"
             app:controller_layout_id="@layout/exoplayer_controls"
-            app:resize_mode="fill"
+            app:resize_mode="fit"
             app:show_buffering="always"
             android:animateLayoutChanges="true"
             app:animation_enabled="false"
