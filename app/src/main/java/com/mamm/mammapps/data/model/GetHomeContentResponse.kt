@@ -20,8 +20,9 @@ data class GetHomeContentResponse(
     @SerializedName("series") val series: List<Serie>? = null
 )
 
+@Parcelize
 data class HomeFeatured(
-    @SerializedName("subgenreById") val subgenreById: Any? = null,
+    @SerializedName("subgenreById") val subgenreById: Int? = null,
     @SerializedName("featured") val featured: Int? = null,
     @SerializedName("urlLoop") val urlLoop: String? = null,
     @SerializedName("logoTransitions") val logoTransitions: List<LogoTransition>? = null,
@@ -30,8 +31,8 @@ data class HomeFeatured(
     @SerializedName("title") val title: String? = null,
     @SerializedName("fcIni") val fcIni: String? = null,
     @SerializedName("logoURL") val logoURL: String? = null,
-    @SerializedName("duration") val duration: Any? = null,
-    @SerializedName("idPpal") val idPpal: Any? = null,
+    @SerializedName("duration") val duration: Int? = null,
+    @SerializedName("idPpal") val idPpal: Int? = null,
     @SerializedName("urlLoopMpd") val urlLoopMpd: String? = null,
     @SerializedName("formatid") val formatid: String? = null,
     @SerializedName("fcEnd") val fcEnd: String? = null,
@@ -40,8 +41,8 @@ data class HomeFeatured(
     @SerializedName("deliveryURL") val deliveryURL: String? = null,
     @SerializedName("id") val id: Int? = null,
     @SerializedName("items") val items: String? = null,
-    @SerializedName("parental") val parental: Any? = null
-)
+    @SerializedName("parental") val parental: Int? = null
+) : Parcelable
 
 @Parcelize
 data class LogoTransition(

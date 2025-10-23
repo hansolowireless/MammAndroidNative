@@ -145,11 +145,16 @@ class MammRepositoryImpl @Inject constructor(
     }
 
     override fun findHomeContent(identifier: ContentIdentifier): Result<Any>? {
-        val content: Any? = when (identifier) {
+        var content: Any? = when (identifier) {
             is ContentIdentifier.Channel -> remoteDatasource.getCachedHomeContent()?.channels?.find { it.id == identifier.id }
             is ContentIdentifier.VoD -> remoteDatasource.getCachedHomeContent()?.contents?.find { it.id == identifier.id }
             is ContentIdentifier.Event -> remoteDatasource.getCachedHomeContent()?.events?.find { it.id == identifier.id }
             is ContentIdentifier.Serie -> remoteDatasource.getCachedHomeContent()?.series?.find { it.id == identifier.id }
+        }
+
+        if (content == null) {
+            //If content is STILL null, try to find it in the featured list
+            content = remoteDatasource.getCachedHomeContent()?.featured?.find { it.id == identifier.id }
         }
 
         return content?.let { Result.success(it) }

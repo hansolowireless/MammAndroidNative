@@ -321,6 +321,18 @@ fun BrandedVod.toContentToPlayUI() = ContentToPlayUI(
     imageUrl = this.contentLogo.orEmpty(),
 )
 
+fun HomeFeatured.toContentToPlayUI(): ContentToPlayUI? {
+    val format = format ?: return null
+    val id = id ?: return null
+
+    return ContentToPlayUI(
+        identifier = ContentIdentifier.fromFormat(format = format, id = id),
+        deliveryURL = this.deliveryURL.orEmpty(),
+        title = this.title.orEmpty(),
+        imageUrl = this.logoURL.orEmpty(),
+    )
+}
+
 fun BrandedFeatured.toContentToPlayUI(): ContentToPlayUI? {
     val format = format ?: return null
     val id = id ?: return null

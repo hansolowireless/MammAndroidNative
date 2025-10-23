@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.Event
+import com.mamm.mammapps.data.model.HomeFeatured
 import com.mamm.mammapps.data.model.VoD
 import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.bookmark.Recommended
@@ -185,6 +186,7 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
         }
 
         val playableContent = when (contentItem) {
+            is HomeFeatured -> contentItem.toContentToPlayUI()
             is Channel -> contentItem.toContentToPlayUI()
             is VoD -> contentItem.toContentToPlayUI()
             is Event -> contentItem.toContentToPlayUI()
