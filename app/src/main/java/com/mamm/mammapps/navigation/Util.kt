@@ -13,8 +13,10 @@ import androidx.compose.ui.unit.dp
 import com.mamm.mammapps.R
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.component.icon.BulletedList
+import com.mamm.mammapps.ui.component.icon.Child_care
 import com.mamm.mammapps.ui.component.icon.Fire
 import com.mamm.mammapps.ui.component.icon.Football
+import com.mamm.mammapps.ui.component.icon.Puzzle
 import com.mamm.mammapps.ui.component.icon.WifiSignal
 
 @Composable
@@ -32,7 +34,7 @@ fun GetIconForRoute(route: AppRoute) {
         AppRoute.AMC -> Icon(painterResource(id = R.drawable.menu_amclogoicon), contentDescription = null, modifier = iconModifier)
         AppRoute.SPORTS -> Icon(Football, contentDescription = null, modifier = iconModifier)
         AppRoute.ADULTS -> Icon(Fire, contentDescription = null, modifier = iconModifier)
-        AppRoute.KIDS -> Icon(Icons.Default.Person, contentDescription = null, modifier = iconModifier)
+        AppRoute.KIDS -> Icon(Puzzle, contentDescription = null, modifier = iconModifier)
         AppRoute.SEARCH -> Icon(Icons.Default.Search, contentDescription = null, modifier = iconModifier)
         AppRoute.DIAGNOSTICS -> Icon(WifiSignal, contentDescription = null, modifier = iconModifier)
         AppRoute.LOGOUT -> Icon(Icons.Default.Person, contentDescription = null, modifier = iconModifier) // Puedes usar un icono de logout
