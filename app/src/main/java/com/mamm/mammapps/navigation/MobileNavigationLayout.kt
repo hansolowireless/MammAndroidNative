@@ -2,6 +2,8 @@ package com.mamm.mammapps.navigation
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
@@ -69,17 +71,19 @@ fun MobileNavigationLayout(navController: NavHostController) {
                     AppRoute.LOGOUT
                 )
 
-                menuItems.forEach { item ->
-                    NavigationDrawerItem(
-                        icon = { GetIconForRoute(route = item) },
-                        label = { Text(stringResource(id = getTitleForRoute(route = item.route))) },
-                        selected = currentRoute == item.route,
-                        onClick = {
-                            scope.launch { drawerState.close() }
-                            navController.navigate(item.route)
-                        },
-                        modifier = Modifier.padding(horizontal = 12.dp)
-                    )
+                LazyColumn {
+                    items(menuItems) { item ->
+                        NavigationDrawerItem(
+                            icon = { GetIconForRoute(route = item) },
+                            label = { Text(stringResource(id = getTitleForRoute(route = item.route))) },
+                            selected = currentRoute == item.route,
+                            onClick = {
+                                scope.launch { drawerState.close() }
+                                navController.navigate(item.route)
+                            },
+                            modifier = Modifier.padding(horizontal = 12.dp)
+                        )
+                    }
                 }
             }
         }
