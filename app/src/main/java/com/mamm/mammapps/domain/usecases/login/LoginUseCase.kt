@@ -27,7 +27,7 @@ class LoginUseCase @Inject constructor(
         return repository.login(username, password).fold(
             onSuccess = { response ->
                 logger.debug(TAG, "invoke Login successful, ${response.data}")
-                response.data?.let { session.assignLoginData(it) }
+                response.data?.let { session.startNewSession(it) }
 
                 // Guardar credenciales tras login exitoso
                 repository.saveUserCredentials(username, password)

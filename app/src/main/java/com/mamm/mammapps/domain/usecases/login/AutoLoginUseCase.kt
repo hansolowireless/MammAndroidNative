@@ -33,7 +33,7 @@ class AutoLoginUseCase @Inject constructor(
                     repository.login(username, password).fold(
                         onSuccess = { response ->
                             logger.debug(TAG, "autologinUseCase Auto-login successful")
-                            response.data?.let { session.assignLoginData(it) }
+                            response.data?.let { session.startNewSession(it) }
 
                             Result.success(Unit)
                         },
