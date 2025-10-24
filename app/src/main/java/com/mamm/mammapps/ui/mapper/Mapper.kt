@@ -167,7 +167,7 @@ fun BrandedVod.toContentEntityUI(isAdult: Boolean) = ContentEntityUI(
 
 fun BrandedFeatured.toContentEntityUI(): ContentEntityUI? {
     val format = format ?: return null
-    val id = id ?: return null
+    val id = formatId?.toInt() ?: return null
 
     return ContentEntityUI(
         identifier = ContentIdentifier.fromFormat(format = format, id = id),
@@ -335,7 +335,7 @@ fun HomeFeatured.toContentToPlayUI(): ContentToPlayUI? {
 
 fun BrandedFeatured.toContentToPlayUI(): ContentToPlayUI? {
     val format = format ?: return null
-    val id = id ?: return null
+    val id = formatId?.toInt() ?: return null
 
     return ContentToPlayUI(
         identifier = ContentIdentifier.fromFormat(format = format, id = id),

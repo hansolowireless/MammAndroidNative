@@ -215,7 +215,7 @@ class MammRepositoryImpl @Inject constructor(
         val content: Any? = when (identifier) {
             is ContentIdentifier.VoD -> {
                 remoteDatasource.getCachedWarner()?.vods?.find { it.getId() == identifier.id }
-                    ?: remoteDatasource.getCachedWarner()?.featured?.find { it.id == identifier.id }
+                    ?: remoteDatasource.getCachedWarner()?.featured?.find { it.formatId == identifier.id.toString() }
             }
             else -> null
         }
@@ -226,7 +226,7 @@ class MammRepositoryImpl @Inject constructor(
         val content: Any? = when (identifier) {
             is ContentIdentifier.VoD -> {
                 remoteDatasource.getCachedAcontra()?.vods?.find { it.getId() == identifier.id }
-                    ?: remoteDatasource.getCachedAcontra()?.featured?.find { it.id == identifier.id }
+                    ?: remoteDatasource.getCachedAcontra()?.featured?.find { it.formatId == identifier.id.toString()}
             }
             else -> null
         }
@@ -237,7 +237,7 @@ class MammRepositoryImpl @Inject constructor(
         val content: Any? = when (identifier) {
             is ContentIdentifier.VoD -> {
                 remoteDatasource.getCachedAMC()?.vods?.find { it.getId() == identifier.id }
-                    ?: remoteDatasource.getCachedAMC()?.featured?.find { it.id == identifier.id }
+                    ?: remoteDatasource.getCachedAMC()?.featured?.find { it.formatId == identifier.id.toString() }
             }
             else -> null
         }
