@@ -33,6 +33,7 @@ import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.RowOfContent
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
 import com.mamm.mammapps.ui.model.ContentEntityUI
+import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.ContentRowUI
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.HomeGridBottomColor
@@ -49,6 +50,7 @@ fun HomeGridBottom(
 ) {
 
     val focusRequester = remember { FocusRequester() }
+    val expandCategoryTitle = stringResource(id = R.string.expand_category_content_title)
 
     LaunchedEffect(Unit) {
         // pequeño delay para que Compose reactive el árbol tras popBackStack()
@@ -102,7 +104,7 @@ fun HomeGridBottom(
                     ),
                     verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
                 ) {
-                    Row (verticalAlignment = Alignment.CenterVertically) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = contentRow.categoryName,
                             color = HomeGridBottomColor.rowTitle,
@@ -128,11 +130,26 @@ fun HomeGridBottom(
                     RowOfContent(
                         modifier = Modifier.focusRequester(rowFocusRequester),
                         contentList = contentRow.items,
+                        showExpandCategory = LocalIsTV.current && contentRow.loadMore,
                         onContentClick = { content ->
                             onContentClicked(index, content)
                         },
                         onFocus = { content ->
                             onFocus(content)
+                        },
+                        onFocusExpandCategory = {
+                            onFocus(
+                                ContentEntityUI(
+                                    identifier = ContentIdentifier.VoD(0),
+                                    title = expandCategoryTitle
+                                )
+                            )
+                        },
+                        onExpandCategoryClick = {
+                            onExpandCategory(
+                                contentRow.categoryId,
+                                contentRow.categoryName
+                            )
                         }
                     )
 

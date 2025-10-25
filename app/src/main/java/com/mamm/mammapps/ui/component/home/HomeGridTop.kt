@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,7 +33,7 @@ import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.HomeGridTopColor
 
 @Composable
-fun HomeGridTop(event: ContentEntityUI) {
+fun HomeGridTop(content: ContentEntityUI) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -48,8 +47,8 @@ fun HomeGridTop(event: ContentEntityUI) {
                 .align(Alignment.CenterEnd)
         ) {
             AsyncImage(
-                model = event.horizontalImageUrl,
-                contentDescription = event.title,
+                model = content.horizontalImageUrl,
+                contentDescription = content.title,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
@@ -103,9 +102,9 @@ fun HomeGridTop(event: ContentEntityUI) {
                 verticalArrangement = Arrangement.spacedBy(Dimensions.paddingXSmall)
             ) {
                 // Event title from ContentEntityUI
-                if (event.title.isNotBlank()) {
+                if (content.title.isNotBlank()) {
                     Text(
-                        text = event.title,
+                        text = content.title ,
                         color = HomeGridTopColor.eventitle,
                         style = MaterialTheme.typography.bodyLarge,
                         maxLines = 2,
@@ -114,7 +113,7 @@ fun HomeGridTop(event: ContentEntityUI) {
                 }
 
                 // Separator line (only if title exists)
-                if (event.detailInfo?.description?.isNotBlank() == true) {
+                if (content.detailInfo?.description?.isNotBlank() == true) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(0.7f)
@@ -123,13 +122,13 @@ fun HomeGridTop(event: ContentEntityUI) {
                     )
                 }
 
-                if (event.isLive()) {
+                if (content.isLive()) {
                     EventStartEndDuration(
-                        liveEventInfo = event.liveEventInfo,
-                        duration = event.detailInfo?.metadata?.durationMin,
+                        liveEventInfo = content.liveEventInfo,
+                        duration = content.detailInfo?.metadata?.durationMin,
                     )
                 } else {
-                    event.detailInfo?.metadata?.let { metadata ->
+                    content.detailInfo?.metadata?.let { metadata ->
                         DurationYearRatingRow(
                             metadata = metadata,
                             textcolor = HomeGridTopColor.metadata
@@ -138,7 +137,7 @@ fun HomeGridTop(event: ContentEntityUI) {
                 }
 
                 // Event description from ContentEntityUI subtitle
-                event.detailInfo?.description?.let { description ->
+                content.detailInfo?.description?.let { description ->
                     if (description.isNotBlank()) {
                         Text(
                             text = description,
@@ -158,7 +157,7 @@ fun HomeGridTop(event: ContentEntityUI) {
 fun HomeGridTopPreview() {
     MaterialTheme {
         HomeGridTop(
-            event = ContentEntityUI(
+            content = ContentEntityUI(
                 title = "Malas lenguas: Episodio 153",
                 imageUrl = "https://picsum.photos/800/600?random=1",
                 identifier = ContentIdentifier.VoD(1),

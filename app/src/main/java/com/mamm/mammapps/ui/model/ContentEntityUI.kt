@@ -12,16 +12,15 @@ import kotlinx.parcelize.RawValue
 @Parcelize
 data class ContentEntityUI(
     val identifier: ContentIdentifier,
-    val imageUrl: String,
+    val imageUrl: String = "",
     val horizontalImageUrl: String = "",
-    val title: String,
+    val title: String = "",
     val detailInfo: DetailInfoUI? = null,
     var liveEventInfo: LiveEventInfoUI? = null,
+    val customContentType: CustomizedContent = CustomizedContent.None,
     val aspectRatio: Float = Ratios.HORIZONTAL,
-    val height: @RawValue Dp = Dimensions.channelEntityHeight,
-    val customContentType: CustomizedContent = CustomizedContent.None
+    val height: @RawValue Dp = Dimensions.channelEntityHeight
 ) : Parcelable {
-
 
     fun isLive(): Boolean {
         if (this.liveEventInfo == null || this.liveEventInfo?.eventStart == null || this.liveEventInfo?.eventEnd == null) return false

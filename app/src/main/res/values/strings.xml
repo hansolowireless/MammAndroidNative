@@ -1,13 +1,17 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">MammApps</string>
 
-    <!--region EPG-->
+    <!--region Login-->
     <string name="type_credentials">Introduce tus datos de acceso</string>
     <string name="email">E-mail</string>
     <string name="password">Contraseña</string>
     <string name="login">Iniciar sesión</string>
     <string name="forgot_password">¿Olvidaste tu contraseña?</string>
-    <!--endregion EPG-->
+    <!--endregion Login-->
+
+    <!--region Home-->
+    <string name="expand_category_content_title">Pulsa para ver más contenido</string>
+    <!--endregion Home-->
 
     <!--region Channels-->
     <string name="search_channel_placeholder">Buscar canal…</string>
