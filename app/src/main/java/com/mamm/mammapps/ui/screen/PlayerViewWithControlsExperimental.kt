@@ -76,6 +76,7 @@ import com.mamm.mammapps.ui.viewmodel.VideoPlayerViewModel
 import kotlinx.coroutines.delay
 import kotlin.math.abs
 
+//TODO dejar aqui solo la lógica onPressed y llevar el resto a VideoPlayer (la clase padre)
 @Composable
 fun PlayerViewWithControlsExperimental(
     modifier: Modifier = Modifier,
@@ -88,6 +89,7 @@ fun PlayerViewWithControlsExperimental(
     val zappingInfo by viewModel.zappingInfo.collectAsStateWithLifecycle()
     val zappingNumberDisplay by viewModel.zappingNumberDisplay.collectAsStateWithLifecycle()
     val isTstvMode by viewModel.isTstvMode.collectAsStateWithLifecycle()
+    val playerState by viewModel.playerState.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val view = LocalView.current
@@ -205,8 +207,7 @@ fun PlayerViewWithControlsExperimental(
 
                     val playingContent = parentView.tag as? ContentToPlayUI
 
-                    val styledPlayerView =
-                        parentView.findViewById<StyledPlayerView>(R.id.player_view).also {
+                    val styledPlayerView = parentView.findViewById<StyledPlayerView>(R.id.player_view).also {
                             playerViewRef.value = it
                         }
 
@@ -298,9 +299,11 @@ fun PlayerViewWithControlsExperimental(
                         parentView.findViewById<CustomPreviewBar>(R.id.exo_progress)
 
                     Log.d("AndroidViewUpdate", "Update ejecutado. isTstvMode = $isTstvMode")
+                    Log.d("AndroidViewUpdate", "PlayerState ha cambiado = $playerState")
 
                     var playerChanged = false
                     if (styledPlayerView.player != player) {
+                        Log.d("AndroidViewUpdate", "styledPlayerView y PLAYER ha cambiado")
                         styledPlayerView.player = player
                         if (player != null) {
                             styledPlayerView.requestLayout()
@@ -310,6 +313,7 @@ fun PlayerViewWithControlsExperimental(
 
                     var contentChanged = false
                     if (parentView.tag != content) {
+                        Log.d("AndroidViewUpdate", "CONTENT ha cambiado")
                         parentView.tag = content
                         contentChanged = true
                     }
@@ -384,7 +388,6 @@ fun PlayerViewWithControlsExperimental(
                 )
             }
         }
-
 
     }
 }
