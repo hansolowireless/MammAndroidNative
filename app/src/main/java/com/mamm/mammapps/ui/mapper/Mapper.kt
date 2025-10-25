@@ -426,7 +426,7 @@ fun GetHomeContentResponse.toContentUIRows(): List<ContentRowUI> {
             ContentRowUI(
                 categoryId = category.id ?: 0,
                 categoryName = category.name.orEmpty(),
-                items = items.repeat(threshold = 5),
+                items = items,
                 loadMore = category.loadMore ?: false
             )
         } else null

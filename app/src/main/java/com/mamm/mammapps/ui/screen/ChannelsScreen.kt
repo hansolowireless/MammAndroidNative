@@ -64,7 +64,7 @@ fun ChannelsScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             liveEvent?.let {
-                HomeGridTop(event = it)
+                HomeGridTop(content = it)
             }
 
             ChannelFilter(

@@ -119,7 +119,7 @@ fun HomeScreen(
                 if (LocalIsTV.current) {
                     focusedContent?.let {
                         HomeGridTop(
-                            event = it
+                            content = it
                         )
                     }
                 }
