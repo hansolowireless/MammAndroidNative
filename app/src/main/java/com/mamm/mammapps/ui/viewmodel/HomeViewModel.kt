@@ -22,8 +22,8 @@ import com.mamm.mammapps.domain.usecases.content.GetWarnerUseCase
 import com.mamm.mammapps.domain.usecases.login.GetOperatorLogoUseCase
 import com.mamm.mammapps.domain.usecases.pin.ShouldRequestPinUseCase
 import com.mamm.mammapps.domain.usecases.pin.ValidatePinUseCase
-import com.mamm.mammapps.ui.mapper.toContentEntityUI
 import com.mamm.mammapps.navigation.model.AppRoute
+import com.mamm.mammapps.ui.mapper.toContentEntityUI
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.ContentRowUI

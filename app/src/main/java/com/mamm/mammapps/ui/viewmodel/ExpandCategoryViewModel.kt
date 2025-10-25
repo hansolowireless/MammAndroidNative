@@ -3,7 +3,6 @@ package com.mamm.mammapps.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
-import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.domain.usecases.content.GetCategoryContentUseCase
 import com.mamm.mammapps.ui.model.uistate.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel

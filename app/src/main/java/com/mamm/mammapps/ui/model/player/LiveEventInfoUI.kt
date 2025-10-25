@@ -1,7 +1,6 @@
 package com.mamm.mammapps.ui.model.player
 
 import android.os.Parcelable
-import com.mamm.mammapps.data.extension.getCurrentDate
 import kotlinx.parcelize.Parcelize
 import java.time.ZonedDateTime
 

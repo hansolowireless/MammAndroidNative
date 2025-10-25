@@ -1,11 +1,13 @@
 package com.mamm.mammapps.ui.component.common
 
+// --- INICIO DE CAMBIOS ---
+// 1. Importa AMBOS botones, dándoles un alias al de TV para evitar conflictos.
+// --- FIN DE CAMBIOS ---
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -18,8 +20,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-// --- INICIO DE CAMBIOS ---
-// 1. Importa AMBOS botones, dándoles un alias al de TV para evitar conflictos.
+import com.mamm.mammapps.ui.component.LocalIsTV
+import com.mamm.mammapps.ui.theme.ButtonColor
 import androidx.compose.material3.Button as MobileButton
 import androidx.compose.material3.ButtonDefaults as MobileButtonDefaults
 import androidx.compose.material3.MaterialTheme as MobileMaterialTheme
@@ -28,9 +30,6 @@ import androidx.tv.material3.Button as TvButton
 import androidx.tv.material3.ButtonDefaults as TvButtonDefaults
 import androidx.tv.material3.MaterialTheme as TvMaterialTheme
 import androidx.tv.material3.Text as TvText
-// --- FIN DE CAMBIOS ---
-import com.mamm.mammapps.ui.component.LocalIsTV
-import com.mamm.mammapps.ui.theme.ButtonColor
 
 @Composable
 fun PrimaryButton(

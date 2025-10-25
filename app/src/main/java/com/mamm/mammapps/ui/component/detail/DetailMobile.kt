@@ -4,11 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,14 +30,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.bookmark.Recommended
-import com.mamm.mammapps.data.model.metadata.Metadata
 import com.mamm.mammapps.ui.component.common.ContentEntityListItem
 import com.mamm.mammapps.ui.component.common.ExpandableText
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
@@ -54,7 +50,6 @@ import com.mamm.mammapps.ui.model.SeasonUI
 import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.theme.DetailColor
 import com.mamm.mammapps.ui.theme.Dimensions
-import kotlinx.coroutines.flow.merge
 
 @Composable
 fun DetailMobile(

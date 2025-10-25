@@ -38,7 +38,6 @@ import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.ContentListUI
 import com.mamm.mammapps.ui.model.DetailInfoUI
 import com.mamm.mammapps.ui.theme.ContentEntityListItemColor
-import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.Ratios
 import drawable.Clock
 

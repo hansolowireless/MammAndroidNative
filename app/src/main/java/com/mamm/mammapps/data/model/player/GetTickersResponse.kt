@@ -2,7 +2,6 @@ package com.mamm.mammapps.data.model.player
 
 import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
 import java.util.Date
 import java.util.Locale
 

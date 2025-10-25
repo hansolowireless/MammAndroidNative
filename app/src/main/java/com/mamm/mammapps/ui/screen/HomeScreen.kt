@@ -1,15 +1,9 @@
 package com.mamm.mammapps.ui.screen
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,25 +13,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
-import com.mamm.mammapps.R
-import com.mamm.mammapps.ui.component.home.HomeGridBottom
-import com.mamm.mammapps.ui.component.home.HomeGridTop
-import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.component.LocalIsTV
+import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.ui.component.dialog.PinDialog
+import com.mamm.mammapps.ui.component.home.HomeGridBottom
+import com.mamm.mammapps.ui.component.home.HomeGridTop
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.uistate.HomeContentUIState
-import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.viewmodel.HomeViewModel
-import org.jetbrains.annotations.Async
 
 @Composable
 fun HomeScreen(

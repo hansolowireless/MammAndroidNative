@@ -30,16 +30,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
 import com.mamm.mammapps.R
-import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.bookmark.Recommended
-import com.mamm.mammapps.ui.component.metadata.DurationYearRatingRow
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.ui.component.common.PrimaryButton
 import com.mamm.mammapps.ui.component.metadata.ActorCard
 import com.mamm.mammapps.ui.component.metadata.DirectorAndGenreRow
+import com.mamm.mammapps.ui.component.metadata.DurationYearRatingRow
 import com.mamm.mammapps.ui.mapper.toSimilarContentRow
 import com.mamm.mammapps.ui.model.ContentEntityUI
-import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.SeasonUI
 import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.theme.DetailColor

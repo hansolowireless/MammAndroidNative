@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.mamm.mammapps.ui.component.common.ContentEntity
 import com.mamm.mammapps.ui.model.ContentEntityUI
-import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.Ratios
 import kotlinx.coroutines.delay
 

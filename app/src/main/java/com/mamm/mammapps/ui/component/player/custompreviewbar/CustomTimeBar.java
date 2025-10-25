@@ -20,6 +20,7 @@ import android.view.ViewParent;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -28,15 +29,14 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ui.TimeBar;
 import com.google.android.exoplayer2.util.Assertions;
 import com.google.android.exoplayer2.util.Util;
-import com.mamm.mammapps.R;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 import java.util.Collections;
 import java.util.Date;
 import java.util.Formatter;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArraySet;
-
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
  * A time bar that shows a current position, buffered position, duration and ad markers.

@@ -12,7 +12,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mamm.mammapps.data.extension.catchupIsAvailable
-import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.ui.component.common.ContentEntityListItem
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset

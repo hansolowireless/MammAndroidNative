@@ -1,6 +1,7 @@
 package com.mamm.mammapps.data.repository
 
-import android.net.Uri
+import android.util.Base64
+import com.mamm.mammapps.data.config.Config
 import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.di.DeviceSerialQualifier
@@ -9,21 +10,19 @@ import com.mamm.mammapps.data.di.DrmIVQualifier
 import com.mamm.mammapps.data.di.DrmSecretKeyQualifier
 import com.mamm.mammapps.data.di.DrmUrlQualifier
 import com.mamm.mammapps.data.logger.Logger
+import com.mamm.mammapps.data.model.player.GetTickersResponse
+import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.domain.interfaces.PlaybackRepository
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import java.net.URLEncoder
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import javax.crypto.Cipher
 import javax.crypto.Mac
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import javax.inject.Inject
-import android.util.Base64
-import com.mamm.mammapps.data.config.Config
-import com.mamm.mammapps.data.model.player.GetTickersResponse
-import com.mamm.mammapps.data.model.player.QosData
-import java.time.format.DateTimeFormatter
 
 class PlaybackRepositoryImpl @Inject constructor (
     private val remoteDatasource: RemoteDatasource,

@@ -11,11 +11,11 @@ import com.mamm.mammapps.data.repository.MammRepositoryImpl
 import com.mamm.mammapps.data.repository.PlaybackRepositoryImpl
 import com.mamm.mammapps.data.repository.TokenRepositoryImpl
 import com.mamm.mammapps.domain.interfaces.CustomContentRepository
-import com.mamm.mammapps.domain.interfaces.TokenRepository
 import com.mamm.mammapps.domain.interfaces.EPGRepository
 import com.mamm.mammapps.domain.interfaces.LoginRepository
 import com.mamm.mammapps.domain.interfaces.MammRepository
 import com.mamm.mammapps.domain.interfaces.PlaybackRepository
+import com.mamm.mammapps.domain.interfaces.TokenRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

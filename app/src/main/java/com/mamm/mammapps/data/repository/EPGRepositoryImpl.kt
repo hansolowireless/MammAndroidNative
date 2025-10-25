@@ -2,15 +2,15 @@ package com.mamm.mammapps.data.repository
 
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.data.model.epg.EPGChannelContent
 import com.mamm.mammapps.data.model.epg.MultiDayEPG
+import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.domain.interfaces.EPGRepository
-import java.time.LocalDate
-import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import java.time.LocalDate
+import javax.inject.Inject
 
 
 class EPGRepositoryImpl @Inject constructor(

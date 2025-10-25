@@ -11,8 +11,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.common.ContentEntity
 import com.mamm.mammapps.ui.model.ContentEntityUI

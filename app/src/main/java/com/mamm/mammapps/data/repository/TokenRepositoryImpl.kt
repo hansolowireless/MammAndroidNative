@@ -17,6 +17,7 @@ import com.mamm.mammapps.util.AppConstants.Companion.STOKEN_PARAM_NAME
 import com.mamm.mammapps.util.cleanUrl
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.security.KeyFactory
@@ -24,7 +25,6 @@ import java.security.PrivateKey
 import java.security.spec.PKCS8EncodedKeySpec
 import javax.crypto.spec.SecretKeySpec
 import javax.inject.Inject
-import io.jsonwebtoken.SignatureAlgorithm
 
 class TokenRepositoryImpl @Inject constructor(
     @ApplicationContext context: Context,

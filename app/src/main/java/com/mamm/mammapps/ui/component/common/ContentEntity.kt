@@ -39,7 +39,6 @@ import androidx.tv.material3.Surface
 import androidx.tv.material3.SurfaceDefaults
 import coil.compose.AsyncImage
 import com.mamm.mammapps.ui.component.LocalIsTV
-import com.mamm.mammapps.ui.extension.glow
 import com.mamm.mammapps.ui.extension.onTap
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier

@@ -1,6 +1,7 @@
 package com.mamm.mammapps.data.session
 
 import android.content.Context
+import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import com.google.gson.Gson
@@ -8,7 +9,6 @@ import com.mamm.mammapps.data.model.login.LoginData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
-import androidx.core.content.edit
 
 @Singleton
 class SessionStorage @Inject constructor(

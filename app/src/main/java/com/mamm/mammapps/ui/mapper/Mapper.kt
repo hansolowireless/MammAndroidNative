@@ -12,8 +12,8 @@ import com.mamm.mammapps.data.model.Serie
 import com.mamm.mammapps.data.model.VoD
 import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.bookmark.Recommended
-import com.mamm.mammapps.data.model.branded.BrandedVod
 import com.mamm.mammapps.data.model.branded.BrandedFeatured
+import com.mamm.mammapps.data.model.branded.BrandedVod
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.data.model.section.SectionVod
@@ -38,7 +38,6 @@ import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.Ratios
 import com.mamm.mammapps.util.orRandom
 import java.time.LocalDate
-import kotlin.math.log
 
 fun Any.toContentEntityUI(isAdult: Boolean = false): ContentEntityUI? {
     return when (this) {

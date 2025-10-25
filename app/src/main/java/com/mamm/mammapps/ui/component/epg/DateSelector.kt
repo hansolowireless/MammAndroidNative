@@ -19,7 +19,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.tv.material3.ListItem
 import androidx.tv.material3.ListItemDefaults
-import com.mamm.mammapps.R
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.mapper.toDateSelectorResId
 import java.time.LocalDate

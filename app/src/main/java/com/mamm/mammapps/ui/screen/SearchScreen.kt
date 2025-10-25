@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,12 +25,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
-import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.component.common.TextInput
-import com.mamm.mammapps.ui.viewmodel.SearchViewModel
 import com.mamm.mammapps.ui.component.search.InitialPrompt
 import com.mamm.mammapps.ui.component.search.SearchResultsGrid
 import com.mamm.mammapps.ui.component.search.SuggestionsList
+import com.mamm.mammapps.ui.model.uistate.UIState
+import com.mamm.mammapps.ui.viewmodel.SearchViewModel
 
 
 @OptIn(ExperimentalComposeUiApi::class)

@@ -1,7 +1,6 @@
 package com.mamm.mammapps.domain.usecases
 
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.bookmark.Recommended
 import com.mamm.mammapps.domain.interfaces.CustomContentRepository
 import javax.inject.Inject

@@ -13,8 +13,8 @@ import com.mamm.mammapps.data.model.HomeFeatured
 import com.mamm.mammapps.data.model.VoD
 import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.bookmark.Recommended
-import com.mamm.mammapps.data.model.branded.BrandedVod
 import com.mamm.mammapps.data.model.branded.BrandedFeatured
+import com.mamm.mammapps.data.model.branded.BrandedVod
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.data.model.section.SectionVod

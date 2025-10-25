@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.dp
 import com.mamm.mammapps.R
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.component.icon.BulletedList
-import com.mamm.mammapps.ui.component.icon.Child_care
 import com.mamm.mammapps.ui.component.icon.Fire
 import com.mamm.mammapps.ui.component.icon.Football
 import com.mamm.mammapps.ui.component.icon.Puzzle

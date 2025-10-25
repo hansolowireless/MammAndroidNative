@@ -2,7 +2,6 @@ package com.mamm.mammapps.domain.usecases.content
 
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
-import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.domain.interfaces.MammRepository
 import javax.inject.Inject
 
