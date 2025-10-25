@@ -4,6 +4,7 @@ import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.interfaces.CustomContentRepository
 import com.mamm.mammapps.domain.interfaces.MammRepository
 import com.mamm.mammapps.ui.mapper.insertBookmarks
+import com.mamm.mammapps.ui.mapper.insertFeatured
 import com.mamm.mammapps.ui.mapper.insertMostWatched
 import com.mamm.mammapps.ui.mapper.insertRecommended
 import com.mamm.mammapps.ui.mapper.toContentUIRows
@@ -50,6 +51,7 @@ class GetHomeContentUseCase @Inject constructor(
                     .insertBookmarks(bookmarksResult.getOrElse { emptyList() })
                     .insertRecommended(recommendedResult.getOrElse { emptyList() })
                     .insertMostWatched(mostWatchedResult.getOrElse { emptyList() })
+                    .insertFeatured(homeResult.getOrThrow().featured.orEmpty())
 
                 Result.success(contentRows)
             }

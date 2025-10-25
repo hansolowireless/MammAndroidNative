@@ -400,14 +400,6 @@ fun Event.toLiveEventInfoUI(): LiveEventInfoUI = LiveEventInfoUI(
 )
 //----------endregion PLAYBACK----------------------
 
-fun List<ContentEntityUI>.repeat(threshold: Int): List<ContentEntityUI> {
-    return if (this.size > threshold) {
-        this.plus(this).plus(this)
-    } else {
-        this
-    }
-}
-
 fun GetHomeContentResponse.toContentUIRows(): List<ContentRowUI> {
     val orderedCategories = categories?.sortedBy { it.pos }
     val rowsWithoutFeatured =  orderedCategories?.mapNotNull { category ->
@@ -431,15 +423,7 @@ fun GetHomeContentResponse.toContentUIRows(): List<ContentRowUI> {
         } else null
     } ?: emptyList()
 
-    return this.featured?.let {
-        listOf(
-            ContentRowUI(
-                categoryName = "Eventos Destacados",
-                items = it.mapNotNull { featured -> featured.toContentEntityUI() },
-                isFeatured = true
-            )
-        ) + rowsWithoutFeatured
-    } ?: rowsWithoutFeatured
+    return rowsWithoutFeatured
 }
 
 fun GetOtherContentResponse.toContentUIRows(
@@ -502,6 +486,18 @@ fun GetBrandedContentResponse.toContentUIRows(
         }
     }
     return rows
+}
+
+fun List<ContentRowUI>.insertFeatured(
+    featured: List<HomeFeatured>
+) : List<ContentRowUI> {
+    ContentRowUI(
+        categoryName = "Eventos Destacados",
+        items = featured.mapNotNull { it.toContentEntityUI() },
+        isFeatured = true
+    ).let {
+        return listOf(it) + this
+    }
 }
 
 fun List<ContentRowUI>.insertBookmarks(
