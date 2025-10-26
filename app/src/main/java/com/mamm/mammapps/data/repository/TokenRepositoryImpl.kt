@@ -7,6 +7,7 @@ import com.example.openstream_flutter_rw.data.security.AES128KeyDecryptor
 import com.example.openstream_flutter_rw.data.security.AES256Encryptor
 import com.mamm.mammapps.data.config.Config
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
+import com.mamm.mammapps.data.di.ChromecastDeviceTypeQualifier
 import com.mamm.mammapps.data.di.DeviceSerialQualifier
 import com.mamm.mammapps.data.di.DeviceTypeQualifier
 import com.mamm.mammapps.data.logger.Logger
@@ -31,6 +32,7 @@ class TokenRepositoryImpl @Inject constructor(
     private val remoteDatasource: RemoteDatasource,
     @DeviceSerialQualifier private val deviceSerial: String,
     @DeviceTypeQualifier private val deviceType: String,
+    @ChromecastDeviceTypeQualifier private val ccastDeviceType: String,
     private val sessionManager: SessionManager,
     private val logger: Logger
 ) : TokenRepository {
@@ -169,15 +171,16 @@ class TokenRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun generateJwtToken(contentID: String, eventType: String): String {
-        val currentTimeSeconds = System.currentTimeMillis() / 1000
+    override fun generateJwtToken(contentID: String, eventType: String, chromecast: Boolean): String {
+        val currentTimeSeconds = System.currentTimeMillis().div(1000)
+        val finalDeviceType : Int = (if (chromecast) ccastDeviceType.toIntOrNull() else deviceType.toIntOrNull()) ?: 0
 
         val tokenData = JwTokenData(
             uID = sessionManager.loginData?.userId ?: 0,
             cID = contentID,
             sType = eventType,
             dvID = deviceSerial,
-            dvTag = deviceType.toIntOrNull() ?: 0,
+            dvTag = finalDeviceType,
             opName = Config.operatorNameDRM
         )
 
@@ -195,7 +198,7 @@ class TokenRepositoryImpl @Inject constructor(
                 )
             )
             .claim("iat", currentTimeSeconds)
-            .claim("exp", currentTimeSeconds + JWTOKEN_EXPIRATION_TIME_SECS) // 12 horas desde ahora
+            .claim("exp", currentTimeSeconds + JWTOKEN_EXPIRATION_TIME_SECS)
             .signWith(privateKey, SignatureAlgorithm.RS256)
             .compact()
     }

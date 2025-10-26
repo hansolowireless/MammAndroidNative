@@ -9,5 +9,10 @@ interface LocalDataSource {
 
     suspend fun getUserCredentials(): Pair<String?, String?>
     fun getLastTimePinWasCorrect(): ZonedDateTime?
-
+    fun getDeviceSerial(): String
+    fun getDeviceType(): String
+    fun getChromecastDeviceType(): String
+    fun getDrmBaseUrl(): String
+    fun getDrmiV64(): ByteArray
+    fun getDrmSecretKey64() : ByteArray
 }

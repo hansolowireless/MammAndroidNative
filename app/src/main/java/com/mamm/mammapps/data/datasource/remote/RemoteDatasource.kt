@@ -3,6 +3,7 @@ package com.mamm.mammapps.data.datasource.remote
 import androidx.core.net.toUri
 import com.mamm.mammapps.data.cache.Cache
 import com.mamm.mammapps.data.di.BaseUrlApi
+import com.mamm.mammapps.data.di.ChromecastDeviceTypeQualifier
 import com.mamm.mammapps.data.di.CustomContentApi
 import com.mamm.mammapps.data.di.DeviceModelQualifier
 import com.mamm.mammapps.data.di.DeviceSerialQualifier
@@ -60,6 +61,7 @@ class RemoteDatasource @Inject constructor(
     @CustomContentApi private val customContentApi: ApiService,
     @DeviceTypeQualifier private val deviceType: String,
     @DeviceSerialQualifier private val deviceSerial: String,
+    @ChromecastDeviceTypeQualifier private val ccastDeviceType: String,
     @DeviceModelQualifier private val deviceModel: String,
     private val sessionManager: SessionManager,
     private val securePreferencesManager: SecurePreferencesManager,
@@ -327,7 +329,11 @@ class RemoteDatasource @Inject constructor(
 
 
     //----------PLAYBACK---------//
-    suspend fun getUrlFromCLM(deliveryURL: String, typeOfContentString: String): String? {
+    suspend fun getUrlFromCLM(
+        deliveryURL: String,
+        typeOfContentString: String,
+        chromecast: Boolean = false
+    ): String? {
         require(
             sessionManager.loginData?.skin?.operator != null
                     && sessionManager.jwToken != null
@@ -340,7 +346,7 @@ class RemoteDatasource @Inject constructor(
             user = securePreferencesManager.getCredentials().first!!,
             typeOfContentString = typeOfContentString,
             model = deviceModel,
-            deviceType = deviceType,
+            deviceType = if (chromecast) ccastDeviceType else deviceType,
             operator = sessionManager.loginData?.skin?.operator!!,
             jwt = sessionManager.jwToken!!
         )

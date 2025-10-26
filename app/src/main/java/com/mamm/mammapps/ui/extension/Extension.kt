@@ -20,12 +20,15 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.google.android.exoplayer2.Player
+import com.google.android.gms.cast.MediaMetadata
+import com.google.android.gms.common.images.WebImage
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.extension.getCurrentDate
 import com.mamm.mammapps.data.logger.SimpleLogger
@@ -33,6 +36,7 @@ import com.mamm.mammapps.data.model.player.GlideThumbnailTransformation
 import com.mamm.mammapps.data.model.player.WatermarkInfo
 import com.mamm.mammapps.ui.constant.PlayerConstant
 import com.mamm.mammapps.ui.model.ContentEntityUI
+import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -245,4 +249,19 @@ fun ContentEntityUI.catchupIsAvailable(availableCatchupHours: Int): Boolean {
     return availableCatchupHours > 0 &&
             differenceInHours > 0 &&
             differenceInHours < availableCatchupHours
+}
+
+
+/**
+ * Convierte un objeto ContentToPlayUI en un MediaMetadata para el SDK de Cast.
+ */
+fun ContentToPlayUI.toMediaMetadata(): MediaMetadata {
+    return MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE)
+        .apply {
+        putString(MediaMetadata.KEY_TITLE, title)
+        putString(MediaMetadata.KEY_SUBTITLE, subtitle.orEmpty())
+        WebImage(imageUrl.toUri()).let {
+            images.add(it)
+        }
+    }
 }

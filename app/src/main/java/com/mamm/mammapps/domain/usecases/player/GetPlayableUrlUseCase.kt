@@ -19,11 +19,15 @@ class GetPlayableUrlUseCase @Inject constructor(
         private const val TAG = "GetPlayableUrlUseCase"
     }
 
-    suspend operator fun invoke(content: ContentToPlayUI): Result<String> =
+    suspend operator fun invoke(
+        content: ContentToPlayUI,
+        chromecast: Boolean = false
+    ): Result<String> =
         runCatching {
             val playableURL = playbackRepository.getVideoUrlFromCLM(
                 deliveryURL = content.deliveryURL,
-                typeOfContentString = content.getCLMString()
+                typeOfContentString = content.getCLMString(),
+                chromecast = chromecast
             ).getOrThrow().let { url ->
 
                 val finalPlayableURL = modifyUrlToCatchupIfNeeded(
@@ -42,9 +46,9 @@ class GetPlayableUrlUseCase @Inject constructor(
 
             playableURL
         }.onSuccess {
-            Result.success(it) // On success, return the result
+            Result.success(it)
         }.onFailure {
-            Result.success(it) // On failure still return the result
+            Result.success(it)
         }
 
     private fun modifyUrlToCatchupIfNeeded(content: ContentToPlayUI, playableUrl: String): String {
@@ -59,7 +63,10 @@ class GetPlayableUrlUseCase @Inject constructor(
         }
 
         val startTime = event.eventStart ?: run {
-            logger.debug(TAG, "tuneUrlToCatchupIfNeeded Event start time is null, will not be tuned")
+            logger.debug(
+                TAG,
+                "tuneUrlToCatchupIfNeeded Event start time is null, will not be tuned"
+            )
             return playableUrl
         }
 
@@ -88,8 +95,12 @@ class GetPlayableUrlUseCase @Inject constructor(
                 "$timeStartParam&$timeEndParam&$originalQuery"
             }
 
-            val catchupURL = "${baseUri.scheme}://${baseUri.authority}${baseUri.path}playlist.mpd?$queryString"
-            logger.debug(TAG, "tuneUrlToCatchupIfNeeded URL has been tuned to conform Catchup URL $catchupURL")
+            val catchupURL =
+                "${baseUri.scheme}://${baseUri.authority}${baseUri.path}playlist.mpd?$queryString"
+            logger.debug(
+                TAG,
+                "tuneUrlToCatchupIfNeeded URL has been tuned to conform Catchup URL $catchupURL"
+            )
 
             catchupURL
         } catch (e: Exception) {
@@ -107,8 +118,6 @@ class GetPlayableUrlUseCase @Inject constructor(
             fullUrl
         }
     }
-
-
 
 
 }

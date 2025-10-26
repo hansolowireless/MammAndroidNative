@@ -19,6 +19,7 @@ import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.data.model.section.SectionVod
 import com.mamm.mammapps.data.model.serie.Episode
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
+import com.mamm.mammapps.data.model.serie.TbContentSeason
 import com.mamm.mammapps.ui.extension.adult
 import com.mamm.mammapps.ui.extension.landscape
 import com.mamm.mammapps.ui.extension.squared
@@ -53,6 +54,24 @@ fun Any.toContentEntityUI(isAdult: Boolean = false): ContentEntityUI? {
         is MostWatchedContent -> this.toContentEntityUI()
         is Recommended -> this.toContentEntityUI()
         is HomeFeatured -> this.toContentEntityUI()
+        else -> null
+    }
+}
+
+fun Any.toContentToPlayUI(): ContentToPlayUI? {
+    return when (this) {
+        is Channel -> this.toContentToPlayUI()
+        is VoD -> this.toContentToPlayUI()
+        is Event -> this.toContentToPlayUI()
+        is HomeFeatured -> this.toContentToPlayUI()
+        is EPGEvent -> this.toContentToPlayUI()
+        is SectionVod -> this.toContentToPlayUI()
+        is BrandedVod -> this.toContentToPlayUI()
+        is BrandedFeatured -> this.toContentToPlayUI()
+        is TbContentSeason -> this.contentDetails?.toContentToPlayUI()
+        is Bookmark -> this.toContentToPlayUI()
+        is MostWatchedContent -> this.toContentToPlayUI()
+        is Recommended -> this.toContentToPlayUI()
         else -> null
     }
 }

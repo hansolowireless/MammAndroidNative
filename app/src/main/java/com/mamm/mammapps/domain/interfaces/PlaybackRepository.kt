@@ -5,9 +5,15 @@ import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 
 interface PlaybackRepository {
-    suspend fun getVideoUrlFromCLM(deliveryURL: String, typeOfContentString: String) : Result<String>
+    suspend fun getVideoUrlFromCLM(
+        deliveryURL: String,
+        typeOfContentString: String,
+        chromecast: Boolean = false
+    ) : Result<String>
 
-    suspend fun getDRMUrl (content: ContentToPlayUI) : Result<Pair<String, String>>
+    suspend fun getDRMUrl(
+        content: ContentToPlayUI
+    ) : Result<Pair<String, String>>
 
     suspend fun getTickers () : Result<GetTickersResponse>
 

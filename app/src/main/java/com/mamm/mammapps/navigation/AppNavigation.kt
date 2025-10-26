@@ -158,7 +158,7 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
             backStackEntry.savedStateHandle.get<AppRoute>("route")
         }
 
-        if (contentUI != null && route != null ) {
+        if (contentUI != null && route != null) {
             DetailScreen(
                 content = contentUI,
                 prefoundContent = prefoundContent,
@@ -190,30 +190,14 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
             backStackEntry.savedStateHandle.retrieveContentClass()
         }
 
-        val playableContent = when (contentItem) {
-            is HomeFeatured -> contentItem.toContentToPlayUI()
-            is Channel -> contentItem.toContentToPlayUI()
-            is VoD -> contentItem.toContentToPlayUI()
-            is Event -> contentItem.toContentToPlayUI()
-            is EPGEvent -> contentItem.toContentToPlayUI()
-            is SectionVod -> contentItem.toContentToPlayUI()
-            is BrandedVod -> contentItem.toContentToPlayUI()
-            is BrandedFeatured -> contentItem.toContentToPlayUI()
-            is TbContentSeason -> contentItem.contentDetails?.toContentToPlayUI()
-            is Bookmark -> contentItem.toContentToPlayUI()
-            is MostWatchedContent -> contentItem.toContentToPlayUI()
-            is Recommended -> contentItem.toContentToPlayUI()
-            else -> null
-        }
-
-        playableContent?.let {
+        contentItem?.toContentToPlayUI()?.let {
             VideoPlayerScreen(
-                playedContent = playableContent
+                playedContent = it
             )
         }
     }
 
-    composable (AppRoute.EXPANDCATEGORY.route) {
+    composable(AppRoute.EXPANDCATEGORY.route) {
         val categoryId = remember(it) {
             it.savedStateHandle.retrieveCategoryId()
         }

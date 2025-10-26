@@ -24,14 +24,9 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import javax.inject.Inject
 
-class PlaybackRepositoryImpl @Inject constructor (
+class PlaybackRepositoryImpl @Inject constructor(
     private val remoteDatasource: RemoteDatasource,
     private val localDatasource: LocalDataSource,
-    @DeviceSerialQualifier private val deviceSerial: String,
-    @DeviceTypeQualifier private val deviceType: String,
-    @DrmUrlQualifier private val drmUrl: String,
-    @DrmIVQualifier private val iV64: ByteArray,
-    @DrmSecretKeyQualifier private val secretKey64: ByteArray,
     private val sessionManager: SessionManager,
     private val logger: Logger
 ) : PlaybackRepository {
@@ -40,26 +35,38 @@ class PlaybackRepositoryImpl @Inject constructor (
         private const val TAG = "PlaybackRepositoryImpl"
     }
 
-    override suspend fun getVideoUrlFromCLM(deliveryURL: String, typeOfContentString: String): Result<String> {
+    override suspend fun getVideoUrlFromCLM(
+        deliveryURL: String,
+        typeOfContentString: String,
+        chromecast: Boolean
+    ): Result<String> {
         return runCatching {
-            val locationUrl = remoteDatasource.getUrlFromCLM(deliveryURL, typeOfContentString)
+            val locationUrl = remoteDatasource.getUrlFromCLM(
+                deliveryURL = deliveryURL,
+                typeOfContentString = typeOfContentString,
+                chromecast = chromecast
+            )
             logger.debug(TAG, "getVideoUrlFromCLM - $locationUrl")
             locationUrl ?: throw Exception("Location header not found in response")
         }
     }
 
-    override suspend fun getDRMUrl(content: ContentToPlayUI): Result<Pair<String, String>> {
+    override suspend fun getDRMUrl(
+        content: ContentToPlayUI
+    ): Result<Pair<String, String>> {
         return runCatching {
             val userName = localDatasource.getUserCredentials().first
             val token = sessionManager.loginData?.token
             val userID = sessionManager.loginData?.userId
             val operatorName = Config.operatorNameDRM
+            val deviceType = localDatasource.getDeviceType()
 
             // Current date
             val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
             val nowString = dateFormat.format(ZonedDateTime.now())
 
-            val signature = "$userName|$deviceType|$deviceSerial|$nowString"
+            val signature =
+                "$userID|$deviceType|${localDatasource.getDeviceSerial()}|$nowString"
             logger.debug(TAG, signature)
 
             // HMAC SHA-1
@@ -74,7 +81,7 @@ class PlaybackRepositoryImpl @Inject constructor (
 
             // AuthString JSON
             val authString = """{
-                "deviceID":"$deviceSerial",
+                "deviceID":"${localDatasource.getDeviceSerial()}",
                 "signature":"$digestString",
                 "expire":"$nowString",
                 "contentType":"${content.getDRMString()}",
@@ -83,14 +90,14 @@ class PlaybackRepositoryImpl @Inject constructor (
             logger.debug(TAG, authString)
 
             // Base64 encoding
-            val encoded = Base64.encodeToString(authString.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
+            val encoded =
+                Base64.encodeToString(authString.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
 
             // AES Encryption (CBC mode with PKCS7 padding)
             val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
-            val secretKeySpec = SecretKeySpec(secretKey64, "AES")
-            val ivSpec = IvParameterSpec(iV64)
+            val secretKeySpec = SecretKeySpec(localDatasource.getDrmSecretKey64(), "AES")
+            val ivSpec = IvParameterSpec(localDatasource.getDrmiV64())
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivSpec)
-
 
             val encrypted = cipher.doFinal(encoded.toByteArray(Charsets.UTF_8))
             val encryptedString = URLEncoder.encode(
@@ -116,11 +123,12 @@ class PlaybackRepositoryImpl @Inject constructor (
             )
 
             // License URL construction (always widevine for Android)
-            val licenseURL = (content.drmUrl) ?: ("${drmUrl}widevine/getLicense?" +
-                    "userID=$userID&" +
-                    "authenticationString=$encryptedString&" +
-                    "streamName=$streamID&" +
-                    "operator=$operatorName")
+            val licenseURL =
+                (content.drmUrl) ?: ("${localDatasource.getDrmBaseUrl()}widevine/getLicense?" +
+                        "userID=$userID&" +
+                        "authenticationString=$encryptedString&" +
+                        "streamName=$streamID&" +
+                        "operator=$operatorName")
 
             logger.debug(TAG, "getDRMUrl - $licenseURL")
 
@@ -131,7 +139,7 @@ class PlaybackRepositoryImpl @Inject constructor (
         }
     }
 
-    override suspend fun getTickers() : Result<GetTickersResponse> {
+    override suspend fun getTickers(): Result<GetTickersResponse> {
         return runCatching {
             remoteDatasource.getTickers()
         }.onFailure {
@@ -140,7 +148,7 @@ class PlaybackRepositoryImpl @Inject constructor (
     }
 
 
-    override suspend fun sendHeartBeat() : Result<Unit> {
+    override suspend fun sendHeartBeat(): Result<Unit> {
         return runCatching {
             remoteDatasource.sendHeartBeat()
         }.onFailure {
@@ -148,7 +156,7 @@ class PlaybackRepositoryImpl @Inject constructor (
         }
     }
 
-    override suspend fun sendQosData(qosData: QosData) : Result<Unit> {
+    override suspend fun sendQosData(qosData: QosData): Result<Unit> {
         return runCatching {
             remoteDatasource.sendQosData(qosData)
         }.onFailure {
@@ -156,7 +164,7 @@ class PlaybackRepositoryImpl @Inject constructor (
         }
     }
 
-   override suspend fun setBookmark(content: ContentToPlayUI, time: Long) {
+    override suspend fun setBookmark(content: ContentToPlayUI, time: Long) {
         remoteDatasource.saveBookmark(
             contentId = content.identifier.getIdValue(),
             type = content.getBookmarkTypeString(),
