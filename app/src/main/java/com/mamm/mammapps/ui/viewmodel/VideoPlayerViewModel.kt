@@ -150,19 +150,19 @@ class VideoPlayerViewModel @Inject constructor(
                 val playableUrlDeferred = async {
                     getPlayableUrlUseCase(content)
                 }
-                val drmUrlDeferred = async {
+                val drmInfoDeferred = async {
                     getDRMUrlUseCase(content = content)
                 }
 
                 // Esperar ambos resultados
                 val playableUrlResult = playableUrlDeferred.await()
-                val drmUrlResult = drmUrlDeferred.await()
+                val drmInfoResult = drmInfoDeferred.await()
 
                 // Verificar que ambos sean exitosos
-                if (playableUrlResult.isSuccess && drmUrlResult.isSuccess) {
+                if (playableUrlResult.isSuccess && drmInfoResult.isSuccess) {
                     logger.debug(TAG, "initializeWithContent getPlayableUrlUseCase success")
                     playableUrl = playableUrlResult.getOrElse { "" }
-                    playableLicenseUrl = drmUrlResult.getOrElse { "" }
+                    playableLicenseUrl = drmInfoResult.map {it.drmUrl}.getOrElse { "" }
 
                     setPlayerUrls(
                         videoUrl = playableUrl,
@@ -171,7 +171,7 @@ class VideoPlayerViewModel @Inject constructor(
 
                 } else {
                     val error =
-                        playableUrlResult.exceptionOrNull() ?: drmUrlResult.exceptionOrNull()
+                        playableUrlResult.exceptionOrNull() ?: drmInfoResult.exceptionOrNull()
                     logger.error(
                         TAG,
                         "initializeWithContent getPlayableUrlUseCase error = ${error?.message}"
