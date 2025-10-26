@@ -17,6 +17,10 @@ annotation class DeviceTypeQualifier
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
+annotation class ChromecastDeviceTypeQualifier
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
 annotation class DeviceSerialQualifier
 
 @Qualifier
@@ -31,6 +35,12 @@ object DeviceModule {
     @DeviceTypeQualifier
     fun provideDeviceType(@ApplicationContext context: Context): String {
         return if (isAndroidTV(context)) "504" else "154"
+    }
+
+    @Provides
+    @ChromecastDeviceTypeQualifier
+    fun provideChromecastDeviceType(): String {
+        return "550"
     }
 
     @Provides
