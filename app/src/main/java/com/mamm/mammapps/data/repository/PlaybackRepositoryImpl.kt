@@ -4,11 +4,6 @@ import android.util.Base64
 import com.mamm.mammapps.data.config.Config
 import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
-import com.mamm.mammapps.data.di.DeviceSerialQualifier
-import com.mamm.mammapps.data.di.DeviceTypeQualifier
-import com.mamm.mammapps.data.di.DrmIVQualifier
-import com.mamm.mammapps.data.di.DrmSecretKeyQualifier
-import com.mamm.mammapps.data.di.DrmUrlQualifier
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.player.GetTickersResponse
 import com.mamm.mammapps.data.model.player.QosData

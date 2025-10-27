@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.mamm.mammapps.R
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.component.chromecast.CastButton
 import kotlinx.coroutines.launch
@@ -103,7 +104,10 @@ fun MobileNavigationLayout(navController: NavHostController) {
                                     if (drawerState.isClosed) drawerState.open() else drawerState.close()
                                 }
                             }) {
-                                Icon(Icons.Default.Menu, contentDescription = "Toggle Drawer")
+                                Icon(
+                                    Icons.Default.Menu,
+                                    contentDescription = stringResource(R.string.accessibility_toggle_drawer)
+                                )
                             }
                         },
                         actions = {

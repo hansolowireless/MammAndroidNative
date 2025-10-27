@@ -103,6 +103,7 @@
     <string name="accessibility_clear_search_action">Limpiar búsqueda</string>
     <string name="accessibility_close">Cerrar</string>
     <string name="accessibility_expandcategory">Expandir categoría</string>
+    <string name="accessibility_toggle_drawer">Abrir cajón de navegación</string>
     <!--endregion Accessibility-->
 
 

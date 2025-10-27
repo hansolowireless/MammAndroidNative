@@ -1,18 +1,21 @@
 package com.mamm.mammapps.ui.viewmodel
 
 import android.app.Application
+import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.cast.MediaInfo
 import com.google.android.gms.cast.MediaLoadRequestData
-import com.google.android.gms.cast.MediaMetadata
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.CastSession
 import com.google.android.gms.cast.framework.SessionManagerListener
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.usecases.player.GetDRMUrlUseCase
+import com.mamm.mammapps.domain.usecases.player.GetJwTokenUseCase
 import com.mamm.mammapps.domain.usecases.player.GetPlayableUrlUseCase
+import com.mamm.mammapps.ui.extension.toMediaMetadata
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
+import com.mamm.mammapps.ui.model.uistate.CastState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,11 +23,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import javax.inject.Inject
-import androidx.core.net.toUri
-import com.google.android.gms.common.images.WebImage
-import com.mamm.mammapps.domain.usecases.player.GetJwTokenUseCase
-import com.mamm.mammapps.ui.extension.toMediaMetadata
-import com.mamm.mammapps.ui.model.uistate.CastState
 
 @HiltViewModel
 class CastViewModel @Inject constructor(

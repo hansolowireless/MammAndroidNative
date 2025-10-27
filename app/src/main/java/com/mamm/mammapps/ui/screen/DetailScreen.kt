@@ -12,19 +12,26 @@ import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.detail.DetailMobile
 import com.mamm.mammapps.ui.component.detail.DetailTV
+import com.mamm.mammapps.ui.mapper.toContentToPlayUI
 import com.mamm.mammapps.ui.model.ContentEntityUI
+import com.mamm.mammapps.ui.model.uistate.CastState
+import com.mamm.mammapps.ui.viewmodel.CastViewModel
 import com.mamm.mammapps.ui.viewmodel.DetailViewModel
 
 
 @Composable
 fun DetailScreen(
     viewModel: DetailViewModel = hiltViewModel(),
+    castViewModel: CastViewModel = hiltViewModel(),
     content: ContentEntityUI,
     prefoundContent: Any? = null,
     routeTag: AppRoute,
     onClickPlay: (Any) -> Unit,
     onSimilarContentClick: (Any) -> Unit
 ) {
+
+    val isTV = LocalIsTV.current
+    val castState by castViewModel.castState.collectAsStateWithLifecycle()
 
     val showPlayButton by viewModel.showPlayButton.collectAsStateWithLifecycle()
     val seasonInfoUIState by viewModel.seasonInfoUIState.collectAsStateWithLifecycle()
@@ -35,13 +42,28 @@ fun DetailScreen(
 
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
-    LaunchedEffect (Unit) {
+    LaunchedEffect(Unit) {
         viewModel.setRouteTag(routeTag)
         viewModel.setShowPlayButton(content)
     }
 
+    LaunchedEffect(Unit) {
+        if (!isTV) {
+            castViewModel.startChromecast()
+        }
+    }
+
     LaunchedEffect(clickedContent) {
-        clickedContent?.let(onClickPlay)
+        clickedContent?.let {
+            when (castState) {
+                is CastState.SessionStarted -> {
+                    castViewModel.loadRemoteMedia(it.toContentToPlayUI())
+                }
+                else -> {
+                    onClickPlay(it)
+                }
+            }
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -69,12 +91,9 @@ fun DetailScreen(
             similarContent = similarContent,
             seasonInfoUIState = seasonInfoUIState,
             onClickPlay = {
-                if (prefoundContent != null) {
-                    onClickPlay(prefoundContent)
-                    return@DetailTV
-                }
                 viewModel.findContent(
-                    entityUI = content
+                    entityUI = content,
+                    prefoundContent = prefoundContent
                 )
             },
             onClickEpisode = { seasonOrder, episodeId ->
@@ -91,12 +110,9 @@ fun DetailScreen(
             showPlayButton = showPlayButton,
             similarContent = similarContent,
             onClickPlay = {
-                if (prefoundContent != null) {
-                    onClickPlay(prefoundContent)
-                    return@DetailMobile
-                }
                 viewModel.findContent(
-                    entityUI = content
+                    entityUI = content,
+                    prefoundContent = prefoundContent
                 )
             },
             seasonInfoUIState = seasonInfoUIState,

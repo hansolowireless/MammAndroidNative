@@ -94,7 +94,14 @@ class DetailViewModel @Inject constructor(
         }
     }
 
-    fun findContent(entityUI: ContentEntityUI) {
+    fun findContent(
+        entityUI: ContentEntityUI,
+        prefoundContent: Any? = null
+    ) {
+        if (prefoundContent != null) {
+            _clickedContent.update { prefoundContent }
+            return
+        }
         findContentEntityUseCase(
             identifier = entityUI.identifier,
             customContent = entityUI.customContentType,

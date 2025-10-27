@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -18,15 +16,22 @@ import com.mamm.mammapps.ui.component.channels.ChannelFilter
 import com.mamm.mammapps.ui.component.channels.ChannelGridMobile
 import com.mamm.mammapps.ui.component.channels.ChannelGridTV
 import com.mamm.mammapps.ui.component.home.HomeGridTop
+import com.mamm.mammapps.ui.mapper.toContentToPlayUI
+import com.mamm.mammapps.ui.model.uistate.CastState
 import com.mamm.mammapps.ui.theme.MammAppsTheme
+import com.mamm.mammapps.ui.viewmodel.CastViewModel
 import com.mamm.mammapps.ui.viewmodel.ChannelsViewModel
 
 @Composable
 fun ChannelsScreen(
     modifier: Modifier = Modifier,
     viewModel: ChannelsViewModel = hiltViewModel(),
+    castViewModel: CastViewModel = hiltViewModel(),
     onContentClicked: (Channel) -> Unit = {}
 ) {
+
+    val castState by castViewModel.castState.collectAsStateWithLifecycle()
+    val isTV = LocalIsTV.current
 
     val focusedContent by viewModel.focusedContent.collectAsStateWithLifecycle()
     val liveEvent by viewModel.liveEventInfo.collectAsStateWithLifecycle()
@@ -34,10 +39,15 @@ fun ChannelsScreen(
     val channelGenres by viewModel.channelGenres.collectAsStateWithLifecycle()
     val selectedGenres by viewModel.selectedGenres.collectAsStateWithLifecycle()
     val clickedContent by viewModel.clickedContent.collectAsStateWithLifecycle()
-    val hasNavigated = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.getChannels()
+    }
+
+    LaunchedEffect(Unit) {
+        if (!isTV) {
+            castViewModel.startChromecast()
+        }
     }
 
     LaunchedEffect(focusedContent) {
@@ -49,12 +59,16 @@ fun ChannelsScreen(
     }
 
     LaunchedEffect(clickedContent) {
-        clickedContent?.let { content ->
-            if (!hasNavigated.value) {
-                onContentClicked(content)
-                hasNavigated.value = true
-                viewModel.clearClickedContent()
+        clickedContent?.let {
+            when (castState) {
+                is CastState.SessionStarted -> {
+                    castViewModel.loadRemoteMedia(it.toContentToPlayUI())
+                }
+                else -> {
+                    onContentClicked(it)
+                }
             }
+            viewModel.clearClickedContent()
         }
     }
 

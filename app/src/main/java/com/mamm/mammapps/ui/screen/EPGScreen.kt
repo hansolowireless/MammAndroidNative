@@ -23,16 +23,24 @@ import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.ui.component.epg.EPGMobile
 import com.mamm.mammapps.ui.component.epg.EPGTV
+import com.mamm.mammapps.ui.mapper.toContentToPlayUI
+import com.mamm.mammapps.ui.model.uistate.CastState
 import com.mamm.mammapps.ui.model.uistate.UIState
+import com.mamm.mammapps.ui.viewmodel.CastViewModel
 import com.mamm.mammapps.ui.viewmodel.EPGViewModel
 import java.time.LocalDate
 
 @Composable
 fun EPGScreen(
     viewModel: EPGViewModel = hiltViewModel(),
+    castViewModel: CastViewModel = hiltViewModel(),
     onShowDetails: (EPGEvent) -> Unit,
     onPlayClick: (Channel) -> Unit
 ) {
+
+    val isTV = LocalIsTV.current
+    val castState by castViewModel.castState.collectAsStateWithLifecycle()
+
     val uiState by viewModel.epgUIState.collectAsStateWithLifecycle()
     var selectedDate by remember { mutableStateOf<LocalDate>(LocalDate.now()) }
     val selectedChannel by viewModel.selectedChannel.collectAsStateWithLifecycle()
@@ -42,9 +50,24 @@ fun EPGScreen(
         viewModel.getEPGContent(LocalDate.now())
     }
 
+    LaunchedEffect(Unit) {
+        if (!isTV) {
+            castViewModel.startChromecast()
+        }
+    }
+
     LaunchedEffect(playedChannel) {
-        playedChannel?.let { onPlayClick(it) }
-        viewModel.clearPlayedChannel()
+        playedChannel?.let {
+            when (castState) {
+                is CastState.SessionStarted -> {
+                    castViewModel.loadRemoteMedia(it.toContentToPlayUI())
+                }
+                else -> {
+                    onPlayClick(it)
+                }
+            }
+            viewModel.clearPlayedChannel()
+        }
     }
 
     when (val state = uiState) {
@@ -53,7 +76,7 @@ fun EPGScreen(
         }
 
         is UIState.Success<List<EPGChannelContent>> -> {
-            if (LocalIsTV.current) {
+            if (isTV) {
                 EPGTV(
                     epgContent = state.data,
                     selectedDate = selectedDate,

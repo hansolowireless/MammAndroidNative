@@ -258,10 +258,10 @@ fun ContentEntityUI.catchupIsAvailable(availableCatchupHours: Int): Boolean {
 fun ContentToPlayUI.toMediaMetadata(): MediaMetadata {
     return MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE)
         .apply {
-        putString(MediaMetadata.KEY_TITLE, title)
-        putString(MediaMetadata.KEY_SUBTITLE, subtitle.orEmpty())
-        WebImage(imageUrl.toUri()).let {
-            images.add(it)
+            putString(MediaMetadata.KEY_TITLE, title)
+            putString(MediaMetadata.KEY_SUBTITLE, subtitle.orEmpty())
+            runCatching {
+                images.add(WebImage(imageUrl.toUri()))
+            }
         }
-    }
 }
