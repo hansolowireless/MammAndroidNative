@@ -67,6 +67,8 @@ import com.mamm.mammapps.ui.viewmodel.VideoPlayerViewModel
 import kotlinx.coroutines.delay
 import kotlin.math.abs
 
+private enum class TrackType { AUDIO, CC, VIDEO }
+
 //TODO dejar aqui solo la lógica onPressed y llevar el resto a VideoPlayer (la clase padre)
 @Composable
 fun PlayerViewWithControlsExperimental(
@@ -383,4 +385,3 @@ fun PlayerViewWithControlsExperimental(
     }
 }
 
-private enum class TrackType { AUDIO, CC, VIDEO }
