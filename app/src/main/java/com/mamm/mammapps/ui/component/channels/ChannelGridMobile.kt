@@ -30,7 +30,7 @@ fun ChannelGridMobile(
         ),
         horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall,
             Alignment.CenterHorizontally),
-        verticalArrangement = Arrangement.spacedBy(Dimensions.paddingXSmall)
+        verticalArrangement = Arrangement.spacedBy(1.dp)
     ) {
         items(channels) { channel ->
             ContentEntity(

@@ -58,9 +58,6 @@ class ChannelsViewModel @Inject constructor(
             getChannelsUseCase().onSuccess { response ->
                 //Quitamos los canales porno de la vista
                 channels = response.filter{ it.isPornChannel == false}
-//                _filteredChannels.update {
-//                    channels.map { it.toContentEntityUI() }
-//                }
                 filterChannelsByGenres(_selectedGenres.value)
                 _channelGenres.update { response.mapNotNull { it.channelGenre }.toSet() }
             }

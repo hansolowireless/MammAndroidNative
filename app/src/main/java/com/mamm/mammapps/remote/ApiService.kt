@@ -24,13 +24,17 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Url
 
+/*En los header se especifica el tipo de URL
+* para que la transforme el dynamic url interceptor
+*/
 interface ApiService {
 
     // ---------- IDM ----------
     @POST("aaservice/login")
     @Headers(
         "Content-Type: application/json",
-        "Accept: application/json"
+        "Accept: application/json",
+        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_IDM}"
     )
     suspend fun login(
         @Body body: LoginRequest
@@ -57,7 +61,8 @@ interface ApiService {
     @GET("epg_files/EPG_{channelID}_{date}.json")
     @Headers(
         "Content-Type: application/json",
-        "Accept: application/json"
+        "Accept: application/json",
+        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_BASE}"
     )
     suspend fun getEPG(
         @Path("channelID") channelID: Int,
@@ -69,7 +74,8 @@ interface ApiService {
     @GET("epg_files/cine_pkg_{jsonParam}")
     @Headers(
         "Content-Type: application/json",
-        "Accept: application/json"
+        "Accept: application/json",
+        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_BASE}"
     )
     suspend fun getMovies(
         @Path("jsonParam") jsonParam: String
@@ -79,7 +85,8 @@ interface ApiService {
     @GET("epg_files/doc_pkg_{jsonParam}")
     @Headers(
         "Content-Type: application/json",
-        "Accept: application/json"
+        "Accept: application/json",
+        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_BASE}"
     )
     suspend fun getDocumentaries(
         @Path("jsonParam") jsonParam: String
@@ -89,7 +96,8 @@ interface ApiService {
     @GET("epg_files/dep_pkg_{jsonParam}")
     @Headers(
         "Content-Type: application/json",
-        "Accept: application/json"
+        "Accept: application/json",
+        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_BASE}"
     )
     suspend fun getSports(
         @Path("jsonParam") jsonParam: String
@@ -99,7 +107,8 @@ interface ApiService {
     @GET("epg_files/inf_pkg_{jsonParam}")
     @Headers(
         "Content-Type: application/json",
-        "Accept: application/json"
+        "Accept: application/json",
+        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_BASE}"
     )
     suspend fun getKids(
         @Path("jsonParam") jsonParam: String
@@ -109,7 +118,8 @@ interface ApiService {
     @GET("epg_files/adt_pkg_{jsonParam}")
     @Headers(
         "Content-Type: application/json",
-        "Accept: application/json"
+        "Accept: application/json",
+        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_BASE}"
     )
     suspend fun getAdults(
         @Path("jsonParam") jsonParam: String
@@ -119,7 +129,8 @@ interface ApiService {
     @GET("epg_files/wb_pkg_{jsonParam}")
     @Headers(
         "Content-Type: application/json",
-        "Accept: application/json"
+        "Accept: application/json",
+        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_BASE}"
     )
     suspend fun getWarner(
         @Path("jsonParam") jsonParam: String
@@ -129,7 +140,8 @@ interface ApiService {
     @GET("epg_files/acf_pkg_{jsonParam}")
     @Headers(
         "Content-Type: application/json",
-        "Accept: application/json"
+        "Accept: application/json",
+        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_BASE}"
     )
     suspend fun getAcontra(
         @Path("jsonParam") jsonParam: String
@@ -139,7 +151,8 @@ interface ApiService {
     @GET("epg_files/amc_pkg_{jsonParam}")
     @Headers(
         "Content-Type: application/json",
-        "Accept: application/json"
+        "Accept: application/json",
+        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_BASE}"
     )
     suspend fun getAMC(
         @Path("jsonParam") jsonParam: String
@@ -149,7 +162,8 @@ interface ApiService {
     @GET("epg_files/serie_{serieId}.json")
     @Headers(
         "Content-Type: application/json",
-        "Accept: application/json"
+        "Accept: application/json",
+        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_BASE}"
     )
     suspend fun getSeasonContent(
         @Path("serieId") jsonParam: String
@@ -168,7 +182,8 @@ interface ApiService {
     @POST("/aaservice/pushsession")
     @Headers(
         "Content-Type: application/json",
-        "Accept: application/json"
+        "Accept: application/json",
+        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_IDM}"
     )
     suspend fun sendHeartBeat(
         @Body heartBeatRequest: HeartBeatRequest
@@ -232,7 +247,8 @@ interface ApiService {
     @GET("/content/search")
     @Headers(
         "Content-Type: application/json",
-        "Accept: application/json"
+        "Accept: application/json",
+        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_SEARCH}"
     )
     suspend fun search(
         @Query("chain") searchQuery: String

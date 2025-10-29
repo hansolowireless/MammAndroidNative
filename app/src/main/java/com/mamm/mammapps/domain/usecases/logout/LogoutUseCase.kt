@@ -1,6 +1,7 @@
 package com.mamm.mammapps.domain.usecases.logout
 
 import com.mamm.mammapps.data.logger.Logger
+import com.mamm.mammapps.domain.interfaces.EPGRepository
 import com.mamm.mammapps.domain.interfaces.LoginRepository
 import javax.inject.Inject
 
@@ -11,9 +12,11 @@ import javax.inject.Inject
  */
 class LogoutUseCase @Inject constructor(
     private val repository: LoginRepository,
+    private val epgRepository: EPGRepository,
     private val logger: Logger
 ) {
     operator fun invoke() {
+        epgRepository.clearCache()
         repository.logout()
     }
 }

@@ -72,7 +72,7 @@ data class Channel(
     @SerializedName("parental") val parental: Int? = null,
     @SerializedName("channelGenreId") val channelGenreId: Int? = null,
     @SerializedName("cutvInitOffset") val cutvInitOffset: Int? = null,
-    @SerializedName("isPornChannel") val isPornChannel: Boolean? = null,
+    @SerializedName("isPornChannel") val isPornChannel: Boolean? = false,
     @SerializedName("logoURL") val logoURL: String? = null,
     @SerializedName("fingerprintFrequency") val fingerprintFrequency: Int? = null,
     @SerializedName("cutvEndOffset") val cutvEndOffset: Int? = null,

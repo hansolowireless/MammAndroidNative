@@ -7,6 +7,7 @@ import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.remote.ApiService
 import com.mamm.mammapps.remote.interceptor.AuthInterceptor
+import com.mamm.mammapps.remote.interceptor.DynamicUrlInterceptor
 import com.mamm.mammapps.remote.interceptor.QosAuthInterceptor
 import dagger.Module
 import dagger.Provides
@@ -83,6 +84,7 @@ object NetworkModule {
     fun provideIdmRetrofit(okHttpClient: OkHttpClient, sessionManager: SessionManager): Retrofit {
         val idmClient = okHttpClient.newBuilder()
             .addInterceptor(AuthInterceptor(sessionManager))
+            .addInterceptor(DynamicUrlInterceptor())
             .build()
 
         return Retrofit.Builder()
@@ -96,9 +98,13 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideSearchRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        val searchClient = okHttpClient.newBuilder()
+            .addInterceptor(DynamicUrlInterceptor())
+            .build()
+
         return Retrofit.Builder()
             .baseUrl(Config.searchUrl)
-            .client(okHttpClient)
+            .client(searchClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -118,9 +124,13 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideBaseUrlRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        val baseUrlClient = okHttpClient.newBuilder()
+            .addInterceptor(DynamicUrlInterceptor())
+            .build()
+
         return Retrofit.Builder()
             .baseUrl(Config.baseUrl)
-            .client(okHttpClient)
+            .client(baseUrlClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
