@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +41,7 @@ fun ChannelsScreen(
     val channelGenres by viewModel.channelGenres.collectAsStateWithLifecycle()
     val selectedGenres by viewModel.selectedGenres.collectAsStateWithLifecycle()
     val clickedContent by viewModel.clickedContent.collectAsStateWithLifecycle()
+    val hasNavigated = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.getChannels()
@@ -65,7 +68,10 @@ fun ChannelsScreen(
                     castViewModel.loadRemoteMedia(it.toContentToPlayUI())
                 }
                 else -> {
-                    onContentClicked(it)
+                    if (!hasNavigated.value) {
+                        onContentClicked(it)
+                        hasNavigated.value = true
+                    }
                 }
             }
             viewModel.clearClickedContent()

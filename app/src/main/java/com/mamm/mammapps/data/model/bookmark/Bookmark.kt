@@ -3,6 +3,9 @@ package com.mamm.mammapps.data.model.bookmark
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import com.mamm.mammapps.data.extension.toZonedDateTimeEPG
+import com.mamm.mammapps.data.model.metadata.Metadata
+import com.mamm.mammapps.data.model.section.TbContentItem
+import com.mamm.mammapps.data.model.section.TbEventItem
 import kotlinx.parcelize.Parcelize
 import java.time.ZonedDateTime
 
@@ -29,6 +32,8 @@ sealed class BookmarkContent : Parcelable {
     abstract val subgenreById: Int?
     abstract val fcIni: String?
     abstract val fcEnd: String?
+    abstract val tbContentItems: List<TbContentItem>?
+    abstract val tbEventItems: List<TbContentItem>?
 
     // Propiedades calculadas que se heredan automáticamente
     val startDateTime: ZonedDateTime?
@@ -36,6 +41,10 @@ sealed class BookmarkContent : Parcelable {
 
     val endDateTime: ZonedDateTime?
         get() = fcEnd?.toZonedDateTimeEPG()
+
+    fun getMetadata(): Metadata {
+        return Metadata.fromTbContentItems(tbEventItems ?: tbContentItems ?: emptyList())
+    }
 }
 
 /**
@@ -59,7 +68,9 @@ data class Bookmark(
     @SerializedName("fcStored") override val fcStored: String? = null,
     @SerializedName("subgenreById") override val subgenreById: Int? = null,
     @SerializedName("fcIni") override val fcIni: String? = null,
-    @SerializedName("fcEnd") override val fcEnd: String? = null
+    @SerializedName("fcEnd") override val fcEnd: String? = null,
+    @SerializedName("tbEventItems") override val tbEventItems: List<TbContentItem>? = null,
+    @SerializedName("tbContentItems") override val tbContentItems: List<TbContentItem>? = null
 ) : BookmarkContent()
 
 
@@ -85,5 +96,7 @@ data class Recommended(
     @SerializedName("fcStored") override val fcStored: String? = null,
     @SerializedName("subgenreById") override val subgenreById: Int? = null,
     @SerializedName("fcIni") override val fcIni: String? = null,
-    @SerializedName("fcEnd") override val fcEnd: String? = null
+    @SerializedName("fcEnd") override val fcEnd: String? = null,
+    @SerializedName("tbEventItems") override val tbEventItems: List<TbContentItem>? = null,
+    @SerializedName("tbContentItems") override val tbContentItems: List<TbContentItem>? = null
 ) : BookmarkContent()

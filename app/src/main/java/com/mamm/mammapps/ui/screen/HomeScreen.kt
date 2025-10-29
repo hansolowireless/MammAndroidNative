@@ -9,6 +9,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -43,6 +45,7 @@ fun HomeScreen(
     val homeContentState = viewModel.homeContentUIState
     val homeContent by viewModel.homeContentUI.collectAsStateWithLifecycle()
     val clickedContent by viewModel.clickedContent.collectAsStateWithLifecycle()
+    val hasNavigated = remember { mutableStateOf(false) }
 
     val lastClickedItemIndex by viewModel.lastClickedItemIndex.collectAsStateWithLifecycle()
     val columnListState =
@@ -80,7 +83,10 @@ fun HomeScreen(
                     castViewModel.loadRemoteMedia(it.toContentToPlayUI())
                 }
                 else -> {
-                    onPlay(it)
+                    if (!hasNavigated.value) {
+                        onPlay(it)
+                        hasNavigated.value = true
+                    }
                 }
             }
             viewModel.clearClickedContent()

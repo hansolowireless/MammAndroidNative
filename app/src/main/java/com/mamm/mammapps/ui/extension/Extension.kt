@@ -43,29 +43,32 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Date
 import kotlin.math.floor
+import kotlin.math.pow
 
 fun Modifier.glow(
     enabled: Boolean = true,
     color: Color = Color.White,
     alpha: Float = 0.8f,
     cornerRadius: Dp = 10.dp,
-    glowRadius: Dp = 10.dp,
-    layers: Int = 5
+    glowRadius: Dp = 24.dp,
+    layers: Int = 25 // más capas = transición más suave
 ) = this.drawBehind {
     if (enabled && alpha > 0f) {
         val cornerRadiusPx = cornerRadius.toPx()
-        val glowColor = color.copy(alpha = alpha)
+        val glowColor = color
+        val glowRadiusPx = glowRadius.toPx()
 
         for (i in 1..layers) {
-            val radius = i * (glowRadius.toPx() / layers)
-            val layerAlpha = alpha / (i * 1.5f)
+            // radio con un incremento progresivo no lineal (curva suave)
+            val t = i / layers.toFloat()
+            val radius = t * glowRadiusPx
+            val decay = (1f - t).pow(2.8f) // curva de caída más suave
+            val layerAlpha = alpha * decay * 0.8f // atenúa el centro un poco
+
             drawRoundRect(
                 color = glowColor.copy(alpha = layerAlpha),
                 topLeft = Offset(-radius, -radius),
-                size = Size(
-                    size.width + radius * 2,
-                    size.height + radius * 2
-                ),
+                size = Size(size.width + radius * 2, size.height + radius * 2),
                 cornerRadius = CornerRadius(cornerRadiusPx + radius)
             )
         }

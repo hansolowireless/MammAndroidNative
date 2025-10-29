@@ -18,32 +18,40 @@ data class Metadata(
 ) : Parcelable {
     companion object {
         fun fromTbContentItems(items: List<TbContentItem>): Metadata {
-            val itemMap = items.associate { it.itemDs to it.itemValue }
+            // Agrupa los items por su itemDs, pero mantiene todos los valores para claves duplicadas.
+            val groupedItems = items.groupBy({ it.itemDs }, { it.itemValue })
+
+            // Une todos los valores de "cast" en un solo String, separados por "|".
+            val allCastValues = groupedItems["cast"]?.joinToString(separator = ",")
 
             return Metadata(
-                actors = itemMap["cast"]?.let { Actor.fromItemValue(it) } ?: emptyList(),
-                director = itemMap["director"]?.split("|")?.firstOrNull() ?: "",
-                year = itemMap["year"] ?: "",
-                country = itemMap["country"] ?: "",
-                durationMin = itemMap["duration"] ?: "",
-                ratingURL = itemMap["rating_icon"],
-                genres = itemMap["genres"] ?: "",
-                originalTitle = itemMap["original_title"] ?: ""
+                actors = allCastValues?.let { Actor.fromItemValue(it) } ?: emptyList(),
+                director = groupedItems["director"]?.firstOrNull()?.split("|")?.firstOrNull() ?: "",
+                year = groupedItems["year"]?.firstOrNull() ?: "",
+                country = groupedItems["country"]?.firstOrNull() ?: "",
+                durationMin = groupedItems["duration"]?.firstOrNull() ?: "",
+                ratingURL = groupedItems["rating_icon"]?.firstOrNull(),
+                genres = groupedItems["genres"]?.firstOrNull() ?: "",
+                originalTitle = groupedItems["original_title"]?.firstOrNull() ?: ""
             )
         }
 
         fun fromTbEventItems(items: List<TbEventItem>): Metadata {
-            val itemMap = items.associate { it.itemDs to it.itemValue }
+            // Agrupa los items por su itemDs para manejar valores duplicados como "cast".
+            val groupedItems = items.groupBy({ it.itemDs }, { it.itemValue })
+
+            // Une todos los valores de "cast" en un solo String, separados por "|".
+            val allCastValues = groupedItems["cast"]?.joinToString(separator = ",")
 
             return Metadata(
-                actors = itemMap["cast"]?.let { Actor.fromItemValue(it) } ?: emptyList(),
-                director = itemMap["director"]?.split("|")?.firstOrNull() ?: "",
-                year = itemMap["year"] ?: "",
-                country = itemMap["country"] ?: "",
-                durationMin = itemMap["duration"] ?: "",
-                ratingURL = itemMap["rating_icon"],
-                genres = itemMap["genres"] ?: "",
-                originalTitle = itemMap["original_title"] ?: ""
+                actors = allCastValues?.let { Actor.fromItemValue(it) } ?: emptyList(),
+                director = groupedItems["director"]?.firstOrNull()?.split("|")?.firstOrNull() ?: "",
+                year = groupedItems["year"]?.firstOrNull() ?: "",
+                country = groupedItems["country"]?.firstOrNull() ?: "",
+                durationMin = groupedItems["duration"]?.firstOrNull() ?: "",
+                ratingURL = groupedItems["rating_icon"]?.firstOrNull(),
+                genres = groupedItems["genres"]?.firstOrNull() ?: "",
+                originalTitle = groupedItems["original_title"]?.firstOrNull() ?: ""
             )
         }
     }

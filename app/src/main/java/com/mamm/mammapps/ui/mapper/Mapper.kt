@@ -128,12 +128,16 @@ fun Serie.toContentEntityUI() = ContentEntityUI(
 fun HomeFeatured.toContentEntityUI(): ContentEntityUI? {
     val format = format ?: return null
     val id = id ?: return null
+    val imageUrl = logoTransitions?.first()?.url ?: logoURL.orEmpty()
 
     return ContentEntityUI(
         identifier = ContentIdentifier.fromFeaturedFormat(format = format, id = id, channelById = channelById),
-        imageUrl = logoURL.orEmpty(),
+        imageUrl = imageUrl,
         horizontalImageUrl = logoURL.orEmpty(),
-        title = title.orEmpty()
+        title = title.orEmpty(),
+        detailInfo = DetailInfoUI(
+            description = description.orEmpty()
+        )
     )
 }
 
@@ -186,10 +190,11 @@ fun BrandedVod.toContentEntityUI(isAdult: Boolean) = ContentEntityUI(
 fun BrandedFeatured.toContentEntityUI(): ContentEntityUI? {
     val format = format ?: return null
     val id = formatId?.toInt() ?: return null
+    val imageUrl = logoTransitions?.first()?.url ?: logoUrl.orEmpty()
 
     return ContentEntityUI(
         identifier = ContentIdentifier.fromFormat(format = format, id = id),
-        imageUrl = logoUrl.orEmpty(),
+        imageUrl = imageUrl,
         horizontalImageUrl = logoUrl.orEmpty(),
         title = title.orEmpty(),
         aspectRatio = Ratios.HORIZONTAL,
@@ -209,7 +214,8 @@ fun Bookmark.toContentEntityUI(): ContentEntityUI? {
         horizontalImageUrl = logoURL.orEmpty(),
         title = title.orEmpty(),
         detailInfo = DetailInfoUI(
-            description = longDesc.orEmpty()
+            description = longDesc.orEmpty(),
+            metadata = getMetadata()
         ),
         aspectRatio = Ratios.VERTICAL,
         height = Dimensions.contentEntityHeight,
@@ -243,7 +249,8 @@ fun Recommended.toContentEntityUI(): ContentEntityUI? {
         horizontalImageUrl = logoURL.orEmpty(),
         title = title.orEmpty(),
         detailInfo = DetailInfoUI(
-            description = longDesc.orEmpty()
+            description = longDesc.orEmpty(),
+            metadata = getMetadata()
         ),
         aspectRatio = Ratios.VERTICAL,
         height = Dimensions.contentEntityHeight,
