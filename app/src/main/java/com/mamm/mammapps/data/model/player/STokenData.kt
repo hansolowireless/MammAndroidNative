@@ -1,4 +1,4 @@
-package com.example.openstream_flutter_rw.data.model
+package com.mamm.mammapps.data.model.player
 
 data class STokenData (
     val uip: String,
