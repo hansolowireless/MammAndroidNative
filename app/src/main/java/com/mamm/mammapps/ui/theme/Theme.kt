@@ -19,7 +19,7 @@ val NetflixColorScheme = darkColorScheme(
     tertiary = Color(0xFFD4D100),          // Amarillo dorado
     onTertiary = Color(0xFF141414),
 
-    background = Color(0xFF141414),        // Negro Netflix
+    background = Color(0xFF000000),        // Negro Netflix
     onBackground = Color(0xFFE5E5E5),      // Texto gris claro
 
     surface = Color(0xFF1F1F1F),           // Gris muy oscuro para cards
