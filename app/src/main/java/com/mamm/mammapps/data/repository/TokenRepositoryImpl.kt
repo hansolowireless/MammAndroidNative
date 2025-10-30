@@ -2,7 +2,7 @@ package com.mamm.mammapps.data.repository
 
 import android.content.Context
 import android.net.Uri
-import com.example.openstream_flutter_rw.data.model.STokenData
+import com.mamm.mammapps.data.model.player.STokenData
 import com.example.openstream_flutter_rw.data.security.AES128KeyDecryptor
 import com.example.openstream_flutter_rw.data.security.AES256Encryptor
 import com.mamm.mammapps.data.config.Config
