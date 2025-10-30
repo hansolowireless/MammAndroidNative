@@ -415,7 +415,8 @@ fun EPGEvent.toLiveEventInfoUI(): LiveEventInfoUI = LiveEventInfoUI(
     deliveryURL = this.deliveryUrl.orEmpty(),
     logoURL = this.eventLogoUrl500.orEmpty(),
     eventStart = this.startDateTime,
-    eventEnd = this.endDateTime
+    eventEnd = this.endDateTime,
+    fatherChannelId = this.idChannel?.toIntOrNull()
 )
 
 fun Event.toLiveEventInfoUI(): LiveEventInfoUI = LiveEventInfoUI(

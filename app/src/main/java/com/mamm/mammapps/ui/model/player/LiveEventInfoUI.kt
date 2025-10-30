@@ -10,5 +10,6 @@ data class LiveEventInfoUI (
     val logoURL: String = "",
     val deliveryURL: String = "",
     val eventStart: ZonedDateTime?,
-    val eventEnd: ZonedDateTime?
+    val eventEnd: ZonedDateTime?,
+    val fatherChannelId: Int? = null
 ) : Parcelable

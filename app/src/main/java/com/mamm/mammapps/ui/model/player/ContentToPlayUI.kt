@@ -24,7 +24,7 @@ data class ContentToPlayUI (
         return when (identifier) {
             is ContentIdentifier.Channel -> "LIVE"
             is ContentIdentifier.VoD -> "VOD"
-            is ContentIdentifier.Event -> "VOD"
+            is ContentIdentifier.Event -> "LIVE"
             is ContentIdentifier.Serie -> "SERIE"
         }
     }

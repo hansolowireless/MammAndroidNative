@@ -9,6 +9,7 @@ import com.mamm.mammapps.data.model.player.GetTickersResponse
 import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.domain.interfaces.PlaybackRepository
+import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import java.net.URLEncoder
 import java.time.ZonedDateTime
@@ -55,6 +56,7 @@ class PlaybackRepositoryImpl @Inject constructor(
             val userID = sessionManager.loginData?.userId
             val operatorName = Config.operatorNameDRM
             val deviceType = localDatasource.getDeviceType()
+            val streamID = content.epgEventInfo?.fatherChannelId ?: content.identifier.getIdValue()
 
             // Current date
             val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
@@ -99,9 +101,6 @@ class PlaybackRepositoryImpl @Inject constructor(
                 Base64.encodeToString(encrypted, Base64.NO_WRAP),
                 "UTF-8"
             )
-
-            // Stream ID logic - basado en ContentIdentifier
-            val streamID = content.identifier.getIdValue()
 
             // Custom data JSON
             val customData = """{

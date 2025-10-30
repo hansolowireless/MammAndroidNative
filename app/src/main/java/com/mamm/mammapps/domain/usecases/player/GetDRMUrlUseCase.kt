@@ -8,6 +8,10 @@ import javax.inject.Inject
 class GetDRMUrlUseCase @Inject constructor(
     private val playbackRepository: PlaybackRepository
 ) {
+
+    companion object {
+        private const val TAG = "GetDRMUrlUseCase"
+    }
     suspend operator fun invoke(
         content: ContentToPlayUI
     ): Result<DrmInfo> {
