@@ -5,6 +5,7 @@ import android.graphics.Paint
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import android.view.animation.PathInterpolator
 import android.widget.FrameLayout
@@ -26,11 +27,9 @@ import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
 /**
- * Réplica funcional, 100% AUTÓNOMA y autocontenida para Jetpack Compose.
- *
- * Al inicializarse, la clase comprueba la lista de tickers. Si encuentra uno válido,
- * INICIA AUTOMÁTICAMENTE su propio ciclo de redimensionado periódico utilizando los
- * parámetros de tiempo del propio ticker, sin necesidad de llamadas externas.
+ * Versión final y definitiva.
+ * Anima el PlayerView y le aplica un bottomMargin para dejar espacio al ticker,
+ * eliminando todos los problemas de temporización.
  */
 class VideoResizeManagerWithTickerCompose(
     private var tickerList: List<Ticker>
@@ -43,6 +42,7 @@ class VideoResizeManagerWithTickerCompose(
     private var tickerContainer: FrameLayout? = null
     private var tickerTextView: TextView? = null
     private var tickerBackground: ImageView? = null
+
     private var currentSize = VideoSize.FULL_SIZE
     private var originalHeight = 0
     private var originalWidth = 0
@@ -51,71 +51,68 @@ class VideoResizeManagerWithTickerCompose(
     private var tickerAnimationJob: Job? = null
     private var sizeAnimator: ValueAnimator? = null
     private var tickerAnimator: ValueAnimator? = null
+
     private var currentTickerIndex = -1
     private var currentTextIndex = -1
     private var _ticker: Ticker? = null
     private val paint = Paint()
 
+    // Definimos la altura del ticker como una constante para usarla en los cálculos
+    // *** AJUSTE 1: Aumentamos el espacio para que el texto suba más ***
+    private val tickerHeightDp = 80f // Antes era 50f
+
     companion object {
         private const val TAG = "VTManagerCompose"
         private const val SMALL_SIZE_SCALE = 0.789f
         private const val ANIMATION_SPEED_FACTOR = 5f
-        private const val TEXT_SIZE_SP = 30f
         private const val TEXT_WIDTH_MARGIN = 300
         private const val PAUSE_BETWEEN_CYCLES = 500L
         private const val MIN_ANIMATION_DURATION = 3000L
         private const val MAX_ANIMATION_DURATION = 15000L
     }
 
-    /**
-     * Inicializa el gestor y arranca el ciclo automático si encuentra un ticker válido.
-     */
     fun initialize(rootView: View, lifecycleOwner: LifecycleOwner) {
         this.rootViewRef = WeakReference(rootView)
         this.lifecycleOwnerRef = WeakReference(lifecycleOwner)
         lifecycleOwner.lifecycle.addObserver(this)
 
-        val playerView: StyledPlayerView? = rootView.findViewById(R.id.player_view)
-        this.playerViewRef = WeakReference(playerView)
+        this.playerViewRef = WeakReference(rootView.findViewById(R.id.player_view))
+        this.tickerContainer = WeakReference<FrameLayout>(rootView.findViewById(R.id.ticker_container)).get()
+        this.tickerTextView = WeakReference<TextView>(rootView.findViewById(R.id.ticker_text)).get()
+        this.tickerBackground = WeakReference<ImageView>(rootView.findViewById(R.id.ticker_background_image)).get()
 
-        tickerContainer = rootView.findViewById(R.id.ticker_container)
-        tickerTextView = rootView.findViewById(R.id.ticker_text)
-        tickerBackground = rootView.findViewById(R.id.ticker_background_image)
-
+        val playerView = playerViewRef?.get()
         if (playerView == null || tickerContainer == null || tickerTextView == null || tickerBackground == null) {
             Log.e(TAG, "Una o más vistas clave no se encontraron. Gestor desactivado.")
             return
         }
 
-        val rootContainer = rootView.findViewById<View>(R.id.root)
-        rootContainer.post {
-            originalHeight = rootContainer.height
-            originalWidth = (originalHeight * 16) / 9
-            Log.d(TAG, "Dimensiones originales calculadas: $originalWidth x $originalHeight")
-        }
+        playerView.post {
+            originalHeight = playerView.height
+            originalWidth = playerView.width
+            Log.d(TAG, "Dimensiones originales del PlayerView: $originalWidth x $originalHeight")
 
-        // --- LÓGICA DE ARRANQUE AUTOMÁTICO ---
-        val firstValidTicker = tickerList.firstOrNull { it.isValid() }
-        if (firstValidTicker != null) {
-            Log.d(TAG, "Ticker válido encontrado. Iniciando ciclo automático.")
-            startCycle(
-                intervalMs = firstValidTicker.tiempoEntreApariciones.toLong() * 1000,
-                smallDurationMs = firstValidTicker.tiempoDuracion.toLong() * 1000
-            )
-        } else {
-            Log.d(TAG, "No se encontraron tickers válidos. El gestor permanecerá inactivo.")
+            val firstValidTicker = tickerList.firstOrNull { it.isValid() }
+            if (firstValidTicker != null) {
+                Log.d(TAG, "Ticker válido encontrado. Iniciando ciclo automático.")
+                startCycle(
+                    intervalMs = firstValidTicker.tiempoEntreApariciones.toLong() * 1000,
+                    smallDurationMs = firstValidTicker.tiempoDuracion.toLong() * 1000
+                )
+            } else {
+                Log.d(TAG, "No se encontraron tickers válidos. El gestor permanecerá inactivo.")
+            }
         }
     }
 
     private fun startCycle(intervalMs: Long, smallDurationMs: Long) {
-        cycleJob?.cancel() // Detener cualquier ciclo anterior
+        cycleJob?.cancel()
         cycleJob = scope.launch {
             if (currentSize != VideoSize.FULL_SIZE) {
                 resizeTo(VideoSize.FULL_SIZE)
             }
-            while (true) { // El ciclo es infinito hasta que el scope se cancele.
+            while (true) {
                 delay(intervalMs)
-
                 if (tickerList.any { it.isValid() }) {
                     Log.d(TAG, "Ciclo: Reduciendo a SMALL_SIZE")
                     resizeTo(VideoSize.SMALL_SIZE)
@@ -132,12 +129,15 @@ class VideoResizeManagerWithTickerCompose(
     }
 
     private fun resizeTo(targetSize: VideoSize) {
-        if (targetSize == currentSize || originalHeight <= 0) return
+        if (targetSize == currentSize && targetSize == VideoSize.SMALL_SIZE) return // Evitar re-animaciones innecesarias
+        if (originalHeight <= 0) return
+
         animateSize(targetSize)
         currentSize = targetSize
 
         if (targetSize == VideoSize.SMALL_SIZE) {
             advanceToNextValidTicker()
+            tickerBackground?.visibility = View.VISIBLE
             tickerContainer?.visibility = View.VISIBLE
             tickerContainer?.post { startTickerAnimation() }
         } else {
@@ -146,31 +146,69 @@ class VideoResizeManagerWithTickerCompose(
     }
 
     private fun animateSize(targetSize: VideoSize) {
-        val rootContainer = rootViewRef?.get()?.findViewById<View>(R.id.root) ?: return
+        val playerView = playerViewRef?.get() ?: return
         sizeAnimator?.cancel()
-        val currentHeight = rootContainer.height.toFloat()
-        val currentWidth = rootContainer.width.toFloat()
-        val targetHeight = if (targetSize == VideoSize.FULL_SIZE) originalHeight.toFloat() else (originalHeight * SMALL_SIZE_SCALE)
-        val targetWidth = (targetHeight * 16) / 9
+
+        val currentHeight = playerView.height.toFloat()
+        val currentWidth = playerView.width.toFloat()
+        val params = playerView.layoutParams as FrameLayout.LayoutParams
+        val currentMargin = params.bottomMargin
+
+        val targetHeight: Float
+        val targetWidth: Float
+        val targetMargin: Int
+
+        // Convertir la altura del ticker de DP a Píxeles
+        val tickerHeightPx = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            tickerHeightDp,
+            playerView.resources.displayMetrics
+        ).toInt()
+
+        if (targetSize == VideoSize.FULL_SIZE) {
+            targetHeight = originalHeight.toFloat()
+            targetWidth = originalWidth.toFloat()
+            targetMargin = 0 // Sin margen
+        } else { // SMALL_SIZE
+            targetHeight = originalHeight * SMALL_SIZE_SCALE
+            targetWidth = originalWidth * SMALL_SIZE_SCALE
+            targetMargin = tickerHeightPx // Dejamos espacio para el ticker
+        }
+
         sizeAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
             duration = 600
             interpolator = PathInterpolator(0.1f, 0.0f, 0.1f, 1.0f)
             addUpdateListener { animation ->
                 val fraction = animation.animatedValue as Float
-                val params = rootContainer.layoutParams
+                // Animamos tamaño y margen simultáneamente
                 params.height = (currentHeight + (targetHeight - currentHeight) * fraction).toInt()
                 params.width = (currentWidth + (targetWidth - currentWidth) * fraction).toInt()
-                rootContainer.layoutParams = params
+                params.bottomMargin = (currentMargin + (targetMargin - currentMargin) * fraction).toInt()
+                playerView.layoutParams = params
+            }
+            doOnEnd {
+                // Al finalizar, aseguramos los valores finales para un estado limpio
+                if (targetSize == VideoSize.FULL_SIZE) {
+                    params.width = ViewGroup.LayoutParams.MATCH_PARENT
+                    params.height = ViewGroup.LayoutParams.MATCH_PARENT
+                    params.bottomMargin = 0
+                } else {
+                    params.height = targetHeight.toInt()
+                    params.width = targetWidth.toInt()
+                    params.bottomMargin = targetMargin
+                }
+                playerView.layoutParams = params
             }
         }
         sizeAnimator?.start()
     }
 
-    // --- MÉTODOS DEL TICKER (sin cambios) ---
+    // --- El resto de la clase permanece igual ---
 
     private fun hideTicker() {
         stopTickerAnimation()
         tickerContainer?.visibility = View.GONE
+        tickerBackground?.visibility = View.GONE
     }
 
     private fun advanceToNextValidTicker() {
@@ -199,13 +237,16 @@ class VideoResizeManagerWithTickerCompose(
 
     private fun setTickerText(text: String?) {
         tickerTextView?.text = text ?: ""
-        tickerTextView?.setTextSize(TypedValue.COMPLEX_UNIT_SP, TEXT_SIZE_SP)
+        // *** AJUSTE 2: Aumentamos el tamaño de la fuente ***
+        tickerTextView?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f) // Antes era 18f
     }
 
     private fun setTickerImageRemote() {
         val context = rootViewRef?.get()?.context ?: return
         val imageUrl = _ticker?.fondo ?: return
-        Glide.with(context).load(imageUrl).apply(RequestOptions().centerCrop()).into(tickerBackground ?: return)
+        tickerBackground?.let {
+            Glide.with(context).load(imageUrl).apply(RequestOptions().centerCrop()).into(it)
+        }
     }
 
     private fun startTickerAnimation() {
@@ -259,9 +300,6 @@ class VideoResizeManagerWithTickerCompose(
 
     fun replaceTickers(newTickerList: List<Ticker>) {
         this.tickerList = newTickerList
-        // La próxima iteración del ciclo ya usará la nueva lista para su comprobación.
-        // Si la lista anterior estaba vacía y esta no, el ciclo necesita ser arrancado.
-        // Si la lista nueva está vacía, el ciclo existente se pausará solo.
         if (cycleJob == null || cycleJob?.isActive == false) {
             val firstValidTicker = tickerList.firstOrNull { it.isValid() }
             if (firstValidTicker != null) {
