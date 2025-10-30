@@ -1,44 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/constraint_root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="center"
-    android:background="@android:color/black"
+    android:background="@android:color/black">
 
-    xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <!-- Imagen de fondo que ocupa toda la pantalla -->
+    <!-- 1. LA IMAGEN DE FONDO - Ocupa toda la pantalla -->
     <ImageView
         android:id="@+id/ticker_background_image"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:contentDescription=""
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="Ticker background"
         android:scaleType="centerCrop"
-        android:visibility="visible"
-        />
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@tools:sample/backgrounds/scenic"
+        tools:visibility="visible" />
 
+    <!-- 2. EL CONTENEDOR DEL VÍDEO - Transparente para ver la imagen de detrás -->
     <FrameLayout
         android:id="@+id/root"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_gravity="center"
-        android:background="@android:color/black"
-
+        android:background="@android:color/transparent"
         android:focusable="true"
         android:keepScreenOn="true"
-
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="16:9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@id/exo_artwork"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitCenter"
-            android:visibility="visible"/>
 
         <com.google.android.exoplayer2.ui.StyledPlayerView
             android:id="@+id/player_view"
@@ -46,41 +41,44 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:background="@android:color/transparent"
+            android:animateLayoutChanges="true"
             android:focusable="true"
-            android:orientation="horizontal"
+            app:animation_enabled="false"
             app:controller_layout_id="@layout/exoplayer_controls"
             app:resize_mode="fit"
-            app:show_buffering="always"
-            android:animateLayoutChanges="true"
-            app:animation_enabled="false"
-            >
-
-        </com.google.android.exoplayer2.ui.StyledPlayerView>
+            app:show_buffering="always" />
 
     </FrameLayout>
 
-    <!-- Contenedor del ticker publicitario -->
+    <!-- 3. EL CONTENEDOR DEL TICKER - Encima de todo, anclado abajo para moverlo con código -->
     <FrameLayout
         android:id="@+id/ticker_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="50dp"
         android:background="@android:color/transparent"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@+id/root"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible"
+        android:paddingBottom="30dp"
+        android:paddingEnd="120dp"
+        android:paddingStart="120dp">
 
         <TextView
             android:id="@+id/ticker_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:singleLine="false"
+            android:maxLines="1"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
-            android:padding="12dp"
-            android:singleLine="true"
-            android:text="" />
-    </FrameLayout>
+            tools:text="Este es un texto de ejemplo que se desplaza" />
 
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
