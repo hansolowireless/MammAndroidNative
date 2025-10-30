@@ -4,6 +4,7 @@ import android.animation.ValueAnimator
 import android.graphics.Paint
 import android.util.Log
 import android.util.TypedValue
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
@@ -57,9 +58,8 @@ class VideoResizeManagerWithTickerCompose(
     private var _ticker: Ticker? = null
     private val paint = Paint()
 
-    // Definimos la altura del ticker como una constante para usarla en los cálculos
     // *** AJUSTE 1: Aumentamos el espacio para que el texto suba más ***
-    private val tickerHeightDp = 80f // Antes era 50f
+    private val tickerHeightDp = 90f // Lo subimos un poco más para asegurar
 
     companion object {
         private const val TAG = "VTManagerCompose"
@@ -100,7 +100,7 @@ class VideoResizeManagerWithTickerCompose(
                     smallDurationMs = firstValidTicker.tiempoDuracion.toLong() * 1000
                 )
             } else {
-                Log.d(TAG, "No se encontraron tickers válidos. El gestor permanecerá inactivo.")
+                Log.d(TAG, "No se encontraron tickers válidos. El gestor permanecerá inactivo, la tickerlist es $tickerList")
             }
         }
     }
@@ -169,10 +169,13 @@ class VideoResizeManagerWithTickerCompose(
             targetHeight = originalHeight.toFloat()
             targetWidth = originalWidth.toFloat()
             targetMargin = 0 // Sin margen
+            params.gravity = Gravity.CENTER // Centrado en pantalla completa
         } else { // SMALL_SIZE
             targetHeight = originalHeight * SMALL_SIZE_SCALE
             targetWidth = originalWidth * SMALL_SIZE_SCALE
             targetMargin = tickerHeightPx // Dejamos espacio para el ticker
+            // *** LA CORRECCIÓN DEFINITIVA: Volvemos a anclarlo ARRIBA ***
+            params.gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
         }
 
         sizeAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
@@ -192,10 +195,13 @@ class VideoResizeManagerWithTickerCompose(
                     params.width = ViewGroup.LayoutParams.MATCH_PARENT
                     params.height = ViewGroup.LayoutParams.MATCH_PARENT
                     params.bottomMargin = 0
+                    params.gravity = Gravity.CENTER
                 } else {
                     params.height = targetHeight.toInt()
                     params.width = targetWidth.toInt()
                     params.bottomMargin = targetMargin
+                    // *** LA CORRECCIÓN DEFINITIVA TAMBIÉN AQUÍ ***
+                    params.gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
                 }
                 playerView.layoutParams = params
             }
@@ -238,7 +244,7 @@ class VideoResizeManagerWithTickerCompose(
     private fun setTickerText(text: String?) {
         tickerTextView?.text = text ?: ""
         // *** AJUSTE 2: Aumentamos el tamaño de la fuente ***
-        tickerTextView?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f) // Antes era 18f
+        tickerTextView?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 26f) // Lo subo a 26f, un valor más grande
     }
 
     private fun setTickerImageRemote() {
@@ -308,6 +314,9 @@ class VideoResizeManagerWithTickerCompose(
                     intervalMs = firstValidTicker.tiempoEntreApariciones.toLong() * 1000,
                     smallDurationMs = firstValidTicker.tiempoDuracion.toLong() * 1000
                 )
+            }
+            else {
+                Log.i(TAG, "No hay tickers válidos en la nueva lista. El ciclo no se reiniciará.")
             }
         }
     }
