@@ -87,6 +87,7 @@ class HomeViewModel @Inject constructor(
             getOperatorLogoUrlUseCase().onSuccess {
                 homeContentUIState = HomeContentUIState.Loading(it)
             }.onFailure {
+                logger.error(TAG, "Error getting operator logo URL: $it")
                 homeContentUIState = HomeContentUIState.Loading(null)
             }
         }
