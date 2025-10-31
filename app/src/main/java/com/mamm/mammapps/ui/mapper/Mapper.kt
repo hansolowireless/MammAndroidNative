@@ -82,7 +82,10 @@ fun Channel.toContentEntityUI() = ContentEntityUI(
     imageUrl = logoURL?.landscape().orEmpty(),
     horizontalImageUrl = logoURL?.landscape().orEmpty(),
     title = name.orEmpty(),
-    detailInfo = DetailInfoUI(squareLogo = logoURL?.squared()),
+    detailInfo = DetailInfoUI(
+        squareLogo = logoURL?.squared(),
+        description = description.orEmpty()
+    ),
 )
 
 fun VoD.toContentEntityUI() = ContentEntityUI(
