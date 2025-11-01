@@ -53,7 +53,7 @@ fun HomeScreen(
 
     val lastClickedItemIndex by viewModel.lastClickedItemIndex.collectAsStateWithLifecycle()
     val columnListState =
-        rememberLazyListState(initialFirstVisibleItemIndex = lastClickedItemIndex ?: 0)
+        rememberLazyListState()
     val focusedContent by viewModel.focusedContent.collectAsStateWithLifecycle()
 
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher

@@ -1,5 +1,6 @@
 package com.mamm.mammapps.ui.component.home
 
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,20 +50,12 @@ fun HomeGridBottom(
     focusedRowIndex: Int?
 ) {
 
-    val focusRequester = remember { FocusRequester() }
     val expandCategoryTitle = stringResource(id = R.string.expand_category_content_title)
-
-    LaunchedEffect(Unit) {
-        // pequeño delay para que Compose reactive el árbol tras popBackStack()
-        kotlinx.coroutines.delay(100)
-        focusRequester.requestFocus()
-    }
 
     ProvideLazyListPivotOffset(parentFraction = 0.248f) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .focusRequester(focusRequester)
                 .padding(top = Dimensions.paddingXSmall),
             verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge),
             state = columnListState
@@ -84,16 +77,11 @@ fun HomeGridBottom(
                 key = { index, item -> "${item.categoryName}_$index" }
             ) { index, contentRow ->
 
-                // 1. Creamos un FocusRequester para esta fila.
                 val rowFocusRequester = remember { FocusRequester() }
 
-                // 2. Si el índice de esta fila coincide con el que queremos enfocar,
-                //    lanzamos un efecto para solicitar el foco.
-                LaunchedEffect(Unit) {
-                    if (index == focusedRowIndex) {
-                        // Un pequeño delay es útil para asegurar que todo esté compuesto
-                        // antes de pedir el foco.
-                        kotlinx.coroutines.delay(100)
+                if (index == focusedRowIndex) {
+                    LaunchedEffect(Unit) {
+                        kotlinx.coroutines.delay(50)
                         rowFocusRequester.requestFocus()
                     }
                 }
