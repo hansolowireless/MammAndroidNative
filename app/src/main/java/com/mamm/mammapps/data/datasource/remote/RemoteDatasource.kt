@@ -19,12 +19,14 @@ import com.mamm.mammapps.data.extension.toEPGRequestDate
 import com.mamm.mammapps.data.extension.transformData
 import com.mamm.mammapps.data.local.SecurePreferencesManager
 import com.mamm.mammapps.data.logger.Logger
+import com.mamm.mammapps.data.mapper.toGetHomeContentException
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetEPGResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.bookmark.SetBookmarkRequest
+import com.mamm.mammapps.data.model.exception.GetHomeContentException
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
@@ -98,7 +100,7 @@ class RemoteDatasource @Inject constructor(
             val response = noBaseUrlApi.getHomeContent(jsonFile)
 
             if (!response.isSuccessful) {
-                throw IOException("HTTP ${response.code()}: ${response.message()}")
+                throw response.code().toGetHomeContentException()
             }
 
             val homeData = response.body()
