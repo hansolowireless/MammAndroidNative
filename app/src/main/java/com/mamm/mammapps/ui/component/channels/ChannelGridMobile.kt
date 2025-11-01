@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.mamm.mammapps.ui.component.common.ContentEntity
+import com.mamm.mammapps.ui.component.common.contententity.ContentEntity
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.theme.Dimensions
 

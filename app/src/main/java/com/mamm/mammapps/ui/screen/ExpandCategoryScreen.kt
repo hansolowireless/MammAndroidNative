@@ -19,7 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mamm.mammapps.ui.component.common.ContentEntity
+import com.mamm.mammapps.ui.component.common.contententity.ContentEntity
 import com.mamm.mammapps.ui.mapper.findContent
 import com.mamm.mammapps.ui.mapper.toContentEntityUIList
 import com.mamm.mammapps.ui.model.uistate.UIState

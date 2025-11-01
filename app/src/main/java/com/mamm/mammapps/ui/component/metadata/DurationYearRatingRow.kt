@@ -54,7 +54,7 @@ fun DurationYearRatingRow(
             metadata.ratingURL?.let { ratingUrl ->
                 AsyncImage(
                     model = ratingUrl,
-                    contentDescription = stringResource(R.string.rating_content_description),
+                    contentDescription = stringResource(R.string.accessibility_rating_content_description),
                     modifier = Modifier.size(Dimensions.paddingLarge)
                 )
             }

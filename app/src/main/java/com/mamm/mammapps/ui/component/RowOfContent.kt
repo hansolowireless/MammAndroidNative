@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.mamm.mammapps.ui.component.common.ContentEntity
+import com.mamm.mammapps.ui.component.common.contententity.ContentEntity
 import com.mamm.mammapps.ui.component.common.ExpandCategoryItemTV
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
 import com.mamm.mammapps.ui.model.ContentEntityUI

@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.mamm.mammapps.ui.component.common.ContentEntity
+import com.mamm.mammapps.ui.component.common.contententity.ContentEntity
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.theme.Ratios
 import kotlinx.coroutines.delay
