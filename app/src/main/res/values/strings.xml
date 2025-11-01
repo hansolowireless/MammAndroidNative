@@ -6,6 +6,7 @@
     <string name="email">E-mail</string>
     <string name="password">Contraseña</string>
     <string name="login">Iniciar sesión</string>
+    <string name="logout">Cerrar sesión</string>
     <string name="forgot_password">¿Olvidaste tu contraseña?</string>
     <!--endregion Login-->
 
@@ -40,6 +41,8 @@
     <string name="tomorrow">Mañana</string>
     <string name="day_after_tomorrow">Pasado mañana</string>
     <string name="live">Directo</string>
+    <string name="days_ago">Hace %d días</string>
+    <string name="in_days">En %d días</string>
     <!--endregion EPG-->
 
     <!-- region SEARCH -->
@@ -47,10 +50,6 @@
     <string name="search_initial_prompt">Encuentra tu contenido favorito.</string>
     <string name="search_no_results">No se encontraron resultados para \"%1$s\"</string>
     <!--endregion SEARCH-->
-
-    <!-- Content descriptions for accessibility -->
-    <string name="rating_content_description">Rating</string>
-    <string name="play_icon_content_description">Play icon</string>
 
     <!--Track selector Strings!-->
     <string name="track_selection_title">Video Quality</string>
@@ -88,7 +87,11 @@
     <string name="nav_change_user">Cambiar usuario</string>
 
     <!--Error-->
+    <string name="generic_error">Error</string>
+    <string name="generic_error_content">Error cargando el contenido</string>
     <string name="error_loading_epg">Error cargando la Guía</string>
+    <string name="error_subscription_in_process">Su suscripción está en proceso. Consulte a su operador</string>
+    <string name="error_content_generic">Error cargando el contenido</string>
     <!--endregion Error-->
 
     <!--region PIN DIALOG-->
@@ -104,6 +107,8 @@
     <string name="accessibility_close">Cerrar</string>
     <string name="accessibility_expandcategory">Expandir categoría</string>
     <string name="accessibility_toggle_drawer">Abrir cajón de navegación</string>
+    <string name="accessibility_rating_content_description">Rating</string>
+    <string name="accessibility_play_icon_content_description">Play icon</string>
     <!--endregion Accessibility-->
 
 
