@@ -46,6 +46,7 @@ object DetailColor {
     val title = Primary
     val description = Color.White
     val metadata = Outlined
+    val serieChapterBackground = Color.Black.copy(alpha = 0.7f)
 }
 
 object EPGMobileColor {

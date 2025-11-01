@@ -20,21 +20,31 @@ val BulletedList: ImageVector
             path(
                 fill = SolidColor(Color(0xFF000000))
             ) {
+                // Línea superior
+                moveTo(360f, 280f)
+                verticalLineToRelative(-80f)
+                horizontalLineToRelative(480f)
+                verticalLineToRelative(80f)
+                horizontalLineToRelative(-480f)
+                close()
+
+                // Línea del medio
+                moveTo(360f, 520f)
+                verticalLineToRelative(-80f)
+                horizontalLineToRelative(480f)
+                verticalLineToRelative(80f)
+                horizontalLineToRelative(-480f)
+                close()
+
+                // Línea inferior
                 moveTo(360f, 760f)
                 verticalLineToRelative(-80f)
                 horizontalLineToRelative(480f)
                 verticalLineToRelative(80f)
+                horizontalLineToRelative(-480f)
                 close()
-                moveToRelative(0f, -240f)
-                verticalLineToRelative(-80f)
-                horizontalLineToRelative(480f)
-                verticalLineToRelative(80f)
-                close()
-                moveToRelative(0f, -240f)
-                verticalLineToRelative(-80f)
-                horizontalLineToRelative(480f)
-                verticalLineToRelative(80f)
-                close()
+
+                // Puntos de la lista (bullets)
                 moveTo(200f, 800f)
                 quadToRelative(-33f, 0f, -56.5f, -23.5f)
                 reflectiveQuadTo(120f, 720f)
@@ -44,7 +54,9 @@ val BulletedList: ImageVector
                 reflectiveQuadTo(280f, 720f)
                 reflectiveQuadToRelative(-23.5f, 56.5f)
                 reflectiveQuadTo(200f, 800f)
-                moveToRelative(0f, -240f)
+                close()
+
+                moveTo(200f, 560f)
                 quadToRelative(-33f, 0f, -56.5f, -23.5f)
                 reflectiveQuadTo(120f, 480f)
                 reflectiveQuadToRelative(23.5f, -56.5f)
@@ -53,7 +65,9 @@ val BulletedList: ImageVector
                 reflectiveQuadTo(280f, 480f)
                 reflectiveQuadToRelative(-23.5f, 56.5f)
                 reflectiveQuadTo(200f, 560f)
-                moveToRelative(0f, -240f)
+                close()
+
+                moveTo(200f, 320f)
                 quadToRelative(-33f, 0f, -56.5f, -23.5f)
                 reflectiveQuadTo(120f, 240f)
                 reflectiveQuadToRelative(23.5f, -56.5f)
@@ -62,6 +76,7 @@ val BulletedList: ImageVector
                 reflectiveQuadTo(280f, 240f)
                 reflectiveQuadToRelative(-23.5f, 56.5f)
                 reflectiveQuadTo(200f, 320f)
+                close()
             }
         }.build()
 
@@ -69,4 +84,3 @@ val BulletedList: ImageVector
     }
 
 private var _Format_list_bulleted: ImageVector? = null
-

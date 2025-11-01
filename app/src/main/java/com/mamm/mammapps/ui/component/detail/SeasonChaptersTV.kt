@@ -1,5 +1,6 @@
 package com.mamm.mammapps.ui.component.detail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -16,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.mamm.mammapps.ui.component.common.ContentEntityListItem
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
 import com.mamm.mammapps.ui.model.SeasonUI
+import com.mamm.mammapps.ui.theme.DetailColor
 import com.mamm.mammapps.ui.theme.Dimensions
 
 @Composable
@@ -29,13 +31,19 @@ fun SeasonChaptersTV(
 
     var selectedTabIndex by remember { mutableStateOf(0) }
 
-    Column(modifier = Modifier.padding(horizontal = Dimensions.paddingMedium)) {
+    Column(
+        modifier = Modifier
+            .padding(horizontal = Dimensions.paddingMedium)
+            .background(DetailColor.serieChapterBackground)
+    ) {
 
         Spacer(
             modifier = Modifier.height(Dimensions.paddingLarge)
         )
 
         SeasonsHeaderTV(
+            modifier = Modifier
+                .padding(horizontal = Dimensions.paddingMedium),
             seasons = seasons,
             selectedTabIndex = selectedTabIndex,
             onClickTab = { selectedTabIndex = it },
