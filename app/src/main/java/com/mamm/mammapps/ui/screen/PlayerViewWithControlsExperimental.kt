@@ -1,8 +1,10 @@
 package com.mamm.mammapps.ui.screen
 
+import android.content.Context
 import android.content.pm.ActivityInfo
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageButton
@@ -23,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -40,7 +43,10 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
@@ -49,6 +55,8 @@ import com.example.openstream_flutter_rw.ui.manager.watermark.FingerprintControl
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.mamm.mammapps.R
+import com.mamm.mammapps.data.model.player.Ticker
+import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.player.ZappingScreen
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
@@ -59,11 +67,15 @@ import com.mamm.mammapps.ui.extension.insertThumbnail
 import com.mamm.mammapps.ui.extension.jump10sBack
 import com.mamm.mammapps.ui.extension.jump10sForward
 import com.mamm.mammapps.ui.extension.toDigitString
+import com.mamm.mammapps.ui.manager.videoresize.VideoResizeManagerWithTicker
+import com.mamm.mammapps.ui.manager.videoresize.VideoResizeManagerWithTickerCompose
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.PlayerColor
 import com.mamm.mammapps.ui.viewmodel.VideoPlayerViewModel
+import com.mamm.mammapps.util.isAndroidTV
+import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.delay
 import kotlin.math.abs
 
@@ -95,6 +107,11 @@ fun PlayerViewWithControlsExperimental(
     val zappingFocusRequester = remember { FocusRequester() }
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
+    //--------------TICKERS-------------------------
+    val tickerList by viewModel.tickerList.collectAsStateWithLifecycle()
+    var videoResizeManager by remember { mutableStateOf<VideoResizeManagerWithTicker?>(null) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     // --- EFECTOS DE PANTALLA COMPLETA Y ORIENTACIÓN ---
     DisposableEffect(Unit) {
         val window = context.findActivity().window
@@ -122,6 +139,18 @@ fun PlayerViewWithControlsExperimental(
             zappingFocusRequester.requestFocus()
         } else {
             playerFocusRequester.requestFocus()
+        }
+    }
+
+    LaunchedEffect(tickerList) {
+        if (tickerList.isNotEmpty()) {
+            Log.d("PlayerViewWithControlsExperimental", "TickerList ha cambiado, comenzamos autoresize $tickerList")
+            videoResizeManager?.replaceTickers(tickerList)
+            videoResizeManager?.setAutoResize(
+                true,
+                tickerList.first().tiempoEntreApariciones.toLong(),
+                tickerList.first().tiempoDuracion.toLong()
+            )
         }
     }
 
@@ -335,6 +364,22 @@ fun PlayerViewWithControlsExperimental(
 
                     viewModel.setControlVisibility(styledPlayerView)
                     viewModel.setDialogButtonVisibility(ccTracksButton, audioTracksButton)
+
+                    //TODO: does not work well if it is created also on mobile, layout is wrong
+                    if (videoResizeManager == null && isAndroidTV(context)) {
+                        val dummyFragment = object : Fragment() {
+                            override fun getView(): View = parentView
+                            override fun getContext(): Context = context
+                            override fun getViewLifecycleOwner(): LifecycleOwner = lifecycleOwner
+                        }
+
+                        videoResizeManager = VideoResizeManagerWithTicker(
+                            fragment = dummyFragment,
+                            frameLayoutId = R.id.root,
+                            tickerList = listOf()
+                        )
+
+                    }
 
                 }
             )
