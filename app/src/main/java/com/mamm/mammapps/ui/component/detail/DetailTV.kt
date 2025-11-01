@@ -25,9 +25,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.bookmark.Recommended
@@ -82,7 +88,21 @@ fun DetailTV(
 
         // Contenido principal
         Row {
-            Column(modifier = Modifier.verticalScroll(scrollState)) {
+            Column(modifier = Modifier
+                .verticalScroll(scrollState)
+                .onKeyEvent { event ->
+                    if (event.type == KeyEventType.KeyDown
+                        && event.key == Key.DirectionUp
+                        && !showPlayButton) {
+                        coroutineScope.launch {
+                            scrollState.animateScrollTo(0)
+                        }
+                        true
+                    } else {
+                        false
+                    }
+                }
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxHeight()
@@ -137,7 +157,7 @@ fun DetailTV(
                             icon = {
                                 Icon(
                                     imageVector = Icons.Default.PlayArrow,
-                                    contentDescription = stringResource(R.string.play_icon_content_description),
+                                    contentDescription = stringResource(R.string.accessibility_play_icon_content_description),
                                     tint = Color.Black,
                                     modifier = Modifier.padding(end = Dimensions.paddingXSmall)
                                 )
@@ -149,9 +169,8 @@ fun DetailTV(
                                 coroutineScope.launch { scrollState.animateScrollTo(0) }
                             }
                         )
+                        Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
                     }
-
-                    Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
 
                     // Sección de reparto
                     content.detailInfo?.metadata?.let { metadata ->
@@ -177,7 +196,9 @@ fun DetailTV(
                     SimilarContentRow(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = Dimensions.paddingSmall),
+                            .height(210.dp)
+                            .padding(horizontal = Dimensions.paddingSmall)
+                            .padding(bottom = 20.dp),
                         content = it.toSimilarContentRow(),
                         onContentClicked = { content ->
                             //Buscamos el contenido que mandamos a la siguiente vista detalle
