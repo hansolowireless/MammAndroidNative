@@ -130,7 +130,7 @@ fun ContentEntityListItem(
                     model = imageUrl,
                     contentDescription = content.detailInfo?.description,
                     modifier = Modifier
-                        .height(56.dp)
+                        .height(80.dp)
                         .aspectRatio(Ratios.HORIZONTAL)
                         .clip(RoundedCornerShape(8.dp)),
                     contentScale = ContentScale.Crop

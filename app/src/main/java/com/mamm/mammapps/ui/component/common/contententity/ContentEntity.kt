@@ -88,7 +88,7 @@ private fun ContentEntityTV(
                 scaleX = scale
                 scaleY = scale
             }
-            .glow(enabled = isFocused, alpha = glowAlpha, glowRadius = 20.dp)
+            .glow(enabled = isFocused, alpha = glowAlpha, glowRadius = 15.dp)
             .onFocusChanged { focusState ->
                 isFocused = focusState.isFocused
                 if (isFocused) onFocus()
@@ -99,14 +99,7 @@ private fun ContentEntityTV(
         ),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = Color.Transparent
-        ),
-//        glow = ClickableSurfaceDefaults.glow(
-//            glow = Glow(
-//                // Tu lógica de color dependiente del foco se mantiene aquí
-//                elevationColor = if (isFocused) ContentEntityColor.glow else Color.Transparent,
-//                elevation = 12.dp
-//            )
-//        )
+        )
     ) {
         SharedContentEntity(contentEntityUI, mostWatchedOrder)
     }

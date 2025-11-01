@@ -43,7 +43,7 @@ fun HomeGridTop(content: ContentEntityUI) {
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(UIConstant.HOMEGRIDTOP_IMAGE_WIDTH_FRACTION)
+                .fillMaxWidth(UIConstant.HOMEGRIDTOP_IMAGE_WIDTH_FRACTION * 1.1f)
                 .align(Alignment.CenterEnd)
         ) {
             AsyncImage(
@@ -56,13 +56,14 @@ fun HomeGridTop(content: ContentEntityUI) {
 
         Box(
             modifier = Modifier
-                .fillMaxHeight()
-                .fillMaxWidth(UIConstant.HOMEGRIDTOP_IMAGE_WIDTH_FRACTION)
-                .align(Alignment.CenterEnd)
+                .fillMaxHeight(0.5f)
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
                 .clip(RectangleShape)
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
+                            Color.Transparent,
                             Color.Transparent,
                             Color.Transparent,
                             MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
@@ -75,7 +76,7 @@ fun HomeGridTop(content: ContentEntityUI) {
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(UIConstant.HOMEGRIDTOP_IMAGE_WIDTH_FRACTION)
+                .fillMaxWidth(UIConstant.HOMEGRIDTOP_IMAGE_WIDTH_FRACTION * 1.1f)
                 .align(Alignment.CenterEnd)
                 .clip(RectangleShape)
                 .background(
@@ -84,8 +85,11 @@ fun HomeGridTop(content: ContentEntityUI) {
                             MaterialTheme.colorScheme.background,
                             MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
                             Color.Transparent,
-                            Color.Transparent
-                        )
+                            Color.Transparent,
+                            Color.Transparent,
+                            Color.Transparent,
+                            Color.Transparent,
+                            Color.Transparent                        )
                     )
                 )
         )
@@ -104,7 +108,7 @@ fun HomeGridTop(content: ContentEntityUI) {
                 // Event title from ContentEntityUI
                 if (content.title.isNotBlank()) {
                     Text(
-                        text = content.title ,
+                        text = content.title,
                         color = HomeGridTopColor.eventitle,
                         style = MaterialTheme.typography.bodyLarge,
                         maxLines = 2,

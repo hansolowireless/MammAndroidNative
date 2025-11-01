@@ -58,12 +58,12 @@ fun HomeGridBottom(
         focusRequester.requestFocus()
     }
 
-    ProvideLazyListPivotOffset(parentFraction = 0.249f) {
+    ProvideLazyListPivotOffset(parentFraction = 0.248f) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .focusRequester(focusRequester)
-                .padding(top = Dimensions.paddingMedium),
+                .padding(top = Dimensions.paddingXSmall),
             verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge),
             state = columnListState
         ) {
@@ -104,7 +104,9 @@ fun HomeGridBottom(
                     ),
                     verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
                             text = contentRow.categoryName,
                             color = HomeGridBottomColor.rowTitle,
@@ -128,7 +130,8 @@ fun HomeGridBottom(
                     }
 
                     RowOfContent(
-                        modifier = Modifier.focusRequester(rowFocusRequester),
+                        modifier = Modifier
+                            .focusRequester(rowFocusRequester),
                         contentList = contentRow.items,
                         showExpandCategory = LocalIsTV.current && contentRow.loadMore,
                         onContentClick = { content ->
