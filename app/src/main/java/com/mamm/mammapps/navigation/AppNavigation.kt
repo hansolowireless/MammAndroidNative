@@ -26,6 +26,7 @@ import com.mamm.mammapps.ui.mapper.toContentToPlayUI
 import com.mamm.mammapps.ui.screen.ChannelsScreen
 import com.mamm.mammapps.ui.screen.DetailScreen
 import com.mamm.mammapps.ui.screen.EPGScreen
+import com.mamm.mammapps.ui.screen.ErrorLogoutScreen
 import com.mamm.mammapps.ui.screen.ExpandCategoryScreen
 import com.mamm.mammapps.ui.screen.HomeScreen
 import com.mamm.mammapps.ui.screen.LoginScreen
@@ -77,6 +78,11 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                 navController.currentBackStackEntry?.savedStateHandle?.addCategoryId(categoryId)
                 navController.currentBackStackEntry?.savedStateHandle?.addCategoryName(categoryName)
                 navController.currentBackStackEntry?.savedStateHandle?.addRoute(AppRoute.HOME)
+            },
+            onErrorLogout = {
+                navController.navigate(AppRoute.ERROR_SUBSCRIPTION_ONGOING.route) {
+                    launchSingleTop = true
+                }
             }
         )
     }
@@ -221,5 +227,14 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
         )
     }
 
+    composable(AppRoute.ERROR_SUBSCRIPTION_ONGOING.route) {
+        ErrorLogoutScreen(
+            onNavigateToLogin = {
+                navController.navigate(AppRoute.LOGIN.route) {
+                    popUpTo(AppRoute.LOGOUT.route) { inclusive = true }
+                }
+            }
+        )
+    }
 
 }

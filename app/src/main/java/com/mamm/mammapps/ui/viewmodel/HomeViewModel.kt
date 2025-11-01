@@ -96,7 +96,7 @@ class HomeViewModel @Inject constructor(
     fun checkRestrictedScreen(routeTag: AppRoute) {
         homeContentUIState = when (routeTag) {
             AppRoute.ADULTS -> {
-                if (shouldRequestPinUseCase()) HomeContentUIState.Restricted else HomeContentUIState.RequestContent
+                if (shouldRequestPinUseCase()) HomeContentUIState.PinRestriction else HomeContentUIState.RequestContent
             }
 
             else -> HomeContentUIState.RequestContent
@@ -144,7 +144,8 @@ class HomeViewModel @Inject constructor(
                 }
                 .onFailure { exception ->
                     homeContentUIState = HomeContentUIState.Error(
-                        exception.message ?: "Unknown error occurred"
+                        exception.message.orEmpty(),
+                        throwable = exception
                     )
                 }
         }

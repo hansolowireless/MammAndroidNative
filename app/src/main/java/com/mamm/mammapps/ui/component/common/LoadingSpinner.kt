@@ -29,13 +29,9 @@ fun LoadingSpinner(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             logoUrl?.let {
-                AsyncImage(
-                    model = logoUrl,
-                    contentDescription = null,
-                    fallback = painterResource(R.drawable.logo_masmedia),
-                    modifier = Modifier
-                        .size(width = 300.dp, height = 110.dp)
-                        .align(Alignment.CenterHorizontally)
+                OperatorLogoImage(
+                    logoUrl = logoUrl,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
             }
             Spacer(modifier = Modifier.height(Dimensions.paddingMedium))

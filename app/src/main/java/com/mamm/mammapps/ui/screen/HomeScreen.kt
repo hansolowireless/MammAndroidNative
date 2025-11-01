@@ -13,8 +13,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mamm.mammapps.data.model.exception.GetHomeContentException
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
@@ -22,6 +24,7 @@ import com.mamm.mammapps.ui.component.dialog.PinDialog
 import com.mamm.mammapps.ui.component.home.HomeGridBottom
 import com.mamm.mammapps.ui.component.home.HomeGridTop
 import com.mamm.mammapps.ui.mapper.toContentToPlayUI
+import com.mamm.mammapps.ui.mapper.toResId
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.uistate.CastState
@@ -36,7 +39,8 @@ fun HomeScreen(
     routeTag: AppRoute = AppRoute.HOME,
     onShowDetails: (item: ContentEntityUI) -> Unit,
     onPlay: (item: Any) -> Unit,
-    onExpandCategory: (categoryId: Int, categoryName: String) -> Unit = { _, _ -> }
+    onExpandCategory: (categoryId: Int, categoryName: String) -> Unit = { _, _ -> },
+    onErrorLogout: () -> Unit = {}
 ) {
 
     val isTV = LocalIsTV.current
@@ -103,15 +107,22 @@ fun HomeScreen(
 
 
         is HomeContentUIState.Error -> {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Text(
-                    text = homeContentState.message,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+            when (homeContentState.throwable) {
+                is GetHomeContentException.ForbiddenException -> {
+                    onErrorLogout()
+                }
+                else -> {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Text(
+                            text = stringResource(homeContentState.throwable.toResId()),
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+                }
             }
         }
 
-        is HomeContentUIState.Restricted -> {
+        is HomeContentUIState.PinRestriction -> {
             PinDialog(
                 onConfirm = {
                     viewModel.validatePin(pin = it)

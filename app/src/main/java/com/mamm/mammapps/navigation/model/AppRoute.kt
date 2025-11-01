@@ -20,7 +20,8 @@ enum class AppRoute {
     DETAIL,
     EXPANDCATEGORY,
     LOGIN,
-    LOGOUT;
+    LOGOUT,
+    ERROR_SUBSCRIPTION_ONGOING;
 
     val route: String
         get() = name.lowercase()
