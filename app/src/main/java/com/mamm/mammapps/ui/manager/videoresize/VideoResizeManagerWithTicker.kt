@@ -222,14 +222,30 @@ class VideoResizeManagerWithTicker(
     }
 
     private fun setTickerImageRemote() {
-        val fragment = fragmentRef.get() ?: return
-        val imageUrl = _ticker?.fondo ?: return
-        if (fragment.isAdded) {
-            Glide.with(fragment)
-                .load(imageUrl)
-                .apply(RequestOptions().centerCrop())
-                .into(tickerBackground ?: return)
+        // Ya no necesitas la referencia al fragment aquí
+        // val fragment = fragmentRef.get() ...
+
+        val imageUrl = _ticker?.fondo
+        if (imageUrl.isNullOrEmpty()) {
+            Log.w(TAG, "setTickerImageRemote: Image URL is null or empty.")
+            tickerBackground?.setImageDrawable(null) // Opcional: limpiar la imagen anterior
+            return
         }
+
+        // Comprueba que la vista de destino (el ImageView) exista
+        val targetView = tickerBackground
+        if (targetView == null) {
+            Log.e(TAG, "setTickerImageRemote: tickerBackground ImageView is null, cannot load image.")
+            return
+        }
+
+        Log.d(TAG, "setTickerImageRemote: Loading image with Glide. URL: $imageUrl")
+
+        // SOLUCIÓN: Usa el contexto de la propia vista 'targetView'
+        Glide.with(targetView.context)
+            .load(imageUrl)
+            .apply(RequestOptions().centerCrop())
+            .into(targetView)
     }
 
     private fun showTicker() {
@@ -348,6 +364,7 @@ class VideoResizeManagerWithTicker(
     }
 
     fun replaceTickers(newTickerList: List<Ticker>) {
+        Log.d(TAG, "replaceTickers called with newTickerList: $newTickerList")
         tickerList = newTickerList
         currentTickerIndex = 0
         if (tickerList.isNotEmpty()) {
