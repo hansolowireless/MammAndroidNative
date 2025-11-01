@@ -196,7 +196,7 @@ fun DetailTV(
                     SimilarContentRow(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(210.dp)
+                            .height(240.dp)
                             .padding(horizontal = Dimensions.paddingSmall)
                             .padding(bottom = 20.dp),
                         content = it.toSimilarContentRow(),
