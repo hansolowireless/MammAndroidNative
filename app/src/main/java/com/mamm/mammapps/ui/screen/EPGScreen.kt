@@ -42,7 +42,7 @@ fun EPGScreen(
     val castState by castViewModel.castState.collectAsStateWithLifecycle()
 
     val uiState by viewModel.epgUIState.collectAsStateWithLifecycle()
-    var selectedDate by remember { mutableStateOf<LocalDate>(LocalDate.now()) }
+    val selectedDate by viewModel.selectedDate.collectAsStateWithLifecycle()
     val selectedChannel by viewModel.selectedChannel.collectAsStateWithLifecycle()
     val playedChannel by viewModel.playedChannel.collectAsStateWithLifecycle()
 
@@ -81,7 +81,7 @@ fun EPGScreen(
                     epgContent = state.data,
                     selectedDate = selectedDate,
                     onDateSelected = { date ->
-                        selectedDate = date
+                        viewModel.setSelectedDate(date)
                         viewModel.getEPGContent(date)
                     },
                     selectedChannel = selectedChannel,
@@ -101,7 +101,7 @@ fun EPGScreen(
                     content = state.data,
                     selectedDate = selectedDate,
                     onDateSelected = { date ->
-                        selectedDate = date
+                        viewModel.setSelectedDate(date)
                         viewModel.getEPGContent(date)
                     },
                     onEventClicked = {

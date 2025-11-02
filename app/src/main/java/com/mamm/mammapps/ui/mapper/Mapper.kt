@@ -644,7 +644,7 @@ fun List<Recommended>.toSimilarContentRow(): ContentRowUI {
 }
 
 //---------------region EPG-------------
-fun LocalDate.toDateSelectorResId(): Int {
+fun LocalDate.toDateSelectorResId(): Int? {
     val now = LocalDate.now()
     return when {
         this == now.minusDays(2) -> R.string.day_before_yesterday
@@ -652,7 +652,7 @@ fun LocalDate.toDateSelectorResId(): Int {
         this == now -> R.string.today
         this == now.plusDays(1) -> R.string.tomorrow
         this == now.plusDays(2) -> R.string.day_after_tomorrow
-        else -> R.string.today // Un fallback por si acaso
+        else -> null
     }
 }
 //----------------endregion EPG--------------

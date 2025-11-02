@@ -29,15 +29,32 @@ fun DateSelector(
     selectedDate: LocalDate,
     onDateSelected: (LocalDate) -> Unit
 ) {
+    val dates = remember {
+        listOf(
+            LocalDate.now().minusDays(7),
+            LocalDate.now().minusDays(6),
+            LocalDate.now().minusDays(5),
+            LocalDate.now().minusDays(4),
+            LocalDate.now().minusDays(3),
+            LocalDate.now().minusDays(2),
+            LocalDate.now().minusDays(1),
+            LocalDate.now(),
+            LocalDate.now().plusDays(1),
+            LocalDate.now().plusDays(2)
+        )
+    }
+
     if (LocalIsTV.current) {
         TvDateSelector(
             modifier = modifier,
+            dates = dates,
             selectedDate = selectedDate,
             onDateSelected = onDateSelected
         )
     } else {
         MobileDateSelector(
             modifier = modifier,
+            dates = dates,
             selectedDate = selectedDate,
             onDateSelected = onDateSelected
         )
@@ -47,21 +64,13 @@ fun DateSelector(
 @Composable
 private fun MobileDateSelector(
     modifier: Modifier = Modifier,
+    dates: List<LocalDate>,
     selectedDate: LocalDate,
     onDateSelected: (LocalDate) -> Unit
 ) {
-    val tabs = remember {
-        listOf(
-            LocalDate.now().minusDays(2),
-            LocalDate.now().minusDays(1),
-            LocalDate.now(),
-            LocalDate.now().plusDays(1),
-            LocalDate.now().plusDays(2)
-        )
-    }
 
     // 2. Encontrar el índice de la pestaña seleccionada
-    val selectedTabIndex = tabs.indexOf(selectedDate)
+    val selectedTabIndex = dates.indexOf(selectedDate)
 
     // 3. Crear el TabRow
     TabRow(
@@ -71,13 +80,15 @@ private fun MobileDateSelector(
         contentColor = MaterialTheme.colorScheme.primary // Color del indicador y del texto seleccionado por defecto
     ) {
         // 4. Iterar sobre la lista de pestañas para crear cada Tab
-        tabs.forEachIndexed { index, date ->
+        dates.forEachIndexed { index, date ->
             Tab(
                 selected = selectedTabIndex == index,
                 onClick = { onDateSelected(date) },
                 text = {
                     Text(
-                        text = stringResource(id = date.toDateSelectorResId()),
+                        text = date.toDateSelectorResId()?.let {
+                            stringResource(id = it)
+                        } ?: date.toString(),
                         color = if (selectedTabIndex == index) {
                             MaterialTheme.colorScheme.primary
                         } else {
@@ -93,18 +104,10 @@ private fun MobileDateSelector(
 @Composable
 private fun TvDateSelector(
     modifier: Modifier = Modifier,
+    dates: List<LocalDate>,
     selectedDate: LocalDate,
     onDateSelected: (LocalDate) -> Unit
 ) {
-    val dates = remember {
-        listOf(
-            LocalDate.now().minusDays(2),
-            LocalDate.now().minusDays(1),
-            LocalDate.now(),
-            LocalDate.now().plusDays(1),
-            LocalDate.now().plusDays(2)
-        )
-    }
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -120,7 +123,9 @@ private fun TvDateSelector(
                 ),
                 headlineContent = {
                     Text(
-                        text = stringResource(id = date.toDateSelectorResId()),
+                        text = date.toDateSelectorResId()?.let {
+                            stringResource(id = it)
+                        } ?: date.toString(),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                         textAlign = TextAlign.Center

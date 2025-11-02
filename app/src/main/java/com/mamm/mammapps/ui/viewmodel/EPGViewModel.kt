@@ -38,6 +38,9 @@ class EPGViewModel @Inject constructor(
     private val _playedChannel = MutableStateFlow<Channel?>(null)
     val playedChannel: StateFlow<Channel?> = _playedChannel.asStateFlow()
 
+    private val _selectedDate = MutableStateFlow<LocalDate>(LocalDate.now())
+    val selectedDate: StateFlow<LocalDate> = _selectedDate.asStateFlow()
+
     fun getEPGContent(date: LocalDate) {
         viewModelScope.launch(Dispatchers.IO) {
             _epgUIState.update { UIState.Loading }
@@ -68,6 +71,10 @@ class EPGViewModel @Inject constructor(
 
     fun setSelectedChannel (channel: Channel) {
         _selectedChannel.update{ channel }
+    }
+
+    fun setSelectedDate (date: LocalDate) {
+        _selectedDate.update { date }
     }
 
     fun clearPlayedChannel() {
