@@ -390,7 +390,7 @@ fun PlayerViewWithControlsExperimental(
             ZappingScreen(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .fillMaxWidth(0.5f)
+                    .fillMaxWidth(0.7f)
                     .focusRequester(zappingFocusRequester) // Foco para el zapping
                     .focusable(),
                 zappingInfo = zappingInfo,
