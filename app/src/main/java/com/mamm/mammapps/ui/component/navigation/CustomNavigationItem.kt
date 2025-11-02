@@ -52,7 +52,7 @@ fun CustomTVNavigationItem(
         },
         leadingContent = {
             Box(
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(32.dp),
                 contentAlignment = Alignment.Center
             ) {
                 icon()
