@@ -188,4 +188,8 @@ class HomeViewModel @Inject constructor(
         _lastClickedItemIndex.update { null }
     }
 
+    fun lastClickedToZero() {
+        _lastClickedItemIndex.update { 0 }
+    }
+
 }
