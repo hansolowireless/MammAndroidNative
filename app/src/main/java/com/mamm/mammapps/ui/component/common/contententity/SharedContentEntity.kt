@@ -13,9 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
+import com.mamm.mammapps.ui.extension.fadeInImageRequest
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.theme.Dimensions
 
@@ -26,7 +28,7 @@ fun SharedContentEntity(
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         AsyncImage(
-            model = contentEntityUI.imageUrl,
+            model = contentEntityUI.imageUrl.fadeInImageRequest(LocalContext.current),
             contentDescription = contentEntityUI.title,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,

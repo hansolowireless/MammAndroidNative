@@ -21,6 +21,7 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import coil.request.ImageRequest
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -113,6 +114,14 @@ fun String.buildThumbnailUrl(position: Long?): String {
     val thumbnail = "$baseUrl-img/${contentID}_mf$thumbnailNumberString.jpg"
     SimpleLogger().debug("buildThumbnailUrl", "thumbnail: $thumbnail")
     return "$baseUrl-img/${contentID}_mf$thumbnailNumberString.jpg"
+}
+
+fun String.fadeInImageRequest(context: Context): ImageRequest {
+    return ImageRequest.Builder(context)
+        .data(this)
+        .crossfade(true)
+        .crossfade(300)
+        .build()
 }
 
 fun ImageView.loadWatermarkOrHide(watermarkInfo: WatermarkInfo) {
