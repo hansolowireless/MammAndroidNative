@@ -78,8 +78,8 @@ class HomeViewModel @Inject constructor(
     private val _focusedContent = MutableStateFlow<ContentEntityUI?>(null)
     val focusedContent: StateFlow<ContentEntityUI?> = _focusedContent.asStateFlow()
 
-    private val _lastClickedItemIndex = MutableStateFlow<Int>(0)
-    val lastClickedItemIndex: StateFlow<Int> = _lastClickedItemIndex.asStateFlow()
+    private val _lastClickedItemIndex = MutableStateFlow<Int?>(0)
+    val lastClickedItemIndex: StateFlow<Int?> = _lastClickedItemIndex.asStateFlow()
 
 
     private fun setLoadingStateWithLogo() {
@@ -185,7 +185,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun reset() {
-        _lastClickedItemIndex.update { 0 }
+        _lastClickedItemIndex.update { null }
     }
 
 }

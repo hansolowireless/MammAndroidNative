@@ -37,6 +37,7 @@ import com.mamm.mammapps.ui.model.player.FingerPrintInfoUI
 import com.mamm.mammapps.ui.model.player.LiveEventInfoUI
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.Ratios
+import com.mamm.mammapps.util.getRandomHashCode
 import com.mamm.mammapps.util.orRandom
 import java.time.LocalDate
 
@@ -522,6 +523,7 @@ fun List<ContentRowUI>.insertFeatured(
     featured: List<HomeFeatured>
 ) : List<ContentRowUI> {
     ContentRowUI(
+        categoryId = getRandomHashCode(),
         categoryName = "Eventos Destacados",
         items = featured.mapNotNull { it.toContentEntityUI() },
         isFeatured = true
@@ -534,6 +536,7 @@ fun List<ContentRowUI>.insertBookmarks(
     bookmarks: List<Bookmark>
 ): List<ContentRowUI> {
     ContentRowUI(
+        categoryId = getRandomHashCode(),
         categoryName = "Seguir viendo",
         items = bookmarks.mapNotNull { it.toContentEntityUI() }
     ).let {
@@ -545,6 +548,7 @@ fun List<ContentRowUI>.insertRecommended(
     bookmarks: List<Recommended>
 ): List<ContentRowUI> {
     ContentRowUI(
+        categoryId = getRandomHashCode(),
         categoryName = "Recomendado para ti",
         items = bookmarks.mapNotNull { it.toContentEntityUI() }
     ).let {
@@ -554,6 +558,7 @@ fun List<ContentRowUI>.insertRecommended(
 
 fun List<ContentRowUI>.insertMostWatched(mostWatched: List<MostWatchedContent>): List<ContentRowUI> {
     ContentRowUI(
+        categoryId = getRandomHashCode(),
         categoryName = "Más visto",
         items = mostWatched.map { it.toContentEntityUI() }
     ).let {
@@ -564,6 +569,7 @@ fun List<ContentRowUI>.insertMostWatched(mostWatched: List<MostWatchedContent>):
 fun List<ContentRowUI>.insertChannelRow(recommended: List<Channel>?): List<ContentRowUI> {
     recommended?.let {
         ContentRowUI(
+            categoryId = getRandomHashCode(),
             categoryName = "Canales",
             items = it.map { channel -> channel.toContentEntityUI() }
         ).let { row ->

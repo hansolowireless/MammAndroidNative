@@ -1,5 +1,6 @@
 package com.mamm.mammapps.ui.component.home
 
+import android.util.Log
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -47,10 +48,12 @@ fun HomeGridBottom(
     onContentClicked: (Int, ContentEntityUI) -> Unit,
     onExpandCategory: (Int, String) -> Unit,
     onFocus: (ContentEntityUI) -> Unit = {},
-    focusedRowIndex: Int?
+    focusedRowIndex: Int?,
+    onRequestedFocus: () -> Unit = {}
 ) {
 
     val expandCategoryTitle = stringResource(id = R.string.expand_category_content_title)
+
 
     ProvideLazyListPivotOffset(parentFraction = 0.248f) {
         LazyColumn(
@@ -74,15 +77,21 @@ fun HomeGridBottom(
 
             itemsIndexed(
                 items = content,
-                key = { index, item -> "${item.categoryName}_$index" }
+                key = { index, item -> "${item.categoryId}_$index" }
             ) { index, contentRow ->
 
-                val rowFocusRequester = remember { FocusRequester() }
+                val rowFocusRequester = remember(contentRow.categoryId) { FocusRequester() }
 
-                if (index == focusedRowIndex) {
-                    LaunchedEffect(Unit) {
+                LaunchedEffect(focusedRowIndex) {
+                    if (index == focusedRowIndex) {
+                        Log.d("HomeGrid", "Focus on row $index")
+                        Log.d("HomeGrid", "focusedRowIndex $focusedRowIndex")
+                        Log.d("HomeGrid", "La key es ${contentRow.categoryId}")
                         kotlinx.coroutines.delay(50)
                         rowFocusRequester.requestFocus()
+
+                        //Hacerlo null para que no vuelva a enfocar
+                        onRequestedFocus()
                     }
                 }
 

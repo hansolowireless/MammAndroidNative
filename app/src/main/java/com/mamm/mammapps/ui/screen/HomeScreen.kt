@@ -1,5 +1,6 @@
 package com.mamm.mammapps.ui.screen
 
+import android.util.Log
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -74,10 +75,6 @@ fun HomeScreen(
             is HomeContentUIState.IncorrectPin -> backDispatcher?.onBackPressed()
             else -> {}
         }
-    }
-
-    LaunchedEffect(homeContent) {
-        viewModel.setFirstFocusedContent()
     }
 
     LaunchedEffect(clickedContent) {
@@ -169,6 +166,9 @@ fun HomeScreen(
                             categoryId,
                             categoryName
                         )
+                    },
+                    onRequestedFocus = {
+                        viewModel.reset()
                     }
                 )
             }

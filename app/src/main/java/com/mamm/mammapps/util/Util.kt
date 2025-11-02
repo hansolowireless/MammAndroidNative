@@ -4,6 +4,7 @@ import android.app.UiModeManager
 import android.content.Context
 import android.content.res.Configuration
 import android.net.Uri
+import kotlin.math.absoluteValue
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -63,4 +64,9 @@ fun Uri.replaceQueryParameter(key: String, newValue: String): Uri {
 @OptIn(ExperimentalUuidApi::class)
 fun Int?.orRandom() : Int {
     return this ?: Uuid.random().hashCode()
+}
+
+@OptIn(ExperimentalUuidApi::class)
+fun getRandomHashCode() : Int {
+    return Uuid.random().hashCode().absoluteValue
 }

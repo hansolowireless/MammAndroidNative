@@ -69,8 +69,10 @@ fun TVNavigationLayout(navController: NavHostController) {
     var isNavRailFocused by remember { mutableStateOf(false) }
     var isInitialFocusSet by remember { mutableStateOf(false) }
 
+    var canFocusAfterRecompose by remember { mutableStateOf(false) }
+
     val railWidth by animateDpAsState(
-        targetValue = if (isNavRailFocused) 200.dp else 60.dp,
+        targetValue = if (isNavRailFocused && canFocusAfterRecompose) 200.dp else 60.dp,
         animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
         label = "NavRailWidthAnimation"
     )
@@ -82,6 +84,11 @@ fun TVNavigationLayout(navController: NavHostController) {
     val bringIntoViewRequesters =
         remember { menuItems.map { it.route }.associateWith { BringIntoViewRequester() } }
     val itemPositions = remember { mutableMapOf<String, Float>() }
+
+    LaunchedEffect (currentRoute) {
+        delay(3000)
+        canFocusAfterRecompose = true
+    }
 
     // --- LÓGICA DE FOCO Y SCROLL ---
     LaunchedEffect(isNavRailFocused, currentRoute) {
@@ -127,7 +134,7 @@ fun TVNavigationLayout(navController: NavHostController) {
                         .onFocusEvent { focusState ->
                             isNavRailFocused = focusState.hasFocus
                         }
-                        .focusable() // Es focusable para que onFocusEvent funcione.
+                        .focusable(canFocusAfterRecompose) // Es focusable para que onFocusEvent funcione.
                 ) {
 
 
