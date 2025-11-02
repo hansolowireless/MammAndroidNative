@@ -3,20 +3,31 @@ package com.mamm.mammapps.ui.component.epg
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.tv.material3.ListItem
 import androidx.tv.material3.ListItemDefaults
 import com.mamm.mammapps.ui.component.LocalIsTV
@@ -68,18 +79,44 @@ private fun MobileDateSelector(
     selectedDate: LocalDate,
     onDateSelected: (LocalDate) -> Unit
 ) {
-
-    // 2. Encontrar el índice de la pestaña seleccionada
     val selectedTabIndex = dates.indexOf(selectedDate)
+    val todayTabIndex = remember(dates) { dates.indexOf(LocalDate.now()) }
 
-    // 3. Crear el TabRow
-    TabRow(
+    val scrollState = rememberScrollState()
+    val screenWidthDp = LocalConfiguration.current.screenWidthDp.dp
+
+    val density = LocalDensity.current
+
+    ScrollableTabRow(
         modifier = modifier,
         selectedTabIndex = selectedTabIndex,
-        containerColor = Color.Transparent, // O el color que prefieras para el fondo de la barra
-        contentColor = MaterialTheme.colorScheme.primary // Color del indicador y del texto seleccionado por defecto
+        containerColor = Color.Transparent,
+        contentColor = MaterialTheme.colorScheme.primary,
+        edgePadding = 0.dp,
+        indicator = { tabPositions ->
+            if (selectedTabIndex in tabPositions.indices) {
+                TabRowDefaults.SecondaryIndicator(
+                    modifier = Modifier
+                        .tabIndicatorOffset(tabPositions[selectedTabIndex])
+                        .width(4.dp)
+                        .height(4.dp)
+                        .clip(CircleShape),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            LaunchedEffect(tabPositions, todayTabIndex) {
+                if (todayTabIndex != -1 && todayTabIndex < tabPositions.size) {
+                    val currentTabPosition = tabPositions[todayTabIndex]
+                    val centeredScroll = (currentTabPosition.left + currentTabPosition.width / 2 - screenWidthDp / 2)
+
+                    val scrollOffsetPx = with(density) { centeredScroll.roundToPx() }
+                    scrollState.animateScrollTo(scrollOffsetPx)
+                }
+            }
+        },
+        divider = {}
     ) {
-        // 4. Iterar sobre la lista de pestañas para crear cada Tab
         dates.forEachIndexed { index, date ->
             Tab(
                 selected = selectedTabIndex == index,
