@@ -95,12 +95,6 @@ fun HomeScreen(
         }
     }
 
-    DisposableEffect (Unit) {
-        onDispose {
-            viewModel.lastClickedToZero()
-        }
-    }
-
     when (homeContentState) {
         is HomeContentUIState.Loading -> {
             LoadingSpinner(

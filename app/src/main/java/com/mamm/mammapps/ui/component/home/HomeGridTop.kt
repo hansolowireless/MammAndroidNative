@@ -43,7 +43,7 @@ fun HomeGridTop(content: ContentEntityUI) {
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(UIConstant.HOMEGRIDTOP_IMAGE_WIDTH_FRACTION * 1.1f)
+                .fillMaxWidth(UIConstant.HOMEGRIDTOP_IMAGE_WIDTH_FRACTION * 1.5f)
                 .align(Alignment.CenterEnd)
         ) {
             AsyncImage(
@@ -64,9 +64,8 @@ fun HomeGridTop(content: ContentEntityUI) {
                     Brush.verticalGradient(
                         colors = listOf(
                             Color.Transparent,
-                            Color.Transparent,
-                            Color.Transparent,
-                            MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.2f),
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.6f),
                             MaterialTheme.colorScheme.background
                         )
                     )
@@ -76,20 +75,16 @@ fun HomeGridTop(content: ContentEntityUI) {
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(UIConstant.HOMEGRIDTOP_IMAGE_WIDTH_FRACTION * 1.1f)
+                .fillMaxWidth(UIConstant.HOMEGRIDTOP_IMAGE_WIDTH_FRACTION * 1.5f)
                 .align(Alignment.CenterEnd)
                 .clip(RectangleShape)
                 .background(
                     Brush.horizontalGradient(
                         colors = listOf(
-                            MaterialTheme.colorScheme.background,
-                            MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
-                            Color.Transparent,
-                            Color.Transparent,
-                            Color.Transparent,
-                            Color.Transparent,
-                            Color.Transparent,
-                            Color.Transparent                        )
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.9f),
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.7f),
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.3f),
+                            Color.Transparent                    )
                     )
                 )
         )

@@ -54,7 +54,6 @@ fun HomeGridBottom(
 
     val expandCategoryTitle = stringResource(id = R.string.expand_category_content_title)
 
-
     ProvideLazyListPivotOffset(parentFraction = 0.248f) {
         LazyColumn(
             modifier = Modifier

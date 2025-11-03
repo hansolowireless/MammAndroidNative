@@ -55,8 +55,6 @@ import com.example.openstream_flutter_rw.ui.manager.watermark.FingerprintControl
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.mamm.mammapps.R
-import com.mamm.mammapps.data.model.player.Ticker
-import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.player.ZappingScreen
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
@@ -68,14 +66,12 @@ import com.mamm.mammapps.ui.extension.jump10sBack
 import com.mamm.mammapps.ui.extension.jump10sForward
 import com.mamm.mammapps.ui.extension.toDigitString
 import com.mamm.mammapps.ui.manager.videoresize.VideoResizeManagerWithTicker
-import com.mamm.mammapps.ui.manager.videoresize.VideoResizeManagerWithTickerCompose
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.PlayerColor
 import com.mamm.mammapps.ui.viewmodel.VideoPlayerViewModel
 import com.mamm.mammapps.util.isAndroidTV
-import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.delay
 import kotlin.math.abs
 
