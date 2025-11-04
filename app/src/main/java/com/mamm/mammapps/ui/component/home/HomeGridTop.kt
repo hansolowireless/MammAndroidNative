@@ -13,12 +13,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,14 +45,15 @@ fun HomeGridTop(content: ContentEntityUI) {
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(UIConstant.HOMEGRIDTOP_IMAGE_WIDTH_FRACTION * 1.5f)
+                .fillMaxWidth(0.86f)
                 .align(Alignment.CenterEnd)
         ) {
             AsyncImage(
                 model = content.horizontalImageUrl,
                 contentDescription = content.title,
                 modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                alignment = BiasAlignment(horizontalBias = 0f, verticalBias = -0.5f)
             )
         }
 
@@ -64,8 +67,8 @@ fun HomeGridTop(content: ContentEntityUI) {
                     Brush.verticalGradient(
                         colors = listOf(
                             Color.Transparent,
-                            MaterialTheme.colorScheme.background.copy(alpha = 0.2f),
-                            MaterialTheme.colorScheme.background.copy(alpha = 0.6f),
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.1f),
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.5f),
                             MaterialTheme.colorScheme.background
                         )
                     )
@@ -75,16 +78,23 @@ fun HomeGridTop(content: ContentEntityUI) {
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(UIConstant.HOMEGRIDTOP_IMAGE_WIDTH_FRACTION * 1.5f)
+                .fillMaxWidth()
                 .align(Alignment.CenterEnd)
                 .clip(RectangleShape)
                 .background(
                     Brush.horizontalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.background.copy(alpha = 0.9f),
-                            MaterialTheme.colorScheme.background.copy(alpha = 0.7f),
-                            MaterialTheme.colorScheme.background.copy(alpha = 0.3f),
-                            Color.Transparent                    )
+                        colorStops = arrayOf(
+                            // 0.0f (inicio) a 0.2f (20%) es negro sólido
+                            0.0f to MaterialTheme.colorScheme.background,
+                            0.17f to MaterialTheme.colorScheme.background.copy(alpha = 0.95f),
+                            0.25f to MaterialTheme.colorScheme.background.copy(alpha = 0.9f),
+
+                            // Transición rápida de negro a transparente entre el 20% y el 35%
+                            0.35f to Color.Transparent,
+
+                            // El resto (35% al 100%) es transparente
+                            1.0f to Color.Transparent
+                        )
                     )
                 )
         )
@@ -93,7 +103,7 @@ fun HomeGridTop(content: ContentEntityUI) {
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(1 - UIConstant.HOMEGRIDTOP_IMAGE_WIDTH_FRACTION)
+                .fillMaxWidth(0.35f)
                 .padding(Dimensions.paddingMedium),
             contentAlignment = Alignment.TopStart
         ) {
@@ -105,7 +115,7 @@ fun HomeGridTop(content: ContentEntityUI) {
                     Text(
                         text = content.title,
                         color = HomeGridTopColor.eventitle,
-                        style = MaterialTheme.typography.bodyLarge,
+                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
