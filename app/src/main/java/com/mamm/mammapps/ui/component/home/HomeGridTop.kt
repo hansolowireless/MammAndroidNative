@@ -35,11 +35,13 @@ import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.HomeGridTopColor
 
 @Composable
-fun HomeGridTop(content: ContentEntityUI) {
+fun HomeGridTop(
+    modifier: Modifier = Modifier,
+    content: ContentEntityUI
+) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .height(260.dp)
     ) {
 
         Box(
@@ -102,7 +104,7 @@ fun HomeGridTop(content: ContentEntityUI) {
         // Content overlay - Left side only (transparent background)
         Box(
             modifier = Modifier
-                .fillMaxHeight()
+                .height(260.dp)
                 .fillMaxWidth(0.35f)
                 .padding(Dimensions.paddingMedium),
             contentAlignment = Alignment.TopStart

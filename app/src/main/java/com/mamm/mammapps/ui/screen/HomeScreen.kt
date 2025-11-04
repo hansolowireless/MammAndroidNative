@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamm.mammapps.data.model.exception.GetHomeContentException
@@ -132,46 +135,52 @@ fun HomeScreen(
         }
 
         is HomeContentUIState.Success -> {
-            Column {
+            Box {
                 if (LocalIsTV.current) {
                     focusedContent?.let {
                         HomeGridTop(
+                            modifier = Modifier.height(430.dp),
                             content = it
                         )
                     }
                 }
-
-                HomeGridBottom(
-                    columnListState = columnListState,
-                    content = if (!LocalIsTV.current) homeContent.filter { !it.isFeatured } else homeContent,
-                    mobileFeatured = if (!LocalIsTV.current) homeContent.find { it.isFeatured }?.items else null,
-                    onContentClicked = { index, entityUI ->
-                        viewModel.setLastClickedIndex(index)
-
-                        if (entityUI.identifier is ContentIdentifier.Channel) {
-                            viewModel.findContent(
-                                entityUI = entityUI,
-                                routeTag = routeTag
-                            )
-                        } else {
-                            onShowDetails(entityUI)
-                        }
-
-                    },
-                    onFocus = { content ->
-                        viewModel.setFocusedContent(content)
-                    },
-                    focusedRowIndex = lastClickedItemIndex,
-                    onExpandCategory = { categoryId, categoryName ->
-                        onExpandCategory(
-                            categoryId,
-                            categoryName
-                        )
-                    },
-                    onRequestedFocus = {
-                        viewModel.reset()
+                Column {
+                    if (LocalIsTV.current) {
+                        Spacer(modifier = Modifier.height(260.dp))
                     }
-                )
+
+                    HomeGridBottom(
+                        columnListState = columnListState,
+                        content = if (!LocalIsTV.current) homeContent.filter { !it.isFeatured } else homeContent,
+                        mobileFeatured = if (!LocalIsTV.current) homeContent.find { it.isFeatured }?.items else null,
+                        onContentClicked = { index, entityUI ->
+                            viewModel.setLastClickedIndex(index)
+
+                            if (entityUI.identifier is ContentIdentifier.Channel) {
+                                viewModel.findContent(
+                                    entityUI = entityUI,
+                                    routeTag = routeTag
+                                )
+                            } else {
+                                onShowDetails(entityUI)
+                            }
+
+                        },
+                        onFocus = { content ->
+                            viewModel.setFocusedContent(content)
+                        },
+                        focusedRowIndex = lastClickedItemIndex,
+                        onExpandCategory = { categoryId, categoryName ->
+                            onExpandCategory(
+                                categoryId,
+                                categoryName
+                            )
+                        },
+                        onRequestedFocus = {
+                            viewModel.reset()
+                        }
+                    )
+                }
             }
         }
 
