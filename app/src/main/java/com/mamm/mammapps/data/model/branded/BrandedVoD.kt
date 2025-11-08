@@ -2,6 +2,8 @@ package com.mamm.mammapps.data.model.branded
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import com.mamm.mammapps.data.model.metadata.Metadata
+import com.mamm.mammapps.data.model.section.TbContentItem
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -19,7 +21,7 @@ data class BrandedVod(
     val idOperator: String? = null,
 
     @SerializedName("tbContentItems")
-    val contentItems: List<ContentItem>? = null,
+    val contentItems: List<TbContentItem>? = null,
 
     @SerializedName("logoTransitions")
     val logoTransitions: List<LogoTransition>? = null,
@@ -89,6 +91,10 @@ data class BrandedVod(
     fun getDescription(): String {
         return contentLanguages?.firstOrNull()?.longDescription.orEmpty()
     }
+
+    fun getMetadata(): Metadata {
+        return Metadata.fromTbContentItems(items = contentItems.orEmpty())
+    }
 }
 
 @Parcelize
@@ -112,20 +118,20 @@ data class ContentLanguage(
     val title: String? = null
 ) : Parcelable
 
-@Parcelize
-data class ContentItem(
-    @SerializedName("id_content")
-    val idContent: String? = null,
-
-    @SerializedName("item_ds")
-    val itemDs: String? = null,
-
-    @SerializedName("id_content_item")
-    val idContentItem: String? = null,
-
-    @SerializedName("item_value")
-    val itemValue: String? = null
-) : Parcelable
+//@Parcelize
+//data class ContentItem(
+//    @SerializedName("id_content")
+//    val idContent: String? = null,
+//
+//    @SerializedName("item_ds")
+//    val itemDs: String? = null,
+//
+//    @SerializedName("id_content_item")
+//    val idContentItem: String? = null,
+//
+//    @SerializedName("item_value")
+//    val itemValue: String? = null
+//) : Parcelable
 
 @Parcelize
 data class LogoTransition(

@@ -187,7 +187,8 @@ fun BrandedVod.toContentEntityUI(isAdult: Boolean) = ContentEntityUI(
     aspectRatio = Ratios.VERTICAL,
     height = Dimensions.contentEntityHeight,
     detailInfo = DetailInfoUI(
-        description = getDescription()
+        description = getDescription(),
+        metadata = getMetadata()
     )
 )
 
@@ -340,14 +341,14 @@ fun SectionVod.toContentToPlayUI() = ContentToPlayUI(
     identifier = ContentIdentifier.VoD(getId()),
     deliveryURL = this.deliveryURL.orEmpty(),
     title = this.getTitle(),
-    imageUrl = this.posterLogo.orEmpty(),
+    imageUrl = this.posterLogo.orEmpty()
 )
 
 fun BrandedVod.toContentToPlayUI() = ContentToPlayUI(
     identifier = ContentIdentifier.VoD(getId()),
     deliveryURL = this.path.orEmpty(),
     title = this.getTitle(),
-    imageUrl = this.contentLogo.orEmpty(),
+    imageUrl = this.contentLogo.orEmpty()
 )
 
 fun HomeFeatured.toContentToPlayUI(): ContentToPlayUI? {
