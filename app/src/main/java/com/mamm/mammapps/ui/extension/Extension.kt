@@ -215,40 +215,21 @@ fun ImageView.insertThumbnail(url: String?, position: Long, onError: (() -> Unit
 }
 
 /**
- * Comprueba si la tecla corresponde a un número del teclado numérico (Numpad).
- */
-fun Key.isNumpadNumber(): Boolean {
-    // La forma segura y recomendada es comprobar contra una lista explícita,
-    // ya que los valores de 'Key' no son necesariamente secuenciales.
-    return this in listOf(
-        Key.NumPad0, Key.NumPad1, Key.NumPad2, Key.NumPad3, Key.NumPad4,
-        Key.NumPad5, Key.NumPad6, Key.NumPad7, Key.NumPad8, Key.NumPad9
-    )
-}
-
-/**
- * Convierte una tecla del Numpad a su representación como String.
- * Devuelve el dígito ("0"-"9") si la tecla es del Numpad, o null en caso contrario.
- *
- * Ejemplo: Key.NumPad7.toDigitString() devuelve "7"
+ * Convierte una tecla numérica a su representación como String.
  */
 fun Key.toDigitString(): String? {
-    // Si la tecla no es del Numpad, no hacemos nada.
-    if (!this.isNumpadNumber()) return null
-
-    // Usa 'when' para un mapeo seguro y legible.
     return when (this) {
-        Key.NumPad0 -> "0"
-        Key.NumPad1 -> "1"
-        Key.NumPad2 -> "2"
-        Key.NumPad3 -> "3"
-        Key.NumPad4 -> "4"
-        Key.NumPad5 -> "5"
-        Key.NumPad6 -> "6"
-        Key.NumPad7 -> "7"
-        Key.NumPad8 -> "8"
-        Key.NumPad9 -> "9"
-        else -> null // Seguridad extra, aunque isNumpadNumber() ya protege.
+        Key.Zero, Key.NumPad0 -> "0"
+        Key.One, Key.NumPad1 -> "1"
+        Key.Two, Key.NumPad2 -> "2"
+        Key.Three, Key.NumPad3 -> "3"
+        Key.Four, Key.NumPad4 -> "4"
+        Key.Five, Key.NumPad5 -> "5"
+        Key.Six, Key.NumPad6 -> "6"
+        Key.Seven, Key.NumPad7 -> "7"
+        Key.Eight, Key.NumPad8 -> "8"
+        Key.Nine, Key.NumPad9 -> "9"
+        else -> null
     }
 }
 
