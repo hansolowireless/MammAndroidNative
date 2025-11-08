@@ -66,6 +66,9 @@ class HomeViewModel @Inject constructor(
     var homeContentUIState by mutableStateOf<HomeContentUIState>(HomeContentUIState.Idle)
         private set
 
+    private val _operatorLogo = MutableStateFlow<String?>(null)
+    val operatorLogo : StateFlow<String?> = _operatorLogo.asStateFlow()
+
     private val _homeContentUI = MutableStateFlow<List<ContentRowUI>>(emptyList())
     val homeContentUI: StateFlow<List<ContentRowUI>> = _homeContentUI.asStateFlow()
 
@@ -84,8 +87,9 @@ class HomeViewModel @Inject constructor(
 
     private fun setLoadingStateWithLogo() {
         viewModelScope.launch(Dispatchers.IO) {
-            getOperatorLogoUrlUseCase().onSuccess {
-                homeContentUIState = HomeContentUIState.Loading(it)
+            getOperatorLogoUrlUseCase().onSuccess { logo ->
+                _operatorLogo.update { logo }
+                homeContentUIState = HomeContentUIState.Loading(logo)
             }.onFailure {
                 logger.error(TAG, "Error getting operator logo URL: $it")
                 homeContentUIState = HomeContentUIState.Loading(null)

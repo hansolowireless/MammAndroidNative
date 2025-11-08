@@ -28,6 +28,7 @@ import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.ui.component.dialog.PinDialog
 import com.mamm.mammapps.ui.component.home.HomeGridBottom
 import com.mamm.mammapps.ui.component.home.HomeGridTop
+import com.mamm.mammapps.ui.component.home.OperatorLogoBottomRight
 import com.mamm.mammapps.ui.mapper.toContentToPlayUI
 import com.mamm.mammapps.ui.mapper.toResId
 import com.mamm.mammapps.ui.model.ContentEntityUI
@@ -53,6 +54,7 @@ fun HomeScreen(
 
     val homeContentState = viewModel.homeContentUIState
     val homeContent by viewModel.homeContentUI.collectAsStateWithLifecycle()
+    val operatorLogo by viewModel.operatorLogo.collectAsStateWithLifecycle()
     val clickedContent by viewModel.clickedContent.collectAsStateWithLifecycle()
     val hasNavigated = remember { mutableStateOf(false) }
 
@@ -102,25 +104,8 @@ fun HomeScreen(
         is HomeContentUIState.Loading -> {
             LoadingSpinner(
                 modifier = Modifier.fillMaxSize(),
-                logoUrl = homeContentState.logo
+                logoUrl = operatorLogo
             )
-        }
-
-
-        is HomeContentUIState.Error -> {
-            when (homeContentState.throwable) {
-                is GetHomeContentException.ForbiddenException -> {
-                    onErrorLogout()
-                }
-                else -> {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        Text(
-                            text = stringResource(homeContentState.throwable.toResId()),
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    }
-                }
-            }
         }
 
         is HomeContentUIState.PinRestriction -> {
@@ -180,6 +165,26 @@ fun HomeScreen(
                             viewModel.reset()
                         }
                     )
+                }
+            }
+
+            OperatorLogoBottomRight(
+                logoUrl = operatorLogo
+            )
+        }
+
+        is HomeContentUIState.Error -> {
+            when (homeContentState.throwable) {
+                is GetHomeContentException.ForbiddenException -> {
+                    onErrorLogout()
+                }
+                else -> {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Text(
+                            text = stringResource(homeContentState.throwable.toResId()),
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
                 }
             }
         }
