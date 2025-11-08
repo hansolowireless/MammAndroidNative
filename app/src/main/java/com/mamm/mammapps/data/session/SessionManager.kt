@@ -77,11 +77,6 @@ class SessionManager @Inject constructor(
         jsonFile = null
     }
 
-    // 5. Nueva función para verificar si hay una sesión activa al iniciar la app
-    fun isSessionActive(): Boolean {
-        return loginData != null && !token.isNullOrEmpty()
-    }
-
     // Propiedades de conveniencia (no cambian)
     val token: String? get() = loginData?.token
     val userId: String? get() = loginData?.userId?.toString()
