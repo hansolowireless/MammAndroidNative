@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -31,24 +32,20 @@ fun ChannelGridTV(
     onChannelFocus: (ContentEntityUI) -> Unit = {}
 ) {
     val lazyGridState = rememberLazyGridState()
-    // 1. Guardamos el índice del último elemento que tuvo el foco.
+    //  Guardamos el índice del último elemento que tuvo el foco.
     // 'rememberSaveable' es clave para que sobreviva a cambios de configuración y al volver a la pantalla.
-    val lastFocusedIndex = rememberSaveable { mutableStateOf(0) }
+    val lastFocusedIndex = rememberSaveable { mutableIntStateOf(0) }
 
-    // 2. Creamos un único FocusRequester. No necesitamos más.
     val focusRequester = remember { FocusRequester() }
 
-    // 3. Este LaunchedEffect SÓLO se ejecuta cuando la lista de canales cambia.
+    // Este LaunchedEffect SÓLO se ejecuta cuando la lista de canales cambia.
     // No se ejecutará durante el scroll.
     LaunchedEffect(channels) {
-        // Da una pequeña demora para que el LazyGrid se componga
         delay(100)
-        // Pide el foco. El sistema de Compose lo entregará al elemento
-        // que tenga el focusRequester en ese momento.
         focusRequester.requestFocus()
     }
 
-    ProvideLazyListPivotOffset(parentFraction = 0.08f) {
+    ProvideLazyListPivotOffset(parentFraction = 0.1f) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(4),
             state = lazyGridState,
@@ -64,20 +61,20 @@ fun ChannelGridTV(
                 val channel = channels[index]
                 ContentEntity(
                     modifier = Modifier
-                        // 4. El FocusRequester se asigna dinámicamente al último elemento enfocado.
+                        // El FocusRequester se asigna dinámicamente al último elemento enfocado.
                         // Cuando volvemos a la pantalla, lastFocusedIndex tiene el valor guardado
                         // y el focusRequester se asigna al item correcto ANTES de que el LaunchedEffect lo pida.
                         .then(
-                            if (index == lastFocusedIndex.value) {
+                            if (index == lastFocusedIndex.intValue) {
                                 Modifier.focusRequester(focusRequester)
                             } else {
                                 Modifier
                             }
                         )
-                        // 5. Usamos onFocusChanged para actualizar nuestro estado SOLO si el item gana el foco.
+                        // Usamos onFocusChanged para actualizar nuestro estado SOLO si el item gana el foco.
                         .onFocusChanged { focusState ->
                             if (focusState.isFocused) {
-                                lastFocusedIndex.value = index
+                                lastFocusedIndex.intValue = index
                             }
                         },
                     contentEntityUI = channel,
