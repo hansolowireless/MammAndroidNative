@@ -31,7 +31,9 @@ fun LoadingSpinner(
             logoUrl?.let {
                 OperatorLogoImage(
                     logoUrl = logoUrl,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .size(width = 300.dp, height = 110.dp)
                 )
             }
             Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
