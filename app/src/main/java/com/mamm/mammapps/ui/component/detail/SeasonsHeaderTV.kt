@@ -5,9 +5,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.requestFocus
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
@@ -26,8 +31,16 @@ fun SeasonsHeaderTV(
     onClickTab: (Int) -> Unit,
     onFocusTab: (Int) -> Unit
 ) {
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
     TabRow(
-        modifier = modifier.height(50.dp),
+        modifier = modifier
+            .height(50.dp)
+            .focusRequester(focusRequester),
         selectedTabIndex = selectedTabIndex
     ) {
         seasons.forEachIndexed { index, season ->
@@ -51,4 +64,5 @@ fun SeasonsHeaderTV(
             }
         }
     }
+
 }
