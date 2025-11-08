@@ -27,7 +27,7 @@ class DynamicUrlInterceptor @Inject constructor() : Interceptor {
             ApiServiceConstant.URL_TYPE_IDM -> Config.idmUrl
             ApiServiceConstant.URL_TYPE_SEARCH -> Config.searchUrl
             ApiServiceConstant.URL_TYPE_PASSWORD_RECOVERY -> Config.passwordRecoveryUrl
-            else -> null // Si no hay cabecera, no se modifica la URL
+            else -> null
         }
 
         if (newUrlString != null) {
@@ -41,7 +41,8 @@ class DynamicUrlInterceptor @Inject constructor() : Interceptor {
                     .build()
 
                 // Creamos una nueva petición con la URL actualizada y eliminamos la cabecera
-                request = request.newBuilder()
+                request = request
+                    .newBuilder()
                     .removeHeader(ApiServiceConstant.URL_TYPE_HEADER) // La cabecera ya no es necesaria
                     .url(finalUrl)
                     .build()
