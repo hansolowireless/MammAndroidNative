@@ -42,7 +42,6 @@ fun DateSelector(
 ) {
     val dates = remember {
         listOf(
-            LocalDate.now().minusDays(7),
             LocalDate.now().minusDays(6),
             LocalDate.now().minusDays(5),
             LocalDate.now().minusDays(4),
