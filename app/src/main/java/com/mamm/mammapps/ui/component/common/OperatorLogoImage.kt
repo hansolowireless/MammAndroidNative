@@ -18,6 +18,5 @@ fun OperatorLogoImage(
         contentDescription = null,
         fallback = painterResource(R.drawable.logo_masmedia),
         modifier = modifier
-            .size(width = 300.dp, height = 110.dp)
     )
 }
