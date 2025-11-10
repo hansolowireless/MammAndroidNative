@@ -18,46 +18,66 @@ import com.mamm.mammapps.ui.component.icon.Football
 import com.mamm.mammapps.ui.component.icon.Puzzle
 import com.mamm.mammapps.ui.component.icon.WifiSignal
 
-@Composable
-fun GetIconForRoute(route: AppRoute) {
-    val iconModifier = Modifier.size(24.dp)
-    when (route) {
-        AppRoute.HOME -> Icon(Icons.Default.Home, contentDescription = null, modifier = iconModifier)
-        AppRoute.EPG -> Icon(BulletedList, contentDescription = null, modifier = iconModifier)
-        AppRoute.CHANNELS -> Icon(painterResource(id = R.drawable.menu_remoteicon), contentDescription = null, modifier = iconModifier)
-        AppRoute.MOVIES -> Icon(painterResource(id = R.drawable.menu_cinemaicon2), contentDescription = null, modifier = iconModifier)
-        AppRoute.DOCUMENTARIES -> Icon(painterResource(id = R.drawable.menu_documentariesicon), contentDescription = null, modifier = iconModifier)
-        AppRoute.SERIES -> Icon(painterResource(id = R.drawable.menu_serieslogoicon), contentDescription = null, modifier = iconModifier)
-        AppRoute.WARNER -> Icon(painterResource(id = R.drawable.menu_wblogoicon), contentDescription = null, modifier = iconModifier)
-        AppRoute.ACONTRA -> Icon(painterResource(id = R.drawable.menu_acontralogoicon), contentDescription = null, modifier = iconModifier)
-        AppRoute.AMC -> Icon(painterResource(id = R.drawable.menu_amclogoicon), contentDescription = null, modifier = iconModifier)
-        AppRoute.SPORTS -> Icon(painterResource(id = R.drawable.menu_iconfootball), contentDescription = null, modifier = iconModifier)
-        AppRoute.ADULTS -> Icon(Fire, contentDescription = null, modifier = iconModifier)
-        AppRoute.KIDS -> Icon(Puzzle, contentDescription = null, modifier = iconModifier)
-        AppRoute.SEARCH -> Icon(Icons.Default.Search, contentDescription = null, modifier = iconModifier)
-        AppRoute.DIAGNOSTICS -> Icon(WifiSignal, contentDescription = null, modifier = iconModifier)
-        AppRoute.LOGOUT -> Icon(Icons.Default.Person, contentDescription = null, modifier = iconModifier) // Puedes usar un icono de logout
-        else -> {} // Para otras rutas como Login, etc.
-    }
-}
 
- fun getTitleForRoute(route: String): Int {
-    return when (route) {
-        AppRoute.HOME.route -> R.string.nav_home
-        AppRoute.EPG.route -> R.string.nav_epg
-        AppRoute.CHANNELS.route -> R.string.nav_channels
-        AppRoute.MOVIES.route -> R.string.nav_movies
-        AppRoute.DOCUMENTARIES.route -> R.string.nav_documentaries
-        AppRoute.SERIES.route -> R.string.nav_series
-        AppRoute.WARNER.route -> R.string.nav_warner
-        AppRoute.ACONTRA.route -> R.string.nav_acontra
-        AppRoute.AMC.route -> R.string.nav_amc
-        AppRoute.SPORTS.route -> R.string.nav_sports
-        AppRoute.ADULTS.route -> R.string.nav_adults
-        AppRoute.KIDS.route -> R.string.nav_kids
-        AppRoute.SEARCH.route -> R.string.nav_search
-        AppRoute.DIAGNOSTICS.route -> R.string.nav_diagnostics
-        AppRoute.LOGOUT.route -> R.string.nav_change_user
-        else -> R.string.app_name // Un título por defecto
+object MenuItems {
+    @Composable
+    fun GetIconForRoute(route: AppRoute) {
+        val iconModifier = Modifier.size(24.dp)
+        when (route) {
+            AppRoute.HOME -> Icon(Icons.Default.Home, contentDescription = null, modifier = iconModifier)
+            AppRoute.EPG -> Icon(BulletedList, contentDescription = null, modifier = iconModifier)
+            AppRoute.CHANNELS -> Icon(painterResource(id = R.drawable.menu_remoteicon), contentDescription = null, modifier = iconModifier)
+            AppRoute.MOVIES -> Icon(painterResource(id = R.drawable.menu_cinemaicon2), contentDescription = null, modifier = iconModifier)
+            AppRoute.DOCUMENTARIES -> Icon(painterResource(id = R.drawable.menu_documentariesicon), contentDescription = null, modifier = iconModifier)
+            AppRoute.SERIES -> Icon(painterResource(id = R.drawable.menu_serieslogoicon), contentDescription = null, modifier = iconModifier)
+            AppRoute.WARNER -> Icon(painterResource(id = R.drawable.menu_wblogoicon), contentDescription = null, modifier = iconModifier)
+            AppRoute.ACONTRA -> Icon(painterResource(id = R.drawable.menu_acontralogoicon), contentDescription = null, modifier = iconModifier)
+            AppRoute.AMC -> Icon(painterResource(id = R.drawable.menu_amclogoicon), contentDescription = null, modifier = iconModifier)
+            AppRoute.SPORTS -> Icon(painterResource(id = R.drawable.menu_iconfootball), contentDescription = null, modifier = iconModifier)
+            AppRoute.ADULTS -> Icon(Fire, contentDescription = null, modifier = iconModifier)
+            AppRoute.KIDS -> Icon(Puzzle, contentDescription = null, modifier = iconModifier)
+            AppRoute.SEARCH -> Icon(Icons.Default.Search, contentDescription = null, modifier = iconModifier)
+            AppRoute.DIAGNOSTICS -> Icon(WifiSignal, contentDescription = null, modifier = iconModifier)
+            AppRoute.LOGOUT -> Icon(Icons.Default.Person, contentDescription = null, modifier = iconModifier) // Puedes usar un icono de logout
+            else -> {} // Para otras rutas como Login, etc.
+        }
     }
+
+    fun getTitleForRoute(route: String): Int {
+        return when (route) {
+            AppRoute.HOME.route -> R.string.nav_home
+            AppRoute.EPG.route -> R.string.nav_epg
+            AppRoute.CHANNELS.route -> R.string.nav_channels
+            AppRoute.MOVIES.route -> R.string.nav_movies
+            AppRoute.DOCUMENTARIES.route -> R.string.nav_documentaries
+            AppRoute.SERIES.route -> R.string.nav_series
+            AppRoute.WARNER.route -> R.string.nav_warner
+            AppRoute.ACONTRA.route -> R.string.nav_acontra
+            AppRoute.AMC.route -> R.string.nav_amc
+            AppRoute.SPORTS.route -> R.string.nav_sports
+            AppRoute.ADULTS.route -> R.string.nav_adults
+            AppRoute.KIDS.route -> R.string.nav_kids
+            AppRoute.SEARCH.route -> R.string.nav_search
+            AppRoute.DIAGNOSTICS.route -> R.string.nav_diagnostics
+            AppRoute.LOGOUT.route -> R.string.nav_change_user
+            else -> R.string.app_name
+        }
+    }
+
+    val list = listOf(
+        AppRoute.HOME,
+        AppRoute.EPG,
+        AppRoute.CHANNELS,
+        AppRoute.MOVIES,
+        AppRoute.DOCUMENTARIES,
+        AppRoute.SPORTS,
+        AppRoute.KIDS,
+        AppRoute.SERIES,
+        AppRoute.WARNER,
+        AppRoute.ACONTRA,
+        AppRoute.AMC,
+        AppRoute.ADULTS,
+        AppRoute.SEARCH,
+        AppRoute.LOGOUT
+    )
 }

@@ -1,5 +1,6 @@
 package com.mamm.mammapps.navigation
 
+import android.view.Menu
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -43,32 +44,17 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun TVNavigationLayout(navController: NavHostController) {
+fun TVNavigationLayout(
+    navController: NavHostController
+) {
 
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
-    val menuItems = listOf(
-        AppRoute.HOME,
-        AppRoute.EPG,
-        AppRoute.CHANNELS,
-        AppRoute.MOVIES,
-        AppRoute.DOCUMENTARIES,
-        AppRoute.SPORTS,
-        AppRoute.KIDS,
-        AppRoute.SERIES,
-        AppRoute.WARNER,
-        AppRoute.ACONTRA,
-        AppRoute.AMC,
-        AppRoute.ADULTS,
-        AppRoute.SEARCH,
-        AppRoute.LOGOUT
-    )
-
-    val showNavigationRail = currentRoute in menuItems.map { it.route }
-
+    val menuItems = MenuItems.list
+    val routeList = menuItems.map { it.route }
+    val showNavigationRail = currentRoute in routeList
     var isNavRailFocused by remember { mutableStateOf(false) }
     var isInitialFocusSet by remember { mutableStateOf(false) }
-
     var canFocusAfterRecompose by remember { mutableStateOf(false) }
 
     val railWidth by animateDpAsState(
@@ -80,9 +66,11 @@ fun TVNavigationLayout(navController: NavHostController) {
     val lazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
-    val focusRequesters = remember { menuItems.map { it.route }.associateWith { FocusRequester() } }
-    val bringIntoViewRequesters =
-        remember { menuItems.map { it.route }.associateWith { BringIntoViewRequester() } }
+    val focusRequesters = remember {
+        routeList
+        .associateWith { FocusRequester() }
+    }
+    val bringIntoViewRequesters = remember { routeList.associateWith { BringIntoViewRequester() } }
     val itemPositions = remember { mutableMapOf<String, Float>() }
 
     LaunchedEffect (currentRoute) {
@@ -108,10 +96,10 @@ fun TVNavigationLayout(navController: NavHostController) {
             // El menú PIERDE foco. Reseteamos.
             isInitialFocusSet = false
             if (currentRoute != null) {
-                // 1. Encuentra el ÍNDICE del item actual en tu lista de menú
+                // Encuentra el ÍNDICE del item actual en tu lista de menú
                 val itemIndex = menuItems.indexOfFirst { it.route == currentRoute }
 
-                // 2. Si se encuentra el índice, haz scroll a ese item
+                // Si se encuentra el índice, haz scroll a ese item
                 if (itemIndex != -1) {
                     coroutineScope.launch {
                         // 3. Usa el método del LazyListState para hacer scroll
@@ -155,8 +143,8 @@ fun TVNavigationLayout(navController: NavHostController) {
 
                             CustomTVNavigationItem(
                                 modifier = itemModifier,
-                                icon = { GetIconForRoute(route = item) },
-                                label = stringResource(id = getTitleForRoute(route = item.route)),
+                                icon = { MenuItems.GetIconForRoute(route = item) },
+                                label = stringResource(id = MenuItems.getTitleForRoute(route = item.route)),
                                 parentIsFocused = isNavRailFocused,
                                 selected = currentRoute == item.route,
                                 onClick = { navController.navigate(item.route) }

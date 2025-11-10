@@ -37,15 +37,8 @@ fun MobileNavigationLayout(navController: NavHostController) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    // La misma lista de secciones que en TV
-    val sectionsWithMenu = listOf(
-        AppRoute.HOME.route, AppRoute.EPG.route, AppRoute.CHANNELS.route,
-        AppRoute.MOVIES.route, AppRoute.DOCUMENTARIES.route, AppRoute.KIDS.route,
-        AppRoute.SERIES.route, AppRoute.SPORTS.route, AppRoute.WARNER.route,
-        AppRoute.ACONTRA.route, AppRoute.AMC.route, AppRoute.SEARCH.route,
-        AppRoute.DIAGNOSTICS.route, AppRoute.LASTSEVENDAYS.route, AppRoute.ADULTS.route
-    )
-    val showNavigationDrawer = currentRoute in sectionsWithMenu
+    val menuItems = MenuItems.list
+    val showNavigationDrawer = currentRoute in menuItems.map { it.route }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -54,29 +47,11 @@ fun MobileNavigationLayout(navController: NavHostController) {
         drawerContent = {
             ModalDrawerSheet {
                 Spacer(modifier = Modifier.padding(12.dp))
-
-                val menuItems = listOf(
-                    AppRoute.HOME,
-                    AppRoute.EPG,
-                    AppRoute.CHANNELS,
-                    AppRoute.MOVIES,
-                    AppRoute.DOCUMENTARIES,
-                    AppRoute.SPORTS,
-                    AppRoute.KIDS,
-                    AppRoute.SERIES,
-                    AppRoute.WARNER,
-                    AppRoute.ACONTRA,
-                    AppRoute.AMC,
-                    AppRoute.ADULTS,
-                    AppRoute.SEARCH,
-                    AppRoute.LOGOUT
-                )
-
                 LazyColumn {
                     items(menuItems) { item ->
                         NavigationDrawerItem(
-                            icon = { GetIconForRoute(route = item) },
-                            label = { Text(stringResource(id = getTitleForRoute(route = item.route))) },
+                            icon = { MenuItems.GetIconForRoute(route = item) },
+                            label = { Text(stringResource(id = MenuItems.getTitleForRoute(route = item.route))) },
                             selected = currentRoute == item.route,
                             onClick = {
                                 scope.launch { drawerState.close() }
@@ -91,11 +66,10 @@ fun MobileNavigationLayout(navController: NavHostController) {
     ) {
         Scaffold(
             topBar = {
-                // Solo mostramos la TopAppBar (y el menú hamburguesa) si el cajón debe mostrarse
                 if (showNavigationDrawer) {
                     TopAppBar(
                         title = {
-                            Text(text = currentRoute?.let { stringResource(getTitleForRoute(it)) }
+                            Text(text = currentRoute?.let { stringResource(MenuItems.getTitleForRoute(it)) }
                                 ?: "")
                         },
                         navigationIcon = {
