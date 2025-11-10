@@ -6,7 +6,7 @@ import javax.inject.Singleton
 
 @Singleton
 class SessionManager @Inject constructor(
-    private val sessionStorage: SessionStorage // 1. Inyecta el nuevo Storage
+    private val sessionStorage: SessionStorage
 ) {
 
     // Datos que vienen directamente de la API
@@ -34,7 +34,6 @@ class SessionManager @Inject constructor(
         processLoginData(data)
     }
 
-    // 4. Tu función 'assignLoginData' se convierte en el procesador interno
     private fun processLoginData(data: LoginData) {
         loginData = data
 

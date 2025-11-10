@@ -18,10 +18,11 @@ class LoginUseCase @Inject constructor(
     suspend operator fun invoke(username: String, password: String): Result<Unit> {
 
         if (Config.shouldUseDynamicUrls) {
-            repository.checkLocator(username).onSuccess { locatorResponse ->
-                logger.debug(TAG, "invoke Received locator response: $locatorResponse")
-                Config.updateDynamicUrls(locatorResponse)
-            }
+            repository.checkLocator(username)
+                .onSuccess { locatorResponse ->
+                    logger.debug(TAG, "invoke Received locator response: $locatorResponse")
+                    Config.updateDynamicUrls(locatorResponse)
+                }
         }
 
         return repository.login(username, password).fold(

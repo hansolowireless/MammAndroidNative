@@ -41,6 +41,7 @@ fun ChannelsScreen(
     val liveEvent by viewModel.liveEventInfo.collectAsStateWithLifecycle()
     val channels by viewModel.filteredChannels.collectAsStateWithLifecycle()
     val channelGenres by viewModel.channelGenres.collectAsStateWithLifecycle()
+
     val selectedGenres by viewModel.selectedGenres.collectAsStateWithLifecycle()
     val clickedContent by viewModel.clickedContent.collectAsStateWithLifecycle()
     val hasNavigated = remember { mutableStateOf(false) }
