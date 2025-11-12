@@ -262,22 +262,22 @@ class MammRepositoryImpl @Inject constructor(
     }
 
     override fun shouldRequestPin(): Boolean {
-        // 1. Obtener la última fecha guardada desde el LocalDataSource.
+        // Obtener la última fecha guardada desde el LocalDataSource.
         val lastPinTime: ZonedDateTime? = localDataSource.getLastTimePinWasCorrect()
 
-        // 2. Si nunca se ha guardado una fecha (es nulo), debemos solicitar el PIN.
+        // Si nunca se ha guardado una fecha (es nulo), debemos solicitar el PIN.
         if (lastPinTime == null) {
             logger.debug(TAG, "No ZonedDateTime found, PIN request is needed.")
             return true
         }
 
-        // 3. Obtener la hora actual con la misma zona horaria.
+        // Obtener la hora actual con la misma zona horaria.
         val currentTime = ZonedDateTime.now(lastPinTime.zone)
 
-        // 4. Calcular la duración entre la fecha guardada y la actual.
+        // Calcular la duración entre la fecha guardada y la actual.
         val duration = Duration.between(lastPinTime, currentTime)
 
-        // 5. Comparar la duración con 15 minutos.
+        // Comparar la duración con 15 minutos.
         val shouldRequest = duration.toMinutes() > AppConstants.PIN_REQUEST_MINS
 
         if (shouldRequest) {
