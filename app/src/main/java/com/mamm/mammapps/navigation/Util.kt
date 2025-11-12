@@ -80,4 +80,9 @@ object MenuItems {
         AppRoute.SEARCH,
         AppRoute.LOGOUT
     )
+
+    val listNoBrandedContent = list.filter {
+        it != AppRoute.WARNER
+                && it != AppRoute.AMC
+                && it != AppRoute.ACONTRA }
 }

@@ -34,10 +34,13 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.mamm.mammapps.navigation.model.AppRoute
+import com.mamm.mammapps.navigation.viewModel.NavigationViewModel
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
 import com.mamm.mammapps.ui.component.navigation.CustomTVNavigationItem
 import kotlinx.coroutines.delay
@@ -45,12 +48,13 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun TVNavigationLayout(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: NavigationViewModel = hiltViewModel()
 ) {
 
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+    val menuItems by viewModel.menuItems.collectAsStateWithLifecycle()
 
-    val menuItems = MenuItems.list
     val routeList = menuItems.map { it.route }
     val showNavigationRail = currentRoute in routeList
     var isNavRailFocused by remember { mutableStateOf(false) }
@@ -66,12 +70,14 @@ fun TVNavigationLayout(
     val lazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
-    val focusRequesters = remember {
-        routeList
-        .associateWith { FocusRequester() }
-    }
+    val focusRequesters = remember { routeList.associateWith { FocusRequester() } }
     val bringIntoViewRequesters = remember { routeList.associateWith { BringIntoViewRequester() } }
     val itemPositions = remember { mutableMapOf<String, Float>() }
+
+    LaunchedEffect (currentRoute) {
+        if (currentRoute == AppRoute.HOME.route)
+            viewModel.setMenuItems()
+    }
 
     LaunchedEffect (currentRoute) {
         delay(3000)

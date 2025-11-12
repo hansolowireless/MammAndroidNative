@@ -22,6 +22,11 @@ class LoginUseCase @Inject constructor(
                 .onSuccess { locatorResponse ->
                     logger.debug(TAG, "invoke Received locator response: $locatorResponse")
                     Config.updateDynamicUrls(locatorResponse)
+                    repository.setShowBrandedContentMenus(false)
+                }
+                .onFailure {
+                    Config.resetDynamicUrls()
+                    repository.setShowBrandedContentMenus(true)
                 }
         }
 

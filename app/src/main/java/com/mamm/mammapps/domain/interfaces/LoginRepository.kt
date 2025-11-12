@@ -9,5 +9,7 @@ interface LoginRepository {
     fun getOperatorLogoUrl() : Result<String>
     suspend fun saveUserCredentials(username: String, password: String) : Result<Unit>
     suspend fun getUserCredentials(): Result<Pair<String?, String?>>
+    fun setShowBrandedContentMenus(show: Boolean)
+    fun getShowBrandedContentMenus(): Result<Boolean>
     fun logout() : Result<Unit>
 }

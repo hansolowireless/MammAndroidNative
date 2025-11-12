@@ -1,9 +1,13 @@
 package com.mamm.mammapps.data.config
 
 import com.mamm.mammapps.BuildConfig
+import com.mamm.mammapps.data.logger.SimpleLogger
 import com.mamm.mammapps.data.model.login.LocatorResponse
 
 object Config {
+
+    const val TAG = "Config"
+    private val logger = SimpleLogger()
 
     // variables que se pueden actualizar en caliente (solo se usan si DYNAMIC_URLS = true)
     private var dynamicBaseUrl: String? = null
@@ -66,9 +70,18 @@ object Config {
     fun updateDynamicUrls(
         locatorResponse: LocatorResponse
     ) {
+        logger.debug(TAG, "updateDynamicUrls Updated dynamic URLs")
         dynamicBaseUrl = locatorResponse.data.endpointStatic ?: dynamicBaseUrl
         dynamicIdmUrl = locatorResponse.data.endpointIdm ?: dynamicIdmUrl
         dynamicSearchUrl = locatorResponse.data.endpointSearch ?: dynamicSearchUrl
         dynamicPasswordRecUrl = locatorResponse.data.endpointManager ?: dynamicPasswordRecUrl
+    }
+
+    fun resetDynamicUrls () {
+        logger.debug(TAG, "resetDynamicUrls Setting dynamic URLs to null")
+        dynamicBaseUrl = null
+        dynamicIdmUrl = null
+        dynamicSearchUrl = null
+        dynamicPasswordRecUrl = null
     }
 }

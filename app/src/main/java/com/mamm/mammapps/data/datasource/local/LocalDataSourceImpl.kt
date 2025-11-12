@@ -28,12 +28,20 @@ class LocalDataSourceImpl @Inject constructor(
         securePreferencesManager.saveCredentials(username, password)
     }
 
+    override fun setShowBrandedContentMenus(show: Boolean) {
+        cache.setShowBrandedContentMenus(show)
+    }
+
     override fun setLastTimePinWasCorrect(lastTimePinWasCorrect: ZonedDateTime) {
         cache.setLastTimePinWasCorrect(lastTimePinWasCorrect)
     }
 
     override suspend fun getUserCredentials(): Pair<String?, String?> {
         return securePreferencesManager.getCredentials()
+    }
+
+    override fun getShowBrandedContentMenus(): Boolean? {
+        return cache.getShowBrandedContentMenus()
     }
 
     override fun getLastTimePinWasCorrect(): ZonedDateTime? {

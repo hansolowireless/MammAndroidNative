@@ -10,6 +10,8 @@ import java.time.ZonedDateTime
 
 interface Cache {
 
+    fun setShowBrandedContentMenus(show: Boolean)
+
     fun setHomeContent(homeContent: GetHomeContentResponse)
     fun setMoviesContent(moviesContent: GetOtherContentResponse)
     fun setDocumentariesContent(documentariesContent: GetOtherContentResponse)
@@ -20,6 +22,7 @@ interface Cache {
     fun setAcontraContent(acontraContent: GetBrandedContentResponse)
     fun setAMCContent(amcContent: GetBrandedContentResponse)
 
+    fun getShowBrandedContentMenus () : Boolean?
     fun getHomeContent(): GetHomeContentResponse?
     fun getMoviesContent(): GetOtherContentResponse?
     fun getDocumentariesContent(): GetOtherContentResponse?
@@ -29,6 +32,7 @@ interface Cache {
     fun getWarnerContent(): GetBrandedContentResponse?
     fun getAcontraContent(): GetBrandedContentResponse?
     fun getAMCContent(): GetBrandedContentResponse?
+
     fun setBookmarks(bookmarks: List<Bookmark>)
     fun setMostWatched(mostWatched: List<MostWatchedContent>)
     fun setRecommended(recommended: GetRecommendedResponse)

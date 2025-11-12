@@ -14,6 +14,9 @@ import javax.inject.Singleton
 class CacheImpl @Inject constructor() : Cache {
 
     @Volatile
+    private var showBrandedContentMenus: Boolean? = null
+
+    @Volatile
     private var cachedHomeContent: GetHomeContentResponse? = null
 
     @Volatile
@@ -51,6 +54,10 @@ class CacheImpl @Inject constructor() : Cache {
 
     @Volatile
     private var cachedLastTimePinWasCorrect: ZonedDateTime? = null
+
+    override fun setShowBrandedContentMenus(show: Boolean) {
+        showBrandedContentMenus = show
+    }
 
     override fun setHomeContent(homeContent: GetHomeContentResponse) {
         cachedHomeContent = homeContent
@@ -104,6 +111,7 @@ class CacheImpl @Inject constructor() : Cache {
         cachedLastTimePinWasCorrect = lastTimePinWasCorrect
     }
 
+    override fun getShowBrandedContentMenus(): Boolean? = showBrandedContentMenus
 
     override fun getHomeContent(): GetHomeContentResponse? = cachedHomeContent
 
@@ -145,6 +153,7 @@ class CacheImpl @Inject constructor() : Cache {
         cachedMostWatched = null
         cachedRecommended = null
         cachedLastTimePinWasCorrect = null
+        showBrandedContentMenus = null
     }
 
 }

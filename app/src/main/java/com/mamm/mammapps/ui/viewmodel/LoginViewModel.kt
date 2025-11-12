@@ -3,6 +3,7 @@ package com.mamm.mammapps.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.usecases.login.AutoLoginUseCase
 import com.mamm.mammapps.domain.usecases.login.LoginUseCase
 import com.mamm.mammapps.ui.model.uistate.UIState
@@ -17,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
-    private val autologinUseCase: AutoLoginUseCase
+    private val autologinUseCase: AutoLoginUseCase,
+    private val logger: Logger
 ) : ViewModel() {
 
     companion object {
@@ -34,7 +36,7 @@ class LoginViewModel @Inject constructor(
 
             result.fold(
                 onSuccess = { data ->
-                    Log.d(TAG, "Autologin successful")
+                    logger.debug(TAG, "Autologin successful")
                     _loginState.update { UIState.Success(data) }
                 },
                 onFailure = {
@@ -51,11 +53,11 @@ class LoginViewModel @Inject constructor(
 
             result.fold(
                 onSuccess = { data ->
-                    Log.d(TAG, "Login successful")
+                    logger.debug(TAG, "Login successful")
                     _loginState.update { UIState.Success(data) }
                 },
                 onFailure = { error ->
-                    Log.e(TAG, "Login failed", error)
+                    logger.error(TAG, "Login failed $error")
                     _loginState.update { UIState.Error(throwable = error) }
                 }
             )

@@ -21,19 +21,19 @@ class AutoLoginUseCase @Inject constructor(
         return repository.getUserCredentials().fold(
             onSuccess = { (username, password) ->
                 if (username != null && password != null) {
-                    logger.debug(
-                        TAG,
-                        "autologinUseCase Found valid credentials, attempting auto-login..."
-                    )
+                    logger.debug(TAG, "autologinUseCase Found valid credentials, attempting auto-login...")
 
                     if (Config.shouldUseDynamicUrls) {
                         repository.checkLocator(username)
                             .onSuccess { locatorResponse ->
-                                logger.debug(
-                                    LoginUseCase.TAG,
-                                    "invoke Received locator response: $locatorResponse"
-                                )
+                                logger.debug(TAG, "invoke Received locator response: $locatorResponse")
                                 Config.updateDynamicUrls(locatorResponse)
+                                repository.setShowBrandedContentMenus(false)
+                            }
+                            .onFailure {
+                                logger.error(TAG, "invoke Locator failed: $it")
+                                Config.resetDynamicUrls()
+                                repository.setShowBrandedContentMenus(true)
                             }
                     }
 
@@ -45,10 +45,7 @@ class AutoLoginUseCase @Inject constructor(
                             Result.success(Unit)
                         },
                         onFailure = { exception ->
-                            logger.debug(
-                                TAG,
-                                "autologinUseCase Auto-login failed: ${exception.message}"
-                            )
+                            logger.debug(TAG, "autologinUseCase Auto-login failed: ${exception.message}")
                             Result.failure(exception)
                         }
                     )
@@ -58,10 +55,7 @@ class AutoLoginUseCase @Inject constructor(
                 }
             },
             onFailure = { exception ->
-                logger.debug(
-                    TAG,
-                    "autologinUseCase No valid stored credentials: ${exception.message}"
-                )
+                logger.debug(TAG, "autologinUseCase No valid stored credentials: ${exception.message}")
                 Result.failure(exception)
             }
         )

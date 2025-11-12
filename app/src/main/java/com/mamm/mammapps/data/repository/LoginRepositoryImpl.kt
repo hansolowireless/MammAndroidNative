@@ -36,6 +36,16 @@ class LoginRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun setShowBrandedContentMenus(show: Boolean) {
+        localDataSource.setShowBrandedContentMenus(show)
+    }
+
+    override fun getShowBrandedContentMenus(): Result<Boolean> {
+        return runCatching {
+            localDataSource.getShowBrandedContentMenus() ?: throw IllegalStateException("Show branded content menus is null")
+        }
+    }
+
     override fun getOperatorLogoUrl() : Result<String> {
         return runCatching {
             remoteDatasource.getOperatorLogoUrl() ?: throw IllegalStateException("Operator logo URL is null")
@@ -52,6 +62,7 @@ class LoginRepositoryImpl @Inject constructor(
             username to password
         }
     }
+
 
     override fun logout() : Result<Unit> {
         return runCatching {
