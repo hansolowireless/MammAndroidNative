@@ -8,7 +8,6 @@ import javax.inject.Singleton
 class SessionManager @Inject constructor(
     private val sessionStorage: SessionStorage
 ) {
-
     // Datos que vienen directamente de la API
     var loginData: LoginData? = null
         private set
@@ -20,11 +19,17 @@ class SessionManager @Inject constructor(
     var channelOrder: MutableMap<Int, Int> = mutableMapOf()
     var jsonFile: String? = null
 
-    // 2. Bloque de inicialización para restaurar la sesión
+    // Propiedades de conveniencia (no cambian)
+    val token: String? get() = loginData?.token
+    val userId: String? get() = loginData?.userId?.toString()
+    val jwToken: String? get() = loginData?.jwtoken
+    val pinParental: String? get() = loginData?.pinparental
+    val operatorLogoUrl : String? get() = skinImages[5002] ?: skinImages[1502]
+
+    // Bloque de inicialización para restaurar la sesión
     init {
         val restoredData = sessionStorage.getLoginData()
         if (restoredData != null) {
-            // Si encontramos datos guardados, los cargamos en memoria
             processLoginData(restoredData)
         }
     }
@@ -76,10 +81,4 @@ class SessionManager @Inject constructor(
         jsonFile = null
     }
 
-    // Propiedades de conveniencia (no cambian)
-    val token: String? get() = loginData?.token
-    val userId: String? get() = loginData?.userId?.toString()
-    val jwToken: String? get() = loginData?.jwtoken
-    val pinParental: String? get() = loginData?.pinparental
-    val operatorLogoUrl : String? get() = skinImages[5002] ?: skinImages[1502]
 }
