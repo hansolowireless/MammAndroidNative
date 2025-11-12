@@ -91,18 +91,4 @@ class SecurePreferencesManager @Inject constructor(
         }
     }
 
-    // Método para debug: ver todas las claves almacenadas
-    fun debugAllStoredData() {
-        try {
-            val allEntries = sharedPrefs.all
-            logger.info(TAG, "=== SharedPreferences Debug ===")
-            logger.info(TAG, "Total entries: ${allEntries.size}")
-            allEntries.forEach { (key, value) ->
-                logger.info(TAG, "Key: '$key' -> Value: '$value' (${value?.javaClass?.simpleName})")
-            }
-            logger.info(TAG, "=== End Debug ===")
-        } catch (e: Exception) {
-            logger.error(TAG, "Failed to debug stored data: ${e.message}")
-        }
-    }
 }
