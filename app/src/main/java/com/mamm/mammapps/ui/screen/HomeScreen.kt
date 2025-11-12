@@ -31,12 +31,14 @@ import com.mamm.mammapps.ui.component.home.HomeGridTop
 import com.mamm.mammapps.ui.component.home.OperatorLogoBottomRight
 import com.mamm.mammapps.ui.mapper.toContentToPlayUI
 import com.mamm.mammapps.ui.mapper.toResId
+import com.mamm.mammapps.ui.mapper.toResponseBodyMessage
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.uistate.CastState
 import com.mamm.mammapps.ui.model.uistate.HomeContentUIState
 import com.mamm.mammapps.ui.viewmodel.CastViewModel
 import com.mamm.mammapps.ui.viewmodel.HomeViewModel
+import retrofit2.HttpException
 
 @Composable
 fun HomeScreen(
@@ -168,9 +170,11 @@ fun HomeScreen(
                 }
             }
 
-            OperatorLogoBottomRight(
-                logoUrl = operatorLogo
-            )
+            if (LocalIsTV.current) {
+                OperatorLogoBottomRight(
+                    logoUrl = operatorLogo
+                )
+            }
         }
 
         is HomeContentUIState.Error -> {
@@ -181,7 +185,7 @@ fun HomeScreen(
                 else -> {
                     Box(modifier = Modifier.fillMaxSize()) {
                         Text(
-                            text = stringResource(homeContentState.throwable.toResId()),
+                            text = (homeContentState.throwable as? HttpException).toResponseBodyMessage(),
                             modifier = Modifier.align(Alignment.Center)
                         )
                     }
