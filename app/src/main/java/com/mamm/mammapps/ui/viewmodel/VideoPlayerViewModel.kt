@@ -319,8 +319,9 @@ class VideoPlayerViewModel @Inject constructor(
         qosJob = viewModelScope.launch {
             while (true) {
                 delay(60000)
-                logger.debug(TAG, "startQoSReporting Sending qos data...")
+                //logger.debug(TAG, "startQoSReporting Sending qos data...")
                 val qosData = createQosData()
+                logger.debug(TAG, "startQoSReporting qosData: $qosData")
                 withContext(Dispatchers.IO) {
                     sendQoSUseCase(qosData)
                 }
@@ -376,7 +377,6 @@ class VideoPlayerViewModel @Inject constructor(
         when (exception.errorCode) {
             PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW -> {
                 logger.error(TAG, "handlePlayerError - ERROR_CODE_BEHIND_LIVE_WINDOW")
-                // Re-initialize player at the live edge.
                 _player.value?.seekToDefaultPosition()
                 _player.value?.prepare()
             }
