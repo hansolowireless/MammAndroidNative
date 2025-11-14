@@ -40,6 +40,7 @@ import com.mamm.mammapps.domain.usecases.player.SendTickerQosUseCase
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
 import com.mamm.mammapps.ui.constant.PlayerConstant
+import com.mamm.mammapps.ui.extension.bitsToMegabits
 import com.mamm.mammapps.ui.extension.setHourText
 import com.mamm.mammapps.ui.extension.toDate
 import com.mamm.mammapps.ui.mapper.toContentEntityUI
@@ -340,7 +341,7 @@ class VideoPlayerViewModel @Inject constructor(
     private fun createQosData(): QosData {
         val player = _player.value
         return QosData(
-            playerBw = statsListener.playbackStats?.meanBandwidth?.toString() ?: "0",
+            playerBw = statsListener.playbackStats?.meanBandwidth?.bitsToMegabits().toString(),
             activeTrack = player?.videoFormat?.height?.toString() ?: "0",
             videoBw = player?.videoFormat?.bitrate?.toString() ?: "0",
             bufTime = statsListener.playbackStats?.rebufferRate?.toString() ?: "0",

@@ -258,3 +258,7 @@ fun ContentToPlayUI.toMediaMetadata(): MediaMetadata {
             }
         }
 }
+
+fun Int?.bitsToMegabits(): Double {
+    return (this?.toDouble() ?: 0.0) / 1_000_000.0
+}
