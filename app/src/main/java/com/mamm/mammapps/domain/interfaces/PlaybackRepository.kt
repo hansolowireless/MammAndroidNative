@@ -17,6 +17,8 @@ interface PlaybackRepository {
 
     suspend fun getTickers () : Result<GetTickersResponse>
 
+    suspend fun getTickerQoSData() : Result<QosData>
+
     suspend fun sendHeartBeat () : Result<Unit>
 
     suspend fun sendQosData (qosData: QosData) : Result<Unit>

@@ -141,6 +141,22 @@ class PlaybackRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getTickerQoSData(): Result<QosData> {
+        return runCatching {
+            QosData(
+                playerBw = "0",
+                activeTrack = "0",
+                videoBw = "0",
+                bufTime = "0",
+                loadLatency = "0",
+                playTime = "0.0",
+                primaryNode = "",
+                id = "0",
+                type = "ticker",
+                ip = remoteDatasource.getCurrentUserIp()
+            )
+        }
+    }
 
     override suspend fun sendHeartBeat(): Result<Unit> {
         return runCatching {

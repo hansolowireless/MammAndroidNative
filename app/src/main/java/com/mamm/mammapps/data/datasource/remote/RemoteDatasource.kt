@@ -409,7 +409,7 @@ class RemoteDatasource @Inject constructor(
         return try {
             getPublicIp() ?: "127.0.0.1"
         } catch (e: Exception) {
-            "127.0.0.1" // fallback
+            "127.0.0.1"
         }
     }
 

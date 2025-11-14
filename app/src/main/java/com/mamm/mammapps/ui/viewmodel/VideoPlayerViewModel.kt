@@ -36,6 +36,7 @@ import com.mamm.mammapps.domain.usecases.player.GetTickersUseCase
 import com.mamm.mammapps.domain.usecases.player.SendBookmarkUseCase
 import com.mamm.mammapps.domain.usecases.player.SendHeartBeatUseCase
 import com.mamm.mammapps.domain.usecases.player.SendQosUseCase
+import com.mamm.mammapps.domain.usecases.player.SendTickerQosUseCase
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
 import com.mamm.mammapps.ui.constant.PlayerConstant
@@ -76,6 +77,7 @@ class VideoPlayerViewModel @Inject constructor(
     private val getTSTVUrlUseCase: GetTSTVUrlUseCase,
     private val getJwTokenUseCase: GetJwTokenUseCase,
     private val sendQoSUseCase: SendQosUseCase,
+    private val sendTickerQosUseCase: SendTickerQosUseCase,
     private val sendBookmarkUseCase: SendBookmarkUseCase,
     private val sendHeartbeatUseCase: SendHeartBeatUseCase,
     private val getLiveEventInfoUseCase: FindLiveEventOnChannelUseCase,
@@ -326,6 +328,12 @@ class VideoPlayerViewModel @Inject constructor(
                     sendQoSUseCase(qosData)
                 }
             }
+        }
+    }
+
+    fun callQoSTicker () {
+        viewModelScope.launch (Dispatchers.IO) {
+            sendTickerQosUseCase()
         }
     }
 
