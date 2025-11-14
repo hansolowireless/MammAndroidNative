@@ -20,5 +20,9 @@ data class QosData(
     @SerializedName("id")
     val id: String,
     @SerializedName("type")
-    val type: String
+    val type: String,
+    @SerializedName("ip")
+    val ip: String? = null,
+    @SerializedName("ad_id")
+    val adId: String? = null
 )

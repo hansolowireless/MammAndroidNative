@@ -29,7 +29,8 @@ import java.lang.ref.WeakReference
 class VideoResizeManagerWithTicker(
     fragment: Fragment,
     frameLayoutId: Int,
-    private var tickerList: List<Ticker>
+    private var tickerList: List<Ticker>,
+    private val onTickerShown: () -> Unit = {}
 ) : VideoResizeManager(fragment, frameLayoutId), DefaultLifecycleObserver {
     private val fragmentRef = WeakReference(fragment)
     private var currentTickerIndex = 0
@@ -144,6 +145,9 @@ class VideoResizeManagerWithTicker(
                             startTickerAnimation()
                         }
                     }
+
+                    //Callback cada vez que se muestra un Ticker
+                    onTickerShown()
                 }
                 else -> hideTicker()
             }

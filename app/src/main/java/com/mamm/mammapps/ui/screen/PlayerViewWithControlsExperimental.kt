@@ -372,11 +372,12 @@ fun PlayerViewWithControlsExperimental(
                         videoResizeManager = VideoResizeManagerWithTicker(
                             fragment = dummyFragment,
                             frameLayoutId = R.id.root,
-                            tickerList = listOf()
+                            tickerList = listOf(),
+                            onTickerShown = {
+                                viewModel.callQoSTicker()
+                            }
                         )
-
                     }
-
                 }
             )
         }
