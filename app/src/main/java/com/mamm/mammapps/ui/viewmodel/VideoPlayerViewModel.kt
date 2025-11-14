@@ -349,7 +349,7 @@ class VideoPlayerViewModel @Inject constructor(
             playTime = "0.0",
             primaryNode = player?.currentMediaItem?.localConfiguration?.uri?.host ?: "",
             id = _content.value.identifier.id.toString(),
-            type = _content.value.identifier.toString()
+            type = _content.value.identifier.getQoSString()
         )
     }
 

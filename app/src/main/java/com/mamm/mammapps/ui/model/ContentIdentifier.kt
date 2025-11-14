@@ -39,4 +39,13 @@ sealed class ContentIdentifier : Parcelable {
         }
     }
 
+    fun getQoSString () : String {
+        return when (this) {
+            is Channel -> "live"
+            is VoD -> "vod"
+            is Event -> "cutv"
+            is Serie -> "serie"
+        }
+    }
+
 }
