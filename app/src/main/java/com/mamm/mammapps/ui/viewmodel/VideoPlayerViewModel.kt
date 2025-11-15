@@ -281,10 +281,7 @@ class VideoPlayerViewModel @Inject constructor(
             getLiveEventInfoUseCase.observeLiveEvents((_content.value.identifier).getIdValue())
                 .onEach { event ->
                     // Nuevo evento iniciado o terminado
-                    logger.debug(
-                        TAG,
-                        "startObservingLiveEvents Event changed: ${event?.getTitle()}"
-                    )
+                    logger.debug(TAG, "startObservingLiveEvents Event changed: ${event?.getTitle()}")
                     _liveEventInfo.value = event?.toLiveEventInfoUI()
                 }
                 .launchIn(viewModelScope)
