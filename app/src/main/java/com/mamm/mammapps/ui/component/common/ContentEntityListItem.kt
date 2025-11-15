@@ -48,6 +48,7 @@ fun ContentEntityListItem(
     channelInfo: ContentEntityUI? = null,
     showLiveIndicator: Boolean = false,
     showCatchupIndicator: Boolean = false,
+    showDescription: Boolean = false,
     onClick: () -> Unit = {}
 ) {
     var isFocused by remember { mutableStateOf(false) }
@@ -110,7 +111,7 @@ fun ContentEntityListItem(
                 }
             }
         },
-        supportingContent = if (isFocused || showLiveIndicator) {
+        supportingContent = if (isFocused || showLiveIndicator || showDescription) {
             content.detailInfo?.description?.let { description ->
                 if (description.isNotBlank()) {
                     {

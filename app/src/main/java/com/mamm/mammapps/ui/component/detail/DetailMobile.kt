@@ -196,7 +196,8 @@ fun DetailMobile(
                         onClick = {
                             val currentSeason = seasonInfoUIState.data[selectedTabIndex]
                             onClickEpisode(currentSeason.order, episode.identifier.id)
-                        }
+                        },
+                        showDescription = true
                     )
                 }
             }
