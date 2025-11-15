@@ -116,7 +116,8 @@ private fun ContentEntityMobile(
         onClick = onClick,
         modifier = modifier
             .height(contentEntityUI.height)
-            .aspectRatio(contentEntityUI.aspectRatio),
+            .aspectRatio(contentEntityUI.aspectRatio)
+            .then(modifier),
         shape = RoundedCornerShape(Dimensions.cornerRadius),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Black) // Fondo mientras carga la imagen

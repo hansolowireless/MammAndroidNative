@@ -3,7 +3,9 @@ package com.mamm.mammapps.ui.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -75,10 +77,12 @@ fun ExpandCategoryScreen(
                         vertical = Dimensions.paddingSmall
                     ),
                     horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall),
-                    verticalArrangement = Arrangement.spacedBy(Dimensions.paddingXSmall)
+                    verticalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall)
                 ) {
                     items(items = state.data.toContentEntityUIList()) { item ->
                         ContentEntity(
+                            modifier = Modifier
+                                .aspectRatio(item.aspectRatio),
                             contentEntityUI = item,
                             onClick = {
                                 state.data.findContent(item.identifier)?.let {

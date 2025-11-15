@@ -2,6 +2,7 @@ package com.mamm.mammapps.ui.component.channels
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -30,10 +31,11 @@ fun ChannelGridMobile(
         ),
         horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall,
             Alignment.CenterHorizontally),
-        verticalArrangement = Arrangement.spacedBy(1.dp)
+        verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
     ) {
         items(channels) { channel ->
             ContentEntity(
+                modifier = Modifier.aspectRatio(channel.aspectRatio),
                 contentEntityUI = channel,
                 onClick = { onChannelClick(channel) },
                 onFocus = { onChannelFocus(channel) }
