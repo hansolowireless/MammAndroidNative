@@ -49,6 +49,7 @@ fun ContentEntityListItem(
     showLiveIndicator: Boolean = false,
     showCatchupIndicator: Boolean = false,
     showDescription: Boolean = false,
+    orderIndex: Int? = null,
     onClick: () -> Unit = {}
 ) {
     var isFocused by remember { mutableStateOf(false) }
@@ -79,7 +80,7 @@ fun ContentEntityListItem(
             Row {
                 Text(
                     modifier = Modifier.weight(1f),
-                    text = content.title.ifBlank {
+                    text = orderIndex?.let{"$it - "} + content.title.ifBlank {
                         channelInfo?.title?.let { "$it: " } + stringResource(
                             R.string.no_event_info
                         )
