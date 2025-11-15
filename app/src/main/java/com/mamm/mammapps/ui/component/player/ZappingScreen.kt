@@ -98,8 +98,7 @@ fun ZappingScreen(
                             .focusRequester(focusRequesters[index]),
                         channelInfo = zappingInfoItem.channel,
                         content = zappingInfoItem.liveEvent,
-                        showLiveIndicator = false,
-                        showCatchupIndicator = false,
+                        orderIndex = index,
                         onClick = {
                             onChannelClick(zappingInfoItem.channel)
                         }
