@@ -334,7 +334,7 @@ class VideoPlayerViewModel @Inject constructor(
 
     fun callQoSTicker () {
         viewModelScope.launch (Dispatchers.IO) {
-            sendTickerQosUseCase()
+            sendTickerQosUseCase(identifier = _content.value.identifier)
         }
     }
 

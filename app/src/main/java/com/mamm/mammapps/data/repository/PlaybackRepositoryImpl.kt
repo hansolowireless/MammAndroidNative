@@ -141,7 +141,7 @@ class PlaybackRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getTickerQoSData(): Result<QosData> {
+    override suspend fun getTickerQoSData(contentId: Int): Result<QosData> {
         return runCatching {
             QosData(
                 playerBw = "0",
@@ -151,7 +151,7 @@ class PlaybackRepositoryImpl @Inject constructor(
                 loadLatency = "0",
                 playTime = "0.0",
                 primaryNode = "",
-                id = "0",
+                id = contentId.toString(),
                 type = "ticker",
                 ip = remoteDatasource.getCurrentUserIp()
             )

@@ -2,6 +2,7 @@ package com.mamm.mammapps.domain.usecases.player
 
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.interfaces.PlaybackRepository
+import com.mamm.mammapps.ui.model.ContentIdentifier
 import javax.inject.Inject
 
 class SendTickerQosUseCase @Inject constructor(
@@ -13,8 +14,8 @@ class SendTickerQosUseCase @Inject constructor(
         private const val TAG = "SendTickerQosUseCase"
     }
 
-    suspend operator fun invoke() {
-        playbackRepository.getTickerQoSData()
+    suspend operator fun invoke(identifier: ContentIdentifier) {
+        playbackRepository.getTickerQoSData(contentId = identifier.getIdValue())
             .onSuccess {
                 logger.debug(TAG, "ticker qos data $it")
                 playbackRepository.sendQosData(it)
