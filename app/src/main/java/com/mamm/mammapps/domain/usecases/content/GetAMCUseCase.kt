@@ -16,7 +16,7 @@ class GetAMCUseCase @Inject constructor(
     }
 
     suspend operator fun invoke(): Result<List<ContentRowUI>> {
-        return mammRepository.findGenreWithId(1).fold(
+        return mammRepository.findGenreWithId(687).fold(
             onSuccess = { genreResult ->
                 mammRepository.getAMC().fold(
                     onSuccess = { response ->
