@@ -80,7 +80,7 @@ fun ContentEntityListItem(
             Row {
                 Text(
                     modifier = Modifier.weight(1f),
-                    text = orderIndex?.let{"$it - "} + content.title.ifBlank {
+                    text = orderIndex?.let{"$it - "}.orEmpty() + content.title.ifBlank {
                         channelInfo?.title?.let { "$it: " } + stringResource(
                             R.string.no_event_info
                         )
