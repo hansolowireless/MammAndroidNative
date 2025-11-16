@@ -1,4 +1,4 @@
-package com.example.openstream_flutter_rw.data.model.customdatasourcefactory
+package com.mamm.mammapps.data.model.player.customdatasourcefactory
 
 import android.net.Uri
 import com.google.android.exoplayer2.upstream.DataSpec
@@ -27,9 +27,6 @@ class TokenParamDataSourceFactory @Inject constructor (
         private const val MAX_RETRIES = 3  // Máximo de reintentos por expiración
     }
 
-    fun d(mensaje: String) = logger.debug(TAG, mensaje)
-    fun e(mensaje: String) = logger.debug(TAG, mensaje)
-
     private var tokenMode: TokenMode = TokenMode.NONE
     private var rtoken: String = ""
 
@@ -46,18 +43,20 @@ class TokenParamDataSourceFactory @Inject constructor (
                 // Determina el modo una vez (basado en la URI inicial)
                 if (tokenMode == TokenMode.NONE) {
                     if (modifiedUri.toString().contains(RTOKEN)) {
-                        d("createDataSource Canal en modo R TOKEN")
+                        logger.debug(TAG, "createDataSource Canal en modo R TOKEN")
                         tokenMode = TokenMode.RTOKEN
                         rtoken = modifiedUri.getQueryParameter(RTOKEN) ?: ""
                     } else if (modifiedUri.toString().contains(STOKEN)) {
-                        d("createDataSource Canal en modo S TOKEN")
+                        logger.debug(TAG,"createDataSource Canal en modo S TOKEN")
                         tokenMode = TokenMode.STOKEN
                     }
                 }
 
                 while (attempts < MAX_RETRIES) {
                     // Inserta o refresca el token según el modo
-                    if (tokenMode == TokenMode.RTOKEN && rtoken.isNotEmpty() && !modifiedUri.queryParameterNames.contains(RTOKEN)) {
+                    if (tokenMode == TokenMode.RTOKEN && rtoken.isNotEmpty() && !modifiedUri.queryParameterNames.contains(
+                            RTOKEN
+                        )) {
                         modifiedUri = modifiedUri.buildUpon().appendQueryParameter(RTOKEN, rtoken).build()
                     } else if (tokenMode == TokenMode.STOKEN) {
                         runCatching {
@@ -83,7 +82,7 @@ class TokenParamDataSourceFactory @Inject constructor (
                         if (e is HttpDataSource.InvalidResponseCodeException &&
                             (e.responseCode == 401 || e.responseCode == 403)
                         ) {
-                            e("Error de token expirado (${e.responseCode}), reintentando ($attempts/$MAX_RETRIES)")
+                            logger.error(TAG,"Error de token expirado (${e.responseCode}), reintentando ($attempts/$MAX_RETRIES)")
                             attempts++
                             // Para STOKEN, se refrescará en la siguiente iteración
                             // Para RTOKEN, si necesita refresco, agrega lógica aquí (ej. refresca rtoken)
