@@ -111,4 +111,8 @@ class TokenParamDataSourceFactory @Inject constructor (
         baseFactory.setDefaultRequestProperties(defaultRequestProperties)
         return this
     }
+
+    fun resetTokenMode() {
+        tokenMode = TokenMode.NONE
+    }
 }

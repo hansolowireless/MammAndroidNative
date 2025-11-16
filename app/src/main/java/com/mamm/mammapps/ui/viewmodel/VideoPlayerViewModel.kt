@@ -8,7 +8,7 @@ import androidx.appcompat.widget.AppCompatImageButton
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
-import com.example.openstream_flutter_rw.data.model.customdatasourcefactory.TokenParamDataSourceFactory
+import com.mamm.mammapps.data.model.player.customdatasourcefactory.TokenParamDataSourceFactory
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.ExoPlayer
@@ -189,8 +189,6 @@ class VideoPlayerViewModel @Inject constructor(
 
     private fun createPlayer() {
 
-        releasePlayer()
-
         val builder = DefaultTrackSelector(context)
         trackSelector = builder
 
@@ -256,9 +254,10 @@ class VideoPlayerViewModel @Inject constructor(
                     .build()
             ).build()
 
-        val dataSourceFactory = tokenParamDataSourceFactory
+        val dataSourceFactory = tokenParamDataSourceFactory.also { it.resetTokenMode() }
 
-        val mediaSource = DashMediaSource.Factory(dataSourceFactory)
+        val mediaSource = DashMediaSource
+            .Factory(dataSourceFactory)
             .createMediaSource(mediaItem)
 
         player?.setMediaSource(mediaSource)
