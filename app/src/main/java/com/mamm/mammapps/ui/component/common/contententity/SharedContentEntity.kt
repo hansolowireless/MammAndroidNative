@@ -24,7 +24,8 @@ import com.mamm.mammapps.ui.theme.Dimensions
 @Composable
 fun SharedContentEntity(
     contentEntityUI: ContentEntityUI,
-    mostWatchedOrder: Int?
+    mostWatchedOrder: Int?,
+    showText : Boolean = true
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         AsyncImage(
@@ -61,29 +62,31 @@ fun SharedContentEntity(
                     )
             )
 
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(Dimensions.paddingMedium),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = contentEntityUI.title,
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            if (contentEntityUI.detailInfo?.subtitle?.isNotBlank() == true) {
+        if (showText){
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(Dimensions.paddingMedium),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
-                    text = contentEntityUI.detailInfo.subtitle,
-                    style = MaterialTheme.typography.bodySmall,
+                    text = contentEntityUI.title,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = Color.White,
                     textAlign = TextAlign.Center,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+                if (contentEntityUI.detailInfo?.subtitle?.isNotBlank() == true) {
+                    Text(
+                        text = contentEntityUI.detailInfo.subtitle,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
         }
     }
