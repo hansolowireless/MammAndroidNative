@@ -101,7 +101,11 @@ private fun ContentEntityTV(
             containerColor = Color.Transparent
         )
     ) {
-        SharedContentEntity(contentEntityUI, mostWatchedOrder)
+        SharedContentEntity(
+            contentEntityUI = contentEntityUI,
+            mostWatchedOrder = mostWatchedOrder,
+            showText = false
+        )
     }
 }
 
