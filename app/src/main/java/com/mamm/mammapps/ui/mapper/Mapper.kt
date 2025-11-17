@@ -139,6 +139,7 @@ fun HomeFeatured.toContentEntityUI(): ContentEntityUI? {
         imageUrl = imageUrl,
         horizontalImageUrl = logoURL.orEmpty(),
         title = title.orEmpty(),
+        isFeatured = true,
         detailInfo = DetailInfoUI(
             description = description.orEmpty()
         )
@@ -202,6 +203,7 @@ fun BrandedFeatured.toContentEntityUI(): ContentEntityUI? {
         imageUrl = imageUrl,
         horizontalImageUrl = logoUrl.orEmpty(),
         title = title.orEmpty(),
+        isFeatured = true,
         aspectRatio = Ratios.HORIZONTAL,
         height = Dimensions.channelEntityHeight,
         detailInfo = DetailInfoUI(
