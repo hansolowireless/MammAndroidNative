@@ -17,7 +17,10 @@ data class GetBrandedContentResponse(
     val vods: List<BrandedVod>? = null,
 
     @SerializedName("events")
-    val events: List<EPGEvent>? = null
+    val events: List<EPGEvent>? = null,
+
+    @SerializedName("series")
+    val series: List<Serie>? = null
 )
 
 

@@ -2,6 +2,7 @@ package com.mamm.mammapps.domain.usecases.content
 
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.interfaces.MammRepository
+import com.mamm.mammapps.domain.usecases.content.GetAcontraUseCase.Companion
 import com.mamm.mammapps.ui.mapper.insertChannelRow
 import com.mamm.mammapps.ui.mapper.toContentUIRows
 import com.mamm.mammapps.ui.model.ContentRowUI
@@ -17,25 +18,17 @@ class GetAdultsUseCase @Inject constructor(
     }
 
     suspend operator fun invoke(): Result<List<ContentRowUI>> {
-        return mammRepository.findGenreWithId(162).fold(
-            onSuccess = { genreResult ->
-                mammRepository.getAdults().fold(
-                    onSuccess = { response ->
-                        logger.debug(TAG, "GetAdultsUseCase Received successful response")
-
-                        Result.success(response
-                            .toContentUIRows(genreResult, isAdult = true)
-                            .insertChannelRow(response.channels)
-                        )
-                    },
-                    onFailure = { exception ->
-                        logger.error(TAG, "GetAdultsUseCase Failed: ${exception.message}")
-                        Result.failure(exception)
-                    }
+        return mammRepository.getAdults().fold(
+            onSuccess = { response ->
+                logger.debug(TAG, "GetAcontraUseCase Received successful response")
+                Result.success(
+                    response
+                        .toContentUIRows(subgenres = mammRepository.getSubgenreList().getOrThrow())
+                        .insertChannelRow(response.channels)
                 )
             },
             onFailure = { exception ->
-                logger.error(TAG, "GetAdultsUseCase Genre lookup failed: ${exception.message}")
+                logger.error(TAG, "GetAcontraUseCase Failed: ${exception.message}")
                 Result.failure(exception)
             }
         )

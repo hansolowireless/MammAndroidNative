@@ -3,6 +3,7 @@ package com.mamm.mammapps.data.cache
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
+import com.mamm.mammapps.data.model.Subgenre
 import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
@@ -13,6 +14,7 @@ interface Cache {
     fun setShowBrandedContentMenus(show: Boolean)
 
     fun setHomeContent(homeContent: GetHomeContentResponse)
+    fun setCachedSubgenreList(list: List<Subgenre>)
     fun setMoviesContent(moviesContent: GetOtherContentResponse)
     fun setDocumentariesContent(documentariesContent: GetOtherContentResponse)
     fun setSportsContent(sportsContent: GetOtherContentResponse)
@@ -24,6 +26,7 @@ interface Cache {
 
     fun getShowBrandedContentMenus () : Boolean?
     fun getHomeContent(): GetHomeContentResponse?
+    fun getCachedSubgenreList(): List<Subgenre>?
     fun getMoviesContent(): GetOtherContentResponse?
     fun getDocumentariesContent(): GetOtherContentResponse?
     fun getSportsContent(): GetOtherContentResponse?

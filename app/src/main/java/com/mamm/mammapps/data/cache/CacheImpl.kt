@@ -3,6 +3,7 @@ package com.mamm.mammapps.data.cache
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
+import com.mamm.mammapps.data.model.Subgenre
 import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
@@ -18,6 +19,9 @@ class CacheImpl @Inject constructor() : Cache {
 
     @Volatile
     private var cachedHomeContent: GetHomeContentResponse? = null
+
+    @Volatile
+    private var cachedSubgenreList: List<Subgenre>? = null
 
     @Volatile
     private var cachedMoviesContent: GetOtherContentResponse? = null
@@ -61,6 +65,10 @@ class CacheImpl @Inject constructor() : Cache {
 
     override fun setHomeContent(homeContent: GetHomeContentResponse) {
         cachedHomeContent = homeContent
+    }
+
+    override fun setCachedSubgenreList(list: List<Subgenre>) {
+        cachedSubgenreList = list
     }
 
     override fun setMoviesContent(moviesContent: GetOtherContentResponse) {
@@ -115,6 +123,8 @@ class CacheImpl @Inject constructor() : Cache {
 
     override fun getHomeContent(): GetHomeContentResponse? = cachedHomeContent
 
+    override fun getCachedSubgenreList(): List<Subgenre>? = cachedSubgenreList
+
     override fun getMoviesContent(): GetOtherContentResponse? = cachedMoviesContent
 
     override fun getDocumentariesContent(): GetOtherContentResponse? = cachedDocumentariesContent
@@ -141,6 +151,7 @@ class CacheImpl @Inject constructor() : Cache {
 
     override fun clear() {
         cachedHomeContent = null
+        cachedSubgenreList = null
         cachedMoviesContent = null
         cachedDocumentariesContent = null
         cachedSportsContent = null

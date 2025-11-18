@@ -5,6 +5,7 @@ import com.mamm.mammapps.data.model.Genre
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
+import com.mamm.mammapps.data.model.Subgenre
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.ui.model.ContentIdentifier
 
@@ -40,4 +41,6 @@ interface MammRepository {
     fun shouldRequestPin(): Boolean
     fun validatePin(pin: String): Boolean
     fun savePinSuccessTimestamp()
+
+    fun getSubgenreList() : Result<List<Subgenre>>
 }

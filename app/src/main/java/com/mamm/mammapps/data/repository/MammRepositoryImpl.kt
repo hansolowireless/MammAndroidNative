@@ -9,6 +9,7 @@ import com.mamm.mammapps.data.model.Genre
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
+import com.mamm.mammapps.data.model.Subgenre
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.domain.interfaces.MammRepository
@@ -311,5 +312,13 @@ class MammRepositoryImpl @Inject constructor(
         localDataSource.setLastTimePinWasCorrect(currentTime)
         logger.debug(TAG, "Saved new PIN success timestamp: $currentTime")
     }
+
+    override fun getSubgenreList() : Result<List<Subgenre>> {
+        return runCatching {
+            remoteDatasource.getSubgenreList()
+                ?: throw NoSuchElementException("Subgenre list not found in cache or is null")
+        }
+    }
+
 
 }

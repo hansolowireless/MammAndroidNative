@@ -24,6 +24,7 @@ import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetEPGResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
+import com.mamm.mammapps.data.model.Subgenre
 import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.bookmark.SetBookmarkRequest
 import com.mamm.mammapps.data.model.exception.GetHomeContentException
@@ -94,9 +95,7 @@ class RemoteDatasource @Inject constructor(
                 "JSON file is required to get Home Content, but was null"
             }
 
-            logger.debug(
-                "getHomeContent", "JSON file: $jsonFile"
-            )
+            logger.debug("getHomeContent", "JSON file: $jsonFile")
             val response = noBaseUrlApi.getHomeContent(jsonFile)
 
             if (!response.isSuccessful) {
@@ -112,6 +111,13 @@ class RemoteDatasource @Inject constructor(
                     userId = sessionManager.loginData?.userId.toString()
                 )
             )
+
+            cache.setCachedSubgenreList(
+                homeData.genres?.flatMap { genre ->
+                    genre.subgenres ?: emptyList()
+                } ?: emptyList()
+            )
+
             cache.getHomeContent()!!
         }
     }
@@ -134,6 +140,10 @@ class RemoteDatasource @Inject constructor(
 
            response.body() ?: throw IllegalStateException("Response body is null")
        }
+    }
+
+    fun getSubgenreList() : List<Subgenre>? {
+        return cache.getCachedSubgenreList()
     }
 
     //----------EPG---------//

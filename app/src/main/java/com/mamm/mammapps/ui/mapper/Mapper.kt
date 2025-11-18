@@ -9,6 +9,7 @@ import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.HomeFeatured
 import com.mamm.mammapps.data.model.Serie
+import com.mamm.mammapps.data.model.Subgenre
 import com.mamm.mammapps.data.model.VoD
 import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.bookmark.Recommended
@@ -487,40 +488,58 @@ fun GetOtherContentResponse.toContentUIRows(
 }
 
 fun GetBrandedContentResponse.toContentUIRows(
-    genre: Genre,
+    subgenres: List<Subgenre>,
     isAdult: Boolean = false
 ): List<ContentRowUI> {
-    val rows = mutableListOf<ContentRowUI>()
+    val rowsMap = mutableMapOf<Int, ContentRowUI>()
 
-    // Add "Eventos Destacados" row without subgenre filtering
-    val allFeaturedItems = featured.orEmpty().mapNotNull { it.toContentEntityUI() }
-    if (allFeaturedItems.isNotEmpty()) {
-        rows.add(
-            ContentRowUI(
-                categoryName = "Eventos Destacados",
-                items = allFeaturedItems,
-                isFeatured = true
-            )
-        )
-    }
-
-    genre.subgenres?.forEach { sub ->
-        val subVods = vods.orEmpty().filter { it.idSubgenre == sub.id.toString() }
-
-        // Convertimos a ContentEntityUI
-        val items = subVods.mapNotNull { it.toContentEntityUI(isAdult = isAdult) }
-
-        if (items.isNotEmpty()) {
-            rows.add(
+    this.vods?.forEach { vod ->
+        vod.idSubgenre?.toIntOrNull()?.let { subgenreId ->
+            val row = rowsMap.getOrPut(subgenreId) {
+                val subgenreName = subgenres.find { it.id == subgenreId }?.ds.orEmpty()
                 ContentRowUI(
-                    categoryName = sub.ds.orEmpty(),
-                    items = items
+                    categoryId = subgenreId,
+                    categoryName = subgenreName,
+                    items = mutableListOf()
                 )
-            )
+            }
+            (row.items as? MutableList)?.add(vod.toContentEntityUI(isAdult = isAdult))
         }
     }
-    return rows
+
+    this.series?.forEach { serie ->
+        serie.subgenreById?.let { subgenreId ->
+            val row = rowsMap.getOrPut(subgenreId) {
+                val subgenreName = subgenres.find { it.id == subgenreId }?.ds.orEmpty()
+                ContentRowUI(
+                    categoryId = subgenreId,
+                    categoryName = subgenreName,
+                    items = mutableListOf()
+                )
+            }
+            (row.items as? MutableList)?.add(serie.toContentEntityUI())
+        }
+    }
+
+    val featuredRow = this.featured?.mapNotNull { it.toContentEntityUI() }
+        ?.takeIf { it.isNotEmpty() }
+        ?.let { items ->
+            ContentRowUI(
+                categoryName = "Eventos Destacados",
+                items = items,
+                isFeatured = true
+            )
+        }
+
+    val contentRows = rowsMap.values.toList()
+
+    return if (featuredRow != null) {
+        listOf(featuredRow) + contentRows
+    } else {
+        contentRows
+    }
 }
+
 
 fun List<ContentRowUI>.insertFeatured(
     featured: List<HomeFeatured>
