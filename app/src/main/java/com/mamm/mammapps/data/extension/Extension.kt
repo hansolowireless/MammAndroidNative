@@ -19,7 +19,7 @@ fun GetHomeContentResponse.transformData(
         content.copy(metadata = Metadata.fromTbContentItems(content.tbContentItems ?: emptyList()))
     }
 
-    var transformedChannels = channels?.map { channel ->
+    val transformedChannels = channels?.map { channel ->
         channel.copy(
             deliveryURL = channel.deliveryURL
                 ?.replace("\${id_channel}", channel.id.toString())
