@@ -394,6 +394,7 @@ fun PlayerViewWithControlsExperimental(
                 currentChannel = content,
                 onChannelClick = { channel ->
                     viewModel.findAndPlayChannel(channel)
+                    viewModel.hideZappingLayer()
                 },
                 onDismiss = {
                     viewModel.hideZappingLayer()
