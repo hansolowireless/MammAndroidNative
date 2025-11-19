@@ -40,6 +40,7 @@ import com.mamm.mammapps.domain.usecases.player.SendTickerQosUseCase
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
 import com.mamm.mammapps.ui.constant.PlayerConstant
+import com.mamm.mammapps.ui.constant.PlayerConstant.MILLISECONDS_TIMEBAR_KEYTIME_INCREMENT
 import com.mamm.mammapps.ui.extension.bitsToMegabits
 import com.mamm.mammapps.ui.extension.setHourText
 import com.mamm.mammapps.ui.extension.toDate
@@ -510,9 +511,7 @@ class VideoPlayerViewModel @Inject constructor(
     }
 
     private fun configureTimeBar(previewBar: CustomPreviewBar?) {
-
-        previewBar?.setKeyTimeIncrement(30000)
-
+        previewBar?.setKeyTimeIncrement(MILLISECONDS_TIMEBAR_KEYTIME_INCREMENT)
         if (_content.value.isLive) {
             if (_liveEventInfo.value != null && _content.value.isTimeshift) {
                 previewBar?.setEventHourEnd(_liveEventInfo.value?.eventEnd?.toDate())
