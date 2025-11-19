@@ -153,7 +153,8 @@ class PlaybackRepositoryImpl @Inject constructor(
                 primaryNode = "",
                 id = contentId.toString(),
                 type = "ticker",
-                ip = remoteDatasource.getCurrentUserIp()
+                ip = remoteDatasource.getCurrentUserIp(),
+                deviceType = localDatasource.getDeviceType()
             )
         }
     }
@@ -168,7 +169,9 @@ class PlaybackRepositoryImpl @Inject constructor(
 
     override suspend fun sendQosData(qosData: QosData): Result<Unit> {
         return runCatching {
-            remoteDatasource.sendQosData(qosData)
+            val completeQosData = qosData.copy(deviceType = localDatasource.getDeviceType())
+            logger.debug(TAG, "sendQoSData qosData: $completeQosData")
+            remoteDatasource.sendQosData(completeQosData)
         }.onFailure {
             logger.error(TAG, "sendQoSData error sending qos data $it.message")
         }

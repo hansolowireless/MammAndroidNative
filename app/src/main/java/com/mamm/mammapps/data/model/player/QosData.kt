@@ -3,6 +3,8 @@ package com.mamm.mammapps.data.model.player
 import com.google.gson.annotations.SerializedName
 
 data class QosData(
+    @SerializedName("deviceType")
+    val deviceType: String? = null,
     @SerializedName("playerBw")
     val playerBw: String,
     @SerializedName("activeTrack")

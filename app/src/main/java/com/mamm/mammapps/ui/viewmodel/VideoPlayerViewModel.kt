@@ -175,10 +175,7 @@ class VideoPlayerViewModel @Inject constructor(
                 } else {
                     val error =
                         playableUrlResult.exceptionOrNull() ?: drmInfoResult.exceptionOrNull()
-                    logger.error(
-                        TAG,
-                        "initializeWithContent getPlayableUrlUseCase error = ${error?.message}"
-                    )
+                    logger.error(TAG, "initializeWithContent getPlayableUrlUseCase error = ${error?.message}")
                     //TODO SHOW ERROR
                 }
             }.onFailure { exception ->
@@ -193,6 +190,7 @@ class VideoPlayerViewModel @Inject constructor(
         trackSelector = builder
 
         _player.update { oldPlayer ->
+            oldPlayer?.stop()
             oldPlayer?.release()
 
             val loadControl = DefaultLoadControl.Builder()
@@ -318,9 +316,8 @@ class VideoPlayerViewModel @Inject constructor(
         qosJob = viewModelScope.launch {
             while (true) {
                 delay(60000)
-                //logger.debug(TAG, "startQoSReporting Sending qos data...")
                 val qosData = createQosData()
-                logger.debug(TAG, "startQoSReporting qosData: $qosData")
+                logger.debug(TAG, "startQoSReporting Calling QoS...")
                 withContext(Dispatchers.IO) {
                     sendQoSUseCase(qosData)
                 }
@@ -508,10 +505,7 @@ class VideoPlayerViewModel @Inject constructor(
                 audioTracksButton?.visibility = View.GONE
             }
         }.onFailure {
-            logger.error(
-                TAG,
-                "setDialogButtonVisibility - Error setting button visibility: ${it.message}"
-            )
+            logger.error(TAG, "setDialogButtonVisibility - Error setting button visibility: ${it.message}")
         }
     }
 
