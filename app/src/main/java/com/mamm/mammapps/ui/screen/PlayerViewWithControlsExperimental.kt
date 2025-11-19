@@ -52,6 +52,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.bumptech.glide.Glide
 import com.example.openstream_flutter_rw.ui.manager.watermark.FingerprintController
+import com.github.rubensousa.previewseekbar.PreviewBar
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.mamm.mammapps.R
@@ -257,6 +258,16 @@ fun PlayerViewWithControlsExperimental(
                                 .into(it)
                         }
                     }
+
+                    previewTimeBar.addOnScrubListener(object : PreviewBar.OnScrubListener {
+                        override fun onScrubStart(previewBar: PreviewBar) {
+                        }
+                        override fun onScrubMove(previewBar: PreviewBar, progress: Int, fromUser: Boolean) {
+                        }
+                        override fun onScrubStop(previewBar: PreviewBar?) {
+                            viewModel.triggerTSTVMode(previewTimeBar)
+                        }
+                    })
 
                     val showTrackDialog: (TrackType) -> Unit = showTrackDialog@{ trackType ->
                         val currentPlayer = styledPlayerView.player ?: return@showTrackDialog
