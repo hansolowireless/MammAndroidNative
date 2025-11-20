@@ -426,7 +426,7 @@ class RemoteDatasource @Inject constructor(
     private suspend fun getPublicIp(): String? {
         return try {
             withContext(Dispatchers.IO) {
-                val url = URL("https://api.ipify.org?format=text")
+                val url = URL("https://ips.service.openstream.es/?format=text")
                 url.readText().trim()
             }
         } catch (e: Exception) {
