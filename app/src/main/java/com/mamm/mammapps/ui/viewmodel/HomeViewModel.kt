@@ -1,5 +1,7 @@
 package com.mamm.mammapps.ui.viewmodel
 
+import android.util.Log
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -37,6 +39,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
+import androidx.compose.runtime.State
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -84,6 +87,13 @@ class HomeViewModel @Inject constructor(
     private val _lastClickedItemIndex = MutableStateFlow<Int?>(0)
     val lastClickedItemIndex: StateFlow<Int?> = _lastClickedItemIndex.asStateFlow()
 
+    private val _rememberedRowState = mutableStateOf<Pair<Int, Int>?>(null)
+    val rememberedRowState: State<Pair<Int, Int>?> = _rememberedRowState
+
+    fun rememberRowState(state: LazyListState) {
+        _rememberedRowState.value = Pair(state.firstVisibleItemIndex, state.firstVisibleItemScrollOffset)
+        logger.debug(TAG, "rememberRowState saved: Index=${state.firstVisibleItemIndex}, Offset=${state.firstVisibleItemScrollOffset}")
+    }
 
     private fun setLoadingStateWithLogo() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -91,7 +101,7 @@ class HomeViewModel @Inject constructor(
                 _operatorLogo.update { logo }
                 homeContentUIState = HomeContentUIState.Loading(logo)
             }.onFailure {
-                logger.error(TAG, "Error getting operator logo URL: $it")
+                logger.error(TAG, "setLoadingStateWithLogo Error getting operator logo URL: $it")
                 homeContentUIState = HomeContentUIState.Loading(null)
             }
         }
@@ -194,11 +204,11 @@ class HomeViewModel @Inject constructor(
         _lastClickedItemIndex.update { index }
     }
 
-    fun reset() {
+    fun setLastClickedIndexToNull() {
         _lastClickedItemIndex.update { null }
     }
 
-    fun lastClickedToZero() {
+    fun setLastClickedIndexToZero() {
         _lastClickedItemIndex.update { 0 }
     }
 

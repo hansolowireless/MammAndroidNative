@@ -9,10 +9,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,6 +32,7 @@ import com.mamm.mammapps.ui.theme.Dimensions
 fun RowOfContent(
     modifier: Modifier = Modifier,
     contentList: List<ContentEntityUI>,
+    lazyListState: LazyListState = rememberLazyListState(),
     onContentClick: (ContentEntityUI) -> Unit,
     onExpandCategoryClick : () -> Unit = {},
     onFocus: (ContentEntityUI) -> Unit = {},
@@ -44,6 +48,7 @@ fun RowOfContent(
             modifier = modifier
                 .fillMaxWidth()
                 .wrapContentHeight(),
+            state = lazyListState,
             verticalAlignment = Alignment.CenterVertically,
             contentPadding = PaddingValues(horizontal = Dimensions.paddingXSmall),
             horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall)

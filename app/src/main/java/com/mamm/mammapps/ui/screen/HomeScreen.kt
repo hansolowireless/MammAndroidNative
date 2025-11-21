@@ -17,7 +17,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -30,7 +29,6 @@ import com.mamm.mammapps.ui.component.home.HomeGridBottom
 import com.mamm.mammapps.ui.component.home.HomeGridTop
 import com.mamm.mammapps.ui.component.home.OperatorLogoBottomRight
 import com.mamm.mammapps.ui.mapper.toContentToPlayUI
-import com.mamm.mammapps.ui.mapper.toResId
 import com.mamm.mammapps.ui.mapper.toResponseBodyMessage
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
@@ -39,6 +37,7 @@ import com.mamm.mammapps.ui.model.uistate.HomeContentUIState
 import com.mamm.mammapps.ui.viewmodel.CastViewModel
 import com.mamm.mammapps.ui.viewmodel.HomeViewModel
 import retrofit2.HttpException
+
 
 @Composable
 fun HomeScreen(
@@ -60,10 +59,11 @@ fun HomeScreen(
     val clickedContent by viewModel.clickedContent.collectAsStateWithLifecycle()
     val hasNavigated = remember { mutableStateOf(false) }
 
-    val lastClickedItemIndex by viewModel.lastClickedItemIndex.collectAsStateWithLifecycle()
-    val columnListState =
-        rememberLazyListState()
     val focusedContent by viewModel.focusedContent.collectAsStateWithLifecycle()
+
+    val lastClickedItemIndex by viewModel.lastClickedItemIndex.collectAsStateWithLifecycle()
+    val columnListState = rememberLazyListState()
+    val rememberedRowState by viewModel.rememberedRowState
 
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
@@ -91,6 +91,7 @@ fun HomeScreen(
                 is CastState.SessionStarted -> {
                     castViewModel.loadRemoteMedia(it.toContentToPlayUI())
                 }
+
                 else -> {
                     if (!hasNavigated.value) {
                         onPlay(it)
@@ -138,10 +139,13 @@ fun HomeScreen(
 
                     HomeGridBottom(
                         columnListState = columnListState,
+                        rememberedRowState = rememberedRowState,
+                        focusedRowIndex = lastClickedItemIndex,
                         content = if (!LocalIsTV.current) homeContent.filter { !it.isFeatured } else homeContent,
                         mobileFeatured = if (!LocalIsTV.current) homeContent.find { it.isFeatured }?.items else null,
-                        onContentClicked = { index, entityUI ->
-                            viewModel.setLastClickedIndex(index)
+                        onContentClicked = { entityUI, rowState ->
+                            viewModel.setLastClickedIndex(columnListState.firstVisibleItemIndex)
+                            rowState?.let { viewModel.rememberRowState(it) }
 
                             if (entityUI.identifier is ContentIdentifier.Channel) {
                                 viewModel.findContent(
@@ -151,20 +155,25 @@ fun HomeScreen(
                             } else {
                                 onShowDetails(entityUI)
                             }
-
                         },
                         onFocus = { content ->
                             viewModel.setFocusedContent(content)
                         },
-                        focusedRowIndex = lastClickedItemIndex,
-                        onExpandCategory = { categoryId, categoryName ->
+                        onExpandCategory = { categoryId, categoryName, rowState ->
+                            viewModel.setLastClickedIndex(columnListState.firstVisibleItemIndex)
+                            rowState?.let { viewModel.rememberRowState(it) }
                             onExpandCategory(
                                 categoryId,
                                 categoryName
                             )
                         },
                         onRequestedFocus = {
-                            viewModel.reset()
+                            /*Si no se hace esto, al darle a un canal se recompone la vista y llama a reset()
+                            * En el caso de canales solo se limpiará al volver a la vista y enfocarse, cuando ya clickedContent será null
+                            */
+                            if (clickedContent == null) {
+                                viewModel.setLastClickedIndexToNull()
+                            }
                         }
                     )
                 }
@@ -182,6 +191,7 @@ fun HomeScreen(
                 is GetHomeContentException.ForbiddenException -> {
                     onErrorLogout()
                 }
+
                 else -> {
                     Box(modifier = Modifier.fillMaxSize()) {
                         Text(

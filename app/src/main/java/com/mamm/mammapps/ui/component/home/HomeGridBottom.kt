@@ -1,7 +1,6 @@
 package com.mamm.mammapps.ui.component.home
 
 import android.util.Log
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
@@ -44,9 +44,10 @@ import com.mamm.mammapps.ui.theme.HomeGridBottomColor
 fun HomeGridBottom(
     content: List<ContentRowUI>,
     columnListState: LazyListState,
+    rememberedRowState: Pair<Int, Int>?,
     mobileFeatured: List<ContentEntityUI>? = null,
-    onContentClicked: (Int, ContentEntityUI) -> Unit,
-    onExpandCategory: (Int, String) -> Unit,
+    onContentClicked: (ContentEntityUI, LazyListState?) -> Unit,
+    onExpandCategory: (Int, String, LazyListState?) -> Unit,
     onFocus: (ContentEntityUI) -> Unit = {},
     focusedRowIndex: Int?,
     onRequestedFocus: () -> Unit = {}
@@ -68,7 +69,7 @@ fun HomeGridBottom(
                         modifier = Modifier.fillMaxWidth(),
                         content = it,
                         onItemClick = { entityUI ->
-                            onContentClicked(0, entityUI)
+                            onContentClicked(entityUI, null)
                         }
                     )
                 }
@@ -79,6 +80,19 @@ fun HomeGridBottom(
                 key = { index, item -> "${item.categoryId}_$index" }
             ) { index, contentRow ->
 
+                /*Para restaurar el foco HORIZONTAL
+                 Donde estaba antes de ir a Details o al Player
+                */
+                val shouldRestoreState = index == focusedRowIndex && rememberedRowState != null
+
+                val rowState = rememberLazyListState(
+                    initialFirstVisibleItemIndex = if (shouldRestoreState) rememberedRowState!!.first else 0,
+                    initialFirstVisibleItemScrollOffset = if (shouldRestoreState) rememberedRowState!!.second else 0
+                )
+
+                /*Para restaurar el foco VERTICAL
+                 Donde estaba antes de ir a Details o al Player
+                */
                 val rowFocusRequester = remember(contentRow.categoryId) { FocusRequester() }
 
                 LaunchedEffect(focusedRowIndex) {
@@ -113,7 +127,8 @@ fun HomeGridBottom(
                             IconButton(onClick = {
                                 onExpandCategory(
                                     contentRow.categoryId,
-                                    contentRow.categoryName
+                                    contentRow.categoryName,
+                                    rowState
                                 )
                             }) {
                                 Icon(
@@ -126,15 +141,22 @@ fun HomeGridBottom(
                     }
 
                     RowOfContent(
-                        modifier = Modifier
-                            .focusRequester(rowFocusRequester),
+                        modifier = Modifier.focusRequester(rowFocusRequester),
                         contentList = contentRow.items,
+                        lazyListState =  rowState,
                         showExpandCategory = LocalIsTV.current && contentRow.loadMore,
                         onContentClick = { content ->
-                            onContentClicked(index, content)
+                            onContentClicked(content, rowState)
                         },
                         onFocus = { content ->
                             onFocus(content)
+                        },
+                        onExpandCategoryClick = {
+                            onExpandCategory(
+                                contentRow.categoryId,
+                                contentRow.categoryName,
+                                rowState
+                            )
                         },
                         onFocusExpandCategory = {
                             onFocus(
@@ -142,12 +164,6 @@ fun HomeGridBottom(
                                     identifier = ContentIdentifier.VoD(0),
                                     title = expandCategoryTitle
                                 )
-                            )
-                        },
-                        onExpandCategoryClick = {
-                            onExpandCategory(
-                                contentRow.categoryId,
-                                contentRow.categoryName
                             )
                         }
                     )
