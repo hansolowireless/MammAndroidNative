@@ -23,7 +23,10 @@ class GetAdultsUseCase @Inject constructor(
                 logger.debug(TAG, "GetAcontraUseCase Received successful response")
                 Result.success(
                     response
-                        .toContentUIRows(subgenres = mammRepository.getSubgenreList().getOrThrow())
+                        .toContentUIRows(
+                            subgenres = mammRepository.getSubgenreList().getOrThrow(),
+                            isAdult = true
+                        )
                         .insertChannelRow(response.channels)
                 )
             },
