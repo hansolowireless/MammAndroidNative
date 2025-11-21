@@ -10,6 +10,8 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,10 +40,27 @@ fun ChannelGridTV(
 
     val focusRequester = remember { FocusRequester() }
 
-    // Este LaunchedEffect SÓLO se ejecuta cuando la lista de canales cambia.
-    // No se ejecutará durante el scroll.
-    LaunchedEffect(channels) {
-        delay(100)
+    val channelsKey by remember(channels) {
+        derivedStateOf {
+            channels.joinToString { it.identifier.id.toString() }
+        }
+    }
+
+    val previousChannelsKey = rememberSaveable { mutableStateOf(channelsKey) }
+
+    LaunchedEffect(channelsKey) {
+        /*Esto es para que el Grid fuerce resetear el foco al 0 al cambiar el estado del filtro.
+          Si no se hace, no encuentra dónde enfocar porque el grid se queda en indices que no incluyen el 0
+         */
+        if (previousChannelsKey.value != channelsKey) {
+            lastFocusedIndex.intValue = 0
+            lazyGridState.scrollToItem(0)
+
+            // Actualizamos la clave guardada para la próxima comparación.
+            previousChannelsKey.value = channelsKey
+        }
+        // Esto simplemente devuelve el foco al mismo elemento que lo tenía (al volver del player por ejemplo) o también al cambiar el filtro
+        delay(50)
         focusRequester.requestFocus()
     }
 
@@ -58,7 +77,6 @@ fun ChannelGridTV(
             verticalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall)
         ) {
             itemsIndexed(channels, key = { _, channel -> channel.identifier.id }) { index, channel ->
-                val channel = channels[index]
                 ContentEntity(
                     modifier = Modifier
                         // El FocusRequester se asigna dinámicamente al último elemento enfocado.
