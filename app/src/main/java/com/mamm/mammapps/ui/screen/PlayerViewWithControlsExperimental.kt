@@ -207,7 +207,7 @@ fun PlayerViewWithControlsExperimental(
                         // 1. La capa de zapping NO debe estar visible.
                         // 2. Los controles del player NO deben estar visibles.
                         // 3. Debe haber un arrastre vertical significativo.
-                        if (!showZappingLayer && !isControllerVisible && abs(dragAmount) > 1.0f) {
+                        if (!showZappingLayer && !isControllerVisible && abs(dragAmount) > 5.0f) {
                             viewModel.showZappingLayer()
                             change.consume() // Consume el evento para que no se propague
                         }
