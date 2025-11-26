@@ -99,6 +99,7 @@ fun String.buildThumbnailUrl(position: Long?): String {
     val contentID = when {
         contains("smil:") -> substringAfter("smil:").substringBefore("_")
         contains("nopack03-") -> substringAfter("nopack03-").substringBefore("/")
+        contains("nopack04-") -> substringAfter("nopack04-").substringBefore("/")
         else -> substringAfter("nopack-").substringBefore("/")
     }
 
@@ -109,6 +110,7 @@ fun String.buildThumbnailUrl(position: Long?): String {
     val baseUrl = when {
         contains("smil:") -> substringBefore("/smil:")
         contains("nopack03-") -> substringBefore("/nopack03-")
+        contains("nopack04-") -> substringBefore("/nopack04-")
         else -> substringBefore("/nopack-")
     }
     val thumbnail = "$baseUrl-img/${contentID}_mf$thumbnailNumberString.jpg"
