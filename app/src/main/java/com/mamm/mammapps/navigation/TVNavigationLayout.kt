@@ -150,7 +150,7 @@ fun TVNavigationLayout(
                             CustomTVNavigationItem(
                                 modifier = itemModifier,
                                 icon = { MenuItems.GetIconForRoute(route = item) },
-                                label = stringResource(id = MenuItems.getTitleForRoute(route = item.route)),
+                                label = stringResource(id = item.getResId()),
                                 parentIsFocused = isNavRailFocused,
                                 selected = currentRoute == item.route,
                                 onClick = { navController.navigate(item.route) }

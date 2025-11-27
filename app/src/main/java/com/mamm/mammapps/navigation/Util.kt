@@ -43,26 +43,6 @@ object MenuItems {
         }
     }
 
-    fun getTitleForRoute(route: String): Int {
-        return when (route) {
-            AppRoute.HOME.route -> R.string.nav_home
-            AppRoute.EPG.route -> R.string.nav_epg
-            AppRoute.CHANNELS.route -> R.string.nav_channels
-            AppRoute.MOVIES.route -> R.string.nav_movies
-            AppRoute.DOCUMENTARIES.route -> R.string.nav_documentaries
-            AppRoute.SERIES.route -> R.string.nav_series
-            AppRoute.WARNER.route -> R.string.nav_warner
-            AppRoute.ACONTRA.route -> R.string.nav_acontra
-            AppRoute.AMC.route -> R.string.nav_amc
-            AppRoute.SPORTS.route -> R.string.nav_sports
-            AppRoute.ADULTS.route -> R.string.nav_adults
-            AppRoute.KIDS.route -> R.string.nav_kids
-            AppRoute.SEARCH.route -> R.string.nav_search
-            AppRoute.DIAGNOSTICS.route -> R.string.nav_diagnostics
-            AppRoute.LOGOUT.route -> R.string.nav_change_user
-            else -> R.string.app_name
-        }
-    }
 
     val list = listOf(
         AppRoute.HOME,

@@ -3,7 +3,9 @@ package com.mamm.mammapps.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
+import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.domain.usecases.content.GetCategoryContentUseCase
+import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.model.uistate.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -19,10 +21,13 @@ class ExpandCategoryViewModel @Inject constructor(
     private val getCategoryContentUseCase: GetCategoryContentUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<UIState<GetBrandedContentResponse>>(UIState.Loading)
-    val uiState: StateFlow<UIState<GetBrandedContentResponse>> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<UIState<Any>>(UIState.Loading)
+    val uiState: StateFlow<UIState<Any>> = _uiState.asStateFlow()
 
-    fun getContent (categoryId: Int?) {
+    fun getContent(
+        categoryId: Int?,
+        route: AppRoute?
+    ) {
         if (categoryId == null) {
             _uiState.value = UIState.Error()
             return
@@ -31,7 +36,10 @@ class ExpandCategoryViewModel @Inject constructor(
         _uiState.value = UIState.Loading
 
         viewModelScope.launch (Dispatchers.IO) {
-            getCategoryContentUseCase(categoryId = categoryId)
+            getCategoryContentUseCase(
+                categoryId = categoryId,
+                route = route
+            )
                 .onSuccess { response ->
                 _uiState.value = UIState.Success(response)
             }.onFailure {

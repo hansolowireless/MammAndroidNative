@@ -2,7 +2,9 @@ package com.mamm.mammapps.domain.usecases.content
 
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
+import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.domain.interfaces.MammRepository
+import com.mamm.mammapps.navigation.model.AppRoute
 import javax.inject.Inject
 
 class GetCategoryContentUseCase @Inject constructor(
@@ -14,15 +16,98 @@ class GetCategoryContentUseCase @Inject constructor(
         private const val TAG = "GetCategoryContentUseCase"
     }
 
-    suspend operator fun invoke(categoryId: Int): Result<GetBrandedContentResponse> {
-        return repository.getExpandedCategoryContent(categoryId = categoryId).fold(
-            onSuccess = { response ->
-                Result.success(response)
-            },
-            onFailure = {
-                logger.error(TAG, "GetCategoryContentUseCase Failed: ${it.message}")
-                Result.failure(it)
+    suspend operator fun invoke(
+        categoryId: Int,
+        route: AppRoute? = null
+    ): Result<Any> {
+        return runCatching {
+            repository.getExpandedCategoryContent(categoryId).getOrThrow()
+        }.onFailure { remoteException ->
+            logger.warn(TAG, "GetCategoryContentUseCase remote fetch failed: ${remoteException.message}. Attempting fallback.")
+
+            if (route == null) {
+                logger.error(TAG, "Cannot perform fallback: AppRoute is null.")
+                return Result.failure(remoteException)
             }
-        )
+
+            return runCatching {
+                findAndFilterLocalContent(route, categoryId)
+            }.getOrElse {
+                logger.error(TAG, "GetCategoryContentUseCase No local content for category")
+                Result.failure(remoteException)
+            }
+        }
+    }
+
+
+    private suspend fun findAndFilterLocalContent(route: AppRoute, categoryId: Int): Result<Any> {
+        return findContentByRoute(route).mapCatching { localContent ->
+            val filteredContent = getResponseFromContentFilteredByCategory(localContent, categoryId)
+            filteredContent ?: throw NoSuchElementException("No local content found for category $categoryId")
+        }
+    }
+
+    /**
+     * Obtiene el contenido completo de una fuente de datos basándose únicamente en la ruta.
+     * Entrada: ruta. Salida: contenido.
+     */
+    private suspend fun findContentByRoute(route: AppRoute): Result<Any> {
+        logger.debug(TAG, "Executing findContentByRoute for route: ${route.name}")
+
+        // El 'when' determina qué método del repositorio llamar y devuelve su resultado.
+        return when (route) {
+            AppRoute.MOVIES -> repository.getMovies()
+            AppRoute.DOCUMENTARIES -> repository.getDocumentaries()
+            AppRoute.KIDS -> repository.getKids()
+            AppRoute.SPORTS -> repository.getSports()
+            AppRoute.WARNER -> repository.getWarner()
+            AppRoute.ACONTRA -> repository.getAcontra()
+            AppRoute.AMC -> repository.getAMC()
+            else -> {
+                logger.error(TAG, "No specific fallback logic defined for route: ${route.name}")
+                Result.failure(NoSuchElementException("No fallback logic for route: ${route.name}"))
+            }
+        }
+    }
+
+    private fun getResponseFromContentFilteredByCategory(content: Any, categoryId: Int) : Any? {
+        when (content) {
+            is GetOtherContentResponse -> {
+                val vods = content.vods?.filter { it.idSubgenre?.toInt() == categoryId }
+                val events = content.events?.filter { it.idSubgenre?.toInt() == categoryId }
+
+                logger.debug(TAG, "Found ${vods?.size} VODs for category $categoryId")
+                logger.debug(TAG, "Found ${events?.size} EVENTS for category $categoryId")
+
+                if (vods != null || events != null) {
+                    return GetOtherContentResponse(
+                            vods = vods,
+                            events = events
+                        )
+                }
+
+                return null
+            }
+
+            is GetBrandedContentResponse -> {
+                val vods = content.vods?.filter { it.idSubgenre?.toInt() == categoryId }
+                val events = content.events?.filter { it.idSubgenre?.toInt() == categoryId }
+
+                logger.debug(TAG, "Found ${vods?.size} VODs for category $categoryId")
+                logger.debug(TAG, "Found ${events?.size} EVENTS for category $categoryId")
+
+                if (vods != null || events != null) {
+                    return GetBrandedContentResponse(
+                            vods = vods,
+                            events = events
+                    )
+                }
+
+                return null
+            }
+
+            else -> { return null}
+        }
+
     }
 }

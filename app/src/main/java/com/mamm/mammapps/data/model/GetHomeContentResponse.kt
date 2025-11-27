@@ -127,7 +127,7 @@ data class Category(
     @SerializedName("pos") val pos: Int? = null,
     @SerializedName("name") val name: String? = null,
     @SerializedName("id") val id: Int? = null,
-    @SerializedName("load_more") val loadMore: Boolean? = null,
+    @SerializedName("load_more") val loadMore: Boolean = false,
     @SerializedName("order") val order: List<OrderItem>? = null
 )
 

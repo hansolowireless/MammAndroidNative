@@ -2,6 +2,7 @@ package com.mamm.mammapps.ui.constant
 
 object UIConstant {
     const val HOMEGRIDTOP_IMAGE_WIDTH_FRACTION = 0.66f
+    const val MAX_ELEMENTS_PER_ROW = 15
 }
 
 object PlayerConstant {

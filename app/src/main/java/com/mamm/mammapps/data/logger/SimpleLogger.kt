@@ -15,4 +15,8 @@ class SimpleLogger : Logger {
     override fun error(tag: String, message: String) {
         Log.e(tag, message)
     }
+
+    override fun warn(tag: String, message: String) {
+        Log.w(tag, message)
+    }
 }
