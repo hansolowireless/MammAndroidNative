@@ -3,6 +3,7 @@ package com.mamm.mammapps.ui.screen
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,11 +18,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.channels.ChannelFilter
+import com.mamm.mammapps.ui.component.channels.ChannelFilterTV
 import com.mamm.mammapps.ui.component.channels.ChannelGridMobile
 import com.mamm.mammapps.ui.component.channels.ChannelGridTV
 import com.mamm.mammapps.ui.component.home.HomeGridTop
 import com.mamm.mammapps.ui.mapper.toContentToPlayUI
 import com.mamm.mammapps.ui.model.uistate.CastState
+import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.MammAppsTheme
 import com.mamm.mammapps.ui.viewmodel.CastViewModel
 import com.mamm.mammapps.ui.viewmodel.ChannelsViewModel
@@ -93,17 +96,12 @@ fun ChannelsScreen(
                 )
             }
 
-            ChannelFilter(
+            ChannelFilterTV(
+                modifier = Modifier.padding(start = Dimensions.paddingLarge),
                 availableGenres = channelGenres,
                 selectedGenres = selectedGenres,
                 onSelectedGenresChanged = {
                     viewModel.filterChannelsByGenres(it)
-                },
-                onSearchQueryChanged = {
-                    viewModel.filterChannelsByQuery(it)
-                },
-                onClearSearch = {
-                    viewModel.resetSelectedGenres()
                 }
             )
 

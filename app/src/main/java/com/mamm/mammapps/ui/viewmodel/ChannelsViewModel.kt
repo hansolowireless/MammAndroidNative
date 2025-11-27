@@ -59,7 +59,12 @@ class ChannelsViewModel @Inject constructor(
                 //Quitamos los canales porno de la vista
                 channels = response.filter{ it.isPornChannel == false}
                 filterChannelsByGenres(_selectedGenres.value)
-                _channelGenres.update { response.mapNotNull { it.channelGenre }.toSet() }
+
+                val startingChar = 'C'
+                val genres = response.mapNotNull { it.channelGenre }.toSet()
+                val (after, before) = genres.partition { it.isNotEmpty() && it[0].uppercaseChar() >= startingChar }
+                val customSortedGenres = (after.sorted() + before.sorted()).toSet()
+                _channelGenres.update { customSortedGenres }
             }
         }
     }
@@ -106,8 +111,7 @@ class ChannelsViewModel @Inject constructor(
                 channels.map { it.toContentEntityUI() }
             }
         } else {
-            val filteredChannelsDebug = channels.filter { it.channelGenre in genres }
-            logger.debug(TAG, "filterChannelsByGenres Filtered channels: $filteredChannels")
+            logger.debug(TAG, "filterChannelsByGenres")
             _filteredChannels.update {
                 channels
                     .filter { it.channelGenre in genres }
