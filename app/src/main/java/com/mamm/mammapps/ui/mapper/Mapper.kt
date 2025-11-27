@@ -21,6 +21,7 @@ import com.mamm.mammapps.data.model.section.SectionVod
 import com.mamm.mammapps.data.model.serie.Episode
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.data.model.serie.TbContentSeason
+import com.mamm.mammapps.ui.constant.UIConstant
 import com.mamm.mammapps.ui.extension.adult
 import com.mamm.mammapps.ui.extension.landscape
 import com.mamm.mammapps.ui.extension.squared
@@ -448,12 +449,14 @@ fun GetHomeContentResponse.toContentUIRows(): List<ContentRowUI> {
             }
         } ?: emptyList()
 
+        val loadMore = category.loadMore || items.size > UIConstant.MAX_ELEMENTS_PER_ROW
+
         if (items.isNotEmpty()) {
             ContentRowUI(
                 categoryId = category.id ?: 0,
                 categoryName = category.name.orEmpty(),
                 items = items,
-                loadMore = category.loadMore ?: false
+                loadMore = loadMore
             )
         } else null
     } ?: emptyList()
@@ -472,14 +475,20 @@ fun GetOtherContentResponse.toContentUIRows(
         val subVods = vods.orEmpty().filter { it.idSubgenre == sub.id.toString() }
 
         // Convertimos a ContentEntityUI
-        val items = subEvents.map { it.toContentEntityUI() } +
-                subVods.map { it.toContentEntityUI() }
+        var items = (subEvents.map { it.toContentEntityUI() }
+                + subVods.map { it.toContentEntityUI() })
+
+        val loadMore = items.size > UIConstant.MAX_ELEMENTS_PER_ROW
+
+        items = items.take(UIConstant.MAX_ELEMENTS_PER_ROW)
 
         if (items.isNotEmpty()) {
             rows.add(
                 ContentRowUI(
-                    categoryName = sub.ds ?: "",
-                    items = items
+                    categoryId = sub.id.orRandom(),
+                    categoryName = sub.ds.orEmpty(),
+                    items = items,
+                    loadMore = loadMore
                 )
             )
         }
@@ -531,7 +540,15 @@ fun GetBrandedContentResponse.toContentUIRows(
             )
         }
 
-    val contentRows = rowsMap.values.toList()
+    var contentRows = rowsMap.values.toList()
+
+    //Cortar las filas a no más de 15 elementos por fila y añadir el loadmore
+    contentRows = contentRows.map { contentRow ->
+        contentRow.copy(
+            loadMore = contentRow.items.size > UIConstant.MAX_ELEMENTS_PER_ROW,
+            items = contentRow.items.take(UIConstant.MAX_ELEMENTS_PER_ROW)
+        )
+    }
 
     return if (featuredRow != null) {
         listOf(featuredRow) + contentRows
@@ -607,7 +624,19 @@ fun GetBrandedContentResponse.toContentEntityUIList() : List<ContentEntityUI> {
     return this.vods.orEmpty().mapNotNull { it.toContentEntityUI() } + this.events.orEmpty().map { it.toContentEntityUI() }
 }
 
+fun GetOtherContentResponse.toContentEntityUIList() : List<ContentEntityUI> {
+    return this.vods.orEmpty().map { it.toContentEntityUI() } + this.events.orEmpty().map { it.toContentEntityUI() }
+}
+
 fun GetBrandedContentResponse.findContent(identifier: ContentIdentifier): Any? {
+    return when (identifier) {
+        is ContentIdentifier.VoD -> this.vods?.find { it.getId() == identifier.id }
+        is ContentIdentifier.Event -> this.events?.find { it.getId() == identifier.id }
+        else -> null
+    }
+}
+
+fun GetOtherContentResponse.findContent(identifier: ContentIdentifier): Any? {
     return when (identifier) {
         is ContentIdentifier.VoD -> this.vods?.find { it.getId() == identifier.id }
         is ContentIdentifier.Event -> this.events?.find { it.getId() == identifier.id }

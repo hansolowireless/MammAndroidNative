@@ -51,7 +51,7 @@ fun MobileNavigationLayout(navController: NavHostController) {
                     items(menuItems) { item ->
                         NavigationDrawerItem(
                             icon = { MenuItems.GetIconForRoute(route = item) },
-                            label = { Text(stringResource(id = MenuItems.getTitleForRoute(route = item.route))) },
+                            label = { Text(stringResource(id = item.getResId())) },
                             selected = currentRoute == item.route,
                             onClick = {
                                 scope.launch { drawerState.close() }
@@ -69,7 +69,7 @@ fun MobileNavigationLayout(navController: NavHostController) {
                 if (showNavigationDrawer) {
                     TopAppBar(
                         title = {
-                            Text(text = currentRoute?.let { stringResource(MenuItems.getTitleForRoute(it)) }
+                            Text(text = currentRoute?.let { stringResource(AppRoute.fromRoute(currentRoute)?.getResId() ?: R.string.empty) }
                                 ?: "")
                         },
                         navigationIcon = {

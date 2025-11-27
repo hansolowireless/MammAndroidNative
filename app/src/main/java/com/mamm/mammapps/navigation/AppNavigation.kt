@@ -200,13 +200,14 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
             it.savedStateHandle.retrieveCategoryName()
         }
 
-        val routeName = remember(it) {
+        val route = remember(it) {
             it.savedStateHandle.retrieveRoute()
         }
 
         ExpandCategoryScreen(
             categoryId = categoryId,
             categoryName = categoryName,
+            appRoute = route,
             onContentClick = { content ->
                 navController.navigate(AppRoute.DETAIL.route) {
                     launchSingleTop = true

@@ -73,7 +73,15 @@ fun NavGraphBuilder.homeScreenRoute(
                     launchSingleTop = true
                 }
                 navController.currentBackStackEntry?.savedStateHandle?.addContentClass(it)
-            }
+            },
+            onExpandCategory = { categoryId, categoryName ->
+                navController.navigate(AppRoute.EXPANDCATEGORY.route) {
+                    launchSingleTop = true
+                }
+                navController.currentBackStackEntry?.savedStateHandle?.addCategoryId(categoryId)
+                navController.currentBackStackEntry?.savedStateHandle?.addCategoryName(categoryName)
+                navController.currentBackStackEntry?.savedStateHandle?.addRoute(appRoute)
+            },
         )
     }
 }
