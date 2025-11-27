@@ -85,3 +85,18 @@ fun NavGraphBuilder.homeScreenRoute(
         )
     }
 }
+
+/**
+ * Navega a un destino de nivel superior, asegurando que la pila de navegación se limpie
+ * hasta 'Home'. Esto hace que el botón 'Atrás' siempre lleve a Home.
+ */
+fun NavController.navigateToTopLevel(route: String) {
+    this.navigate(route) {
+        popUpTo(AppRoute.HOME.route) {
+            // saveState es opcional pero bueno para restaurar el estado de Home
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
+    }
+}

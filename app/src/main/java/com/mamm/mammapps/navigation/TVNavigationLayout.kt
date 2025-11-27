@@ -1,6 +1,5 @@
 package com.mamm.mammapps.navigation
 
-import android.view.Menu
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -17,7 +16,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.NavigationRail
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,6 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.mamm.mammapps.navigation.extension.navigateToTopLevel
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.navigation.viewModel.NavigationViewModel
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
@@ -80,15 +79,13 @@ fun TVNavigationLayout(
     }
 
     LaunchedEffect (currentRoute) {
-        delay(3000)
+        delay(1500)
         canFocusAfterRecompose = true
     }
 
     // --- LÓGICA DE FOCO Y SCROLL ---
     LaunchedEffect(isNavRailFocused, currentRoute) {
         if (isNavRailFocused) {
-            // ... (Tu lógica para cuando GANA el foco está mayormente bien)
-            // Podrías incluso mejorarla usando el índice aquí también
             if (currentRoute != null && !isInitialFocusSet) {
                 focusRequesters[currentRoute]?.requestFocus()
                 coroutineScope.launch {
@@ -153,7 +150,17 @@ fun TVNavigationLayout(
                                 label = stringResource(id = item.getResId()),
                                 parentIsFocused = isNavRailFocused,
                                 selected = currentRoute == item.route,
-                                onClick = { navController.navigate(item.route) }
+                                onClick = {
+                                    // Comprueba si la ruta es la de Home para evitar un popUp a sí misma
+                                    if (item.route == AppRoute.HOME.route) {
+                                        navController.navigate(item.route) {
+                                            popUpTo(navController.graph.startDestinationId)
+                                            launchSingleTop = true
+                                        }
+                                    } else {
+                                        navController.navigateToTopLevel(item.route)
+                                    }
+                                }
                             )
                         }
 
