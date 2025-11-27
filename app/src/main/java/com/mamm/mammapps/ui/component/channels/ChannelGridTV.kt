@@ -2,7 +2,9 @@ package com.mamm.mammapps.ui.component.channels
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -20,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.unit.dp
 import com.mamm.mammapps.ui.component.common.contententity.ContentEntity
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
 import com.mamm.mammapps.ui.model.ContentEntityUI
@@ -48,20 +51,23 @@ fun ChannelGridTV(
 
     val previousChannelsKey = rememberSaveable { mutableStateOf(channelsKey) }
 
-    LaunchedEffect(channelsKey) {
-        /*Esto es para que el Grid fuerce resetear el foco al 0 al cambiar el estado del filtro.
-          Si no se hace, no encuentra dónde enfocar porque el grid se queda en indices que no incluyen el 0
-         */
-        if (previousChannelsKey.value != channelsKey) {
-            lastFocusedIndex.intValue = 0
-            lazyGridState.scrollToItem(0)
-
-            // Actualizamos la clave guardada para la próxima comparación.
-            previousChannelsKey.value = channelsKey
-        }
-        // Esto simplemente devuelve el foco al mismo elemento que lo tenía (al volver del player por ejemplo) o también al cambiar el filtro
+    LaunchedEffect (Unit) {
         delay(50)
         focusRequester.requestFocus()
+    }
+
+    LaunchedEffect(channelsKey) {
+        if (previousChannelsKey.value != channelsKey) {
+            //Hace scroll al 0 al cambiar de categoría de canales
+            lastFocusedIndex.intValue = 0
+            lazyGridState.scrollToItem(0)
+        } else {
+            /*Para que al navegar a la sección
+        el foco se vaya al primer canal
+        */
+            delay(50)
+            focusRequester.requestFocus()
+        }
     }
 
     ProvideLazyListPivotOffset(parentFraction = 0.1f) {
@@ -76,7 +82,9 @@ fun ChannelGridTV(
             horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium),
             verticalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall)
         ) {
-            itemsIndexed(channels, key = { _, channel -> channel.identifier.id }) { index, channel ->
+            itemsIndexed(
+                channels,
+                key = { _, channel -> channel.identifier.id }) { index, channel ->
                 ContentEntity(
                     modifier = Modifier
                         // El FocusRequester se asigna dinámicamente al último elemento enfocado.
@@ -97,9 +105,12 @@ fun ChannelGridTV(
                         },
                     contentEntityUI = channel,
                     onClick = { onChannelClick(channel) },
-                    // El onFocus original se puede mantener si se necesita para otra lógica.
                     onFocus = { onChannelFocus(channel) }
                 )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(1000.dp))
             }
         }
     }
