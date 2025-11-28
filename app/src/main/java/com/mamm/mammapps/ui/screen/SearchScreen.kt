@@ -10,10 +10,14 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -43,6 +47,11 @@ fun SearchScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
     val searchResults by viewModel.searchResults.collectAsStateWithLifecycle()
+    val textInputFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect (Unit) {
+        textInputFocusRequester.requestFocus()
+    }
 
     Column(
         modifier = Modifier
@@ -51,6 +60,7 @@ fun SearchScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         TextInput(
+            modifier = Modifier.focusRequester(textInputFocusRequester),
             value = uiState.searchQuery,
             onValueChange = viewModel::onSearchQueryChange,
             label = stringResource(id = R.string.search_field_label),
