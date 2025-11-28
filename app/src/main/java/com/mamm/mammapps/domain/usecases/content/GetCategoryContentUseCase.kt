@@ -62,6 +62,7 @@ class GetCategoryContentUseCase @Inject constructor(
             AppRoute.SPORTS -> repository.getSports()
             AppRoute.WARNER -> repository.getWarner()
             AppRoute.ACONTRA -> repository.getAcontra()
+            AppRoute.ADULTS -> repository.getAdults()
             AppRoute.AMC -> repository.getAMC()
             else -> {
                 logger.error(TAG, "No specific fallback logic defined for route: ${route.name}")
