@@ -23,14 +23,15 @@ import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.mapper.toContentEntityUI
 import com.mamm.mammapps.ui.mapper.toContentToPlayUI
+import com.mamm.mammapps.ui.screen.AboutScreen
 import com.mamm.mammapps.ui.screen.ChannelsScreen
 import com.mamm.mammapps.ui.screen.DetailScreen
 import com.mamm.mammapps.ui.screen.EPGScreen
 import com.mamm.mammapps.ui.screen.ErrorLogoutScreen
+import com.mamm.mammapps.ui.screen.ExitScreen
 import com.mamm.mammapps.ui.screen.ExpandCategoryScreen
 import com.mamm.mammapps.ui.screen.HomeScreen
 import com.mamm.mammapps.ui.screen.LoginScreen
-import com.mamm.mammapps.ui.screen.LogoutScreen
 import com.mamm.mammapps.ui.screen.SearchScreen
 import com.mamm.mammapps.ui.screen.VideoPlayerScreen
 
@@ -218,11 +219,17 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
         )
     }
 
+
+    composable(AppRoute.ABOUT.route) {
+        AboutScreen()
+    }
+
     composable(AppRoute.LOGOUT.route) {
-        LogoutScreen(
-            onNavigateToLogin = {
-                navController.navigate(AppRoute.LOGIN.route) {
-                    popUpTo(AppRoute.LOGOUT.route) { inclusive = true }
+        LoginScreen(
+            enableAutologin = false,
+            onNavigateToHome = {
+                navController.navigate(AppRoute.HOME.route) {
+                    popUpTo(AppRoute.LOGIN.route) { inclusive = true }
                 }
             }
         )
@@ -236,6 +243,10 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                 }
             }
         )
+    }
+
+    composable (AppRoute.EXIT.route) {
+        ExitScreen()
     }
 
 }

@@ -38,7 +38,7 @@ interface ApiService {
     )
     suspend fun login(
         @Body body: LoginRequest
-    ): LoginResponse
+    ): Response<LoginResponse>
 
     // ---------- LOCATOR ----------
     @GET("locator/endpoint")

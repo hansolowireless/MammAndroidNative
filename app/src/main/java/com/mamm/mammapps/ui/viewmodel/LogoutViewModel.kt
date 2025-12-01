@@ -40,8 +40,6 @@ class LogoutViewModel @Inject constructor(
     }
 
     fun logout() {
-        // Lanzamos una corrutina en el scope del ViewModel para realizar
-        // la operación de logout en segundo plano.
         viewModelScope.launch {
             logoutUseCase()
             _uiState.update { UIState.Success(Unit) }

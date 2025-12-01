@@ -9,25 +9,33 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.ui.component.login.LoginMobile
 import com.mamm.mammapps.ui.component.login.LoginTV
+import com.mamm.mammapps.ui.mapper.toResId
 import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.viewmodel.LoginViewModel
 
 @Composable
 fun LoginScreen(
     onNavigateToHome: () -> Unit,
+    enableAutologin: Boolean = true,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val loginState by viewModel.loginState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.trytoAutoLogin()
+        if (enableAutologin) {
+            viewModel.trytoAutoLogin()
+        }
+        else {
+            viewModel.setIdleState()
+        }
     }
 
     LaunchedEffect(loginState) {
@@ -39,7 +47,13 @@ fun LoginScreen(
     LaunchedEffect(loginState) {
         when (val state = loginState) {
             is UIState.Error -> {
-                Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
+                state.throwable?.let {
+                    Toast.makeText(
+                        context,
+                        context.getString(it.toResId()),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
 
             else -> {}

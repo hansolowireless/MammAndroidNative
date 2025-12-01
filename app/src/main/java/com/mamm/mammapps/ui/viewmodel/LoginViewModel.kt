@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.usecases.login.AutoLoginUseCase
 import com.mamm.mammapps.domain.usecases.login.LoginUseCase
+import com.mamm.mammapps.domain.usecases.logout.LogoutUseCase
 import com.mamm.mammapps.ui.model.uistate.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +20,7 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val autologinUseCase: AutoLoginUseCase,
+    private val logoutUseCase: LogoutUseCase,
     private val logger: Logger
 ) : ViewModel() {
 
@@ -28,6 +30,10 @@ class LoginViewModel @Inject constructor(
 
     private val _loginState = MutableStateFlow<UIState<Unit>>(UIState.Loading)
     val loginState: StateFlow<UIState<Unit>> = _loginState.asStateFlow()
+
+    fun setIdleState() {
+        _loginState.update { UIState.Idle }
+    }
 
     fun trytoAutoLogin() {
         viewModelScope.launch {
@@ -54,6 +60,7 @@ class LoginViewModel @Inject constructor(
             result.fold(
                 onSuccess = { data ->
                     logger.debug(TAG, "Login successful")
+
                     _loginState.update { UIState.Success(data) }
                 },
                 onFailure = { error ->

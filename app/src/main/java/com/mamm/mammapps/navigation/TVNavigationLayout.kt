@@ -1,5 +1,7 @@
 package com.mamm.mammapps.navigation
 
+import android.view.Menu
+import android.view.MenuItem
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -55,7 +57,7 @@ fun TVNavigationLayout(
     val menuItems by viewModel.menuItems.collectAsStateWithLifecycle()
 
     val routeList = menuItems.map { it.route }
-    val showNavigationRail = currentRoute in routeList
+
     var isNavRailFocused by remember { mutableStateOf(false) }
     var isInitialFocusSet by remember { mutableStateOf(false) }
     var canFocusAfterRecompose by remember { mutableStateOf(false) }
@@ -114,7 +116,7 @@ fun TVNavigationLayout(
     }
 
     Row(modifier = Modifier.fillMaxSize()) {
-        if (showNavigationRail) {
+        if (AppRoute.fromRoute(currentRoute)?.let { MenuItems.showSideMenu(it) } == true) {
             ProvideLazyListPivotOffset(parentFraction = 0.01f) {
                 // CAMBIO ARQUITECTÓNICO: El NavigationRail solo es un contenedor, ya no es scrollable.
                 NavigationRail(
