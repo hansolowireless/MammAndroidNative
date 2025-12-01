@@ -96,6 +96,7 @@
     <string name="error_loading_epg">Error cargando la Guía</string>
     <string name="error_subscription_in_process">Su suscripción está en proceso. Consulte a su operador</string>
     <string name="error_content_generic">Error cargando el contenido</string>
+    <string name="error_invalid_credentials">Nombre de usuario o contraseña inválidos</string>
     <!--endregion Error-->
 
     <!--region PIN DIALOG-->

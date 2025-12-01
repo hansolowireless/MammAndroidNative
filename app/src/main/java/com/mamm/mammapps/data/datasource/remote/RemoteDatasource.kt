@@ -20,6 +20,7 @@ import com.mamm.mammapps.data.extension.transformData
 import com.mamm.mammapps.data.local.SecurePreferencesManager
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.mapper.toGetHomeContentException
+import com.mamm.mammapps.data.mapper.toLoginException
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetEPGResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
@@ -73,14 +74,25 @@ class RemoteDatasource @Inject constructor(
 ) {
 
     suspend fun login(username: String, password: String): LoginResponse {
-        return idmApi.login(LoginRequest(username, password, deviceType, deviceSerial))
+        val response = idmApi.login(
+            LoginRequest(
+                username,
+                password,
+                deviceType,
+                deviceSerial
+            )
+        )
+        if (!response.isSuccessful) {
+            throw response.code().toLoginException()
+        }
+        return response.body() ?: throw IllegalStateException("Response body is null")
     }
 
     suspend fun checkLocator(userName: String): LocatorResponse {
         return locatorApi.checkLocator(userName)
     }
 
-    fun getOperatorLogoUrl () : String? {
+    fun getOperatorLogoUrl(): String? {
         return sessionManager.operatorLogoUrl
     }
 
@@ -126,23 +138,23 @@ class RemoteDatasource @Inject constructor(
         return cache.getHomeContent()
     }
 
-    suspend fun getExpandedCategory(categoryId: Int) : GetBrandedContentResponse {
-       return withContext(Dispatchers.IO) {
-           val jsonFile = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
-           require(jsonFile != null) {
-               "JSON file is required to get Home Content, but was null"
-           }
-           val response = baseUrlApi.getExpandCategory(categoryId.toString(), jsonFile)
-           if (!response.isSuccessful) {
-               val errorBody = response.errorBody()?.string()?.toResponseBody()
-               throw HttpException(Response.error<Any>(response.code(), errorBody))
-           }
+    suspend fun getExpandedCategory(categoryId: Int): GetBrandedContentResponse {
+        return withContext(Dispatchers.IO) {
+            val jsonFile = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
+            require(jsonFile != null) {
+                "JSON file is required to get Home Content, but was null"
+            }
+            val response = baseUrlApi.getExpandCategory(categoryId.toString(), jsonFile)
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()?.string()?.toResponseBody()
+                throw HttpException(Response.error<Any>(response.code(), errorBody))
+            }
 
-           response.body() ?: throw IllegalStateException("Response body is null")
-       }
+            response.body() ?: throw IllegalStateException("Response body is null")
+        }
     }
 
-    fun getSubgenreList() : List<Subgenre>? {
+    fun getSubgenreList(): List<Subgenre>? {
         return cache.getCachedSubgenreList()
     }
 
