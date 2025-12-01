@@ -23,13 +23,19 @@ import com.mamm.mammapps.ui.viewmodel.LoginViewModel
 @Composable
 fun LoginScreen(
     onNavigateToHome: () -> Unit,
+    enableAutologin: Boolean = true,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val loginState by viewModel.loginState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.trytoAutoLogin()
+        if (enableAutologin) {
+            viewModel.trytoAutoLogin()
+        }
+        else {
+            viewModel.setIdleState()
+        }
     }
 
     LaunchedEffect(loginState) {

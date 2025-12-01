@@ -4,6 +4,7 @@ import androidx.core.net.toUri
 import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.logger.Logger
+import com.mamm.mammapps.data.model.AboutInfo
 import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.Genre
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
@@ -28,6 +29,15 @@ class MammRepositoryImpl @Inject constructor(
 
     companion object {
         private const val TAG = "MammRepositoryImpl"
+    }
+
+    override suspend fun getAboutInfo() : Result<AboutInfo> {
+        return runCatching {
+            AboutInfo(
+                appVersion = localDataSource.getApplicationVersion(),
+                userName = localDataSource.getUserCredentials().first.orEmpty()
+            )
+        }
     }
 
     override suspend fun getHomeContent(): Result<GetHomeContentResponse> {
@@ -319,6 +329,7 @@ class MammRepositoryImpl @Inject constructor(
                 ?: throw NoSuchElementException("Subgenre list not found in cache or is null")
         }
     }
+
 
 
 }

@@ -3,6 +3,10 @@
 
     <!--region common-->
     <string name="empty"></string>
+    <string name="exit">Salir</string>
+    <string name="yes">Sí</string>
+    <string name="no">No</string>
+    <string name="do_you_want_exit">¿Desea cerrar la aplicación?</string>
     <!--region common-->
 
     <!--region Login-->
@@ -55,6 +59,11 @@
     <string name="search_no_results">No se encontraron resultados para \"%1$s\"</string>
     <!--endregion SEARCH-->
 
+    <!-- region ABOUT -->
+    <string name="username">Usuario: </string>
+    <string name="application_version">Versión de la aplicación: </string>
+    <!-- endregion ABOUT -->
+
     <!--Track selector Strings!-->
     <string name="track_selection_title">Video Quality</string>
     <string name="subtitle_selection_title">Subtitles</string>
@@ -87,8 +96,10 @@
     <string name="nav_movies_amc">Cine AMC</string>
     <string name="nav_series_amc">Series AMC</string>
     <string name="nav_search">Buscar</string>
-    <string name="nav_diagnostics">Diagnóstico de Conexión</string>
+    <string name="nav_diagnostics">Acerca de</string>
     <string name="nav_change_user">Cambiar usuario</string>
+    <string name="nav_exit">Salir</string>
+    <!--endregion Navigation Labels-->
 
     <!--Error-->
     <string name="generic_error">Error</string>

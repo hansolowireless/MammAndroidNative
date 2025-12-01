@@ -11,5 +11,5 @@ interface LoginRepository {
     suspend fun getUserCredentials(): Result<Pair<String?, String?>>
     fun setShowBrandedContentMenus(show: Boolean)
     fun getShowBrandedContentMenus(): Result<Boolean>
-    fun logout() : Result<Unit>
+    fun clearCaches() : Result<Unit>
 }

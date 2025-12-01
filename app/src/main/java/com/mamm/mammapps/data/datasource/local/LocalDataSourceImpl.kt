@@ -1,5 +1,6 @@
 package com.mamm.mammapps.data.datasource.local
 
+import com.mamm.mammapps.BuildConfig
 import com.mamm.mammapps.data.cache.Cache
 import com.mamm.mammapps.data.di.ChromecastDeviceTypeQualifier
 import com.mamm.mammapps.data.di.DeviceSerialQualifier
@@ -70,6 +71,10 @@ class LocalDataSourceImpl @Inject constructor(
 
     override fun getDrmSecretKey64() : ByteArray {
         return secretKey64
+    }
+
+    override fun getApplicationVersion(): String {
+        return BuildConfig.VERSION_NAME
     }
 
     fun clearUserCredentials() {

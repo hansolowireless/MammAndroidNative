@@ -17,6 +17,6 @@ class LogoutUseCase @Inject constructor(
 ) {
     operator fun invoke() {
         epgRepository.clearCache()
-        repository.logout()
+        repository.clearCaches()
     }
 }

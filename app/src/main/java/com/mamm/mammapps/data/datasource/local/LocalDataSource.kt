@@ -17,4 +17,5 @@ interface LocalDataSource {
     fun getDrmBaseUrl(): String
     fun getDrmiV64(): ByteArray
     fun getDrmSecretKey64() : ByteArray
+    fun getApplicationVersion(): String
 }

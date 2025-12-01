@@ -18,12 +18,13 @@ enum class AppRoute {
     SEARCH,
     ADULTS,
     LASTSEVENDAYS,
-    DIAGNOSTICS,
+    ABOUT,
     PLAYER,
     DETAIL,
     EXPANDCATEGORY,
     LOGIN,
     LOGOUT,
+    EXIT,
     ERROR_SUBSCRIPTION_ONGOING;
 
     companion object {
@@ -62,10 +63,10 @@ enum class AppRoute {
             ADULTS -> R.string.nav_adults
             KIDS -> R.string.nav_kids
             SEARCH -> R.string.nav_search
-            DIAGNOSTICS -> R.string.nav_diagnostics
+            ABOUT -> R.string.nav_diagnostics
             LOGOUT -> R.string.nav_change_user
+             EXIT -> R.string.nav_exit
             else -> R.string.app_name
         }
-
     }
 }

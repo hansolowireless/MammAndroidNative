@@ -42,7 +42,6 @@ fun MobileNavigationLayout(navController: NavHostController) {
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-        // Habilitar/deshabilitar gestos para abrir el cajón
         gesturesEnabled = showNavigationDrawer,
         drawerContent = {
             ModalDrawerSheet {

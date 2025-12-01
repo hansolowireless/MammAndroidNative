@@ -2,6 +2,8 @@ package com.mamm.mammapps.navigation
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
@@ -12,6 +14,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.mamm.mammapps.R
 import com.mamm.mammapps.navigation.model.AppRoute
+import com.mamm.mammapps.navigation.model.AppRoute.ERROR_SUBSCRIPTION_ONGOING
+import com.mamm.mammapps.navigation.model.AppRoute.LOGIN
+import com.mamm.mammapps.navigation.model.AppRoute.LOGOUT
 import com.mamm.mammapps.ui.component.icon.BulletedList
 import com.mamm.mammapps.ui.component.icon.Fire
 import com.mamm.mammapps.ui.component.icon.Football
@@ -37,8 +42,9 @@ object MenuItems {
             AppRoute.ADULTS -> Icon(Fire, contentDescription = null, modifier = iconModifier)
             AppRoute.KIDS -> Icon(Puzzle, contentDescription = null, modifier = iconModifier)
             AppRoute.SEARCH -> Icon(Icons.Default.Search, contentDescription = null, modifier = iconModifier)
-            AppRoute.DIAGNOSTICS -> Icon(WifiSignal, contentDescription = null, modifier = iconModifier)
-            AppRoute.LOGOUT -> Icon(Icons.Default.Person, contentDescription = null, modifier = iconModifier) // Puedes usar un icono de logout
+            AppRoute.ABOUT -> Icon(WifiSignal, contentDescription = null, modifier = iconModifier)
+            AppRoute.LOGOUT -> Icon(Icons.Default.Person, contentDescription = null, modifier = iconModifier)
+            AppRoute.EXIT -> Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null, modifier = iconModifier)
             else -> {} // Para otras rutas como Login, etc.
         }
     }
@@ -58,11 +64,25 @@ object MenuItems {
         AppRoute.AMC,
         AppRoute.ADULTS,
         AppRoute.SEARCH,
-        AppRoute.LOGOUT
+        AppRoute.ABOUT,
+        AppRoute.LOGOUT,
+        AppRoute.EXIT
     )
 
     val listNoBrandedContent = list.filter {
         it != AppRoute.WARNER
                 && it != AppRoute.AMC
                 && it != AppRoute.ACONTRA }
+
+    fun showSideMenu(route: AppRoute): Boolean {
+        return when (route) {
+            LOGOUT,
+            AppRoute.PLAYER,
+            AppRoute.DETAIL,
+            AppRoute.LOGIN,
+            AppRoute.EXIT,
+            AppRoute.ERROR_SUBSCRIPTION_ONGOING -> false
+            else -> true
+        }
+    }
 }

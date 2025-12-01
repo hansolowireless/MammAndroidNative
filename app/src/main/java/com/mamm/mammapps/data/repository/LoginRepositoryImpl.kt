@@ -64,7 +64,7 @@ class LoginRepositoryImpl @Inject constructor(
     }
 
 
-    override fun logout() : Result<Unit> {
+    override fun clearCaches() : Result<Unit> {
         return runCatching {
             sessionManager.clear()
             remoteDatasource.clearCache()
