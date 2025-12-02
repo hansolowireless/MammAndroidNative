@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.mamm.mammapps.ui.component.common.contententity.ContentEntity
 import com.mamm.mammapps.ui.component.common.ExpandCategoryItemTV
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
+import com.mamm.mammapps.ui.constant.UIConstant
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.CustomizedContent
@@ -74,7 +75,7 @@ fun RowOfContent(
                     )
                 }
             }
-            if (contentList.size > 5) {
+            if (contentList.size >= UIConstant.MIN_ELEMENTS_DUPLICATE_ROW) {
                 itemsIndexed(
                     contentList
                 ) { index, contentEntity ->
