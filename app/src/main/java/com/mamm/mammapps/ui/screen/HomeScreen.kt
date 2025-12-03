@@ -67,6 +67,8 @@ fun HomeScreen(
 
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
+    val shouldResetFocus = remember { mutableStateOf(true) }
+
     LaunchedEffect(Unit) {
         if (!isTV) {
             castViewModel.startChromecast()
@@ -74,6 +76,7 @@ fun HomeScreen(
     }
 
     LaunchedEffect(Unit) {
+        shouldResetFocus.value = true
         viewModel.checkRestrictedScreen(routeTag)
     }
 
@@ -81,7 +84,23 @@ fun HomeScreen(
         when (homeContentState) {
             is HomeContentUIState.RequestContent -> viewModel.content(routeTag = routeTag)
             is HomeContentUIState.IncorrectPin -> backDispatcher?.onBackPressed()
+            is HomeContentUIState.Success -> {
+                //Para resetear el foco a 0 cada vez que se compone la pantalla
+                val targetIndex = lastClickedItemIndex ?: 0
+                if (columnListState.firstVisibleItemIndex != targetIndex) {
+                    columnListState.scrollToItem(targetIndex)
+                }
+            }
+
             else -> {}
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            if (shouldResetFocus.value) {
+                viewModel.setLastClickedIndexToZero()
+            }
         }
     }
 
@@ -96,6 +115,7 @@ fun HomeScreen(
                     if (!hasNavigated.value) {
                         onPlay(it)
                         hasNavigated.value = true
+                        shouldResetFocus.value = false
                     }
                 }
             }
@@ -153,6 +173,7 @@ fun HomeScreen(
                                     routeTag = routeTag
                                 )
                             } else {
+                                shouldResetFocus.value = false
                                 onShowDetails(entityUI)
                             }
                         },
@@ -162,6 +183,7 @@ fun HomeScreen(
                         onExpandCategory = { categoryId, categoryName, rowState ->
                             viewModel.setLastClickedIndex(columnListState.firstVisibleItemIndex)
                             rowState?.let { viewModel.rememberRowState(it) }
+                            shouldResetFocus.value = false
                             onExpandCategory(
                                 categoryId,
                                 categoryName
