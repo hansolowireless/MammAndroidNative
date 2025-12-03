@@ -1,8 +1,7 @@
 package com.mamm.mammapps.ui.component.common
 
-// --- INICIO DE CAMBIOS ---
-// 1. Importa AMBOS botones, dándoles un alias al de TV para evitar conflictos.
-// --- FIN DE CAMBIOS ---
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -20,8 +19,11 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.Glow
 import com.mamm.mammapps.ui.component.LocalIsTV
+import com.mamm.mammapps.ui.extension.glow
 import com.mamm.mammapps.ui.theme.ButtonColor
+import com.mamm.mammapps.ui.theme.Dimensions
 import androidx.compose.material3.Button as MobileButton
 import androidx.compose.material3.ButtonDefaults as MobileButtonDefaults
 import androidx.compose.material3.MaterialTheme as MobileMaterialTheme
@@ -54,7 +56,10 @@ fun PrimaryButton(
             shape = TvButtonDefaults.shape(shape = RoundedCornerShape(8.dp)),
             modifier = modifier
                 .height(height),
-            glow = TvButtonDefaults.glow(),
+            glow = TvButtonDefaults.glow(Glow(
+                elevationColor = ButtonColor.focusedContent,
+                elevation = 5.dp
+            )),
             colors = TvButtonDefaults.colors(
                 containerColor = ButtonColor.background,
                 focusedContainerColor = ButtonColor.background,
@@ -86,7 +91,11 @@ fun PrimaryButton(
             onClick = onClick,
             shape = RectangleShape, // En móvil es más directo
             modifier = modifier
-                .height(height),
+                .height(height)
+                .border(BorderStroke(
+                    Dimensions.buttonBorder,
+                    color = ButtonColor.focusedContent
+                )),
             colors = MobileButtonDefaults.buttonColors(
                 containerColor = ButtonColor.background,
                 contentColor = ButtonColor.focusedContent,

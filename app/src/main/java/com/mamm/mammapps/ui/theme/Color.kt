@@ -9,9 +9,9 @@ val TextPrimary = Color.White
 val Background = Color.Black
 
 object ButtonColor {
-    val focusedContent = Color.Black
-    val unfocusedContent = Color.Black
-    val background = Color(0xFF4A90E2)
+    val focusedContent = Color.White
+    val unfocusedContent = Color.White
+    val background = Color.DarkGray
 }
 
 object ContentEntityListItemColor {

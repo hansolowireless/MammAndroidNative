@@ -158,7 +158,6 @@ fun DetailTV(
                                 Icon(
                                     imageVector = Icons.Default.PlayArrow,
                                     contentDescription = stringResource(R.string.accessibility_play_icon_content_description),
-                                    tint = Color.Black,
                                     modifier = Modifier.padding(end = Dimensions.paddingXSmall)
                                 )
                             },

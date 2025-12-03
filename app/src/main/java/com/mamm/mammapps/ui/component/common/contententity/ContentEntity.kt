@@ -88,7 +88,11 @@ private fun ContentEntityTV(
                 scaleX = scale
                 scaleY = scale
             }
-            .glow(enabled = isFocused, alpha = glowAlpha, glowRadius = 15.dp)
+            .glow(
+                enabled = isFocused,
+                alpha = glowAlpha,
+                glowRadius = 15.dp
+            )
             .onFocusChanged { focusState ->
                 isFocused = focusState.isFocused
                 if (isFocused) onFocus()

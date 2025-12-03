@@ -12,6 +12,7 @@ object Dimensions {
     val contentEntityHeight = 190.dp
     val channelEntityHeight = 140.dp
     val cornerRadius = 10.dp
+    val buttonBorder = 2.dp
 }
 
 object Ratios{
