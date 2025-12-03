@@ -1,7 +1,6 @@
 package com.mamm.mammapps.navigation
 
-import android.view.Menu
-import android.view.MenuItem
+import android.util.Log
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -30,6 +29,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.res.stringResource
@@ -139,11 +143,23 @@ fun TVNavigationLayout(
                     ) {
                         items(menuItems) { item ->
 
+                            val isLastItem = menuItems.last().route == item.route
+
                             val itemModifier = Modifier
                                 .focusRequester(focusRequesters.getValue(item.route))
                                 .bringIntoViewRequester(bringIntoViewRequesters.getValue(item.route))
                                 .onGloballyPositioned { coordinates ->
                                     itemPositions[item.route] = coordinates.positionInParent().y
+                                }.onKeyEvent { keyEvent ->
+                                    if (keyEvent.type == KeyEventType.KeyDown &&
+                                        keyEvent.key == Key.DirectionDown
+                                    ) {
+                                        if (isLastItem) {
+                                            // Evita abandonar la navegación en el último elemento del menú
+                                            return@onKeyEvent true
+                                        }
+                                    }
+                                    false
                                 }
 
                             CustomTVNavigationItem(
