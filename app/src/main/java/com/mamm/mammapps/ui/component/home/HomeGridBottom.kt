@@ -99,7 +99,6 @@ fun HomeGridBottom(
                     if (index == focusedRowIndex) {
                         Log.d("HomeGrid", "Focus on row $index")
                         Log.d("HomeGrid", "focusedRowIndex $focusedRowIndex")
-                        Log.d("HomeGrid", "La key es ${contentRow.categoryId}")
                         kotlinx.coroutines.delay(50)
                         rowFocusRequester.requestFocus()
 
