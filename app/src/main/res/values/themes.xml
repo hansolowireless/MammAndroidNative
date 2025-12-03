@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <!-- Establece el color de fondo de la splash screen -->
+        <item name="windowSplashScreenBackground">@android:color/black</item>
+
+        <!-- Icono que se mostrará en el centro. Puede ser tu logo -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+
+        <!-- Opcional: Duración del icono animado (si lo tienes) -->
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+
+        <!-- El tema que usará tu app una vez que la splash screen termine -->
+        <item name="postSplashScreenTheme">@style/Theme.MammApps</item>
+    </style>
+
     <style name="Theme.MammApps" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:colorBackground">@color/white</item>
         <item name="colorSurface">@color/white</item>

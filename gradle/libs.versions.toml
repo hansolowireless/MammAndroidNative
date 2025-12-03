@@ -32,6 +32,7 @@ glide = "4.14.2"
 exoplayer = "2.19.0"
 playServicesCastFramework = "21.5.0"
 previewseekbar-exoplayer = "2.18.1.0"
+coreSplashscreen = "1.0.1"
 jjwt = "0.12.6"
 
 
@@ -47,6 +48,7 @@ androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecyc
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 androidxLeanback = { group = "androidx.leanback", name = "leanback", version.ref = "androidxLeanback" }
 androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "security-crypto" }
 androidx-tv-foundation = { group = "androidx.tv", name = "tv-foundation", version.ref = "androidx-tv" }
