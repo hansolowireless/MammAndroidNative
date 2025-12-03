@@ -70,3 +70,10 @@ object PlayerColor {
 object ExpandCategoryColor {
     val title = Color.White
 }
+
+object SnackbarColor {
+    val containerColor = Color.DarkGray
+    val contentColor = Color.White
+    val actionColor = Color.Yellow
+    val dismissActionContentColor = Color.LightGray
+}

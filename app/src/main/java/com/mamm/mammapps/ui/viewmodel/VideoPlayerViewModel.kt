@@ -383,6 +383,9 @@ class VideoPlayerViewModel @Inject constructor(
                 _player.value?.seekToDefaultPosition()
                 _player.value?.prepare()
             }
+            else -> {
+                _playerState.update { PlayerUIState.Error(exception.localizedMessage.orEmpty() + ": " + exception.errorCode) }
+            }
         }
     }
 
