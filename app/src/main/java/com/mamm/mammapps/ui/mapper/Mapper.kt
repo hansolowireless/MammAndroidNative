@@ -449,7 +449,7 @@ fun GetHomeContentResponse.toContentUIRows(): List<ContentRowUI> {
             }
         } ?: emptyList()
 
-        val loadMore = category.loadMore || items.size > UIConstant.MAX_ELEMENTS_PER_ROW
+        val loadMore = category.loadMore
 
         if (items.isNotEmpty()) {
             ContentRowUI(
