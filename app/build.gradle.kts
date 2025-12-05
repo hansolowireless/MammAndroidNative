@@ -90,10 +90,10 @@ android {
 
     defaultConfig {
         applicationId = "com.mamm.mammapps"
-        minSdk = 24
+        minSdk = 21
         targetSdk = 35
-        versionCode = 503
-        versionName = "4.7.532"
+        versionCode = 504
+        versionName = "4.8.001"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
