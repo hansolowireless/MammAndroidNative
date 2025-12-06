@@ -35,13 +35,16 @@ class LoginUseCase @Inject constructor(
         return repository.login(username, password).fold(
             onSuccess = { response ->
                 logger.debug(TAG, "invoke Login successful, ${response.data}")
-                response.data?.let { session.startNewSession(it) }
 
                 //Limpiar credenciales y datos si quedaran
+                //ANTES DE GUARDAR LOS NUEVOS!!!!
                 epgRepository.clearCache()
                 repository.clearCaches()
 
-                // Guardar credenciales tras login exitoso
+                //Almacenar los nuevos datos de sesión
+                response.data?.let { session.startNewSession(it) }
+
+                // Guardar credenciales
                 repository.saveUserCredentials(username, password)
                 logger.debug(TAG, "User credentials saved securely")
 
