@@ -6,7 +6,9 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class WatermarkInfo(
-    @SerializedName("has") val hasInt: Int = 0,
+    @SerializedName("has")
+    val hasInt: Int = 0,
+    @SerializedName("url")
     val url: String? = null
 ) : Parcelable {
     val has: Boolean get() = hasInt == 1
