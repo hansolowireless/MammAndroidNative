@@ -74,7 +74,7 @@ class GetCategoryContentUseCase @Inject constructor(
     private fun getResponseFromContentFilteredByCategory(content: Any, categoryId: Int) : Any? {
         when (content) {
             is GetOtherContentResponse -> {
-                val vods = content.vods?.filter { it.idSubgenre?.toInt() == categoryId }
+                val vods = content.vods?.filter { it.subgenreById == categoryId }
                 val events = content.events?.filter { it.idSubgenre?.toInt() == categoryId }
 
                 logger.debug(TAG, "Found ${vods?.size} VODs for category $categoryId")

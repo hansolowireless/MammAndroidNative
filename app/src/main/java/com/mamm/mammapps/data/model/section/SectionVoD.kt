@@ -8,85 +8,69 @@ import kotlinx.parcelize.Parcelize
 // Assuming Vod has similar structure to Event, but you may need to adjust based on actual structure
 @Parcelize
 data class SectionVod(
-    @SerializedName("featured")
-    val featured: String? = null,
+    @SerializedName("id")
+    val id: Int? = null,
 
-    @SerializedName("id_ppal_event")
-    val idPpalEvent: String? = null,
+    @SerializedName("title")
+    val title: String? = null,
 
-    @SerializedName("event_logo_url_500")
-    val eventLogoUrl500: String? = null,
+    @SerializedName("shortDesc")
+    val shortDesc: String? = null,
 
-    @SerializedName("tbEventItems")
-    val tbEventItems: List<TbContentItem>? = null,
-
-    @SerializedName("event_logo_title_url")
-    val eventLogoTitleUrl: String? = null,
-
-    @SerializedName("id_channel")
-    val idChannel: String? = null,
-
-    @SerializedName("episode")
-    val episode: String? = null,
-
-    @SerializedName("url_loop_mpd")
-    val urlLoopMpd: String? = null,
-
-    @SerializedName("poster_logo")
-    val posterLogo: String? = null,
-
-    @SerializedName("event_logo_url")
-    val eventLogoUrl: String? = null,
-
-    @SerializedName("fc_ini")
-    val fcIni: String? = null,
+    @SerializedName("longDesc")
+    val longDesc: String? = null,
 
     @SerializedName("duration")
-    val duration: String? = null,
-
-    @SerializedName("in_active")
-    val inActive: String? = null,
-
-    @SerializedName("fc_end")
-    val fcEnd: String? = null,
-
-    @SerializedName("id_parental")
-    val idParental: String? = null,
-
-    @SerializedName("tbEventLanguages")
-    val tbEventLanguages: List<TbEventLanguage>? = null,
+    val duration: Int? = null,
 
     @SerializedName("deliveryURL")
     val deliveryURL: String? = null,
 
-    @SerializedName("id_event")
-    val idEvent: String? = null,
+    @SerializedName("provider")
+    val provider: String? = null,
 
-    @SerializedName("url_loop")
-    val urlLoop: String? = null,
+    @SerializedName("parental")
+    val parental: Int? = null,
 
-    @SerializedName("tbEventLogoTransitions")
-    val tbEventLogoTransitions: List<String>? = null,
+    @SerializedName("startDate")
+    val startDate: String? = null,
 
-    @SerializedName("id_subgenre")
-    val idSubgenre: String? = null
+    @SerializedName("expiryDate")
+    val expiryDate: String? = null,
+
+    @SerializedName("logoURL")
+    val logoURL: String? = null,
+
+    @SerializedName("posterURL")
+    val posterURL: String? = null,
+
+    @SerializedName("content_logo")
+    val contentLogo: String? = null,
+
+    @SerializedName("content_logo_500")
+    val contentLogo500: String? = null,
+
+    @SerializedName("content_logo_tilte")
+    val contentLogoTitle: String? = null,
+
+    @SerializedName("subgenreById")
+    val subgenreById: Int? = null,
+
+    @SerializedName("tbContentItems")
+    val tbContentItems: List<TbContentItem>? = null,
+
+    @SerializedName("logoTransitions")
+    val logoTransitions: List<String>? = null
 ) : Parcelable {
 
-    fun getId(): Int = idEvent?.toIntOrNull() ?: idEvent?.hashCode() ?: 0
+    fun getId(): Int = id ?: 0
 
     fun getMetadata(): Metadata {
-        return Metadata.fromTbContentItems(tbEventItems ?: emptyList())
-    }
-
-    fun getTitle(): String {
-        return tbEventLanguages?.firstOrNull()?.title ?: ""
+        return Metadata.fromTbContentItems(tbContentItems ?: emptyList())
     }
 
     fun getDescription(): String {
-        return tbEventLanguages?.firstOrNull()?.description ?: ""
+        return longDesc.orEmpty()
     }
 
-    fun getSubtitle(): String {
-        return tbEventLanguages?.firstOrNull()?.subtitle ?: ""
-    }
 }

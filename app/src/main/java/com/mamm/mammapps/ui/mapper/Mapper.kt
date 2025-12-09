@@ -168,17 +168,17 @@ fun EPGEvent.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
 
 fun SectionVod.toContentEntityUI() = ContentEntityUI(
     identifier = ContentIdentifier.VoD(getId()),
-    imageUrl = (posterLogo?.takeIf { it.isNotBlank() }
-        ?: eventLogoUrl500?.takeIf { it.isNotBlank() })
+    imageUrl = (posterURL?.takeIf { it.isNotBlank() }
+        ?: logoURL?.takeIf { it.isNotBlank() })
         .orEmpty(),
-    horizontalImageUrl = eventLogoTitleUrl.orEmpty(),
-    title = getTitle(),
+    horizontalImageUrl = logoURL.orEmpty(),
+    title = title.orEmpty(),
     aspectRatio = Ratios.VERTICAL,
     height = Dimensions.contentEntityHeight,
     detailInfo = DetailInfoUI(
         description = getDescription(),
         metadata = getMetadata(),
-        subgenreId = this.idSubgenre?.toInt()
+        subgenreId = this.subgenreById
     )
 )
 
@@ -344,8 +344,8 @@ fun EPGEvent.toContentToPlayUI() = ContentToPlayUI(
 fun SectionVod.toContentToPlayUI() = ContentToPlayUI(
     identifier = ContentIdentifier.VoD(getId()),
     deliveryURL = this.deliveryURL.orEmpty(),
-    title = this.getTitle(),
-    imageUrl = this.posterLogo.orEmpty()
+    title = title.orEmpty(),
+    imageUrl = this.posterURL.orEmpty()
 )
 
 fun BrandedVod.toContentToPlayUI() = ContentToPlayUI(
@@ -465,36 +465,54 @@ fun GetHomeContentResponse.toContentUIRows(): List<ContentRowUI> {
 }
 
 fun GetOtherContentResponse.toContentUIRows(
-    genre: Genre
+    subgenres: List<Subgenre>
 ): List<ContentRowUI> {
-    val rows = mutableListOf<ContentRowUI>()
+    val rowsMap = mutableMapOf<Int, ContentRowUI>()
 
-    genre.subgenres?.forEach { sub ->
-        // Filtramos los events de este subgénero (si aplica)
-        val subEvents = events.orEmpty().filter { it.idSubgenre == sub.id.toString() }
-        val subVods = vods.orEmpty().filter { it.idSubgenre == sub.id.toString() }
-
-        // Convertimos a ContentEntityUI
-        var items = (subEvents.map { it.toContentEntityUI() }
-                + subVods.map { it.toContentEntityUI() })
-
-        val loadMore = items.size > UIConstant.MAX_ELEMENTS_PER_ROW
-
-        items = items.take(UIConstant.MAX_ELEMENTS_PER_ROW)
-
-        if (items.isNotEmpty()) {
-            rows.add(
+    // Procesamos los eventos y los agrupamos por subgénero
+    this.events?.forEach { event ->
+        event.idSubgenre?.toIntOrNull()?.let { subgenreId ->
+            val row = rowsMap.getOrPut(subgenreId) {
+                val subgenreName = subgenres.find { it.id == subgenreId }?.ds.orEmpty()
                 ContentRowUI(
-                    categoryId = sub.id.orRandom(),
-                    categoryName = sub.ds.orEmpty(),
-                    items = items,
-                    loadMore = loadMore
+                    categoryId = subgenreId,
+                    categoryName = subgenreName,
+                    items = mutableListOf()
                 )
-            )
+            }
+            (row.items as? MutableList)?.add(event.toContentEntityUI())
         }
     }
-    return rows
+
+    // Hacemos lo mismo con los VODs, añadiéndolos a las filas existentes si el subgénero ya existe
+    this.vods?.forEach { vod ->
+        vod.subgenreById?.let { subgenreId ->
+            val row = rowsMap.getOrPut(subgenreId) {
+                val subgenreName = subgenres.find { it.id == subgenreId }?.ds.orEmpty()
+                ContentRowUI(
+                    categoryId = subgenreId,
+                    categoryName = subgenreName,
+                    items = mutableListOf()
+                )
+            }
+            (row.items as? MutableList)?.add(vod.toContentEntityUI())
+        }
+    }
+
+    // Obtenemos la lista de filas desde el mapa y la ordenamos si es necesario
+    var contentRows = rowsMap.values.toList()
+
+    // Cortamos las filas a no más de MAX_ELEMENTS_PER_ROW y añadimos el flag `loadMore`
+    contentRows = contentRows.map { contentRow ->
+        contentRow.copy(
+            loadMore = contentRow.items.size > UIConstant.MAX_ELEMENTS_PER_ROW,
+            items = contentRow.items.take(UIConstant.MAX_ELEMENTS_PER_ROW)
+        )
+    }
+
+    return contentRows
 }
+
 
 fun GetBrandedContentResponse.toContentUIRows(
     subgenres: List<Subgenre>,

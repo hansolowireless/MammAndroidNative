@@ -16,21 +16,16 @@ class GetKidsUseCase @Inject constructor(
     }
 
     suspend operator fun invoke(): Result<List<ContentRowUI>> {
-        return mammRepository.findGenreWithId(15).fold(
-            onSuccess = { genreResult ->
-                mammRepository.getKids().fold(
-                    onSuccess = { response ->
-                        logger.debug(TAG, "GetKidsUseCase Received successful response")
-                        Result.success(response.toContentUIRows(genreResult))
-                    },
-                    onFailure = { exception ->
-                        logger.error(TAG, "GetKidsUseCase Failed: ${exception.message}")
-                        Result.failure(exception)
-                    }
+        return mammRepository.getKids().fold(
+            onSuccess = { response ->
+                logger.debug(TAG, "GetKidsUseCase Received successful response")
+                Result.success(
+                    response.toContentUIRows(
+                        subgenres = mammRepository.getSubgenreList().getOrThrow())
                 )
             },
             onFailure = { exception ->
-                logger.error(TAG, "GetKidsUseCase Genre lookup failed: ${exception.message}")
+                logger.error(TAG, "GetKidsUseCase Failed: ${exception.message}")
                 Result.failure(exception)
             }
         )

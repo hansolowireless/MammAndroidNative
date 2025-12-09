@@ -16,21 +16,16 @@ class GetDocumentariesUseCase @Inject constructor(
     }
 
     suspend operator fun invoke(): Result<List<ContentRowUI>> {
-        return mammRepository.findGenreWithId(9).fold(
-            onSuccess = { genreResult ->
-                mammRepository.getDocumentaries().fold(
-                    onSuccess = { response ->
-                        logger.debug(TAG, "GetDocumentariesUseCase Received successful response")
-                        Result.success(response.toContentUIRows(genreResult))
-                    },
-                    onFailure = { exception ->
-                        logger.error(TAG, "GetDocumentariesUseCase Failed: ${exception.message}")
-                        Result.failure(exception)
-                    }
+        return mammRepository.getDocumentaries().fold(
+            onSuccess = { response ->
+                logger.debug(TAG, "GetDocumentariesUseCase Received successful response")
+                Result.success(
+                    response.toContentUIRows(
+                        subgenres = mammRepository.getSubgenreList().getOrThrow())
                 )
             },
             onFailure = { exception ->
-                logger.error(TAG, "GetDocumentariesUseCase Genre lookup failed: ${exception.message}")
+                logger.error(TAG, "GetDocumentariesUseCase Failed: ${exception.message}")
                 Result.failure(exception)
             }
         )

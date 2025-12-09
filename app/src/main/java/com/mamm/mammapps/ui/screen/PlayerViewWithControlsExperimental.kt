@@ -51,7 +51,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.bumptech.glide.Glide
-import com.example.openstream_flutter_rw.ui.manager.watermark.FingerprintController
+import com.mamm.mammapps.ui.manager.watermark.FingerprintController
 import com.github.rubensousa.previewseekbar.PreviewBar
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ui.StyledPlayerView
@@ -148,6 +148,12 @@ fun PlayerViewWithControlsExperimental(
                 tickerList.first().tiempoEntreApariciones.toLong(),
                 tickerList.first().tiempoDuracion.toLong()
             )
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            fingerprintController.stop()
         }
     }
 

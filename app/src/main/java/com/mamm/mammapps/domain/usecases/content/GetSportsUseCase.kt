@@ -16,21 +16,16 @@ class GetSportsUseCase @Inject constructor(
     }
 
     suspend operator fun invoke(): Result<List<ContentRowUI>> {
-        return mammRepository.findGenreWithId(4).fold(
-            onSuccess = { genreResult ->
-                mammRepository.getSports().fold(
-                    onSuccess = { response ->
-                        logger.debug(TAG, "GetSportsUseCase Received successful response")
-                        Result.success(response.toContentUIRows(genreResult))
-                    },
-                    onFailure = { exception ->
-                        logger.error(TAG, "GetSportsUseCase Failed: ${exception.message}")
-                        Result.failure(exception)
-                    }
+        return mammRepository.getSports().fold(
+            onSuccess = { response ->
+                logger.debug(TAG, "GetSportsUseCase Received successful response")
+                Result.success(
+                    response.toContentUIRows(
+                        subgenres = mammRepository.getSubgenreList().getOrThrow())
                 )
             },
             onFailure = { exception ->
-                logger.error(TAG, "GetSportsUseCase Genre lookup failed: ${exception.message}")
+                logger.error(TAG, "GetSportsUseCase Failed: ${exception.message}")
                 Result.failure(exception)
             }
         )

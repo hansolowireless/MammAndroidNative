@@ -16,21 +16,16 @@ class GetMoviesUseCase @Inject constructor(
     }
 
     suspend operator fun invoke(): Result<List<ContentRowUI>> {
-        return mammRepository.findGenreWithId(1).fold(
-            onSuccess = { genreResult ->
-                mammRepository.getMovies().fold(
-                    onSuccess = { response ->
-                        logger.debug(TAG, "GetMoviesUseCase Received successful response")
-                        Result.success(response.toContentUIRows(genreResult))
-                    },
-                    onFailure = { exception ->
-                        logger.error(TAG, "GetMoviesUseCase Failed: ${exception.message}")
-                        Result.failure(exception)
-                    }
+        return mammRepository.getMovies().fold(
+            onSuccess = { response ->
+                logger.debug(TAG, "GetMoviesUseCase Received successful response")
+                Result.success(
+                    response.toContentUIRows(
+                        subgenres = mammRepository.getSubgenreList().getOrThrow())
                 )
             },
             onFailure = { exception ->
-                logger.error(TAG, "Genre lookup failed: ${exception.message}")
+                logger.error(TAG, "GetMoviesUseCase Failed: ${exception.message}")
                 Result.failure(exception)
             }
         )
