@@ -1,4 +1,4 @@
-package com.example.openstream_flutter_rw.ui.manager.watermark
+package com.mamm.mammapps.ui.manager.watermark
 
 import android.os.Handler
 import android.os.Looper
