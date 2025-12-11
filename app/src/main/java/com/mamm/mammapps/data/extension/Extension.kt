@@ -1,8 +1,11 @@
 package com.mamm.mammapps.data.extension
 
+import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
+import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.metadata.Metadata
 import com.mamm.mammapps.data.model.section.EPGEvent
+import com.mamm.mammapps.ui.extension.adult
 import retrofit2.Response
 import java.time.Instant
 import java.time.LocalDate
@@ -36,7 +39,21 @@ fun GetHomeContentResponse.transformData(
     )
 }
 
-fun LocalDate.toEPGRequestDate () : String {
+fun GetBrandedContentResponse.correctAdultImages(
+): GetBrandedContentResponse = run {
+    val transformedEvents = events?.map {
+        it.copy(posterLogo = it.posterLogo?.adult())
+    }
+    val transformedVods = vods?.map {
+        it.copy(posterLogo = it.posterLogo?.adult())
+    }
+    this.copy(
+        events = transformedEvents,
+        vods = transformedVods
+    )
+}
+
+fun LocalDate.toEPGRequestDate(): String {
     return this.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 }
 
@@ -44,7 +61,7 @@ fun ZonedDateTime.toTSTVDateString(): String {
     return this.format(DateTimeFormatter.ofPattern("yyyy/MM/dd/HH/mm"))
 }
 
-fun getCurrentDate() : ZonedDateTime {
+fun getCurrentDate(): ZonedDateTime {
     return ZonedDateTime.now()
 }
 
