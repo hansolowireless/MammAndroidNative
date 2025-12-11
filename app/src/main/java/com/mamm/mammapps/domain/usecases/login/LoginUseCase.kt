@@ -27,6 +27,7 @@ class LoginUseCase @Inject constructor(
                     repository.setShowBrandedContentMenus(false)
                 }
                 .onFailure {
+                    logger.error(TAG, "invoke Locator request failed: ${it.message}")
                     Config.resetDynamicUrls()
                     repository.setShowBrandedContentMenus(true)
                 }
