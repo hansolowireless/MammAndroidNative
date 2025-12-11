@@ -42,10 +42,15 @@ fun GetHomeContentResponse.transformData(
 fun GetBrandedContentResponse.correctAdultImages(
 ): GetBrandedContentResponse = run {
     val transformedEvents = events?.map {
-        it.copy(posterLogo = it.posterLogo?.adult())
+        it.copy(
+            posterLogo = it.posterLogo?.adult(),
+        )
     }
     val transformedVods = vods?.map {
-        it.copy(posterLogo = it.posterLogo?.adult())
+        it.copy(
+            posterLogo = it.posterLogo?.adult(),
+            contentLogo = it.contentLogo?.adult()
+        )
     }
     this.copy(
         events = transformedEvents,
