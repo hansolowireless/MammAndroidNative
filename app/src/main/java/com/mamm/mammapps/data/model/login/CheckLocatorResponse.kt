@@ -3,9 +3,12 @@ package com.mamm.mammapps.data.model.login
 import com.google.gson.annotations.SerializedName
 
 data class LocatorResponse(
-    val status: Int,  // era "statusCode" pero en JSON es "status"
+    @SerializedName("status")
+    val status: Int,
+    @SerializedName("message")
     val message: String,
-    val data: EndpointData  // correcto
+    @SerializedName("data")
+    val data: EndpointData
 )
 
 data class EndpointData(
