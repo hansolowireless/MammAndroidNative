@@ -60,7 +60,7 @@ data class SectionVod(
     val tbContentItems: List<TbContentItem>? = null,
 
     @SerializedName("logoTransitions")
-    val logoTransitions: List<String>? = null
+    val logoTransitions: List<LogoTransition>? = null
 ) : Parcelable {
 
     fun getId(): Int = id ?: 0
@@ -74,3 +74,9 @@ data class SectionVod(
     }
 
 }
+
+@Parcelize
+data class LogoTransition(
+    @SerializedName("url")
+    val url: String? = null
+) : Parcelable
