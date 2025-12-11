@@ -89,8 +89,8 @@ fun Modifier.onTap(onTap: () -> Unit): Modifier {
 
 fun String.squared() = this.replace(".png", "_x4.png").replace(".jpg", "_x4.jpg")
 fun String.landscape() = this.replace(".png", "_viewer.png").replace(".jpg", "_viewer.jpg")
-fun String.adult(isAdult: Boolean = false): String {
-    return if (isAdult) this.replace(".png", "_p.png").replace(".jpg", "_p.jpg") else this
+fun String.adult(): String {
+    return this.replace(".png", "_p.png").replace(".jpg", "_p.jpg")
 }
 
 fun String.buildThumbnailUrl(position: Long?): String {
