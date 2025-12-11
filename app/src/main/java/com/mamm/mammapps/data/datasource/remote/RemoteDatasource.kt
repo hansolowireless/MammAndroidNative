@@ -13,6 +13,7 @@ import com.mamm.mammapps.data.di.LocatorApi
 import com.mamm.mammapps.data.di.NoBaseUrlApi
 import com.mamm.mammapps.data.di.NoBaseUrlNoRedirectApi
 import com.mamm.mammapps.data.di.QosApi
+import com.mamm.mammapps.data.extension.correctAdultImages
 import com.mamm.mammapps.data.extension.getCurrentDate
 import com.mamm.mammapps.data.extension.isRedirect
 import com.mamm.mammapps.data.extension.toEPGRequestDate
@@ -262,14 +263,15 @@ class RemoteDatasource @Inject constructor(
         return withContext(Dispatchers.IO) {
 
             cache.getAdultsContent()?.let { return@withContext it }
-            val response = baseUrlApi.getAdults(jsonParam)
-            if (!response.isSuccessful) {
-                val errorBody = response.errorBody()?.string()?.toResponseBody()
-                throw HttpException(Response.error<Any>(response.code(), errorBody))
+            baseUrlApi.getAdults(jsonParam).let {
+                if (!it.isSuccessful){
+                    val errorBody = it.errorBody()?.string()?.toResponseBody()
+                    throw HttpException(Response.error<Any>(it.code(), errorBody))
+                }
+                val adultsData = it.body() ?: throw IllegalStateException("Response body is null")
+                cache.setAdultsContent(adultsData.correctAdultImages())
+                cache.getAdultsContent()!!
             }
-            val adultsData = response.body() ?: throw IllegalStateException("Response body is null")
-            cache.setAdultsContent(adultsData)
-            adultsData
         }
     }
 

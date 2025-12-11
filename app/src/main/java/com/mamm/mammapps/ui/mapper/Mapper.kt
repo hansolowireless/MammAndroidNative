@@ -43,15 +43,15 @@ import com.mamm.mammapps.util.getRandomHashCode
 import com.mamm.mammapps.util.orRandom
 import java.time.LocalDate
 
-fun Any.toContentEntityUI(isAdult: Boolean = false): ContentEntityUI? {
+fun Any.toContentEntityUI(): ContentEntityUI? {
     return when (this) {
         is Channel -> this.toContentEntityUI()
         is VoD -> this.toContentEntityUI()
         is Event -> this.toContentEntityUI()
         is Serie -> this.toContentEntityUI()
-        is EPGEvent -> this.toContentEntityUI(isAdult)
+        is EPGEvent -> this.toContentEntityUI()
         is SectionVod -> this.toContentEntityUI()
-        is BrandedVod -> this.toContentEntityUI(isAdult)
+        is BrandedVod -> this.toContentEntityUI()
         is BrandedFeatured -> this.toContentEntityUI()
         is Bookmark -> this.toContentEntityUI()
         is MostWatchedContent -> this.toContentEntityUI()
@@ -148,11 +148,11 @@ fun HomeFeatured.toContentEntityUI(): ContentEntityUI? {
     )
 }
 
-fun EPGEvent.toContentEntityUI(isAdult: Boolean = false) = ContentEntityUI(
+fun EPGEvent.toContentEntityUI() = ContentEntityUI(
     identifier = ContentIdentifier.Event(getId()),
     imageUrl = (posterLogo?.takeIf { it.isNotBlank() }
         ?: eventLogoUrl500?.takeIf { it.isNotBlank() })
-        .orEmpty().adult(isAdult),
+        .orEmpty(),
     horizontalImageUrl = eventLogoUrl.orEmpty(),
     title = getTitle(),
     aspectRatio = Ratios.VERTICAL,
@@ -182,9 +182,9 @@ fun SectionVod.toContentEntityUI() = ContentEntityUI(
     )
 )
 
-fun BrandedVod.toContentEntityUI(isAdult: Boolean) = ContentEntityUI(
+fun BrandedVod.toContentEntityUI() = ContentEntityUI(
     identifier = ContentIdentifier.VoD(getId()),
-    imageUrl = posterLogo.orEmpty().adult(isAdult),
+    imageUrl = posterLogo.orEmpty(),
     horizontalImageUrl = contentLogo.orEmpty(),
     title = getTitle(),
     aspectRatio = Ratios.VERTICAL,
@@ -530,7 +530,7 @@ fun GetBrandedContentResponse.toContentUIRows(
                     items = mutableListOf()
                 )
             }
-            (row.items as? MutableList)?.add(vod.toContentEntityUI(isAdult = isAdult))
+            (row.items as? MutableList)?.add(vod.toContentEntityUI())
         }
     }
 
@@ -592,39 +592,56 @@ fun List<ContentRowUI>.insertFeatured(
 fun List<ContentRowUI>.insertBookmarks(
     bookmarks: List<Bookmark>
 ): List<ContentRowUI> {
-    ContentRowUI(
-        categoryId = getRandomHashCode(),
-        categoryName = "Seguir viendo",
-        items = bookmarks.mapNotNull { it.toContentEntityUI() }
-    ).let {
-        return listOf(it) + this
+    if (bookmarks.isNotEmpty()) {
+        ContentRowUI(
+            categoryId = getRandomHashCode(),
+            categoryName = "Seguir viendo",
+            items = bookmarks.mapNotNull { it.toContentEntityUI() }
+        ).let {
+            return listOf(it) + this
+        }
+    }
+    else {
+        return this
     }
 }
 
 fun List<ContentRowUI>.insertRecommended(
-    bookmarks: List<Recommended>
+    recommended: List<Recommended>
 ): List<ContentRowUI> {
-    ContentRowUI(
-        categoryId = getRandomHashCode(),
-        categoryName = "Recomendado para ti",
-        items = bookmarks.mapNotNull { it.toContentEntityUI() }
-    ).let {
-        return listOf(it) + this
+    if (recommended.isNotEmpty()) {
+        ContentRowUI(
+            categoryId = getRandomHashCode(),
+            categoryName = "Recomendado para ti",
+            items = recommended.mapNotNull { it.toContentEntityUI() }
+        ).let {
+            return listOf(it) + this
+        }
+    }
+    else {
+        return this
     }
 }
 
-fun List<ContentRowUI>.insertMostWatched(mostWatched: List<MostWatchedContent>): List<ContentRowUI> {
-    ContentRowUI(
-        categoryId = getRandomHashCode(),
-        categoryName = "Más visto",
-        items = mostWatched.map { it.toContentEntityUI() }
-    ).let {
-        return listOf(it) + this
+fun List<ContentRowUI>.insertMostWatched(
+    mostWatched: List<MostWatchedContent>
+): List<ContentRowUI> {
+    if (mostWatched.isNotEmpty()) {
+        ContentRowUI(
+            categoryId = getRandomHashCode(),
+            categoryName = "Más visto",
+            items = mostWatched.map { it.toContentEntityUI() }
+        ).let {
+            return listOf(it) + this
+        }
+    }
+    else {
+        return this
     }
 }
 
-fun List<ContentRowUI>.insertChannelRow(recommended: List<Channel>?): List<ContentRowUI> {
-    recommended?.let {
+fun List<ContentRowUI>.insertChannelRow(channels: List<Channel>?): List<ContentRowUI> {
+    channels?.let {
         ContentRowUI(
             categoryId = getRandomHashCode(),
             categoryName = "Canales",
