@@ -50,7 +50,7 @@ fun SharedContentEntity(
             }
         }
 
-        if (contentEntityUI.title.isNotBlank())
+        if (contentEntityUI.title.isNotBlank() && showText)
             Box(
                 modifier = Modifier
                     .fillMaxSize()

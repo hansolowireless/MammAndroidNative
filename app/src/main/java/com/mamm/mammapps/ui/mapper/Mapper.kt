@@ -137,7 +137,11 @@ fun HomeFeatured.toContentEntityUI(): ContentEntityUI? {
     val imageUrl = logoTransitions?.first()?.url ?: logoURL.orEmpty()
 
     return ContentEntityUI(
-        identifier = ContentIdentifier.fromFeaturedFormat(format = format, id = id, channelById = channelById),
+        identifier = ContentIdentifier.fromFeaturedFormat(
+            format = format,
+            id = id,
+            channelById = channelById
+        ),
         imageUrl = imageUrl,
         horizontalImageUrl = logoURL.orEmpty(),
         title = title.orEmpty(),
@@ -232,10 +236,13 @@ fun Bookmark.toContentEntityUI(): ContentEntityUI? {
     )
 }
 
-fun MostWatchedContent.toContentEntityUI(): ContentEntityUI {
+fun MostWatchedContent.toContentEntityUI(): ContentEntityUI? {
+    val format = type ?: return null
+    val id = id ?: return null
     return ContentEntityUI(
-        identifier = ContentIdentifier.VoD(
-            id = id.orRandom()
+        identifier = ContentIdentifier.fromFormat(
+            format = format,
+            id = id
         ),
         imageUrl = posterLogo.orEmpty(),
         horizontalImageUrl = logoURL.orEmpty(),
@@ -403,19 +410,43 @@ fun Bookmark.toContentToPlayUI(): ContentToPlayUI? {
     )
 }
 
-fun MostWatchedContent.toContentToPlayUI() = ContentToPlayUI(
-    identifier = ContentIdentifier.VoD(id.orRandom()),
-    deliveryURL = this.deliveryURL.orEmpty(),
-    title = this.title.orEmpty(),
-    imageUrl = this.logoURL.orEmpty(),
-)
+fun MostWatchedContent.toContentToPlayUI(): ContentToPlayUI? {
+    val format = type ?: return null
+    val id = id ?: return null
+    return ContentToPlayUI(
+        identifier = ContentIdentifier.fromFormat(
+            format = format,
+            id = id
+        ),
+        deliveryURL = this.deliveryURL.orEmpty(),
+        title = this.title.orEmpty(),
+        imageUrl = this.logoURL.orEmpty(),
+        epgEventInfo = LiveEventInfoUI(
+            title = this.title.orEmpty(),
+            eventStart = this.startDateTime,
+            eventEnd = this.endDateTime
+        )
+    )
+}
 
-fun Recommended.toContentToPlayUI() = ContentToPlayUI(
-    identifier = ContentIdentifier.VoD(id.orRandom()),
-    deliveryURL = this.deliveryURL.orEmpty(),
-    title = this.title.orEmpty(),
-    imageUrl = this.logoURL.orEmpty(),
-)
+fun Recommended.toContentToPlayUI(): ContentToPlayUI? {
+    val format = type ?: return null
+    val id = id ?: return null
+    return ContentToPlayUI(
+        identifier = ContentIdentifier.fromFormat(
+            format = format,
+            id = id
+        ),
+        deliveryURL = this.deliveryURL.orEmpty(),
+        title = this.title.orEmpty(),
+        imageUrl = this.logoURL.orEmpty(),
+        epgEventInfo = LiveEventInfoUI(
+            title = this.title.orEmpty(),
+            eventStart = this.startDateTime,
+            eventEnd = this.endDateTime
+        )
+    )
+}
 
 
 //------------------------LIVE EVENT INFO------------------------
@@ -438,7 +469,7 @@ fun Event.toLiveEventInfoUI(): LiveEventInfoUI = LiveEventInfoUI(
 
 fun GetHomeContentResponse.toContentUIRows(): List<ContentRowUI> {
     val orderedCategories = categories?.sortedBy { it.pos }
-    val rowsWithoutFeatured =  orderedCategories?.mapNotNull { category ->
+    val rowsWithoutFeatured = orderedCategories?.mapNotNull { category ->
         val items = category.order?.mapNotNull { orderItem ->
             when (orderItem.type) {
                 "channel" -> channels?.find { it.id == orderItem.id }?.toContentEntityUI()
@@ -578,7 +609,7 @@ fun GetBrandedContentResponse.toContentUIRows(
 
 fun List<ContentRowUI>.insertFeatured(
     featured: List<HomeFeatured>
-) : List<ContentRowUI> {
+): List<ContentRowUI> {
     ContentRowUI(
         categoryId = getRandomHashCode(),
         categoryName = "Eventos Destacados",
@@ -600,8 +631,7 @@ fun List<ContentRowUI>.insertBookmarks(
         ).let {
             return listOf(it) + this
         }
-    }
-    else {
+    } else {
         return this
     }
 }
@@ -617,8 +647,7 @@ fun List<ContentRowUI>.insertRecommended(
         ).let {
             return listOf(it) + this
         }
-    }
-    else {
+    } else {
         return this
     }
 }
@@ -630,12 +659,11 @@ fun List<ContentRowUI>.insertMostWatched(
         ContentRowUI(
             categoryId = getRandomHashCode(),
             categoryName = "Más visto",
-            items = mostWatched.map { it.toContentEntityUI() }
+            items = mostWatched.mapNotNull { it.toContentEntityUI() }
         ).let {
             return listOf(it) + this
         }
-    }
-    else {
+    } else {
         return this
     }
 }
@@ -655,12 +683,14 @@ fun List<ContentRowUI>.insertChannelRow(channels: List<Channel>?): List<ContentR
 
 
 //-------------region EXPANDED CATEGORY-----------------
-fun GetBrandedContentResponse.toContentEntityUIList() : List<ContentEntityUI> {
-    return this.vods.orEmpty().mapNotNull { it.toContentEntityUI() } + this.events.orEmpty().map { it.toContentEntityUI() }
+fun GetBrandedContentResponse.toContentEntityUIList(): List<ContentEntityUI> {
+    return this.vods.orEmpty().mapNotNull { it.toContentEntityUI() } + this.events.orEmpty()
+        .map { it.toContentEntityUI() }
 }
 
-fun GetOtherContentResponse.toContentEntityUIList() : List<ContentEntityUI> {
-    return this.vods.orEmpty().map { it.toContentEntityUI() } + this.events.orEmpty().map { it.toContentEntityUI() }
+fun GetOtherContentResponse.toContentEntityUIList(): List<ContentEntityUI> {
+    return this.vods.orEmpty().map { it.toContentEntityUI() } + this.events.orEmpty()
+        .map { it.toContentEntityUI() }
 }
 
 fun GetBrandedContentResponse.findContent(identifier: ContentIdentifier): Any? {
