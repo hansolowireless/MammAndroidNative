@@ -16,7 +16,7 @@ fun OperatorLogoImage(
     AsyncImage(
         model = logoUrl,
         contentDescription = null,
-        fallback = painterResource(R.drawable.logo_masmedia),
+        fallback = painterResource(R.drawable.logo_branding),
         modifier = modifier
     )
 }

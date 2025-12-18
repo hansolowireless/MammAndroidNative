@@ -40,7 +40,7 @@ fun LoginMobile(
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(id = R.drawable.logo_masmedia),
+                painter = painterResource(id = R.drawable.logo_branding),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth(),

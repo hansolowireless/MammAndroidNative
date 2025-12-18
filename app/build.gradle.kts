@@ -116,6 +116,9 @@ android {
             if (storeFilePath != null) {
                 storeFile = file(storeFilePath)
             }
+
+            enableV1Signing = true
+            enableV2Signing = true
         }
 
         create("keystoreDiego") {
@@ -134,6 +137,9 @@ android {
             if (storeFilePath != null) {
                 storeFile = file(storeFilePath)
             }
+
+            enableV1Signing = true
+            enableV2Signing = true
         }
     }
 
@@ -178,6 +184,17 @@ android {
             "@mipmap/ic_launcher_masmedia",
             "@mipmap/ic_launcher_masmedia_round",
             "@drawable/banner_masmedia",
+            signingConfig = signingConfigs.getByName("keystoreDiego")
+        )
+
+        configureFlavorWithMasmediaUrls(
+            this,
+            "fibrazo",
+            "app.fibrazo.com",
+            "@mipmap/ic_launcher_fibrazo",
+            "@mipmap/ic_launcher_fibrazo",
+            "@mipmap/ic_launcher_fibrazo_round",
+            "@drawable/banner_fibrazo",
             signingConfig = signingConfigs.getByName("keystoreDiego")
         )
 
