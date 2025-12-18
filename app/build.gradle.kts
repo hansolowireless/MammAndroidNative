@@ -195,7 +195,7 @@ android {
             "@mipmap/ic_launcher_fibrazo",
             "@mipmap/ic_launcher_fibrazo_round",
             "@drawable/banner_fibrazo",
-            signingConfig = signingConfigs.getByName("keystoreDiego")
+            signingConfig = signingConfigs.getByName("keystoreMamm")
         )
 
         configureCustomFlavor(
