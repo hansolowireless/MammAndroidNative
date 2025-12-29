@@ -1,7 +1,7 @@
 package com.mamm.mammapps.ui.viewmodel
 
-import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -39,7 +39,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
-import androidx.compose.runtime.State
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -96,14 +95,13 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun setLoadingStateWithLogo() {
-        viewModelScope.launch(Dispatchers.IO) {
-            getOperatorLogoUrlUseCase().onSuccess { logo ->
-                _operatorLogo.update { logo }
-                homeContentUIState = HomeContentUIState.Loading(logo)
-            }.onFailure {
-                logger.error(TAG, "setLoadingStateWithLogo Error getting operator logo URL: $it")
-                homeContentUIState = HomeContentUIState.Loading(null)
-            }
+        getOperatorLogoUrlUseCase().onSuccess { logo ->
+            logger.debug(TAG, "setLoadingStateWithLogo setting Load State...")
+            _operatorLogo.update { logo }
+            homeContentUIState = HomeContentUIState.Loading(logo)
+        }.onFailure {
+            logger.error(TAG, "setLoadingStateWithLogo Error getting operator logo URL: $it")
+            homeContentUIState = HomeContentUIState.Loading(null)
         }
     }
 
