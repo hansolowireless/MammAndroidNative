@@ -201,11 +201,12 @@ fun BrandedVod.toContentEntityUI() = ContentEntityUI(
 
 fun BrandedFeatured.toContentEntityUI(): ContentEntityUI? {
     val format = format ?: return null
-    val id = formatId?.toInt() ?: return null
+    //A veces viene un featured sin formatid porque es solamente un mensaje
+    val id = formatId?.toIntOrNull().orRandom()
     val imageUrl = logoTransitions?.first()?.url ?: logoUrl.orEmpty()
 
     return ContentEntityUI(
-        identifier = ContentIdentifier.fromFormat(format = format, id = id),
+        identifier = ContentIdentifier.fromFeaturedFormat(format = format, id = id),
         imageUrl = imageUrl,
         horizontalImageUrl = logoUrl.orEmpty(),
         title = title.orEmpty(),
@@ -367,7 +368,7 @@ fun HomeFeatured.toContentToPlayUI(): ContentToPlayUI? {
     val id = id ?: return null
 
     return ContentToPlayUI(
-        identifier = ContentIdentifier.fromFormat(format = format, id = id),
+        identifier = ContentIdentifier.fromFeaturedFormat(format = format, id = id),
         deliveryURL = this.deliveryURL.orEmpty(),
         title = this.title.orEmpty(),
         imageUrl = this.logoURL.orEmpty(),
@@ -376,10 +377,10 @@ fun HomeFeatured.toContentToPlayUI(): ContentToPlayUI? {
 
 fun BrandedFeatured.toContentToPlayUI(): ContentToPlayUI? {
     val format = format ?: return null
-    val id = formatId?.toInt() ?: return null
+    val id = formatId?.toIntOrNull() ?: return null
 
     return ContentToPlayUI(
-        identifier = ContentIdentifier.fromFormat(format = format, id = id),
+        identifier = ContentIdentifier.fromFeaturedFormat(format = format, id = id),
         deliveryURL = this.deliveryUrl.orEmpty(),
         title = this.title.orEmpty(),
         imageUrl = this.logoUrl.orEmpty(),

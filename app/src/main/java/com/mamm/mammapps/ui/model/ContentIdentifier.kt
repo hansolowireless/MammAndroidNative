@@ -25,8 +25,7 @@ sealed class ContentIdentifier : Parcelable {
             "live" -> Channel(channelById ?: 0)
             "vod" -> VoD(id)
             "cutv" -> Event(id)
-            "still" -> VoD(id)
-            else -> throw IllegalArgumentException("Unknown type: $format")
+            else -> VoD(id)
         }
     }
 
