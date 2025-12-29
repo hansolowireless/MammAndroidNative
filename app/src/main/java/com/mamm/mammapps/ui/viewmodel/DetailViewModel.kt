@@ -67,10 +67,7 @@ class DetailViewModel @Inject constructor(
                         _showPlayButton.update { content.catchupIsAvailable(catchupHours) }
                         return
                     }.onFailure {
-                        logger.error(
-                            TAG,
-                            "setShowPlayButton channel for content was not found ${it.message}"
-                        )
+                        logger.error(TAG, "setShowPlayButton channel for content was not found ${it.message}")
                         _showPlayButton.update { false }
                         return
                     }
