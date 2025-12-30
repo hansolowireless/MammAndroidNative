@@ -3,7 +3,6 @@ package com.mamm.mammapps.navigation
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
@@ -12,14 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.mamm.mammapps.BuildConfig
 import com.mamm.mammapps.R
 import com.mamm.mammapps.navigation.model.AppRoute
-import com.mamm.mammapps.navigation.model.AppRoute.ERROR_SUBSCRIPTION_ONGOING
-import com.mamm.mammapps.navigation.model.AppRoute.LOGIN
 import com.mamm.mammapps.navigation.model.AppRoute.LOGOUT
 import com.mamm.mammapps.ui.component.icon.BulletedList
 import com.mamm.mammapps.ui.component.icon.Fire
-import com.mamm.mammapps.ui.component.icon.Football
 import com.mamm.mammapps.ui.component.icon.Puzzle
 import com.mamm.mammapps.ui.component.icon.WifiSignal
 
@@ -110,7 +107,7 @@ object MenuItems {
     }
 
 
-    val list = listOf(
+    private val masterList = listOf(
         AppRoute.HOME,
         AppRoute.EPG,
         AppRoute.CHANNELS,
@@ -128,6 +125,15 @@ object MenuItems {
         AppRoute.LOGOUT,
         AppRoute.EXIT
     )
+
+    val list: List<AppRoute> = when (BuildConfig.FLAVOR) {
+        "eligetv" -> {
+            masterList.filter { it != AppRoute.AMC }
+        }
+        else -> {
+            masterList
+        }
+    }
 
     val listNoBrandedContent = list.filter {
         it != AppRoute.WARNER
