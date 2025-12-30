@@ -2,7 +2,7 @@ package com.mamm.mammapps.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Primary = Color(0xFFF0ED00)
+var Primary = Color.Unspecified
 val Secondary = Color.White
 val Outlined = Color(0xFF625b71)
 val TextPrimary = Color.White
@@ -50,16 +50,16 @@ object DetailColor {
 }
 
 object EPGMobileColor {
-    val channelCellBackground = NetflixColorScheme.outlineVariant
-    val timelineTextColor = NetflixColorScheme.outlineVariant
+    val channelCellBackground = FlavorColorScheme.outlineVariant
+    val timelineTextColor = FlavorColorScheme.outlineVariant
 
-    val eventCellBorder = NetflixColorScheme.secondaryContainer
-    val eventCellBackground = NetflixColorScheme.surfaceVariant
-    val eventCellBackgroundLive = NetflixColorScheme.primaryContainer
-    val eventCellText = NetflixColorScheme.onSurfaceVariant
-    val eventCellTextLive = NetflixColorScheme.onPrimaryContainer
+    val eventCellBorder = FlavorColorScheme.secondaryContainer
+    val eventCellBackground = FlavorColorScheme.surfaceVariant
+    val eventCellBackgroundLive = FlavorColorScheme.primaryContainer
+    val eventCellText = FlavorColorScheme.onSurfaceVariant
+    val eventCellTextLive = FlavorColorScheme.onPrimaryContainer
 
-    val timeLine = NetflixColorScheme.onError
+    val timeLine = FlavorColorScheme.onError
 
 }
 
