@@ -51,7 +51,7 @@ class GetHomeContentUseCase @Inject constructor(
                     .insertBookmarks(bookmarksResult.getOrElse { emptyList() })
                     .insertRecommended(recommendedResult.getOrElse { emptyList() })
                     .insertMostWatched(mostWatchedResult.getOrElse { emptyList() })
-                    .insertFeatured(homeResult.getOrThrow().featured.orEmpty())
+                    .insertFeatured(homeResult.getOrThrow().featured)
 
                 Result.success(contentRows)
             }

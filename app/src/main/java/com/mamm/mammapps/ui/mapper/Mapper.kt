@@ -609,15 +609,20 @@ fun GetBrandedContentResponse.toContentUIRows(
 
 
 fun List<ContentRowUI>.insertFeatured(
-    featured: List<HomeFeatured>
+    featured: List<HomeFeatured>?
 ): List<ContentRowUI> {
-    ContentRowUI(
-        categoryId = getRandomHashCode(),
-        categoryName = "Eventos Destacados",
-        items = featured.mapNotNull { it.toContentEntityUI() },
-        isFeatured = true
-    ).let {
-        return listOf(it) + this
+    if (!featured.isNullOrEmpty()) {
+        ContentRowUI(
+            categoryId = getRandomHashCode(),
+            categoryName = "Eventos Destacados",
+            items = featured.mapNotNull { it.toContentEntityUI() },
+            isFeatured = true
+        ).let {
+            return listOf(it) + this
+        }
+    }
+    else {
+        return this
     }
 }
 
