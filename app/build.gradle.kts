@@ -202,9 +202,9 @@ android {
             this,
             "eligetv",
             "app.openstream.com",
-            "@drawable/banner_openstream",
-            "@mipmap/ic_launcher_openstream",
-            "@mipmap/ic_launcher_openstream_round",
+            "@drawable/banner_eligetv",
+            "@mipmap/ic_launcher_eligetv",
+            "@mipmap/ic_launcher_eligetv_round",
             "@drawable/banner_openstream",
             "http://locator.service.openstream.es/",
             "https://dyncont.openstream.es/",
@@ -213,7 +213,8 @@ android {
             "https://indexsrv-openstream.service.openstream.es/",
             "https://gestionclientes.openstream.es/openstream_mngr/",
             false,
-            "openstream"
+            "openstream",
+            signingConfig = signingConfigs.getByName("keystoreDiego")
         )
 
     }
