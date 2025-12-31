@@ -5,7 +5,7 @@ import androidx.compose.ui.graphics.Color
 
 val FlavorColorScheme = darkColorScheme(
     primary = Color(0xFFFFFFFF),
-    onPrimary = Color(0xFFFFFFFF),
+    onPrimary = Color(0xFF4A4458),
     primaryContainer = Color(0xFF330099),
     onPrimaryContainer = Color(0xFFEADDFF),
 
