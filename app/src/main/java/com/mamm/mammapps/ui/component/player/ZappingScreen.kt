@@ -52,17 +52,22 @@ fun ZappingScreen(
 
     LaunchedEffect(listState.firstVisibleItemIndex) {
         delay(PlayerConstant.MILLISECONDS_SHOW_ZAPPER)
+        zappingInfo.getOrNull(listState.firstVisibleItemIndex)?.let { focusedItem ->
+            // Si el canal enfocado es distinto al actual, disparamos el click
+            if (focusedItem.channel.identifier.id != currentChannel?.identifier?.id) {
+                onChannelClick(focusedItem.channel)
+            }
+        }
         onDismiss()
     }
 
-    // 4. ELIMINAMOS EL SCROLL Y SOLO DAMOS EL FOCO
-    LaunchedEffect(Unit) { // Se ejecuta solo una vez
+    LaunchedEffect(Unit) {
         if (focusRequesters.isNotEmpty()) {
             // Esperamos a que la lista se haya compuesto en su estado inicial
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.isNotEmpty() }
                 .first { it }
 
-            // La lista ya está en la posición correcta, solo pedimos el foco.
+            // Pedimos el foco.
             focusRequesters[initialIndex].requestFocus()
         }
     }
@@ -72,7 +77,10 @@ fun ZappingScreen(
             .fillMaxSize()
             .background(Color.Black.copy(alpha = 0.7f))
             .onInterceptKeyBeforeSoftKeyboard {
-                if (it.key == Key.Back) {
+                if (it.key == Key.Back ||
+                    it.key == Key.DirectionLeft ||
+                    it.key == Key.DirectionRight
+                ) {
                     onDismiss()
                     true
                 } else {

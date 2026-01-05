@@ -183,13 +183,23 @@ fun PlayerViewWithControlsExperimental(
                             }
                         }
 
-                        Key.DirectionUp, Key.DirectionDown, Key.ChannelUp, Key.ChannelDown -> {
+                        Key.DirectionUp, Key.DirectionDown -> {
                             if (!showZappingLayer && !isControllerVisible) {
                                 viewModel.showZappingLayer()
                                 true
                             } else {
                                 false
                             }
+                        }
+
+                        Key.ChannelUp -> {
+                            viewModel.navigateToNextChannel()
+                            true
+                        }
+
+                        Key.ChannelDown -> {
+                            viewModel.navigateToPreviousChannel()
+                            true
                         }
 
                         else -> false

@@ -586,24 +586,6 @@ class VideoPlayerViewModel @Inject constructor(
         triggerTSTVMode(previewBar, forcePosition = currentLivePosition)
     }
 
-    fun releaseVariables() {
-        stopPeriodicFunctions()
-        releasePlayer()
-    }
-
-    private fun stopPeriodicFunctions() {
-        qosJob?.cancel()
-        bookmarkJob?.cancel()
-        heartbeatJob?.cancel()
-        channelInputJob?.cancel()
-    }
-
-    private fun releasePlayer() {
-        _player.value?.removeAnalyticsListener(statsListener)
-        _player.value?.release()
-        _player.value = null
-    }
-
     fun showZappingLayer() {
         if (_content.value.identifier is ContentIdentifier.Channel) {
             _showZappingLayer.update { true }
@@ -625,16 +607,6 @@ class VideoPlayerViewModel @Inject constructor(
             else {
                 _zappingNumberDisplay.update { newValue }
             }
-        }
-    }
-
-    fun navigateToChannel (number: String) {
-        runCatching {
-            _zappingNumberDisplay.update { "" }
-            val channel = _zappingInfo.value[number.toInt()].channel
-            findAndPlayChannel(content = channel)
-        }.onFailure {
-            logger.error(TAG, "navigateToChannel - Error navigating to channel: ${it.message}")
         }
     }
 
@@ -671,6 +643,75 @@ class VideoPlayerViewModel @Inject constructor(
                 } ?: logger.error(TAG, "findAndPlayChannel - Channel not found")
             }
         }
+    }
+
+    fun navigateToChannel (number: String) {
+        runCatching {
+            _zappingNumberDisplay.update { "" }
+            findAndPlayChannel(content = _zappingInfo.value[number.toInt()].channel)
+        }.onFailure {
+            logger.error(TAG, "navigateToChannel - Error navigating to channel: ${it.message}")
+        }
+    }
+
+    fun navigateToNextChannel() {
+        if (_content.value.identifier is ContentIdentifier.Channel) {
+            runCatching {
+                val currentList = _zappingInfo.value
+                if (currentList.isNotEmpty()) {
+                    val currentIndex = currentList.indexOfFirst { it.channel.identifier.id == _content.value.identifier.id }
+
+                    // Calculamos el siguiente índice (si es el último, vuelve al 0)
+                    val nextIndex = (currentIndex + 1) % currentList.size
+
+                    val nextChannel = currentList[nextIndex].channel
+                    findAndPlayChannel(content = nextChannel)
+                }
+            }.onFailure {
+                logger.error(TAG, "navigateToNextChannel - Error navigating to next channel: ${it.message}")
+            }
+        } else {
+            logger.error(TAG, "navigateToNextChannel - Content is not a channel")
+        }
+    }
+
+    fun navigateToPreviousChannel() {
+        if (_content.value.identifier is ContentIdentifier.Channel) {
+            runCatching {
+                val currentList = _zappingInfo.value
+                if (currentList.isNotEmpty()) {
+                    val currentIndex = currentList.indexOfFirst { it.channel.identifier.id == _content.value.identifier.id }
+
+                    // Calculamos el índice anterior (si es 0, va al último)
+                    val prevIndex = if (currentIndex <= 0) currentList.size - 1 else currentIndex - 1
+
+                    val prevChannel = currentList[prevIndex].channel
+                    findAndPlayChannel(content = prevChannel)
+                }
+            }.onFailure {
+                logger.error(TAG, "navigateToPreviousChannel - Error navigating to previous channel: ${it.message}")
+            }
+        } else {
+            logger.error(TAG, "navigateToPreviousChannel - Content is not a channel")
+        }
+    }
+
+    fun releaseVariables() {
+        stopPeriodicFunctions()
+        releasePlayer()
+    }
+
+    private fun stopPeriodicFunctions() {
+        qosJob?.cancel()
+        bookmarkJob?.cancel()
+        heartbeatJob?.cancel()
+        channelInputJob?.cancel()
+    }
+
+    private fun releasePlayer() {
+        _player.value?.removeAnalyticsListener(statsListener)
+        _player.value?.release()
+        _player.value = null
     }
 
 }
