@@ -3,7 +3,7 @@ package com.mamm.mammapps.ui.theme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.ui.graphics.Color
 
-val ColorScheme = darkColorScheme(
+val FlavorColorScheme = darkColorScheme(
     primary = Color(0xFFF0ED00),
     onPrimary = Color(0xFF141414),
     primaryContainer = Color(0xFFC4C100),

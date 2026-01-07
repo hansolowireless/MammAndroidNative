@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -29,6 +30,7 @@ import com.mamm.mammapps.ui.component.home.HomeGridBottom
 import com.mamm.mammapps.ui.component.home.HomeGridTop
 import com.mamm.mammapps.ui.component.home.OperatorLogoBottomRight
 import com.mamm.mammapps.ui.mapper.toContentToPlayUI
+import com.mamm.mammapps.ui.mapper.toResId
 import com.mamm.mammapps.ui.mapper.toResponseBodyMessage
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
@@ -217,7 +219,7 @@ fun HomeScreen(
                 else -> {
                     Box(modifier = Modifier.fillMaxSize()) {
                         Text(
-                            text = (homeContentState.throwable as? HttpException).toResponseBodyMessage(),
+                            text = stringResource(homeContentState.throwable.toResId()),
                             modifier = Modifier.align(Alignment.Center)
                         )
                     }

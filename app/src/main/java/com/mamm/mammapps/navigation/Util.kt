@@ -106,7 +106,6 @@ object MenuItems {
         }
     }
 
-
     private val masterList = listOf(
         AppRoute.HOME,
         AppRoute.EPG,
@@ -130,6 +129,21 @@ object MenuItems {
         "eligetv" -> {
             masterList.filter { it != AppRoute.AMC }
         }
+
+        "fibrazo" -> {
+            masterList.filter {
+                it != AppRoute.MOVIES &&
+                        it != AppRoute.DOCUMENTARIES &&
+                        it != AppRoute.SPORTS &&
+                        it != AppRoute.KIDS &&
+                        it != AppRoute.SERIES &&
+                        it != AppRoute.WARNER &&
+                        it != AppRoute.ACONTRA &&
+                        it != AppRoute.AMC &&
+                        it != AppRoute.SEARCH
+            }
+        }
+
         else -> {
             masterList
         }
