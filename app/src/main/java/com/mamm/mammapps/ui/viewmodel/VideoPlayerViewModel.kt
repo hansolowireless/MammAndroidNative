@@ -648,7 +648,7 @@ class VideoPlayerViewModel @Inject constructor(
     fun navigateToChannel (number: String) {
         runCatching {
             _zappingNumberDisplay.update { "" }
-            findAndPlayChannel(content = _zappingInfo.value[number.toInt()].channel)
+            findAndPlayChannel(content = _zappingInfo.value[number.toInt() - 1].channel)
         }.onFailure {
             logger.error(TAG, "navigateToChannel - Error navigating to channel: ${it.message}")
         }
