@@ -51,12 +51,22 @@ fun ChannelFilterTV(
         ProvideLazyListPivotOffset(parentFraction = 0.03f) {
             TabRow(
                 selectedTabIndex = selectedTabIndex,
+                indicator = { tabPositions, doesTabRowHaveFocus ->
+                    // FocusedTab's indicator
+                    TabRowDefaults.PillIndicator(
+                        currentTabPosition = tabPositions[selectedTabIndex],
+                        activeColor = Color.White.copy(alpha = 0.4f),
+                        doesTabRowHaveFocus = doesTabRowHaveFocus
+                    )
+                },
                 modifier = modifier
                     .focusRestorer(tabFocusRequesters[selectedTabIndex])
                     .focusGroup()
             ) {
                 genres.forEachIndexed { index, genre ->
-                    val isSelected = (genre == allGenresLabel && selectedGenres.isEmpty()) || selectedGenres.contains(genre)
+
+                    val isSelected = (genre == allGenresLabel && selectedGenres.isEmpty())
+                            || selectedGenres.contains(genre)
 
                     Tab(
                         selected = isSelected,
@@ -72,12 +82,12 @@ fun ChannelFilterTV(
                             .padding(horizontal = 16.dp, vertical = 6.dp)
                             .focusRequester(tabFocusRequesters[index]),
                         colors = TabDefaults.pillIndicatorTabColors(
+                            contentColor = Color.White,
                             focusedContentColor = Color.White,
-                            selectedContentColor = Color.White.copy(alpha = 0.85f),
+                            focusedSelectedContentColor = Color.White,
                             inactiveContentColor = Color.White.copy(alpha = 1f),
                             disabledContentColor = Color.White.copy(alpha = 1f),
                             disabledInactiveContentColor = Color.White,
-                            contentColor = Color.White,
                         )
                     ) {
                         Text(text = genre,

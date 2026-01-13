@@ -33,6 +33,7 @@ import androidx.tv.material3.ListItem
 import androidx.tv.material3.ListItemDefaults
 import coil.compose.AsyncImage
 import com.mamm.mammapps.R
+import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.ContentListUI
@@ -59,11 +60,12 @@ fun ContentEntityListItem(
         onClick = onClick,
         colors = ListItemDefaults.colors(
             containerColor = ContentEntityListItemColor.unfocusedContent,
-            focusedContainerColor = ContentEntityListItemColor.focusedContent,
+            focusedContainerColor = ContentEntityListItemColor.focusedContent
         ),
         modifier = modifier
             .onFocusChanged { isFocused = it.isFocused }
-            .clickable(onClick = onClick),
+            //Si no se hace esto, no funcionan los colors al hacer focus en TV
+            .then(if (!LocalIsTV.current) Modifier.clickable(onClick = onClick) else Modifier),
         leadingContent = channelInfo?.let {
             {
                 AsyncImage(
