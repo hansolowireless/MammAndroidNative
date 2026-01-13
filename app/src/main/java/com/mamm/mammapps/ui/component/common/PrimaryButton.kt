@@ -58,7 +58,7 @@ fun PrimaryButton(
                 .height(height),
             glow = TvButtonDefaults.glow(Glow(
                 elevationColor = ButtonColor.focusedContent,
-                elevation = 5.dp
+                elevation = if (isFocused) 5.dp else 0.dp
             )),
             colors = TvButtonDefaults.colors(
                 containerColor = ButtonColor.background,

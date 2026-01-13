@@ -10,7 +10,7 @@ val Background = Color.Black
 
 object ButtonColor {
     val focusedContent = Color.White
-    val unfocusedContent = Color.White
+    val unfocusedContent = Outlined
     val background = Color.DarkGray
 }
 
