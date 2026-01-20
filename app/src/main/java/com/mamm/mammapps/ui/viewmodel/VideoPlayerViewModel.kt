@@ -615,11 +615,15 @@ class VideoPlayerViewModel @Inject constructor(
     }
 
     fun updateChannelList() {
+        logger.debug(TAG, "updateChannelList")
         if (_content.value.identifier is ContentIdentifier.Channel) {
             viewModelScope.launch(Dispatchers.IO) {
                 getChannelsUseCase().onSuccess { channels ->
+
+                    val currentIsPorn = channels.find { it.id == _content.value.identifier.id  }?.isPornChannel ?: false
+
                     _zappingInfo.update {
-                        channels.map { channel ->
+                        channels.filter{ it.isPornChannel == currentIsPorn }.map { channel ->
                             ZappingInfoUI(
                                 channel = channel.toContentEntityUI(),
                                 liveEvent = getLiveEventInfoUseCase(channelId = channel.id)?.toContentListUI()
