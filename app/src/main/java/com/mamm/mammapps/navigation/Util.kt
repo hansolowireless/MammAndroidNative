@@ -137,6 +137,7 @@ object MenuItems {
                         it != AppRoute.SPORTS &&
                         it != AppRoute.KIDS &&
                         it != AppRoute.SERIES &&
+                        it != AppRoute.ADULTS &&
                         it != AppRoute.WARNER &&
                         it != AppRoute.ACONTRA &&
                         it != AppRoute.AMC &&

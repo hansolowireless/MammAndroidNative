@@ -44,6 +44,7 @@ import com.mamm.mammapps.ui.component.metadata.DirectorAndGenreRow
 import com.mamm.mammapps.ui.component.metadata.DurationYearRatingRow
 import com.mamm.mammapps.ui.mapper.toSimilarContentRow
 import com.mamm.mammapps.ui.model.ContentEntityUI
+import com.mamm.mammapps.ui.model.PlayButtonModeUI
 import com.mamm.mammapps.ui.model.SeasonUI
 import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.theme.DetailColor
@@ -56,6 +57,7 @@ fun DetailTV(
     content: ContentEntityUI,
     similarContent: List<Recommended>?,
     showPlayButton: Boolean = true,
+    playButtonMode: PlayButtonModeUI,
     seasonInfoUIState: UIState<List<SeasonUI>>?,
     onClickPlay: () -> Unit,
     onClickEpisode: (Int, Int) -> Unit,
@@ -153,7 +155,7 @@ fun DetailTV(
                     if (showPlayButton) {
                         PrimaryButton(
                             modifier = Modifier.fillMaxWidth(0.5f),
-                            text = stringResource(R.string.play),
+                            text = stringResource(playButtonMode.resId),
                             icon = {
                                 Icon(
                                     imageVector = Icons.Default.PlayArrow,

@@ -10,6 +10,7 @@ import com.mamm.mammapps.data.di.DrmSecretKeyQualifier
 import com.mamm.mammapps.data.di.DrmUrlQualifier
 import com.mamm.mammapps.data.local.SecurePreferencesManager
 import com.mamm.mammapps.data.logger.Logger
+import kotlinx.coroutines.flow.Flow
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
@@ -31,6 +32,10 @@ class LocalDataSourceImpl @Inject constructor(
 
     override fun setShowBrandedContentMenus(show: Boolean) {
         cache.setShowBrandedContentMenus(show)
+    }
+
+    override fun setContentPlayProgress(contentId: String, progress: Long) {
+        cache.setContentPlayProgress(contentId, progress)
     }
 
     override fun setLastTimePinWasCorrect(lastTimePinWasCorrect: ZonedDateTime) {
@@ -77,7 +82,20 @@ class LocalDataSourceImpl @Inject constructor(
         return BuildConfig.VERSION_NAME
     }
 
+    override fun getContentPlayProgress(contentId: String): Long {
+        return cache.getContentPlayProgress(contentId)
+    }
+
+    override fun getContentProgressFlow(): Flow<Map<String, Long>> {
+        return cache.getProgressFlow()
+    }
+
     fun clearUserCredentials() {
         securePreferencesManager.clearCredentials()
     }
+
+    override fun clearContentPlayProgress() {
+        cache.clearContentPlayProgress()
+    }
+
 }
