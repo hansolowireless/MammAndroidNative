@@ -7,6 +7,10 @@ import com.mamm.mammapps.data.model.Subgenre
 import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import java.time.ZonedDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -58,6 +62,9 @@ class CacheImpl @Inject constructor() : Cache {
 
     @Volatile
     private var cachedLastTimePinWasCorrect: ZonedDateTime? = null
+
+    @Volatile
+    private var cachedContentProgress = MutableStateFlow<Map<String, Long>>(emptyMap())
 
     override fun setShowBrandedContentMenus(show: Boolean) {
         showBrandedContentMenus = show
@@ -119,6 +126,10 @@ class CacheImpl @Inject constructor() : Cache {
         cachedLastTimePinWasCorrect = lastTimePinWasCorrect
     }
 
+    override fun setContentPlayProgress(id: String, progress: Long) {
+        cachedContentProgress.update { it + (id to progress) }
+    }
+
     override fun getShowBrandedContentMenus(): Boolean? = showBrandedContentMenus
 
     override fun getHomeContent(): GetHomeContentResponse? = cachedHomeContent
@@ -149,6 +160,16 @@ class CacheImpl @Inject constructor() : Cache {
 
     override fun getLastTimePinWasCorrect(): ZonedDateTime? = cachedLastTimePinWasCorrect
 
+    override fun getContentPlayProgress(id: String): Long {
+        return cachedContentProgress.value[id] ?: 0L
+    }
+
+    override fun getProgressFlow(): Flow<Map<String, Long>> = cachedContentProgress.asStateFlow()
+
+    override fun clearContentPlayProgress() {
+        cachedContentProgress.value = emptyMap()
+    }
+
     override fun clear() {
         cachedHomeContent = null
         cachedSubgenreList = null
@@ -165,6 +186,7 @@ class CacheImpl @Inject constructor() : Cache {
         cachedRecommended = null
         cachedLastTimePinWasCorrect = null
         showBrandedContentMenus = null
+        clearContentPlayProgress()
     }
 
 }

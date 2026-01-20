@@ -7,6 +7,7 @@ import com.mamm.mammapps.data.model.Subgenre
 import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
+import kotlinx.coroutines.flow.Flow
 import java.time.ZonedDateTime
 
 interface Cache {
@@ -40,12 +41,16 @@ interface Cache {
     fun setMostWatched(mostWatched: List<MostWatchedContent>)
     fun setRecommended(recommended: GetRecommendedResponse)
     fun setLastTimePinWasCorrect(lastTimePinWasCorrect: ZonedDateTime)
+    fun setContentPlayProgress(id: String, progress: Long)
 
     fun getBookmarks(): List<Bookmark>?
     fun getMostWatched(): List<MostWatchedContent>?
     fun getRecommended(): GetRecommendedResponse?
     fun getLastTimePinWasCorrect(): ZonedDateTime?
+    fun getContentPlayProgress(id: String): Long
+    fun getProgressFlow(): Flow<Map<String, Long>>
 
+    fun clearContentPlayProgress()
     fun clear()
 
 }

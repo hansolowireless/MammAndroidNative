@@ -8,7 +8,6 @@ import androidx.appcompat.widget.AppCompatImageButton
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
-import com.mamm.mammapps.data.model.player.customdatasourcefactory.TokenParamDataSourceFactory
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.ExoPlayer
@@ -26,6 +25,7 @@ import com.mamm.mammapps.data.extension.getCurrentDate
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.model.player.Ticker
+import com.mamm.mammapps.data.model.player.customdatasourcefactory.TokenParamDataSourceFactory
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
 import com.mamm.mammapps.domain.usecases.content.GetChannelsUseCase
 import com.mamm.mammapps.domain.usecases.player.GetDRMUrlUseCase
@@ -37,6 +37,8 @@ import com.mamm.mammapps.domain.usecases.player.SendBookmarkUseCase
 import com.mamm.mammapps.domain.usecases.player.SendHeartBeatUseCase
 import com.mamm.mammapps.domain.usecases.player.SendQosUseCase
 import com.mamm.mammapps.domain.usecases.player.SendTickerQosUseCase
+import com.mamm.mammapps.domain.usecases.player.playprogresscache.GetPlayProgressUseCaseSync
+import com.mamm.mammapps.domain.usecases.player.playprogresscache.SavePlayProgressUseCase
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
 import com.mamm.mammapps.ui.constant.PlayerConstant
@@ -85,6 +87,8 @@ class VideoPlayerViewModel @Inject constructor(
     private val getLiveEventInfoUseCase: FindLiveEventOnChannelUseCase,
     private val getChannelsUseCase: GetChannelsUseCase,
     private val getTickersUseCase: GetTickersUseCase,
+    private val savePlayProgressUseCase: SavePlayProgressUseCase,
+    private val getPlayProgressUseCase: GetPlayProgressUseCaseSync,
     @ApplicationContext private val context: Context,
     private val logger: Logger
 ) : ViewModel() {
@@ -267,7 +271,7 @@ class VideoPlayerViewModel @Inject constructor(
             player?.seekTo(tstvInitialPlayPositionMs)
             tstvInitialPlayPositionMs = 0
         } else {
-            player?.seekTo(0)
+            player?.seekTo(getPlayProgress())
         }
 
         player?.prepare()
@@ -696,11 +700,6 @@ class VideoPlayerViewModel @Inject constructor(
         }
     }
 
-    fun releaseVariables() {
-        stopPeriodicFunctions()
-        releasePlayer()
-    }
-
     private fun stopPeriodicFunctions() {
         qosJob?.cancel()
         bookmarkJob?.cancel()
@@ -712,6 +711,30 @@ class VideoPlayerViewModel @Inject constructor(
         _player.value?.removeAnalyticsListener(statsListener)
         _player.value?.release()
         _player.value = null
+    }
+
+    private fun savePlayProgress() {
+        if (_content.value.identifier !is ContentIdentifier.Channel) {
+            logger.debug(TAG, "savePlayProgress")
+            savePlayProgressUseCase.invoke(
+                _content.value.identifier.id.toString(),
+                _player.value?.currentPosition ?: 0)
+        }
+    }
+
+    private fun getPlayProgress() : Long {
+        return getPlayProgressUseCase.invoke(
+            _content.value.identifier.id
+        ).let { progress ->
+            logger.debug(TAG, "getPlayProgress, $progress")
+            progress
+        }
+    }
+
+    fun releaseVariables() {
+        savePlayProgress()
+        stopPeriodicFunctions()
+        releasePlayer()
     }
 
 }

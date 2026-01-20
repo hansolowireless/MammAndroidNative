@@ -9,11 +9,14 @@ import com.mamm.mammapps.data.model.serie.TbSeason
 import com.mamm.mammapps.domain.usecases.FindContentEntityUseCase
 import com.mamm.mammapps.domain.usecases.GetSeasonsInfoUseCase
 import com.mamm.mammapps.domain.usecases.GetSimilarContentUseCase
+import com.mamm.mammapps.domain.usecases.player.playprogresscache.ClearPlayProgressUseCase
+import com.mamm.mammapps.domain.usecases.player.playprogresscache.GetPlayProgressUseCase
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.extension.catchupIsAvailable
 import com.mamm.mammapps.ui.mapper.toSeasonUIList
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
+import com.mamm.mammapps.ui.model.PlayButtonModeUI
 import com.mamm.mammapps.ui.model.SeasonUI
 import com.mamm.mammapps.ui.model.uistate.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,6 +33,8 @@ class DetailViewModel @Inject constructor(
     private val getSeasonsInfoUseCase: GetSeasonsInfoUseCase,
     private val findContentEntityUseCase: FindContentEntityUseCase,
     private val getSimilarContentUseCase: GetSimilarContentUseCase,
+    private val getPlayProgressUseCase: GetPlayProgressUseCase,
+    private val clearPlayProgressUseCase: ClearPlayProgressUseCase,
     private val logger: Logger
 ) : ViewModel() {
 
@@ -53,11 +58,15 @@ class DetailViewModel @Inject constructor(
     private val _similarContent = MutableStateFlow<List<Recommended>?>(null)
     val similarContent: StateFlow<List<Recommended>?> = _similarContent.asStateFlow()
 
+    private val _playButtonMode = MutableStateFlow<PlayButtonModeUI>(PlayButtonModeUI.PLAY)
+    val playButtonMode = _playButtonMode.asStateFlow()
+
     fun setRouteTag(routeTag: AppRoute) {
         this.routeTag = routeTag
     }
 
     fun setShowPlayButton(content: ContentEntityUI) {
+        logger.debug(TAG, "setShowPlayButton")
         //Caso de venir en la EPG
         if (content.identifier is ContentIdentifier.Event && routeTag == AppRoute.EPG) {
             content.detailInfo?.channelId?.let {
@@ -74,6 +83,15 @@ class DetailViewModel @Inject constructor(
             }
         }
 
+        //Si hay un progreso en memoria, mostrar el botón de continuar
+        viewModelScope.launch {
+            getPlayProgressUseCase(content.identifier.id).collect { progress ->
+                logger.debug(TAG, "setShowPlayButton: Nuevo progreso recibido para ${content.identifier.id} = $progress")
+                _playButtonMode.update {
+                    if (progress > 0L) PlayButtonModeUI.CONTINUE else PlayButtonModeUI.PLAY
+                }
+            }
+        }
         //Si no venimos de la EPG
         _showPlayButton.update { content.identifier !is ContentIdentifier.Serie && !content.isFuture() }
     }
@@ -133,6 +151,11 @@ class DetailViewModel @Inject constructor(
 
     fun clearClickedContent() {
         _clickedContent.update { null }
+    }
+
+    fun clearPlayProgress() {
+        logger.debug(TAG, "clearPlayProgress")
+        clearPlayProgressUseCase()
     }
 
 }

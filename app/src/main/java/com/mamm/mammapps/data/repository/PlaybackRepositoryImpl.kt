@@ -11,6 +11,7 @@ import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.domain.interfaces.PlaybackRepository
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
+import kotlinx.coroutines.flow.Flow
 import java.net.URLEncoder
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -183,5 +184,23 @@ class PlaybackRepositoryImpl @Inject constructor(
             type = content.getBookmarkTypeString(),
             time = time
         )
+    }
+
+    override fun saveContentProgress(contentId: String, progress: Long) {
+        logger.debug(TAG, "saveContentProgress - $contentId, $progress")
+        localDatasource.setContentPlayProgress(contentId = contentId, progress = progress)
+    }
+
+    override fun getContentProgress(contentId: String) : Long {
+        logger.debug(TAG, "getContentProgress - $contentId")
+        return localDatasource.getContentPlayProgress(contentId = contentId)
+    }
+
+    override fun getContentProgressFlow(): Flow<Map<String, Long>> {
+        return localDatasource.getContentProgressFlow()
+    }
+
+    override fun clearContentProgress() {
+        localDatasource.clearContentPlayProgress()
     }
 }

@@ -3,6 +3,7 @@ package com.mamm.mammapps.domain.interfaces
 import com.mamm.mammapps.data.model.player.GetTickersResponse
 import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
+import kotlinx.coroutines.flow.Flow
 
 interface PlaybackRepository {
     suspend fun getVideoUrlFromCLM(
@@ -24,5 +25,23 @@ interface PlaybackRepository {
     suspend fun sendQosData (qosData: QosData) : Result<Unit>
 
     suspend fun setBookmark (content: ContentToPlayUI, time: Long)
+
+    /**
+     * Guarda el progreso actual de un contenido en la memoria volátil (Caché).
+     * @param contentId Identificador único (ej: "VOD_123" o generado por ContentIdentifier)
+     * @param progress Posición en milisegundos.
+     */
+    fun saveContentProgress(contentId: String, progress: Long)
+
+    /**
+     * Recupera el progreso guardado de un contenido.
+     * @param contentId Identificador único del contenido.
+     * @return El progreso en milisegundos o 0L si no existe o la caché fue limpiada.
+     */
+    fun getContentProgress(contentId: String): Long
+
+    fun getContentProgressFlow(): Flow<Map<String, Long>>
+
+    fun clearContentProgress()
 
 }
