@@ -1,5 +1,6 @@
 package com.mamm.mammapps.ui.component.channels
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -37,10 +38,10 @@ fun ChannelGridTV(
     onChannelFocus: (ContentEntityUI) -> Unit = {}
 ) {
     val lazyGridState = rememberLazyGridState()
+
     //  Guardamos el índice del último elemento que tuvo el foco.
     // 'rememberSaveable' es clave para que sobreviva a cambios de configuración y al volver a la pantalla.
     val lastFocusedIndex = rememberSaveable { mutableIntStateOf(0) }
-
     val focusRequester = remember { FocusRequester() }
 
     val channelsKey by remember(channels) {
@@ -51,7 +52,7 @@ fun ChannelGridTV(
 
     val previousChannelsKey = rememberSaveable { mutableStateOf(channelsKey) }
 
-    LaunchedEffect (Unit) {
+    LaunchedEffect(Unit) {
         delay(50)
         focusRequester.requestFocus()
     }
@@ -61,10 +62,11 @@ fun ChannelGridTV(
             //Hace scroll al 0 al cambiar de categoría de canales
             lastFocusedIndex.intValue = 0
             lazyGridState.scrollToItem(0)
+            previousChannelsKey.value = channelsKey
         } else {
             /*Para que al navegar a la sección
-        el foco se vaya al primer canal
-        */
+            el foco se vaya al primer canal
+            */
             delay(50)
             focusRequester.requestFocus()
         }
