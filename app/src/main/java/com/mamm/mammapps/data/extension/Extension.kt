@@ -28,7 +28,7 @@ fun GetHomeContentResponse.transformData(
                 ?.replace("\${id_channel}", channel.id.toString())
                 ?.replace("\${quality}", "HD")
                 ?.plus(".smil/"),
-            position = channelOrder?.get(channel.id) ?: 0,
+            position = channelOrder?.get(channel.id) ?: Int.MAX_VALUE,
             fingerPrintText = userId
         )
     }?.sortedBy { it.position }

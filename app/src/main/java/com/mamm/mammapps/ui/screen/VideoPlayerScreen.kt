@@ -18,6 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
@@ -35,6 +38,7 @@ fun VideoPlayerScreen(
     val player by viewModel.player.collectAsStateWithLifecycle()
     val content by viewModel.content.collectAsStateWithLifecycle()
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -60,6 +64,27 @@ fun VideoPlayerScreen(
             }
             else -> {
             }
+        }
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        // PLAY/PAUSE del Player al poner la app en segundo plano o reanudarla
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_PAUSE -> {
+                    viewModel.pausePlayer()
+                }
+                Lifecycle.Event.ON_RESUME -> {
+                    viewModel.playPlayer()
+                }
+                else -> {}
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
 

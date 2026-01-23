@@ -278,6 +278,16 @@ class VideoPlayerViewModel @Inject constructor(
         player?.playWhenReady = true
     }
 
+    fun pausePlayer() {
+        logger.debug(TAG, "pausePlayer")
+        _player.value?.pause()
+    }
+
+    fun playPlayer() {
+        logger.debug(TAG, "playPlayer")
+        _player.value?.play()
+    }
+
     fun observeLiveEvents() {
         if (_content.value.isLive)
             getLiveEventInfoUseCase.observeLiveEvents((_content.value.identifier).getIdValue())
@@ -601,25 +611,22 @@ class VideoPlayerViewModel @Inject constructor(
     }
 
     fun showZappingNumberDisplay(newDigit: String) {
-        if (newDigit.isEmpty()) {
-            _zappingNumberDisplay.update { newDigit }
-        } else {
-            val newValue = _zappingNumberDisplay.value + newDigit
-            if (newValue.length == 3) {
-                _zappingNumberDisplay.update { "" }
-            }
-            else {
-                _zappingNumberDisplay.update { newValue }
-            }
+        logger.debug(TAG, "showZappingNumberDisplay")
+        if (_zappingNumberDisplay.value.length < 3) {
+            _zappingNumberDisplay.update{ _zappingNumberDisplay.value + newDigit }
         }
     }
 
     fun updateChannelList() {
+        logger.debug(TAG, "updateChannelList")
         if (_content.value.identifier is ContentIdentifier.Channel) {
             viewModelScope.launch(Dispatchers.IO) {
                 getChannelsUseCase().onSuccess { channels ->
+
+                    val currentIsPorn = channels.find { it.id == _content.value.identifier.id  }?.isPornChannel ?: false
+
                     _zappingInfo.update {
-                        channels.map { channel ->
+                        channels.filter{ it.isPornChannel == currentIsPorn }.map { channel ->
                             ZappingInfoUI(
                                 channel = channel.toContentEntityUI(),
                                 liveEvent = getLiveEventInfoUseCase(channelId = channel.id)?.toContentListUI()
@@ -652,6 +659,7 @@ class VideoPlayerViewModel @Inject constructor(
     fun navigateToChannel (number: String) {
         runCatching {
             _zappingNumberDisplay.update { "" }
+            //Pulsar 1 en el mando tiene que ir al primer canal de la lista
             findAndPlayChannel(content = _zappingInfo.value[number.toInt() - 1].channel)
         }.onFailure {
             logger.error(TAG, "navigateToChannel - Error navigating to channel: ${it.message}")
