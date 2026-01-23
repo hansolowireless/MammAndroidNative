@@ -7,10 +7,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.detail.DetailMobile
@@ -20,7 +17,6 @@ import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.uistate.CastState
 import com.mamm.mammapps.ui.viewmodel.CastViewModel
 import com.mamm.mammapps.ui.viewmodel.DetailViewModel
-import kotlinx.coroutines.delay
 
 
 @Composable

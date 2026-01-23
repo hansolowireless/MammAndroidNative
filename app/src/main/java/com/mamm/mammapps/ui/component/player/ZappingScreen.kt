@@ -106,7 +106,8 @@ fun ZappingScreen(
                             .focusRequester(focusRequesters[index]),
                         channelInfo = zappingInfoItem.channel,
                         content = zappingInfoItem.liveEvent,
-                        orderIndex = index,
+                        //Se tiene que ver que en la posición 0 el canal tiene el número 1
+                        orderIndex = index + 1,
                         onClick = {
                             onChannelClick(zappingInfoItem.channel)
                         }
