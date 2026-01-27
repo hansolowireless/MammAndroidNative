@@ -547,8 +547,7 @@ fun GetOtherContentResponse.toContentUIRows(
 
 
 fun GetBrandedContentResponse.toContentUIRows(
-    subgenres: List<Subgenre>,
-    isAdult: Boolean = false
+    subgenres: List<Subgenre>
 ): List<ContentRowUI> {
     val rowsMap = mutableMapOf<Int, ContentRowUI>()
 
