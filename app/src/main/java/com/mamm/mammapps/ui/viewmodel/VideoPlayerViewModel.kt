@@ -17,6 +17,7 @@ import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.analytics.PlaybackStatsListener
 import com.google.android.exoplayer2.source.dash.DashMediaSource
+import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.util.MimeTypes
@@ -42,6 +43,7 @@ import com.mamm.mammapps.domain.usecases.player.playprogresscache.SavePlayProgre
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
 import com.mamm.mammapps.ui.constant.PlayerConstant
+import com.mamm.mammapps.ui.constant.PlayerConstant.M3U8_EXTENSION
 import com.mamm.mammapps.ui.constant.PlayerConstant.MILLISECONDS_TIMEBAR_KEYTIME_INCREMENT
 import com.mamm.mammapps.ui.extension.bitsToMegabits
 import com.mamm.mammapps.ui.extension.setHourText
@@ -238,8 +240,12 @@ class VideoPlayerViewModel @Inject constructor(
     private fun setPlayerUrls(videoUrl: String, drmUrl: String = "") {
         val player = _player.value
         val content = _content.value
-
         var requestHeaders = emptyMap<String, String>()
+        val mimeType = if (videoUrl.contains(M3U8_EXTENSION)) {
+            MimeTypes.APPLICATION_M3U8
+        } else {
+            MimeTypes.APPLICATION_MPD
+        }
 
         getJwTokenUseCase(_content.value).onSuccess { token ->
             requestHeaders = hashMapOf("Authorization" to "Bearer $token")
@@ -248,7 +254,7 @@ class VideoPlayerViewModel @Inject constructor(
         val mediaItem = MediaItem.Builder()
             .setUri(videoUrl)
             .setMediaMetadata(MediaMetadata.Builder().setTitle("").build())
-            .setMimeType(MimeTypes.APPLICATION_MPD)
+            .setMimeType(mimeType)
             .setDrmConfiguration(
                 MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
                     .setLicenseUri(drmUrl)
@@ -259,9 +265,13 @@ class VideoPlayerViewModel @Inject constructor(
 
         val dataSourceFactory = tokenParamDataSourceFactory.also { it.resetTokenMode() }
 
-        val mediaSource = DashMediaSource
-            .Factory(dataSourceFactory)
-            .createMediaSource(mediaItem)
+        val mediaSource = if (mimeType == MimeTypes.APPLICATION_M3U8) {
+            HlsMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(mediaItem)
+        } else {
+            DashMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(mediaItem)
+        }
 
         player?.setMediaSource(mediaSource)
 

@@ -24,8 +24,7 @@ class GetAdultsUseCase @Inject constructor(
                 Result.success(
                     response
                         .toContentUIRows(
-                            subgenres = mammRepository.getSubgenreList().getOrThrow(),
-                            isAdult = true
+                            subgenres = mammRepository.getSubgenreList().getOrThrow()
                         )
                         .insertChannelRow(response.channels)
                 )

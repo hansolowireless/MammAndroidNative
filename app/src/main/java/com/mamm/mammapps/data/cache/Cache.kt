@@ -5,6 +5,7 @@ import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.Subgenre
 import com.mamm.mammapps.data.model.bookmark.Bookmark
+import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
 import kotlinx.coroutines.flow.Flow
@@ -24,6 +25,7 @@ interface Cache {
     fun setWarnerContent(warnerContent: GetBrandedContentResponse)
     fun setAcontraContent(acontraContent: GetBrandedContentResponse)
     fun setAMCContent(amcContent: GetBrandedContentResponse)
+    fun setMyMemories(memories: GetMemoriesResponse)
 
     fun getShowBrandedContentMenus () : Boolean?
     fun getHomeContent(): GetHomeContentResponse?
@@ -36,6 +38,7 @@ interface Cache {
     fun getWarnerContent(): GetBrandedContentResponse?
     fun getAcontraContent(): GetBrandedContentResponse?
     fun getAMCContent(): GetBrandedContentResponse?
+    fun getMyMemories(): GetMemoriesResponse?
 
     fun setBookmarks(bookmarks: List<Bookmark>)
     fun setMostWatched(mostWatched: List<MostWatchedContent>)

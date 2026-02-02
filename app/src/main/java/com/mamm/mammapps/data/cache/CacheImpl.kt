@@ -5,6 +5,7 @@ import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.Subgenre
 import com.mamm.mammapps.data.model.bookmark.Bookmark
+import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
 import kotlinx.coroutines.flow.Flow
@@ -50,6 +51,9 @@ class CacheImpl @Inject constructor() : Cache {
 
     @Volatile
     private var cachedAMCContent: GetBrandedContentResponse? = null
+
+    @Volatile
+    private var cachedMyMemories: GetMemoriesResponse? = null
 
     @Volatile
     private var cachedBookmarks: List<Bookmark>? = null
@@ -110,6 +114,10 @@ class CacheImpl @Inject constructor() : Cache {
         cachedAMCContent = amcContent
     }
 
+    override fun setMyMemories(memories: GetMemoriesResponse) {
+        cachedMyMemories = memories
+    }
+
     override fun setBookmarks(bookmarks: List<Bookmark>) {
         cachedBookmarks = bookmarks
     }
@@ -151,6 +159,8 @@ class CacheImpl @Inject constructor() : Cache {
     override fun getAcontraContent(): GetBrandedContentResponse? = cachedAcontraContent
 
     override fun getAMCContent(): GetBrandedContentResponse? = cachedAMCContent
+
+    override fun getMyMemories(): GetMemoriesResponse? = cachedMyMemories
 
     override fun getBookmarks(): List<Bookmark>? = cachedBookmarks
 

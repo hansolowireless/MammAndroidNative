@@ -13,4 +13,5 @@ object PlayerConstant {
     const val MILLISECONDS_SHOW_ZAPPER = 8000L
     const val THUMBNAIL_UPDATE_INTERVAL = 500000L
     const val CHANNEL_NUMBER_ZAPPING_WAITTIME = 3000L
+    const val M3U8_EXTENSION = ".m3u8"
 }

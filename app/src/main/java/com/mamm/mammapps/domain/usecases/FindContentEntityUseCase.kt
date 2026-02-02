@@ -124,6 +124,14 @@ class FindContentEntityUseCase @Inject constructor(
                     } ?: Result.failure(Exception("Content not found"))
             }
 
+            AppRoute.MEMORIES -> {
+                return repository.findMemoriesContent(identifier = identifier)?.onSuccess {
+                    logger.debug(TAG, "invoke Received content: $it")
+                }?.onFailure {
+                    logger.debug(TAG, "invoke Failed: ${it.message}, $it")
+                } ?: Result.failure(Exception("Content not found"))
+            }
+
             else -> {
                 logger.debug(TAG, "invoke Route not implemented")
                 return Result.failure(Exception("FindContentEntityUseCase Route not implemented"))

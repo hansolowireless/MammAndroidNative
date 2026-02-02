@@ -95,6 +95,7 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
     homeScreenRoute(AppRoute.SPORTS, navController)
     homeScreenRoute(AppRoute.WARNER, navController)
     homeScreenRoute(AppRoute.ACONTRA, navController)
+    homeScreenRoute(AppRoute.MEMORIES, navController)
     homeScreenRoute(AppRoute.AMC, navController)
     homeScreenRoute(AppRoute.ADULTS, navController)
 
