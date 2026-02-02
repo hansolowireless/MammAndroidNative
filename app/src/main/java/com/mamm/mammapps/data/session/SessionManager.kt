@@ -24,7 +24,7 @@ class SessionManager @Inject constructor(
     val userId: String? get() = loginData?.userId?.toString()
     val jwToken: String? get() = loginData?.jwtoken
     val pinParental: String? get() = loginData?.pinparental
-    val operatorLogoUrl : String? get() = skinImages[5002] ?: skinImages[1502]
+    val operatorLogoUrl : String? get() = skinImages[5001] ?: skinImages[1501]
 
     // Bloque de inicialización para restaurar la sesión
     init {
