@@ -9,6 +9,7 @@ import com.mamm.mammapps.data.model.bookmark.SetBookmarkRequest
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
+import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.player.GetTickersResponse
 import com.mamm.mammapps.data.model.player.QosData
@@ -263,6 +264,16 @@ interface ApiService {
     suspend fun getTickers(
         @Url url: String
     ): Response<GetTickersResponse>
+
+    // ---------- Memories ----------
+    @GET
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getMemories(
+        @Url url: String
+    ): Response<GetMemoriesResponse>
 
     // ------- Expand Category ----------
     @GET("epg_files/cat_{categoryId}_pkg_{jsonParam}")

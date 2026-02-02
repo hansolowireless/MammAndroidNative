@@ -7,6 +7,7 @@ import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.Subgenre
+import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.ui.model.ContentIdentifier
 
@@ -24,6 +25,7 @@ interface MammRepository {
     suspend fun getWarner(): Result<GetBrandedContentResponse>
     suspend fun getAcontra(): Result<GetBrandedContentResponse>
     suspend fun getAMC(): Result<GetBrandedContentResponse>
+    suspend fun getMemories () : Result<GetMemoriesResponse>
 
     suspend fun getSeasonsInfo(serieId: Int): Result<GetSeasonInfoResponse>
     suspend fun getExpandedCategoryContent(categoryId: Int): Result<GetBrandedContentResponse>
@@ -37,6 +39,7 @@ interface MammRepository {
     fun findWarnerContent(identifier: ContentIdentifier): Result<Any>?
     fun findAcontraContent(identifier: ContentIdentifier): Result<Any>?
     fun findAMCContent(identifier: ContentIdentifier): Result<Any>?
+    fun findMemoriesContent(identifier: ContentIdentifier) : Result<Any>?
 
     fun findGenreWithId(id: Int): Result<Genre>
     fun findChannelWithId(id: Int): Result<Channel>

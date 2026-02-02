@@ -11,6 +11,7 @@ import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.Subgenre
+import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.domain.interfaces.MammRepository
@@ -31,7 +32,7 @@ class MammRepositoryImpl @Inject constructor(
         private const val TAG = "MammRepositoryImpl"
     }
 
-    override suspend fun getAboutInfo() : Result<AboutInfo> {
+    override suspend fun getAboutInfo(): Result<AboutInfo> {
         return runCatching {
             AboutInfo(
                 appVersion = localDataSource.getApplicationVersion(),
@@ -138,18 +139,26 @@ class MammRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getMemories(): Result<GetMemoriesResponse> {
+        return runCatching {
+            remoteDatasource.getMyMemories()
+        }.onFailure {
+            logger.error(TAG, "getMemories failed: ${it.message}, $it")
+        }
+    }
+
     override suspend fun getSeasonsInfo(serieId: Int): Result<GetSeasonInfoResponse> {
         return runCatching {
             remoteDatasource.getSeasonInfo(serieId)
-        }.onSuccess { response ->
+        }.onSuccess {
             logger.debug(TAG, "getSeasonsInfo Received successful response")
         }
     }
 
-    override suspend fun getExpandedCategoryContent(categoryId: Int) : Result<GetBrandedContentResponse> {
+    override suspend fun getExpandedCategoryContent(categoryId: Int): Result<GetBrandedContentResponse> {
         return runCatching {
             remoteDatasource.getExpandedCategory(categoryId)
-        }.onSuccess { response ->
+        }.onSuccess {
             logger.debug(TAG, "getExpandedCategory Received successful response")
         }
     }
@@ -164,7 +173,8 @@ class MammRepositoryImpl @Inject constructor(
 
         if (content == null) {
             //If content is STILL null, try to find it in the featured list
-            content = remoteDatasource.getCachedHomeContent()?.featured?.find { it.id == identifier.id }
+            content =
+                remoteDatasource.getCachedHomeContent()?.featured?.find { it.id == identifier.id }
         }
 
         return content?.let { Result.success(it) }
@@ -221,37 +231,56 @@ class MammRepositoryImpl @Inject constructor(
         return content?.let { Result.success(it) }
     }
 
-    override fun findWarnerContent(identifier: ContentIdentifier) : Result<Any>? {
+    override fun findWarnerContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
             is ContentIdentifier.VoD -> {
                 remoteDatasource.getCachedWarner()?.vods?.find { it.getId() == identifier.id }
                     ?: remoteDatasource.getCachedWarner()?.featured?.find { it.formatId == identifier.id.toString() }
             }
+
             else -> null
         }
         return content?.let { Result.success(it) }
     }
 
-    override fun findAcontraContent(identifier: ContentIdentifier) : Result<Any>? {
+    override fun findAcontraContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
             is ContentIdentifier.VoD -> {
                 remoteDatasource.getCachedAcontra()?.vods?.find { it.getId() == identifier.id }
-                    ?: remoteDatasource.getCachedAcontra()?.featured?.find { it.formatId == identifier.id.toString()}
+                    ?: remoteDatasource.getCachedAcontra()?.featured?.find { it.formatId == identifier.id.toString() }
             }
+
             else -> null
         }
         return content?.let { Result.success(it) }
     }
 
-    override fun findAMCContent(identifier: ContentIdentifier) : Result<Any>? {
+    override fun findAMCContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
             is ContentIdentifier.VoD -> {
                 remoteDatasource.getCachedAMC()?.vods?.find { it.getId() == identifier.id }
                     ?: remoteDatasource.getCachedAMC()?.featured?.find { it.formatId == identifier.id.toString() }
             }
+
             else -> null
         }
         return content?.let { Result.success(it) }
+    }
+
+    override fun findMemoriesContent(identifier: ContentIdentifier): Result<Any>? {
+        val memories = remoteDatasource.getCachedMemories()
+
+        val content: Any? = when (identifier) {
+            is ContentIdentifier.VoD -> {
+                memories?.videos?.find { it.id == identifier.id }
+                    ?: memories?.slideshows?.find { it.id == identifier.id }
+            }
+            else -> null
+        }
+
+        return content?.let {
+            Result.success(it)
+        }
     }
 
     override fun findGenreWithId(id: Int): Result<Genre> {
@@ -323,13 +352,12 @@ class MammRepositoryImpl @Inject constructor(
         logger.debug(TAG, "Saved new PIN success timestamp: $currentTime")
     }
 
-    override fun getSubgenreList() : Result<List<Subgenre>> {
+    override fun getSubgenreList(): Result<List<Subgenre>> {
         return runCatching {
             remoteDatasource.getSubgenreList()
                 ?: throw NoSuchElementException("Subgenre list not found in cache or is null")
         }
     }
-
 
 
 }

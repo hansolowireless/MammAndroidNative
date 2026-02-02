@@ -18,6 +18,7 @@ enum class AppRoute {
     SEARCH,
     ADULTS,
     LASTSEVENDAYS,
+    MEMORIES,
     ABOUT,
     PLAYER,
     DETAIL,
@@ -49,7 +50,7 @@ enum class AppRoute {
 
     @StringRes
     fun getResId(): Int {
-         return when (this) {
+        return when (this) {
             HOME -> R.string.nav_home
             EPG -> R.string.nav_epg
             CHANNELS -> R.string.nav_channels
@@ -60,12 +61,13 @@ enum class AppRoute {
             ACONTRA -> R.string.nav_acontra
             AMC -> R.string.nav_amc
             SPORTS -> R.string.nav_sports
+            MEMORIES -> R.string.nav_my_memories
             ADULTS -> R.string.nav_adults
             KIDS -> R.string.nav_kids
             SEARCH -> R.string.nav_search
             ABOUT -> R.string.nav_diagnostics
             LOGOUT -> R.string.nav_change_user
-             EXIT -> R.string.nav_exit
+            EXIT -> R.string.nav_exit
             else -> R.string.app_name
         }
     }

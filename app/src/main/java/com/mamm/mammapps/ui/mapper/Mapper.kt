@@ -1,5 +1,6 @@
 package com.mamm.mammapps.ui.mapper
 
+import androidx.compose.foundation.layout.add
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.Event
@@ -15,6 +16,8 @@ import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.bookmark.Recommended
 import com.mamm.mammapps.data.model.branded.BrandedFeatured
 import com.mamm.mammapps.data.model.branded.BrandedVod
+import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
+import com.mamm.mammapps.data.model.memories.MemoryItem
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.data.model.section.SectionVod
@@ -42,6 +45,8 @@ import com.mamm.mammapps.ui.theme.Ratios
 import com.mamm.mammapps.util.getRandomHashCode
 import com.mamm.mammapps.util.orRandom
 import java.time.LocalDate
+import kotlin.collections.isNotEmpty
+import kotlin.collections.map
 
 fun Any.toContentEntityUI(): ContentEntityUI? {
     return when (this) {
@@ -75,6 +80,7 @@ fun Any.toContentToPlayUI(): ContentToPlayUI? {
         is Bookmark -> this.toContentToPlayUI()
         is MostWatchedContent -> this.toContentToPlayUI()
         is Recommended -> this.toContentToPlayUI()
+        is MemoryItem -> this.toContentToPlayUI()
         else -> null
     }
 }
@@ -275,6 +281,15 @@ fun Recommended.toContentEntityUI(): ContentEntityUI? {
     )
 }
 
+fun MemoryItem.toContentEntityUI(): ContentEntityUI {
+    return ContentEntityUI(
+        identifier = ContentIdentifier.VoD(this.id),
+        title = this.title,
+        imageUrl = this.thumbnail,
+        horizontalImageUrl = this.thumbnail
+    )
+}
+
 //--------------------endregion Home------------------------
 
 
@@ -449,6 +464,16 @@ fun Recommended.toContentToPlayUI(): ContentToPlayUI? {
     )
 }
 
+fun MemoryItem.toContentToPlayUI() : ContentToPlayUI {
+    return ContentToPlayUI(
+        identifier = ContentIdentifier.VoD(this.id),
+        title = this.title,
+        deliveryURL = this.url,
+        imageUrl = this.thumbnail,
+        shouldCallCLM = false
+    )
+}
+
 
 //------------------------LIVE EVENT INFO------------------------
 fun EPGEvent.toLiveEventInfoUI(): LiveEventInfoUI = LiveEventInfoUI(
@@ -547,8 +572,7 @@ fun GetOtherContentResponse.toContentUIRows(
 
 
 fun GetBrandedContentResponse.toContentUIRows(
-    subgenres: List<Subgenre>,
-    isAdult: Boolean = false
+    subgenres: List<Subgenre>
 ): List<ContentRowUI> {
     val rowsMap = mutableMapOf<Int, ContentRowUI>()
 
@@ -605,6 +629,33 @@ fun GetBrandedContentResponse.toContentUIRows(
     } else {
         contentRows
     }
+}
+
+fun GetMemoriesResponse.toContentUIRows(): List<ContentRowUI> {
+    val rows = mutableListOf<ContentRowUI>()
+
+    if (this.videos.isNotEmpty()) {
+        rows.add(
+            ContentRowUI(
+                categoryId = 1,
+                categoryName = "Vídeos",
+                items = this.videos.map { it.toContentEntityUI() }
+            )
+        )
+    }
+
+    // Fila de Slideshows
+    if (this.slideshows.isNotEmpty()) {
+        rows.add(
+            ContentRowUI(
+                categoryId = 2,
+                categoryName = "Fotos",
+                items = this.slideshows.map { it.toContentEntityUI() }
+            )
+        )
+    }
+
+    return rows
 }
 
 

@@ -22,8 +22,14 @@ class GetPlayableUrlUseCase @Inject constructor(
     suspend operator fun invoke(
         content: ContentToPlayUI,
         chromecast: Boolean = false
-    ): Result<String> =
-        runCatching {
+    ): Result<String> {
+
+        if (!content.shouldCallCLM) {
+            logger.debug(TAG, "invoke This content does not require calling CLM, ${content.deliveryURL}")
+            return Result.success(content.deliveryURL)
+        }
+
+        return runCatching {
             val playableURL = playbackRepository.getVideoUrlFromCLM(
                 deliveryURL = content.deliveryURL,
                 typeOfContentString = content.getCLMString(),
@@ -50,6 +56,7 @@ class GetPlayableUrlUseCase @Inject constructor(
         }.onFailure {
             Result.success(it)
         }
+    }
 
     private fun modifyUrlToCatchupIfNeeded(content: ContentToPlayUI, playableUrl: String): String {
         if (content.identifier !is ContentIdentifier.Event) {

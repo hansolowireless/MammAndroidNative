@@ -13,6 +13,7 @@ data class ContentToPlayUI (
     val drmUrl: String? = null,
     val isTimeshift: Boolean = false,
     val isRadio: Boolean = false,
+    val shouldCallCLM : Boolean = true,
     val initialPlayPositionMs: Long = 0,
     val epgEventInfo: LiveEventInfoUI? = null,
     val fingerprintInfo: FingerPrintInfoUI? = null,

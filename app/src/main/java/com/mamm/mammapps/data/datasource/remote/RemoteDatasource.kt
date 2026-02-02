@@ -21,6 +21,7 @@ import com.mamm.mammapps.data.extension.transformData
 import com.mamm.mammapps.data.local.SecurePreferencesManager
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.mapper.toGetHomeContentException
+import com.mamm.mammapps.data.mapper.toGetMemoriesException
 import com.mamm.mammapps.data.mapper.toLoginException
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetEPGResponse
@@ -33,6 +34,7 @@ import com.mamm.mammapps.data.model.exception.GetHomeContentException
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
+import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.player.GetTickersResponse
 import com.mamm.mammapps.data.model.player.QosData
@@ -463,6 +465,28 @@ class RemoteDatasource @Inject constructor(
 
             response.body() ?: throw IllegalStateException("Response body is null")
         }
+    }
+
+    //----------MEMORIES---------//
+    suspend fun getMyMemories(): GetMemoriesResponse {
+        return withContext(Dispatchers.IO) {
+            val url = "https://masmedia.b-cdn.net/jsonmemories/user_" +
+                    "${sessionManager.loginData?.userId}.json" +
+                    "?t=${getCurrentDate().toDate().time}"
+
+            val response = noBaseUrlApi.getMemories(url)
+            if (!response.isSuccessful) {
+                throw response.code().toGetMemoriesException()
+            }
+            val memoriesResponse = response.body() ?: throw IllegalStateException("Response body is null")
+            cache.setMyMemories(memoriesResponse)
+
+            response.body() ?: throw IllegalStateException("Response body is null")
+        }
+    }
+
+    fun getCachedMemories() : GetMemoriesResponse? {
+        return cache.getMyMemories()
     }
 
     //----------BOOKMARKS---------//

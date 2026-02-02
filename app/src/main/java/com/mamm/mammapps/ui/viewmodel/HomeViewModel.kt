@@ -17,6 +17,7 @@ import com.mamm.mammapps.domain.usecases.content.GetDocumentariesUseCase
 import com.mamm.mammapps.domain.usecases.content.GetEPGContentUseCase
 import com.mamm.mammapps.domain.usecases.content.GetHomeContentUseCase
 import com.mamm.mammapps.domain.usecases.content.GetKidsUseCase
+import com.mamm.mammapps.domain.usecases.content.GetMemoriesUseCase
 import com.mamm.mammapps.domain.usecases.content.GetMoviesUseCase
 import com.mamm.mammapps.domain.usecases.content.GetSeriesUseCase
 import com.mamm.mammapps.domain.usecases.content.GetSportsUseCase
@@ -54,6 +55,7 @@ class HomeViewModel @Inject constructor(
     private val getWarnerUseCase: GetWarnerUseCase,
     private val getAMCUseCase: GetAMCUseCase,
     private val getAcontraUseCase: GetAcontraUseCase,
+    private val getMemoriesUseCase: GetMemoriesUseCase,
     private val findContentEntityUseCase: FindContentEntityUseCase,
     private val findLiveEventOnChannelUseCase: FindLiveEventOnChannelUseCase,
     private val shouldRequestPinUseCase: ShouldRequestPinUseCase,
@@ -142,6 +144,7 @@ class HomeViewModel @Inject constructor(
             AppRoute.WARNER -> loadContent { getWarnerUseCase() }
             AppRoute.AMC -> loadContent { getAMCUseCase() }
             AppRoute.ACONTRA -> loadContent { getAcontraUseCase() }
+            AppRoute.MEMORIES -> loadContent { getMemoriesUseCase() }
             else -> logger.debug(TAG, "Route not implemented")
         }
     }
