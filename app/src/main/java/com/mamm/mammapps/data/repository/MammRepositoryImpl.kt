@@ -11,6 +11,7 @@ import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.Subgenre
+import com.mamm.mammapps.data.model.exception.GetMemoriesException
 import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.data.session.SessionManager
@@ -141,8 +142,13 @@ class MammRepositoryImpl @Inject constructor(
 
     override suspend fun getMemories(): Result<GetMemoriesResponse> {
         return runCatching {
-            remoteDatasource.getMyMemories()
+            val response = remoteDatasource.getMyMemories()
+            if (response.sections.isNullOrEmpty()) {
+                throw GetMemoriesException.EmptyList
+            }
+            response
         }.onFailure {
+            // Este bloque ahora capturará tanto errores de red como tu excepción personalizada
             logger.error(TAG, "getMemories failed: ${it.message}, $it")
         }
     }
@@ -268,13 +274,15 @@ class MammRepositoryImpl @Inject constructor(
     }
 
     override fun findMemoriesContent(identifier: ContentIdentifier): Result<Any>? {
-        val memories = remoteDatasource.getCachedMemories()
+        val memories = remoteDatasource.getCachedMemories() ?: return null
 
         val content: Any? = when (identifier) {
             is ContentIdentifier.VoD -> {
-                memories?.videos?.find { it.id == identifier.id }
-                    ?: memories?.slideshows?.find { it.id == identifier.id }
+                memories.sections
+                    ?.flatMap { it.items }
+                    ?.find { it.id == identifier.id }
             }
+
             else -> null
         }
 

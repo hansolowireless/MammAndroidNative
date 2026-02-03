@@ -632,32 +632,18 @@ fun GetBrandedContentResponse.toContentUIRows(
 }
 
 fun GetMemoriesResponse.toContentUIRows(): List<ContentRowUI> {
-    val rows = mutableListOf<ContentRowUI>()
-
-    if (this.videos.isNotEmpty()) {
-        rows.add(
+    return this.sections?.mapIndexedNotNull { index, section ->
+        if (section.items.isNotEmpty()) {
             ContentRowUI(
-                categoryId = 1,
-                categoryName = "Vídeos",
-                items = this.videos.map { it.toContentEntityUI() }
+                categoryId = index,
+                categoryName = section.title,
+                items = section.items.map { it.toContentEntityUI() }
             )
-        )
-    }
-
-    // Fila de Slideshows
-    if (this.slideshows.isNotEmpty()) {
-        rows.add(
-            ContentRowUI(
-                categoryId = 2,
-                categoryName = "Fotos",
-                items = this.slideshows.map { it.toContentEntityUI() }
-            )
-        )
-    }
-
-    return rows
+        } else {
+            null
+        }
+    } ?: emptyList()
 }
-
 
 fun List<ContentRowUI>.insertFeatured(
     featured: List<HomeFeatured>?

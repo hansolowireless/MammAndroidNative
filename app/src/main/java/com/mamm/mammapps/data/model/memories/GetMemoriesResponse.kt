@@ -4,23 +4,30 @@ import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class GetMemoriesResponse(
     @SerializedName("user_id")
     val userId: Int,
     @SerializedName("updated_at")
     val updatedAt: String,
-    @SerializedName("videos")
-    val videos: List<MemoryItem> = emptyList(),
-    @SerializedName("slideshows")
-    val slideshows: List<MemoryItem> = emptyList()
-)
+    @SerializedName("sections")
+    val sections: List<MemorySection>? = null
+) : Parcelable
+
+@Parcelize
+data class MemorySection(
+    @SerializedName("title")
+    val title: String,
+    @SerializedName("items")
+    val items: List<MemoryItem> = emptyList()
+) : Parcelable
 
 @Parcelize
 data class MemoryItem(
     @SerializedName("id")
     val id: Int,
     @SerializedName("type")
-    val type: String,
+    val type: String, // "video" o "slideshow"
     @SerializedName("title")
     val title: String,
     @SerializedName("thumbnail")
