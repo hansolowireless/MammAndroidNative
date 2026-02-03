@@ -32,7 +32,7 @@ class NavigationViewModel @Inject constructor(
                     _menuItems.value = MenuItems.list
                 } else {
                     logger.debug(TAG, "Setting menu items without branded content")
-                    _menuItems.value = MenuItems.listNoBrandedContent
+                    _menuItems.value = MenuItems.listNoSpanishUserContent
                 }
             }.onFailure {
                 logger.error(TAG, "Error setting menu items: ${it.message}")

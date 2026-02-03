@@ -195,7 +195,6 @@ class CacheImpl @Inject constructor() : Cache {
         cachedMostWatched = null
         cachedRecommended = null
         cachedLastTimePinWasCorrect = null
-        showBrandedContentMenus = null
         clearContentPlayProgress()
     }
 

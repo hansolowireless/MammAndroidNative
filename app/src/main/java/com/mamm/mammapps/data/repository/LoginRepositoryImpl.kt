@@ -18,6 +18,10 @@ class LoginRepositoryImpl @Inject constructor(
     private val logger: Logger
 ) : LoginRepository {
 
+    companion object {
+        private const val TAG = "LoginRepositoryImpl"
+    }
+
     override suspend fun login(username: String, password: String): Result<LoginResponse> {
         return runCatching {
             remoteDatasource.login(username, password)
@@ -37,6 +41,7 @@ class LoginRepositoryImpl @Inject constructor(
     }
 
     override fun setShowBrandedContentMenus(show: Boolean) {
+        logger.debug(TAG, "Setting show branded content menus to $show")
         localDataSource.setShowBrandedContentMenus(show)
     }
 

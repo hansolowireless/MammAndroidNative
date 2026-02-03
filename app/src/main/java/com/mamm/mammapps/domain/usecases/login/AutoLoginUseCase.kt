@@ -22,7 +22,6 @@ class AutoLoginUseCase @Inject constructor(
             onSuccess = { (username, password) ->
                 if (username != null && password != null) {
                     logger.debug(TAG, "autologinUseCase Found valid credentials, attempting auto-login...")
-
                     if (Config.shouldUseDynamicUrls) {
                         repository.checkLocator(username)
                             .onSuccess { locatorResponse ->
@@ -35,6 +34,9 @@ class AutoLoginUseCase @Inject constructor(
                                 Config.resetDynamicUrls()
                                 repository.setShowBrandedContentMenus(true)
                             }
+                    }
+                    else {
+                        repository.setShowBrandedContentMenus(true)
                     }
 
                     repository.login(username, password).fold(

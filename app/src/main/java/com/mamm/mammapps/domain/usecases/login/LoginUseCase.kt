@@ -32,6 +32,9 @@ class LoginUseCase @Inject constructor(
                     repository.setShowBrandedContentMenus(true)
                 }
         }
+        else {
+            repository.setShowBrandedContentMenus(true)
+        }
 
         return repository.login(username, password).fold(
             onSuccess = { response ->

@@ -159,10 +159,11 @@ object MenuItems {
         }
     }
 
-    val listNoBrandedContent = list.filter {
+    val listNoSpanishUserContent = list.filter {
         it != AppRoute.WARNER
                 && it != AppRoute.AMC
                 && it != AppRoute.ACONTRA
+                && it != AppRoute.MEMORIES
     }
 
     fun showSideMenu(route: AppRoute): Boolean {
