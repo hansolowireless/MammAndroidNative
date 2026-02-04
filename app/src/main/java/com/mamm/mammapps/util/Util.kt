@@ -4,18 +4,15 @@ import android.app.UiModeManager
 import android.content.Context
 import android.content.res.Configuration
 import android.net.Uri
+import androidx.core.content.ContextCompat
 import kotlin.math.absoluteValue
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 
 fun isAndroidTV(context: Context): Boolean {
-    return try {
-        val uiModeManager = context.getSystemService(UiModeManager::class.java)
-        uiModeManager?.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
-    } catch (e: Exception) {
-        false
-    }
+    val uiModeManager = ContextCompat.getSystemService(context, UiModeManager::class.java)
+    return uiModeManager?.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
 }
 
 /**
