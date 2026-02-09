@@ -648,18 +648,35 @@ fun GetMemoriesResponse.toContentUIRows(): List<ContentRowUI> {
 fun List<ContentRowUI>.insertFeatured(
     featured: List<HomeFeatured>?
 ): List<ContentRowUI> {
-    if (!featured.isNullOrEmpty()) {
-        ContentRowUI(
-            categoryId = getRandomHashCode(),
-            categoryName = "Eventos Destacados",
-            items = featured.mapNotNull { it.toContentEntityUI() },
-            isFeatured = true
-        ).let {
-            return listOf(it) + this
+    if (featured.isNullOrEmpty()) return this
+
+    val featuredItems = featured.mapNotNull { it.toContentEntityUI() }
+    val targetCategoryId = 2002
+
+    // Comprobamos si la categoría 2002 ya existe en la lista
+    val hasTargetCategory = this.any { it.categoryId == targetCategoryId }
+
+    return if (hasTargetCategory) {
+        // Si existe, mapeamos la lista para encontrarla y añadir los items al principio de esa fila
+        this.map { row ->
+            if (row.categoryId == targetCategoryId) {
+                row.copy(
+                    items = featuredItems + row.items,
+                    isFeatured = true
+                )
+            } else {
+                row
+            }
         }
-    }
-    else {
-        return this
+    } else {
+        // Si NO existe la categoría 2002, crear una fila nueva e insertarla al principio de todo
+        val newFeaturedRow = ContentRowUI(
+            categoryId = targetCategoryId,
+            categoryName = "Eventos Destacados",
+            items = featuredItems,
+            isFeatured = true
+        )
+        listOf(newFeaturedRow) + this
     }
 }
 

@@ -32,71 +32,85 @@ object MenuItems {
                 contentDescription = null,
                 modifier = iconModifier
             )
+
             AppRoute.EPG -> Icon(
                 BulletedList,
                 contentDescription = null,
                 modifier = iconModifier
             )
+
             AppRoute.CHANNELS -> Icon(
                 painterResource(id = R.drawable.menu_remoteicon),
                 contentDescription = null,
                 modifier = iconModifier
             )
+
             AppRoute.MOVIES -> Icon(
                 painterResource(id = R.drawable.menu_cinemaicon2),
                 contentDescription = null,
                 modifier = iconModifier
             )
+
             AppRoute.DOCUMENTARIES -> Icon(
                 painterResource(id = R.drawable.menu_documentariesicon),
                 contentDescription = null,
                 modifier = iconModifier
             )
+
             AppRoute.SERIES -> Icon(
                 painterResource(id = R.drawable.menu_serieslogoicon),
                 contentDescription = null,
                 modifier = iconModifier
             )
+
             AppRoute.WARNER -> Icon(
                 painterResource(id = R.drawable.menu_wblogoicon),
                 contentDescription = null,
                 modifier = iconModifier
             )
+
             AppRoute.ACONTRA -> Icon(
                 painterResource(id = R.drawable.menu_acontralogoicon),
                 contentDescription = null,
                 modifier = iconModifier
             )
+
             AppRoute.AMC -> Icon(
                 painterResource(id = R.drawable.menu_amclogoicon),
                 contentDescription = null,
                 modifier = iconModifier
             )
+
             AppRoute.SPORTS -> Icon(
                 painterResource(id = R.drawable.menu_iconfootball),
                 contentDescription = null,
                 modifier = iconModifier
             )
+
             AppRoute.MEMORIES -> Icon(
                 imageVector = Memories,
                 contentDescription = null,
                 modifier = iconModifier
             )
+
             AppRoute.ADULTS -> Icon(
                 Fire,
                 contentDescription = null,
                 modifier = iconModifier
             )
+
             AppRoute.KIDS -> Icon(
                 Puzzle,
                 contentDescription = null,
                 modifier = iconModifier
             )
+
             AppRoute.SEARCH -> Icon(
                 Icons.Default.Search,
                 contentDescription = null,
                 modifier = iconModifier
             )
+
             AppRoute.ABOUT -> Icon(WifiSignal, contentDescription = null, modifier = iconModifier)
             AppRoute.LOGOUT -> Icon(
                 Icons.Default.Person,
@@ -146,7 +160,6 @@ object MenuItems {
                         it != AppRoute.SPORTS &&
                         it != AppRoute.KIDS &&
                         it != AppRoute.SERIES &&
-                        it != AppRoute.ADULTS &&
                         it != AppRoute.WARNER &&
                         it != AppRoute.ACONTRA &&
                         it != AppRoute.AMC &&
@@ -177,6 +190,18 @@ object MenuItems {
             AppRoute.ERROR_SUBSCRIPTION_ONGOING -> false
 
             else -> true
+        }
+    }
+
+    fun showLogoOnMenu(): Boolean {
+        return when (BuildConfig.FLAVOR) {
+            "fibrazo" -> {
+                true
+            }
+
+            else -> {
+                false
+            }
         }
     }
 }

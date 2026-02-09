@@ -1,5 +1,6 @@
 package com.mamm.mammapps.ui.theme
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -55,6 +56,15 @@ val Typography = Typography(
         fontSize = FontSizes.medium,
         lineHeight = LineHeights.medium,
         letterSpacing = 0.sp
+    ),
+    headlineLarge = Typography().headlineLarge.copy(
+        fontFamily = AppFontFamily
+    ),
+    headlineMedium = Typography().headlineMedium.copy(
+        fontFamily = AppFontFamily
+    ),
+    headlineSmall = Typography().headlineSmall.copy(
+        fontFamily = AppFontFamily
     )
     /* Other default text styles to override
     titleLarge = TextStyle(

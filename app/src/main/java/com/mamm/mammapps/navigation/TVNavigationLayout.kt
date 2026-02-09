@@ -1,22 +1,19 @@
 package com.mamm.mammapps.navigation
 
-import android.util.Log
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.relocation.BringIntoViewRequester
-import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.material3.NavigationRail
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,27 +24,18 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusEvent
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.type
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.mamm.mammapps.navigation.extension.navigateToTopLevel
+import com.mamm.mammapps.navigation.component.TVMenuList
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.navigation.viewModel.NavigationViewModel
+import com.mamm.mammapps.ui.component.common.OperatorLogoImage
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
-import com.mamm.mammapps.ui.component.navigation.CustomTVNavigationItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -59,6 +47,7 @@ fun TVNavigationLayout(
 
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     val menuItems by viewModel.menuItems.collectAsStateWithLifecycle()
+    val operatorLogo by viewModel.operatorLogo.collectAsStateWithLifecycle()
 
     val routeList = menuItems.map { it.route }
 
@@ -79,12 +68,14 @@ fun TVNavigationLayout(
     val bringIntoViewRequesters = remember { routeList.associateWith { BringIntoViewRequester() } }
     val itemPositions = remember { mutableMapOf<String, Float>() }
 
-    LaunchedEffect (currentRoute) {
-        if (currentRoute == AppRoute.HOME.route)
+    LaunchedEffect(currentRoute) {
+        if (currentRoute == AppRoute.HOME.route) {
             viewModel.setMenuItems()
+            viewModel.getOperatorLogo()
+        }
     }
 
-    LaunchedEffect (currentRoute) {
+    LaunchedEffect(currentRoute) {
         delay(1500)
         canFocusAfterRecompose = true
     }
@@ -122,68 +113,41 @@ fun TVNavigationLayout(
     Row(modifier = Modifier.fillMaxSize()) {
         if (AppRoute.fromRoute(currentRoute)?.let { MenuItems.showSideMenu(it) } == true) {
             ProvideLazyListPivotOffset(parentFraction = 0.01f) {
-                // CAMBIO ARQUITECTÓNICO: El NavigationRail solo es un contenedor, ya no es scrollable.
                 NavigationRail(
                     modifier = Modifier
                         .width(railWidth)
-                        .fillMaxHeight()
-                        // El onFocusEvent ahora está en el padre, que es quien tiene el foco lógico.
                         .onFocusEvent { focusState ->
                             isNavRailFocused = focusState.hasFocus
                         }
-                        .focusable(canFocusAfterRecompose) // Es focusable para que onFocusEvent funcione.
+                        .focusable(canFocusAfterRecompose)
                 ) {
+                    // Usamos un Column para organizar el Menú (arriba) y el Logo (abajo)
+                    Column(modifier = Modifier.fillMaxHeight()) {
 
+                        // El menú ocupa todo el espacio disponible, empujando lo demás abajo
+                        TVMenuList(
+                            navController = navController,
+                            menuItems = menuItems,
+                            currentRoute = currentRoute,
+                            isNavRailFocused = isNavRailFocused,
+                            lazyListState = lazyListState,
+                            focusRequesters = focusRequesters,
+                            bringIntoViewRequesters = bringIntoViewRequesters,
+                            itemPositions = itemPositions,
+                            modifier = Modifier
+                                .weight(1f) // Esto hace que el scroll sea independiente
+                                .padding(vertical = 5.dp)
+                        )
 
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .padding(top = 5.dp, bottom = 5.dp),
-                        state = lazyListState
-                    ) {
-                        items(menuItems) { item ->
-
-                            val isLastItem = menuItems.last().route == item.route
-
-                            val itemModifier = Modifier
-                                .focusRequester(focusRequesters.getValue(item.route))
-                                .bringIntoViewRequester(bringIntoViewRequesters.getValue(item.route))
-                                .onGloballyPositioned { coordinates ->
-                                    itemPositions[item.route] = coordinates.positionInParent().y
-                                }.onKeyEvent { keyEvent ->
-                                    if (keyEvent.type == KeyEventType.KeyDown &&
-                                        keyEvent.key == Key.DirectionDown
-                                    ) {
-                                        if (isLastItem) {
-                                            // Evita abandonar la navegación en el último elemento del menú
-                                            return@onKeyEvent true
-                                        }
-                                    }
-                                    false
-                                }
-
-                            CustomTVNavigationItem(
-                                modifier = itemModifier,
-                                icon = { MenuItems.GetIconForRoute(route = item) },
-                                label = stringResource(id = item.getResId()),
-                                parentIsFocused = isNavRailFocused,
-                                selected = currentRoute == item.route,
-                                onClick = {
-                                    // Comprueba si la ruta es la de Home para evitar un popUp a sí misma
-                                    if (item.route == AppRoute.HOME.route) {
-                                        navController.navigate(item.route) {
-                                            popUpTo(navController.graph.startDestinationId)
-                                            launchSingleTop = true
-                                        }
-                                    } else {
-                                        navController.navigateToTopLevel(item.route)
-                                    }
-                                }
+                        // Imagen fija en la parte inferior
+                        if (MenuItems.showLogoOnMenu() && isNavRailFocused) {
+                            OperatorLogoImage(
+                                logoUrl = operatorLogo,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(60.dp)
+                                    .padding(16.dp),
                             )
-                        }
-
-                        item {
-                            Spacer(modifier = Modifier.height(1000.dp))
                         }
                     }
                 }
