@@ -15,7 +15,7 @@
         android:label="@string/app_name"
         android:roundIcon="${appIconRound}"
         android:supportsRtl="true"
-        android:banner="${appIcon}"
+        android:banner="${banner}"
         android:theme="@style/Theme.MammApps"
         tools:targetApi="31">
     <activity
