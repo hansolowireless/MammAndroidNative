@@ -6,6 +6,7 @@ import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.bookmark.SetBookmarkRequest
+import com.mamm.mammapps.data.model.diagnostic.DiagResponseDto
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
@@ -16,6 +17,7 @@ import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.model.player.heartbeat.HeartBeatRequest
 import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -23,6 +25,7 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Streaming
 import retrofit2.http.Url
 
 /*En los header se especifica el tipo de URL
@@ -286,6 +289,17 @@ interface ApiService {
         @Path("jsonParam") jsonParam: String
     ): Response<GetBrandedContentResponse>
 
+    // ------- Diagnostics ----------
+    @GET("diag.json")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getDiagNodes(
+    ): Response<DiagResponseDto>
 
+    @Streaming
+    @GET
+    suspend fun downloadFile(@Url url: String): Response<ResponseBody>
 
 }

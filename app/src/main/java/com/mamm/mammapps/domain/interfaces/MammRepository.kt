@@ -1,6 +1,5 @@
 package com.mamm.mammapps.domain.interfaces
 
-import com.mamm.mammapps.data.model.AboutInfo
 import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.data.model.Genre
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
@@ -12,8 +11,6 @@ import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.ui.model.ContentIdentifier
 
 interface MammRepository {
-
-    suspend fun getAboutInfo() : Result<AboutInfo>
 
     suspend fun getHomeContent() : Result<GetHomeContentResponse>
     suspend fun getMovies(): Result<GetOtherContentResponse>
