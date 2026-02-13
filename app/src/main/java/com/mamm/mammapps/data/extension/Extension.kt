@@ -2,7 +2,6 @@ package com.mamm.mammapps.data.extension
 
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
-import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.metadata.Metadata
 import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.ui.extension.adult

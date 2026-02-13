@@ -18,6 +18,7 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -263,4 +264,8 @@ fun ContentToPlayUI.toMediaMetadata(): MediaMetadata {
 
 fun Int?.bitsToMegabits(): Double {
     return (this?.toDouble() ?: 0.0) / 1_000_000.0
+}
+
+fun Double.formatMbps(): String {
+    return String.format(java.util.Locale.US, "%.2f", this)
 }

@@ -63,6 +63,9 @@
     <!-- region ABOUT -->
     <string name="username">Usuario: </string>
     <string name="application_version">Versión de la aplicación: </string>
+    <string name="start_diagnostic">Iniciar diagnóstico</string>
+    <string name="loading_diagnostic">Realizando diagnóstico</string>
+    <string name="node">Nodo</string>
     <!-- endregion ABOUT -->
 
     <!--Track selector Strings!-->

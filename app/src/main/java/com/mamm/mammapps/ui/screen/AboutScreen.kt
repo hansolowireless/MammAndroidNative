@@ -1,26 +1,37 @@
 package com.mamm.mammapps.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamm.mammapps.R
+import com.mamm.mammapps.domain.model.DownloadSpeedResult
 import com.mamm.mammapps.ui.component.common.OperatorLogoImage
+import com.mamm.mammapps.ui.component.common.PrimaryButton
+import com.mamm.mammapps.ui.component.diagnostic.DiagnosticResultsList
+import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.TextPrimary
 import com.mamm.mammapps.ui.viewmodel.AboutViewModel
@@ -31,10 +42,17 @@ fun AboutScreen(
 ) {
     val aboutInfo by viewModel.aboutInfo.collectAsStateWithLifecycle()
     val operatorLogo by viewModel.operatorLogo.collectAsStateWithLifecycle()
+    val diagnosticState by viewModel.diagnosticUiState.collectAsStateWithLifecycle()
+
+    val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
         viewModel.getAboutInfo()
         viewModel.getOperatorLogo()
+    }
+
+    LaunchedEffect(diagnosticState) {
+        focusRequester.requestFocus()
     }
 
     Column(
@@ -57,12 +75,73 @@ fun AboutScreen(
                 style = MaterialTheme.typography.bodyLarge,
                 color = TextPrimary
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Dimensions.paddingXSmall))
+            Text(
+                text = "IP: ${info.userIp}",
+                style = MaterialTheme.typography.bodyLarge,
+                color = TextPrimary
+            )
+            Spacer(modifier = Modifier.height(Dimensions.paddingXSmall))
             Text(
                 text = "${stringResource(R.string.application_version)}: ${info.appVersion}",
                 style = MaterialTheme.typography.bodyLarge,
                 color = TextPrimary
             )
         }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // SECCIÓN DE DIAGNÓSTICO
+        when (val state = diagnosticState) {
+            is UIState.Idle -> {
+                PrimaryButton(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .focusRequester(focusRequester),
+                    onClick = { viewModel.runDiagnostic() },
+                    text = stringResource(R.string.start_diagnostic))
+            }
+
+            is UIState.Loading -> {
+                Spacer(modifier = Modifier.height(Dimensions.paddingXLarge))
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                }
+                Spacer(modifier = Modifier.height(Dimensions.paddingXLarge))
+                PrimaryButton(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .focusRequester(focusRequester),
+                    onClick = { viewModel.runDiagnostic() },
+                    text = stringResource(R.string.loading_diagnostic),
+                    enabled = false)
+            }
+
+            is UIState.Success -> {
+                DiagnosticResultsList(state.data as List<DownloadSpeedResult?>)
+                Spacer(modifier = Modifier.height(16.dp))
+                // Permitir repetir el test
+                PrimaryButton(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .focusRequester(focusRequester),
+                    onClick = { viewModel.runDiagnostic() },
+                    text = stringResource(R.string.start_diagnostic))
+            }
+
+            is UIState.Error -> {
+                Text(text = state.message, color = Color.Red)
+                PrimaryButton(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .focusRequester(focusRequester),
+                    onClick = { viewModel.runDiagnostic() },
+                    text = stringResource(R.string.start_diagnostic))
+            }
+        }
     }
+
 }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,9 +40,9 @@ fun PrimaryButton(
     text: String,
     height: Dp = if (LocalIsTV.current) 40.dp else 48.dp,
     icon: @Composable (() -> Unit)? = null,
+    enabled: Boolean = true,
     onClick: () -> Unit,
     onRegainFocus: (() -> Unit)? = null,
-    enabled: Boolean = true
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
@@ -72,7 +73,6 @@ fun PrimaryButton(
             enabled = enabled
         ) {
             Row(
-                modifier = Modifier.fillMaxSize(),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -89,7 +89,7 @@ fun PrimaryButton(
         // --- CÓDIGO NUEVO PARA MÓVIL/TABLET ---
         MobileButton(
             onClick = onClick,
-            shape = RectangleShape, // En móvil es más directo
+            shape = RectangleShape,
             modifier = modifier
                 .height(height)
                 .border(BorderStroke(

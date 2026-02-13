@@ -30,7 +30,8 @@ import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.data.model.Subgenre
 import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.bookmark.SetBookmarkRequest
-import com.mamm.mammapps.data.model.exception.GetHomeContentException
+import com.mamm.mammapps.data.model.diagnostic.DiagResponseDto
+import com.mamm.mammapps.domain.model.DownloadSpeedResult
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
@@ -45,6 +46,7 @@ import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.remote.ApiService
 import com.mamm.mammapps.ui.extension.toDate
+import com.mamm.mammapps.util.calculateMbps
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -75,6 +77,10 @@ class RemoteDatasource @Inject constructor(
     private val cache: Cache,
     private val logger: Logger
 ) {
+
+    companion object {
+        private const val BUFFER_SIZE = 8192
+    }
 
     suspend fun login(username: String, password: String): LoginResponse {
         val response = idmApi.login(
@@ -567,6 +573,53 @@ class RemoteDatasource @Inject constructor(
 
     fun clearCache() {
         cache.clear()
+    }
+
+    //----------DIAGNOSTIC---------//
+    suspend fun getDiagNodes() : DiagResponseDto {
+        return withContext(Dispatchers.IO) {
+            baseUrlApi.getDiagNodes().let {
+                if (!it.isSuccessful) {
+                    val errorBody = it.errorBody()?.string()?.toResponseBody()
+                    throw HttpException(Response.error<Any>(it.code(), errorBody))
+                } else {
+                    it.body() ?: throw IllegalStateException("Response body is null")
+                }
+            }
+        }
+    }
+
+    suspend fun performDownloadSpeedTest(url: String): Result<DownloadSpeedResult> = runCatching {
+        val response = noBaseUrlApi.downloadFile(url)
+        val body = response.body()
+
+        if (!response.isSuccessful || body == null) {
+            throw Exception("Error al descargar el archivo: ${response.code()}")
+        }
+
+        val startTime = System.currentTimeMillis()
+        var totalBytes: Long = 0
+
+        // .use asegura que el stream se cierre al terminar
+        body.byteStream().use { inputStream ->
+            val buffer = ByteArray(BUFFER_SIZE)
+            var bytesRead: Int
+            while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                totalBytes += bytesRead
+
+                // Opcional: Limitar la prueba a 10MB o 5 segundos para no consumir datos infinitos
+                // if (totalBytes > 10 * 1024 * 1024) break
+            }
+        }
+
+        val durationMs = System.currentTimeMillis() - startTime
+        val speedMbps = calculateMbps(totalBytes, durationMs)
+
+        DownloadSpeedResult(
+            speedMbps = speedMbps,
+            durationMs = durationMs,
+            bytesDownloaded = totalBytes
+        )
     }
 
 }
