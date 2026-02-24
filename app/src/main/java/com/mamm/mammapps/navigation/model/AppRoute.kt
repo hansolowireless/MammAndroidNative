@@ -19,6 +19,7 @@ enum class AppRoute {
     ADULTS,
     LASTSEVENDAYS,
     MEMORIES,
+    SPORTSCALENDAR,
     ABOUT,
     PLAYER,
     DETAIL,
@@ -63,6 +64,7 @@ enum class AppRoute {
             SPORTS -> R.string.nav_sports
             MEMORIES -> R.string.nav_my_memories
             ADULTS -> R.string.nav_adults
+            SPORTSCALENDAR -> R.string.nav_sport_calendar
             KIDS -> R.string.nav_kids
             SEARCH -> R.string.nav_search
             ABOUT -> R.string.nav_diagnostics

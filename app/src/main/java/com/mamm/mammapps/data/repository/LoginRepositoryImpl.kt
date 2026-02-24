@@ -51,6 +51,12 @@ class LoginRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun getUserIsHoreca(): Result<Boolean> {
+        return runCatching {
+            sessionManager.isHoreca()
+        }
+    }
+
     override fun getOperatorLogoUrl() : Result<String> {
         return runCatching {
             remoteDatasource.getOperatorLogoUrl() ?: throw IllegalStateException("Operator logo URL is null")

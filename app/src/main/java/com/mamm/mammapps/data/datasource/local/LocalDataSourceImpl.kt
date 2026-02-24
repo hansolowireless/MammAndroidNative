@@ -9,7 +9,6 @@ import com.mamm.mammapps.data.di.DrmIVQualifier
 import com.mamm.mammapps.data.di.DrmSecretKeyQualifier
 import com.mamm.mammapps.data.di.DrmUrlQualifier
 import com.mamm.mammapps.data.local.SecurePreferencesManager
-import com.mamm.mammapps.data.logger.Logger
 import kotlinx.coroutines.flow.Flow
 import java.time.ZonedDateTime
 import javax.inject.Inject
@@ -22,8 +21,7 @@ class LocalDataSourceImpl @Inject constructor(
     @ChromecastDeviceTypeQualifier private val ccastDeviceType: String,
     @DrmUrlQualifier private val drmUrl: String,
     @DrmIVQualifier private val iV64: ByteArray,
-    @DrmSecretKeyQualifier private val secretKey64: ByteArray,
-    private val logger: Logger
+    @DrmSecretKeyQualifier private val secretKey64: ByteArray
 ) : LocalDataSource {
 
     override suspend fun saveUserCredentials(username: String, password: String) {
