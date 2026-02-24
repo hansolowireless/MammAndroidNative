@@ -72,14 +72,14 @@ fun configureFlavorWithMasmediaUrls(
         iconMobile = iconMobile,
         iconRound = iconRound,
         banner = banner,
-        "https://locator.service.openstream.es/",
-        "https://dyncont.masmediatv.es/",
-        "https://idm.masmediatv.es/",
-        "https://metrics.service.openstream.es/",
-        "https://indexsrv-masmediatv.service.openstream.es/",
-        "https://gestionclientes.masmediatv.es/masmediatv_mngr/",
-        true,
-        "masmediatv",
+        locatorUrl = "https://locator.service.openstream.es/",
+        baseUrl = "https://dyncont.masmediatv.es/",
+        idmUrl = "https://idm.masmediatv.es/",
+        metricsUrl = "https://metrics.service.openstream.es/",
+        searchUrl = "https://indexsrv-masmediatv.service.openstream.es/",
+        passwordUrl = "https://gestionclientes.masmediatv.es/masmediatv_mngr/",
+        dynamicUrls = true,
+        operatorNameDRM = "masmediatv",
         signingConfig = signingConfig
     )
 }
@@ -177,43 +177,43 @@ android {
     productFlavors {
 
         configureFlavorWithMasmediaUrls(
-            this,
-            "masmedia",
-            "masmedia.openstream.com",
-            "@mipmap/ic_launcher_masmedia",
-            "@mipmap/ic_launcher_masmedia",
-            "@mipmap/ic_launcher_masmedia_round",
-            "@drawable/banner_masmedia",
+            flavors = this,
+            name = "masmedia",
+            appId = "masmedia.openstream.com",
+            icon = "@mipmap/ic_launcher_masmedia",
+            iconMobile = "@mipmap/ic_launcher_masmedia",
+            iconRound = "@mipmap/ic_launcher_masmedia_round",
+            banner = "@drawable/banner_masmedia",
             signingConfig = signingConfigs.getByName("keystoreDiego")
         )
 
         configureFlavorWithMasmediaUrls(
-            this,
-            "fibrazo",
-            "app.fibrazo.com",
-            "@mipmap/ic_launcher_fibrazo",
-            "@mipmap/ic_launcher_fibrazo",
-            "@mipmap/ic_launcher_fibrazo_round",
-            "@drawable/banner_fibrazo",
+            flavors = this,
+            name = "fibrazo",
+            appId = "app.fibrazo.com",
+            icon = "@mipmap/ic_launcher_fibrazo",
+            iconMobile = "@mipmap/ic_launcher_fibrazo",
+            iconRound = "@mipmap/ic_launcher_fibrazo_round",
+            banner = "@drawable/banner_fibrazo",
             signingConfig = signingConfigs.getByName("keystoreMamm")
         )
 
         configureCustomFlavor(
-            this,
-            "eligetv",
-            "app.openstream.com",
-            "@mipmap/ic_launcher_eligetv",
-            "@mipmap/ic_launcher_eligetv",
-            "@mipmap/ic_launcher_eligetv_round",
-            "@drawable/banner_eligetv",
-            "http://locator.service.openstream.es/",
-            "https://dyncont.openstream.es/",
-            "https://idm.openstream.es/",
-            "https://metrics.service.openstream.es/",
-            "https://indexsrv-openstream.service.openstream.es/",
-            "https://gestionclientes.openstream.es/openstream_mngr/",
-            false,
-            "openstream",
+            flavors = this,
+            name = "eligetv",
+            appId = "app.openstream.com",
+            icon = "@mipmap/ic_launcher_eligetv",
+            iconMobile = "@mipmap/ic_launcher_eligetv",
+            iconRound = "@mipmap/ic_launcher_eligetv_round",
+            banner = "@drawable/banner_eligetv",
+            locatorUrl = "http://locator.service.openstream.es/",
+            baseUrl = "https://dyncont.openstream.es/",
+            idmUrl = "https://idm.openstream.es/",
+            metricsUrl = "https://metrics.service.openstream.es/",
+            searchUrl = "https://indexsrv-openstream.service.openstream.es/",
+            passwordUrl = "https://gestionclientes.openstream.es/openstream_mngr/",
+            dynamicUrls = false,
+            operatorNameDRM = "openstream",
             signingConfig = signingConfigs.getByName("keystoreDiego")
         )
 

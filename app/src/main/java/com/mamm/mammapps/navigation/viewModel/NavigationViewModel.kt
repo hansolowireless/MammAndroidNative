@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.interfaces.LoginRepository
 import com.mamm.mammapps.domain.usecases.login.GetOperatorLogoUseCase
+import com.mamm.mammapps.domain.usecases.navigation.GetMenuItemsUseCase
 import com.mamm.mammapps.navigation.MenuItems
 import com.mamm.mammapps.navigation.model.AppRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,8 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NavigationViewModel @Inject constructor(
-    private val loginRepository: LoginRepository,
     private val getOperatorLogoUseCase: GetOperatorLogoUseCase,
+    private val getMenuItemsUseCase: GetMenuItemsUseCase,
     private val logger: Logger
 ) : ViewModel() {
 
@@ -30,18 +31,12 @@ class NavigationViewModel @Inject constructor(
     val operatorLogo: StateFlow<String?> = _operatorLogo.asStateFlow()
 
     fun setMenuItems() {
-        loginRepository.getShowBrandedContentMenus()
-            .onSuccess { show ->
-                if (show) {
-                    logger.debug(TAG, "Setting menu items with branded content")
-                    _menuItems.value = MenuItems.list
-                } else {
-                    logger.debug(TAG, "Setting menu items without branded content")
-                    _menuItems.value = MenuItems.listNoSpanishUserContent
-                }
-            }.onFailure {
-                logger.error(TAG, "Error setting menu items: ${it.message}")
-            }
+        getMenuItemsUseCase().onSuccess { items ->
+            logger.debug(TAG, "Actualizando UI con ${items.size} elementos de menú")
+            _menuItems.value = items
+        }.onFailure {
+            logger.error(TAG, "Fallo al setear menús en el ViewModel")
+        }
     }
 
     fun getOperatorLogo() {

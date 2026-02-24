@@ -86,7 +86,7 @@ fun TVNavigationLayout(
             if (currentRoute != null && !isInitialFocusSet) {
                 focusRequesters[currentRoute]?.requestFocus()
                 coroutineScope.launch {
-                    delay(100) // El delay sigue siendo una buena práctica
+                    delay(100)
                     bringIntoViewRequesters[currentRoute]?.bringIntoView()
                 }
                 isInitialFocusSet = true

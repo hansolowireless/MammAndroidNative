@@ -72,6 +72,11 @@ class SessionManager @Inject constructor(
         }
     }
 
+    fun isHoreca(): Boolean {
+        val horecaIds = listOf(226, 225, 206, 224)
+        return availablePackages.any { it in horecaIds }
+    }
+
     fun clear() {
         sessionStorage.clear() // ¡Importante! Limpiar también el almacenamiento persistente
         loginData = null

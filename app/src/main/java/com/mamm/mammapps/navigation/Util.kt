@@ -142,6 +142,7 @@ object MenuItems {
         AppRoute.AMC,
         AppRoute.MEMORIES,
         AppRoute.ADULTS,
+        AppRoute.SPORTSCALENDAR,
         AppRoute.SEARCH,
         AppRoute.ABOUT,
         AppRoute.LOGOUT,
