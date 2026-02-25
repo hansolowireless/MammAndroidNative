@@ -45,8 +45,8 @@ import drawable.Clock
 @Composable
 fun ContentEntityListItem(
     modifier: Modifier = Modifier,
-    content: ContentListUI,
-    channelInfo: ContentEntityUI? = null,
+    mainContent: ContentListUI,
+    leadingContent: ContentEntityUI? = null,
     showLiveIndicator: Boolean = false,
     showCatchupIndicator: Boolean = false,
     showDescription: Boolean = false,
@@ -66,7 +66,7 @@ fun ContentEntityListItem(
             .onFocusChanged { isFocused = it.isFocused }
             //Si no se hace esto, no funcionan los colors al hacer focus en TV
             .then(if (!LocalIsTV.current) Modifier.clickable(onClick = onClick) else Modifier),
-        leadingContent = channelInfo?.let {
+        leadingContent = leadingContent?.let {
             {
                 AsyncImage(
                     model = it.detailInfo?.squareLogo,
@@ -82,8 +82,8 @@ fun ContentEntityListItem(
             Row {
                 Text(
                     modifier = Modifier.weight(1f),
-                    text = orderIndex?.let{"$it - "}.orEmpty() + content.title.ifBlank {
-                        channelInfo?.title?.let { "$it: " } + stringResource(
+                    text = orderIndex?.let{"$it - "}.orEmpty() + mainContent.title.ifBlank {
+                        leadingContent?.title?.let { "$it: " } + stringResource(
                             R.string.no_event_info
                         )
                     },
@@ -115,7 +115,7 @@ fun ContentEntityListItem(
             }
         },
         supportingContent = if (isFocused || showLiveIndicator || showDescription) {
-            content.detailInfo?.description?.let { description ->
+            mainContent.detailInfo?.description?.let { description ->
                 if (description.isNotBlank()) {
                     {
                         Text(
@@ -128,11 +128,11 @@ fun ContentEntityListItem(
                 } else null
             }
         } else null,
-        trailingContent = content.imageUrl.let { imageUrl ->
+        trailingContent = mainContent.imageUrl.let { imageUrl ->
             {
                 AsyncImage(
                     model = imageUrl,
-                    contentDescription = content.detailInfo?.description,
+                    contentDescription = mainContent.detailInfo?.description,
                     modifier = Modifier
                         .height(80.dp)
                         .aspectRatio(Ratios.HORIZONTAL)
@@ -165,7 +165,7 @@ private fun ContentEntityListItemPreview() {
             color = Color.White
         )
         ContentEntityListItem(
-            content = sampleContent,
+            mainContent = sampleContent,
             onClick = {}
         )
 
@@ -181,7 +181,7 @@ private fun ContentEntityListItemPreview() {
             color = Color.White
         )
         ContentEntityListItem(
-            content = sampleContent,
+            mainContent = sampleContent,
             showLiveIndicator = true,
             onClick = {}
         )
@@ -195,7 +195,7 @@ private fun ContentEntityListItemPreview() {
             color = Color.White
         )
         ContentEntityListItem(
-            content = sampleContent,
+            mainContent = sampleContent,
             showCatchupIndicator = true,
             onClick = {}
         )

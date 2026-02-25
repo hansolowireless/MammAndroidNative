@@ -58,7 +58,7 @@ fun SeasonChaptersTV(
             LazyColumn {
                 items(seasons[selectedTabIndex].episodes) { episode ->
                     ContentEntityListItem(
-                        content = episode,
+                        mainContent = episode,
                         onClick = {
                             onEpisodeClick(seasons[selectedTabIndex].order, episode.identifier.id)
                         }
