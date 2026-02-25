@@ -43,7 +43,7 @@ fun EventsColumn(
             items(events) { event ->
                 Box {
                     ContentEntityListItem(
-                        content = event.toContentListUI(),
+                        mainContent = event.toContentListUI(),
                         showLiveIndicator = event.isLive(),
                         showCatchupIndicator = event.catchupIsAvailable(availableCatchupHours = catchupHours ?: 0),
                         onClick = { onEventClicked(event) }

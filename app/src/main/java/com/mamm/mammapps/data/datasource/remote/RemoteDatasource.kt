@@ -272,7 +272,7 @@ class RemoteDatasource @Inject constructor(
 
             cache.getAdultsContent()?.let { return@withContext it }
             baseUrlApi.getAdults(jsonParam).let {
-                if (!it.isSuccessful){
+                if (!it.isSuccessful) {
                     val errorBody = it.errorBody()?.string()?.toResponseBody()
                     throw HttpException(Response.error<Any>(it.code(), errorBody))
                 }
@@ -484,14 +484,15 @@ class RemoteDatasource @Inject constructor(
             if (!response.isSuccessful) {
                 throw response.code().toGetMemoriesException()
             }
-            val memoriesResponse = response.body() ?: throw IllegalStateException("Response body is null")
+            val memoriesResponse =
+                response.body() ?: throw IllegalStateException("Response body is null")
             cache.setMyMemories(memoriesResponse)
 
             response.body() ?: throw IllegalStateException("Response body is null")
         }
     }
 
-    fun getCachedMemories() : GetMemoriesResponse? {
+    fun getCachedMemories(): GetMemoriesResponse? {
         return cache.getMyMemories()
     }
 
@@ -576,7 +577,7 @@ class RemoteDatasource @Inject constructor(
     }
 
     //----------DIAGNOSTIC---------//
-    suspend fun getDiagNodes() : DiagResponseDto {
+    suspend fun getDiagNodes(): DiagResponseDto {
         return withContext(Dispatchers.IO) {
             baseUrlApi.getDiagNodes().let {
                 if (!it.isSuccessful) {
@@ -589,37 +590,36 @@ class RemoteDatasource @Inject constructor(
         }
     }
 
-    suspend fun performDownloadSpeedTest(url: String): Result<DownloadSpeedResult> = runCatching {
-        val response = noBaseUrlApi.downloadFile(url)
-        val body = response.body()
+    suspend fun performDownloadSpeedTest(url: String): Result<DownloadSpeedResult> = withContext(Dispatchers.IO) {
+        runCatching {
+            val response = noBaseUrlApi.downloadFile(url)
+            val body = response.body()
 
-        if (!response.isSuccessful || body == null) {
-            throw Exception("Error al descargar el archivo: ${response.code()}")
-        }
-
-        val startTime = System.currentTimeMillis()
-        var totalBytes: Long = 0
-
-        // .use asegura que el stream se cierre al terminar
-        body.byteStream().use { inputStream ->
-            val buffer = ByteArray(BUFFER_SIZE)
-            var bytesRead: Int
-            while (inputStream.read(buffer).also { bytesRead = it } != -1) {
-                totalBytes += bytesRead
-
-                // Opcional: Limitar la prueba a 10MB o 5 segundos para no consumir datos infinitos
-                // if (totalBytes > 10 * 1024 * 1024) break
+            if (!response.isSuccessful || body == null) {
+                throw Exception("Error al descargar el archivo: ${response.code()}")
             }
+
+            val startTime = System.currentTimeMillis()
+            var totalBytes: Long = 0
+
+            // .use asegura que el stream se cierre al terminar
+            body.byteStream().use { inputStream ->
+                val buffer = ByteArray(BUFFER_SIZE)
+                var bytesRead: Int
+                while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                    totalBytes += bytesRead
+                }
+            }
+
+            val durationMs = System.currentTimeMillis() - startTime
+            val speedMbps = calculateMbps(totalBytes, durationMs)
+
+            DownloadSpeedResult(
+                speedMbps = speedMbps,
+                durationMs = durationMs,
+                bytesDownloaded = totalBytes
+            )
         }
-
-        val durationMs = System.currentTimeMillis() - startTime
-        val speedMbps = calculateMbps(totalBytes, durationMs)
-
-        DownloadSpeedResult(
-            speedMbps = speedMbps,
-            durationMs = durationMs,
-            bytesDownloaded = totalBytes
-        )
     }
 
 }

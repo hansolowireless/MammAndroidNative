@@ -1,0 +1,22 @@
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preEligetvDebugBuild UP-TO-DATE
+> Task :app:generateEligetvDebugBuildConfig UP-TO-DATE
+> Task :app:checkEligetvDebugAarMetadata UP-TO-DATE
+> Task :app:generateEligetvDebugResValues UP-TO-DATE
+> Task :app:mapEligetvDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateEligetvDebugResources UP-TO-DATE
+> Task :app:mergeEligetvDebugResources UP-TO-DATE
+> Task :app:packageEligetvDebugResources UP-TO-DATE
+> Task :app:parseEligetvDebugLocalResources UP-TO-DATE
+> Task :app:createEligetvDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksEligetvDebug UP-TO-DATE
+> Task :app:processEligetvDebugMainManifest UP-TO-DATE
+> Task :app:processEligetvDebugManifest UP-TO-DATE
+> Task :app:processEligetvDebugManifestForPackage UP-TO-DATE
+> Task :app:processEligetvDebugResources UP-TO-DATE
+> Task :app:kaptGenerateStubsEligetvDebugKotlin UP-TO-DATE
+> Task :app:kaptEligetvDebugKotlin UP-TO-DATE
+
+> Task :app:compileEligetvDebugKotlin FAILED
+17 actionable tasks: 1 executed, 16 up-to-date
