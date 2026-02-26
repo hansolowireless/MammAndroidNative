@@ -16,12 +16,10 @@ class SportsCalendarRemoteDatasource @Inject constructor(
     private val logger: Logger
 ) {
 
-    suspend fun getFootballEvents(): SportsEventListDto {
+    suspend fun getSportsEvents(): SportsEventListDto {
         return withContext(Dispatchers.IO) {
             val response = staticApi.getFootballEvents()
             if (!response.isSuccessful) {
-                val errorBody = response.errorBody()?.string()
-                logger.error("SportsEventsRemoteDatasource", "Error fetching football events: $errorBody")
                 throw HttpException(response)
             }
             response.body() ?: throw IllegalStateException("Response body is null")
