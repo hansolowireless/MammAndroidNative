@@ -84,3 +84,7 @@ lint/tmp/
 .DS_Store
 .AppleDouble
 .LSOverride
+# Build artifacts and Local IDE files
+build_output.txt
+.idea/deploymentTargetSelector.xml
+
