@@ -82,4 +82,10 @@ abstract class DataModule {
         impl: CacheImpl
     ): Cache
 
+    @Binds
+    @Singleton
+    abstract fun bindSportsEventsRepository(
+        impl: com.mamm.mammapps.data.repository.SportsEventsRepositoryImpl
+    ): com.mamm.mammapps.domain.interfaces.SportsEventsRepository
+
 }

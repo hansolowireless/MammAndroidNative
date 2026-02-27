@@ -27,6 +27,7 @@ fun configureCustomFlavor(
     metricsUrl: String,
     searchUrl: String,
     passwordUrl: String,
+    staticServiceUrl: String,
     dynamicUrls: Boolean,
     operatorNameDRM: String,
     signingConfig: ApkSigningConfig? = null
@@ -45,6 +46,7 @@ fun configureCustomFlavor(
         buildConfigField("String", "METRICS_URL", "\"$metricsUrl\"")
         buildConfigField("String", "SEARCH_URL", "\"$searchUrl\"")
         buildConfigField("String", "PASSWORD_REC_URL", "\"$passwordUrl\"")
+        buildConfigField("String", "STATIC_SERVICE_URL", "\"$staticServiceUrl\"")
         buildConfigField("boolean", "DYNAMIC_URLS", "$dynamicUrls")
         buildConfigField("String", "OPERATORNAME_DRM", "\"$operatorNameDRM\"")
 
@@ -78,6 +80,7 @@ fun configureFlavorWithMasmediaUrls(
         metricsUrl = "https://metrics.service.openstream.es/",
         searchUrl = "https://indexsrv-masmediatv.service.openstream.es/",
         passwordUrl = "https://gestionclientes.masmediatv.es/masmediatv_mngr/",
+        staticServiceUrl = "https://static.masmediatv.com/",
         dynamicUrls = true,
         operatorNameDRM = "masmediatv",
         signingConfig = signingConfig
@@ -212,6 +215,7 @@ android {
             metricsUrl = "https://metrics.service.openstream.es/",
             searchUrl = "https://indexsrv-openstream.service.openstream.es/",
             passwordUrl = "https://gestionclientes.openstream.es/openstream_mngr/",
+            staticServiceUrl = "https://static.masmediatv.com/",
             dynamicUrls = false,
             operatorNameDRM = "openstream",
             signingConfig = signingConfigs.getByName("keystoreDiego")

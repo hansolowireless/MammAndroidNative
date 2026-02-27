@@ -18,6 +18,7 @@ object Config {
     // valores fijos desde BuildConfig
     val locatorUrl: String get() = BuildConfig.LOCATOR_URL
     val metricsUrl: String get() = BuildConfig.METRICS_URL
+    val staticServiceUrl: String get() = BuildConfig.STATIC_SERVICE_URL
 
     val shouldUseDynamicUrls: Boolean get() = BuildConfig.DYNAMIC_URLS
 

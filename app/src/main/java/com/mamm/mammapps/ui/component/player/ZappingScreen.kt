@@ -104,8 +104,8 @@ fun ZappingScreen(
                     ContentEntityListItem(
                         modifier = Modifier
                             .focusRequester(focusRequesters[index]),
-                        channelInfo = zappingInfoItem.channel,
-                        content = zappingInfoItem.liveEvent,
+                        leadingContent = zappingInfoItem.channel,
+                        mainContent = zappingInfoItem.liveEvent,
                         //Se tiene que ver que en la posición 0 el canal tiene el número 1
                         orderIndex = index + 1,
                         onClick = {

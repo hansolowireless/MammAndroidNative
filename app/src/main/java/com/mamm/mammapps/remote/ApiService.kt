@@ -302,4 +302,11 @@ interface ApiService {
     @GET
     suspend fun downloadFile(@Url url: String): Response<ResponseBody>
 
+    @GET("futbol/xml/calendario_futbol_completo.json")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getFootballEvents(): Response<com.mamm.mammapps.data.model.sportsevent.SportsEventListDto>
+
 }

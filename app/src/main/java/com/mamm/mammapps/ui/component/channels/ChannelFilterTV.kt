@@ -53,6 +53,7 @@ fun ChannelFilterTV(
                 selectedTabIndex = selectedTabIndex,
                 indicator = { tabPositions, doesTabRowHaveFocus ->
                     // FocusedTab's indicator
+                    // Esto gestiona el color del indicador de las tab
                     TabRowDefaults.PillIndicator(
                         currentTabPosition = tabPositions[selectedTabIndex],
                         activeColor = Color.White.copy(alpha = 0.4f),

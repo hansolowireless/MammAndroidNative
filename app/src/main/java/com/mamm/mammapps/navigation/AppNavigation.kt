@@ -33,6 +33,7 @@ import com.mamm.mammapps.ui.screen.ExpandCategoryScreen
 import com.mamm.mammapps.ui.screen.HomeScreen
 import com.mamm.mammapps.ui.screen.LoginScreen
 import com.mamm.mammapps.ui.screen.SearchScreen
+import com.mamm.mammapps.ui.screen.SportsCalendarScreen
 import com.mamm.mammapps.ui.screen.VideoPlayerScreen
 
 @Composable
@@ -242,6 +243,20 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
                 navController.navigate(AppRoute.LOGIN.route) {
                     popUpTo(AppRoute.LOGOUT.route) { inclusive = true }
                 }
+            }
+        )
+    }
+
+    composable(AppRoute.SPORTSCALENDAR.route) {
+        SportsCalendarScreen(
+            onShowDetails = {
+                // To be implemented. Placeholder for navigating to detail screen.
+            },
+            onPlayChannel = { channel ->
+                navController.navigate(AppRoute.PLAYER.route) {
+                    launchSingleTop = true
+                }
+                navController.currentBackStackEntry?.savedStateHandle?.addContentClass(channel)
             }
         )
     }

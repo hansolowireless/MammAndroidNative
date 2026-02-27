@@ -1,6 +1,9 @@
 package com.mamm.mammapps.util
 
 import android.net.Uri
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 /**Cleans the URl String from
  * @parameterName value*/
@@ -27,5 +30,16 @@ fun cleanUrl(url: String, parameterName: String): String {
         }
     } catch (e: Exception) {
         "/"
+    }
+}
+
+fun parseSportEventDate(dateStr: String?): ZonedDateTime? {
+    // Example date format: "20260227210000 +0100"
+    val dateFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss Z")
+    if (dateStr.isNullOrBlank()) return null
+    return try {
+        ZonedDateTime.parse(dateStr, dateFormatter)
+    } catch (e: DateTimeParseException) {
+        null
     }
 }

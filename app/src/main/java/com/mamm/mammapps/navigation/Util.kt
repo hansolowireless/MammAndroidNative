@@ -81,7 +81,7 @@ object MenuItems {
                 modifier = iconModifier
             )
 
-            AppRoute.SPORTS -> Icon(
+            AppRoute.SPORTS, AppRoute.SPORTSCALENDAR -> Icon(
                 painterResource(id = R.drawable.menu_iconfootball),
                 contentDescription = null,
                 modifier = iconModifier
@@ -112,7 +112,7 @@ object MenuItems {
             )
 
             AppRoute.ABOUT -> Icon(WifiSignal, contentDescription = null, modifier = iconModifier)
-            AppRoute.LOGOUT -> Icon(
+            LOGOUT -> Icon(
                 Icons.Default.Person,
                 contentDescription = null,
                 modifier = iconModifier
@@ -145,7 +145,7 @@ object MenuItems {
         AppRoute.SPORTSCALENDAR,
         AppRoute.SEARCH,
         AppRoute.ABOUT,
-        AppRoute.LOGOUT,
+        LOGOUT,
         AppRoute.EXIT
     )
 

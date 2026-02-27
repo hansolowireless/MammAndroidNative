@@ -192,7 +192,7 @@ fun DetailMobile(
                 }
                 items(seasonInfoUIState.data[selectedTabIndex].episodes) { episode ->
                     ContentEntityListItem(
-                        content = episode,
+                        mainContent = episode,
                         onClick = {
                             val currentSeason = seasonInfoUIState.data[selectedTabIndex]
                             onClickEpisode(currentSeason.order, episode.identifier.id)

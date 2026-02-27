@@ -53,6 +53,10 @@ annotation class QosApi
 @Retention(AnnotationRetention.BINARY)
 annotation class CustomContentApi
 
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class StaticApi
+
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
@@ -199,6 +203,20 @@ object NetworkModule {
             .build()
     }
 
+    @StaticApi
+    @Provides
+    @Singleton
+    fun provideStaticRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        val staticClient = okHttpClient.newBuilder()
+            .build()
+        
+        return Retrofit.Builder()
+            .baseUrl(Config.staticServiceUrl)
+            .client(staticClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
 
     @IdmApi
     @Provides
@@ -254,6 +272,13 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideBookmarksApi(@CustomContentApi retrofit: Retrofit): ApiService {
+        return retrofit.create(ApiService::class.java)
+    }
+
+    @StaticApi
+    @Provides
+    @Singleton
+    fun provideStaticApi(@StaticApi retrofit: Retrofit): ApiService {
         return retrofit.create(ApiService::class.java)
     }
 
