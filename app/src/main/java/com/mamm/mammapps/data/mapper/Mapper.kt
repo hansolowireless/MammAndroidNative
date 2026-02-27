@@ -1,7 +1,10 @@
 package com.mamm.mammapps.data.mapper
 
 import com.mamm.mammapps.data.model.diagnostic.DiagResponseDto
+import com.mamm.mammapps.data.model.sportsevent.SportsEventDto
 import com.mamm.mammapps.domain.model.DiagnosticInfo
+import com.mamm.mammapps.domain.model.SportsEvent
+import com.mamm.mammapps.util.parseSportEventDate
 
 fun DiagResponseDto.toDomain(): DiagnosticInfo {
     return DiagnosticInfo(
@@ -9,6 +12,18 @@ fun DiagResponseDto.toDomain(): DiagnosticInfo {
         node2Url = formatUrl(this.nodeHA.node02),
         node3Url = formatUrl(this.nodeDir.node01),
         node4Url = formatUrl(this.nodeDir.node02)
+    )
+}
+
+fun SportsEventDto.toDomain() : SportsEvent {
+    return SportsEvent(
+        title = this.title ?: "",
+        description = this.desc ?: "",
+        startTime = parseSportEventDate(this.start),
+        endTime = parseSportEventDate(this.stop),
+        channelId = this.channel ?: "",
+        horizontalImage = this.icons?.find { it.contains("_B") }.orEmpty(),
+        verticalImage = this.icons?.find { it.contains("_P") }.orEmpty()
     )
 }
 

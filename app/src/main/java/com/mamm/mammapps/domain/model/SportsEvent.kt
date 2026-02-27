@@ -8,5 +8,6 @@ data class SportsEvent(
     val startTime: ZonedDateTime?,
     val endTime: ZonedDateTime?,
     val channelId: String,
-    val images: List<String>
+    val horizontalImage: String,
+    val verticalImage: String
 )
