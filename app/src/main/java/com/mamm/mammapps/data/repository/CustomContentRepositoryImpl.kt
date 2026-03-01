@@ -1,5 +1,6 @@
 package com.mamm.mammapps.data.repository
 
+import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.bookmark.Bookmark
@@ -12,6 +13,7 @@ import javax.inject.Inject
 
 class CustomContentRepositoryImpl @Inject constructor(
     private val remoteDatasource: RemoteDatasource,
+    private val localDataSource: LocalDataSource,
     private val logger: Logger
 ) : CustomContentRepository {
 
@@ -21,7 +23,11 @@ class CustomContentRepositoryImpl @Inject constructor(
 
     override suspend fun getBookmarks(): Result<List<Bookmark>> {
         return runCatching {
-            remoteDatasource.getBookmarks()
+            localDataSource.getBookmarks()?.let { return@runCatching it }
+            remoteDatasource.getBookmarks().let {
+                localDataSource.setBookmarks(it)
+                it
+            }
         }.onFailure {
             logger.error(TAG, "getBookmarks failed: ${it.message}, $it")
         }
@@ -38,7 +44,11 @@ class CustomContentRepositoryImpl @Inject constructor(
 
     override suspend fun getMostWatched(): Result<List<MostWatchedContent>> {
         return runCatching {
-            remoteDatasource.getMostWatched()
+            localDataSource.getMostWatched()?.let { return@runCatching it }
+            remoteDatasource.getMostWatched().let {
+                localDataSource.setMostWatched(it)
+                it
+            }
         }.onFailure {
             logger.error(TAG, "getMostWatched failed: ${it.message}, $it")
         }
@@ -46,11 +56,15 @@ class CustomContentRepositoryImpl @Inject constructor(
 
     override suspend fun getRecommended(): Result<List<Recommended>> {
         return runCatching {
-            remoteDatasource.getRecommended().let { response ->
-                val vods = response.vods.orEmpty()
-                val cutvs = response.cutvs.orEmpty()
-                vods + cutvs
+            localDataSource.getRecommended()?.let { response ->
+                return@runCatching response.vods.orEmpty() + response.cutvs.orEmpty()
             }
+
+            remoteDatasource.getRecommended().let {
+                localDataSource.setRecommended(it)
+                it.vods.orEmpty() + it.cutvs.orEmpty()
+            }
+
         }.onFailure {
             logger.error(TAG, "getRecommended failed: ${it.message}, $it")
         }
@@ -69,9 +83,9 @@ class CustomContentRepositoryImpl @Inject constructor(
         contentType: CustomizedContent
     ): Result<Any>? {
         val content: Any? = when (contentType) {
-            CustomizedContent.BookmarkType -> remoteDatasource.getCachedBookmarks().find { it.id == contentId }
-            CustomizedContent.MostWatchedType -> remoteDatasource.getCachedMostWatched().find { it.id == contentId }
-            CustomizedContent.RecommendedType -> remoteDatasource.getCachedRecommended()?.vods?.find { it.id == contentId } ?: remoteDatasource.getCachedRecommended()?.cutvs?.find { it.id == contentId }
+            CustomizedContent.BookmarkType -> localDataSource.getBookmarks()?.find { it.id == contentId }
+            CustomizedContent.MostWatchedType -> localDataSource.getMostWatched()?.find { it.id == contentId }
+            CustomizedContent.RecommendedType -> localDataSource.getRecommended()?.vods?.find { it.id == contentId } ?: localDataSource.getRecommended()?.cutvs?.find { it.id == contentId }
             else -> null
         }
 
