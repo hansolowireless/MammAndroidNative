@@ -1,5 +1,6 @@
 package com.mamm.mammapps.data.repository
 
+import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.epg.EPGChannelContent
@@ -15,6 +16,7 @@ import javax.inject.Inject
 
 class EPGRepositoryImpl @Inject constructor(
     private val remoteDataSource: RemoteDatasource,
+    private val localDataSource: LocalDataSource,
     private val logger: Logger
 ) : EPGRepository {
 
@@ -39,7 +41,7 @@ class EPGRepositoryImpl @Inject constructor(
 
     private suspend fun loadEPGFromAPI(date: LocalDate): Result<Unit> {
         return runCatching {
-            val homeContent = remoteDataSource.getCachedHomeContent()
+            val homeContent = localDataSource.getHomeContent()
             val multiDayEPGMap = cachedMultiDayEPG?.multiDayEPG?.toMutableMap() ?: mutableMapOf()
 
             val epgChannelContentList = coroutineScope {

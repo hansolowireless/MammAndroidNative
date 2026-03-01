@@ -9,6 +9,14 @@ import com.mamm.mammapps.data.di.DrmIVQualifier
 import com.mamm.mammapps.data.di.DrmSecretKeyQualifier
 import com.mamm.mammapps.data.di.DrmUrlQualifier
 import com.mamm.mammapps.data.local.SecurePreferencesManager
+import com.mamm.mammapps.data.model.GetBrandedContentResponse
+import com.mamm.mammapps.data.model.GetHomeContentResponse
+import com.mamm.mammapps.data.model.GetOtherContentResponse
+import com.mamm.mammapps.data.model.Subgenre
+import com.mamm.mammapps.data.model.bookmark.Bookmark
+import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
+import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
+import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
 import kotlinx.coroutines.flow.Flow
 import java.time.ZonedDateTime
 import javax.inject.Inject
@@ -38,6 +46,62 @@ class LocalDataSourceImpl @Inject constructor(
 
     override fun setLastTimePinWasCorrect(lastTimePinWasCorrect: ZonedDateTime) {
         cache.setLastTimePinWasCorrect(lastTimePinWasCorrect)
+    }
+
+    override fun setHomeContent(homeContent: GetHomeContentResponse) {
+        cache.setHomeContent(homeContent)
+    }
+
+    override fun setCachedSubgenreList(list: List<Subgenre>) {
+        cache.setCachedSubgenreList(list)
+    }
+
+    override fun setMoviesContent(moviesContent: GetOtherContentResponse) {
+        cache.setMoviesContent(moviesContent)
+    }
+
+    override fun setDocumentariesContent(documentariesContent: GetOtherContentResponse) {
+        cache.setDocumentariesContent(documentariesContent)
+    }
+
+    override fun setSportsContent(sportsContent: GetOtherContentResponse) {
+        cache.setSportsContent(sportsContent)
+    }
+
+    override fun setKidsContent(kidsContent: GetOtherContentResponse) {
+        cache.setKidsContent(kidsContent)
+    }
+
+    override fun setAdultsContent(adultsContent: GetBrandedContentResponse) {
+        cache.setAdultsContent(adultsContent)
+    }
+
+    override fun setWarnerContent(warnerContent: GetBrandedContentResponse) {
+        cache.setWarnerContent(warnerContent)
+    }
+
+    override fun setAcontraContent(acontraContent: GetBrandedContentResponse) {
+        cache.setAcontraContent(acontraContent)
+    }
+
+    override fun setAMCContent(amcContent: GetBrandedContentResponse) {
+        cache.setAMCContent(amcContent)
+    }
+
+    override fun setMyMemories(memories: GetMemoriesResponse) {
+        cache.setMyMemories(memories)
+    }
+
+    override fun setBookmarks(bookmarks: List<Bookmark>) {
+        cache.setBookmarks(bookmarks)
+    }
+
+    override fun setMostWatched(mostWatched: List<MostWatchedContent>) {
+        cache.setMostWatched(mostWatched)
+    }
+
+    override fun setRecommended(recommended: GetRecommendedResponse) {
+        cache.setRecommended(recommended)
     }
 
     override suspend fun getUserCredentials(): Pair<String?, String?> {
@@ -88,12 +152,72 @@ class LocalDataSourceImpl @Inject constructor(
         return cache.getProgressFlow()
     }
 
-    fun clearUserCredentials() {
+    override fun getHomeContent(): GetHomeContentResponse? {
+        return cache.getHomeContent()
+    }
+
+    override fun getCachedSubgenreList(): List<Subgenre>? {
+        return cache.getCachedSubgenreList()
+    }
+
+    override fun getMoviesContent(): GetOtherContentResponse? {
+        return cache.getMoviesContent()
+    }
+
+    override fun getDocumentariesContent(): GetOtherContentResponse? {
+        return cache.getDocumentariesContent()
+    }
+
+    override fun getSportsContent(): GetOtherContentResponse? {
+        return cache.getSportsContent()
+    }
+
+    override fun getKidsContent(): GetOtherContentResponse? {
+        return cache.getKidsContent()
+    }
+
+    override fun getAdultsContent(): GetBrandedContentResponse? {
+        return cache.getAdultsContent()
+    }
+
+    override fun getWarnerContent(): GetBrandedContentResponse? {
+        return cache.getWarnerContent()
+    }
+
+    override fun getAcontraContent(): GetBrandedContentResponse? {
+        return cache.getAcontraContent()
+    }
+
+    override fun getAMCContent(): GetBrandedContentResponse? {
+        return cache.getAMCContent()
+    }
+
+    override fun getMyMemories(): GetMemoriesResponse? {
+        return cache.getMyMemories()
+    }
+
+    override fun getBookmarks(): List<Bookmark>? {
+        return cache.getBookmarks()
+    }
+
+    override fun getMostWatched(): List<MostWatchedContent>? {
+        return cache.getMostWatched()
+    }
+
+    override fun getRecommended(): GetRecommendedResponse? {
+        return cache.getRecommended()
+    }
+
+    override fun clearUserCredentials() {
         securePreferencesManager.clearCredentials()
     }
 
     override fun clearContentPlayProgress() {
         cache.clearContentPlayProgress()
+    }
+
+    override fun clearCache() {
+        cache.clear()
     }
 
 }

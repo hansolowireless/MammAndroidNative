@@ -14,7 +14,6 @@ class LoginRepositoryImpl @Inject constructor(
     private val remoteDatasource: RemoteDatasource,
     private val localDataSource: LocalDataSource,
     private val sessionManager: SessionManager,
-    private val securePreferencesManager: SecurePreferencesManager,
     private val logger: Logger
 ) : LoginRepository {
 
@@ -78,8 +77,8 @@ class LoginRepositoryImpl @Inject constructor(
     override fun clearCaches() : Result<Unit> {
         return runCatching {
             sessionManager.clear()
-            remoteDatasource.clearCache()
-            securePreferencesManager.clearCredentials()
+            localDataSource.clearCache()
+            localDataSource.clearUserCredentials()
         }
     }
 }

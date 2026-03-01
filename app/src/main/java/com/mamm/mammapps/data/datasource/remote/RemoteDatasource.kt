@@ -1,7 +1,7 @@
 package com.mamm.mammapps.data.datasource.remote
 
 import androidx.core.net.toUri
-import com.mamm.mammapps.data.cache.Cache
+
 import com.mamm.mammapps.data.di.BaseUrlApi
 import com.mamm.mammapps.data.di.ChromecastDeviceTypeQualifier
 import com.mamm.mammapps.data.di.CustomContentApi
@@ -58,7 +58,6 @@ import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 @Singleton
 class RemoteDatasource @Inject constructor(
     @IdmApi private val idmApi: ApiService,
@@ -74,7 +73,6 @@ class RemoteDatasource @Inject constructor(
     @DeviceModelQualifier private val deviceModel: String,
     private val sessionManager: SessionManager,
     private val securePreferencesManager: SecurePreferencesManager,
-    private val cache: Cache,
     private val logger: Logger
 ) {
 
@@ -91,9 +89,7 @@ class RemoteDatasource @Inject constructor(
                 deviceSerial
             )
         )
-        if (!response.isSuccessful) {
-            throw response.code().toLoginException()
-        }
+        if (!response.isSuccessful) { throw response.code().toLoginException() }
         return response.body() ?: throw IllegalStateException("Response body is null")
     }
 
@@ -107,9 +103,6 @@ class RemoteDatasource @Inject constructor(
 
     suspend fun getHomeContent(): GetHomeContentResponse {
         return withContext(Dispatchers.IO) {
-            // Return cached content if available
-            cache.getHomeContent()?.let { return@withContext it }
-
             val jsonFile = sessionManager.jsonFile
 
             require(jsonFile != null) {
@@ -126,25 +119,11 @@ class RemoteDatasource @Inject constructor(
             val homeData = response.body()
                 ?: throw IOException("Home content response body is null")
 
-            cache.setHomeContent(
-                homeData.transformData(
-                    channelOrder = sessionManager.channelOrder,
-                    userId = sessionManager.loginData?.userId.toString()
-                )
+            homeData.transformData(
+                channelOrder = sessionManager.channelOrder,
+                userId = sessionManager.loginData?.userId.toString()
             )
-
-            cache.setCachedSubgenreList(
-                homeData.genres?.flatMap { genre ->
-                    genre.subgenres ?: emptyList()
-                } ?: emptyList()
-            )
-
-            cache.getHomeContent()!!
         }
-    }
-
-    fun getCachedHomeContent(): GetHomeContentResponse? {
-        return cache.getHomeContent()
     }
 
     suspend fun getExpandedCategory(categoryId: Int): GetBrandedContentResponse {
@@ -158,25 +137,20 @@ class RemoteDatasource @Inject constructor(
                 val errorBody = response.errorBody()?.string()?.toResponseBody()
                 throw HttpException(Response.error<Any>(response.code(), errorBody))
             }
-
             response.body() ?: throw IllegalStateException("Response body is null")
         }
     }
 
-    fun getSubgenreList(): List<Subgenre>? {
-        return cache.getCachedSubgenreList()
-    }
+
 
     //----------EPG---------//
     suspend fun getChannelEPG(channelId: Int, date: LocalDate): GetEPGResponse {
         return withContext(Dispatchers.IO) {
             val response = baseUrlApi.getEPG(channelId, date.toEPGRequestDate())
-
             if (!response.isSuccessful) {
                 val errorBody = response.errorBody()?.string()?.toResponseBody()
                 throw HttpException(Response.error<Any>(response.code(), errorBody))
             }
-
             response.body() ?: throw IllegalStateException("Response body is null")
         }
     }
@@ -184,168 +158,99 @@ class RemoteDatasource @Inject constructor(
     //----------MOVIES---------//
     suspend fun getMovies(jsonParam: String): GetOtherContentResponse {
         return withContext(Dispatchers.IO) {
-
-            cache.getMoviesContent()?.let { return@withContext it }
-
             val response = baseUrlApi.getMovies(jsonParam)
             if (!response.isSuccessful) {
                 val errorBody = response.errorBody()?.string()?.toResponseBody()
                 throw HttpException(Response.error<Any>(response.code(), errorBody))
             }
-            val movieData = response.body() ?: throw IllegalStateException("Response body is null")
-
-            cache.setMoviesContent(movieData)
-            movieData
+            response.body() ?: throw IllegalStateException("Response body is null")
         }
-    }
-
-    fun getCachedMovies(): GetOtherContentResponse? {
-        return cache.getMoviesContent()
     }
 
     //----------DOCUMENTARIES---------//
     suspend fun getDocumentaries(jsonParam: String): GetOtherContentResponse {
         return withContext(Dispatchers.IO) {
-
-            cache.getDocumentariesContent()?.let { return@withContext it }
-
             val response = baseUrlApi.getDocumentaries(jsonParam)
             if (!response.isSuccessful) {
                 val errorBody = response.errorBody()?.string()?.toResponseBody()
                 throw HttpException(Response.error<Any>(response.code(), errorBody))
             }
-            val docsData = response.body() ?: throw IllegalStateException("Response body is null")
-
-            cache.setDocumentariesContent(docsData)
-            docsData
+            response.body() ?: throw IllegalStateException("Response body is null")
         }
-    }
-
-    fun getCachedDocumentaries(): GetOtherContentResponse? {
-        return cache.getDocumentariesContent()
     }
 
     //----------SPORTS---------//
     suspend fun getSports(jsonParam: String): GetOtherContentResponse {
         return withContext(Dispatchers.IO) {
-            cache.getSportsContent()?.let { return@withContext it }
             val response = baseUrlApi.getSports(jsonParam)
             if (!response.isSuccessful) {
                 val errorBody = response.errorBody()?.string()?.toResponseBody()
                 throw HttpException(Response.error<Any>(response.code(), errorBody))
             }
-            val sportsData = response.body() ?: throw IllegalStateException("Response body is null")
-            cache.setSportsContent(sportsData)
-            sportsData
+            response.body() ?: throw IllegalStateException("Response body is null")
         }
-    }
-
-    fun getCachedSports(): GetOtherContentResponse? {
-        return cache.getSportsContent()
     }
 
     //----------KIDS---------//
     suspend fun getKids(jsonParam: String): GetOtherContentResponse {
         return withContext(Dispatchers.IO) {
-
-            cache.getKidsContent()?.let { return@withContext it }
-
             val response = baseUrlApi.getKids(jsonParam)
             if (!response.isSuccessful) {
                 val errorBody = response.errorBody()?.string()?.toResponseBody()
                 throw HttpException(Response.error<Any>(response.code(), errorBody))
             }
-            val kidsData = response.body() ?: throw IllegalStateException("Response body is null")
-
-            cache.setKidsContent(kidsData)
-            kidsData
+            response.body() ?: throw IllegalStateException("Response body is null")
         }
-    }
-
-    fun getCachedKids(): GetOtherContentResponse? {
-        return cache.getKidsContent()
     }
 
     //----------ADULTS---------//
     suspend fun getAdults(jsonParam: String): GetBrandedContentResponse {
         return withContext(Dispatchers.IO) {
-
-            cache.getAdultsContent()?.let { return@withContext it }
             baseUrlApi.getAdults(jsonParam).let {
                 if (!it.isSuccessful) {
                     val errorBody = it.errorBody()?.string()?.toResponseBody()
                     throw HttpException(Response.error<Any>(it.code(), errorBody))
                 }
                 val adultsData = it.body() ?: throw IllegalStateException("Response body is null")
-                cache.setAdultsContent(adultsData.correctAdultImages())
-                cache.getAdultsContent()!!
+                adultsData.correctAdultImages()
             }
         }
-    }
-
-    fun getCachedAdults(): GetBrandedContentResponse? {
-        return cache.getAdultsContent()
     }
 
     //----------WARNER---------//
     suspend fun getWarner(jsonParam: String): GetBrandedContentResponse {
         return withContext(Dispatchers.IO) {
-
-            cache.getWarnerContent()?.let { return@withContext it }
             val response = baseUrlApi.getWarner(jsonParam)
             if (!response.isSuccessful) {
                 val errorBody = response.errorBody()?.string()?.toResponseBody()
                 throw HttpException(Response.error<Any>(response.code(), errorBody))
             }
-            val warnerData = response.body() ?: throw IllegalStateException("Response body is null")
-            cache.setWarnerContent(warnerData)
-            warnerData
+            response.body() ?: throw IllegalStateException("Response body is null")
         }
-    }
-
-    fun getCachedWarner(): GetBrandedContentResponse? {
-        return cache.getWarnerContent()
     }
 
     //----------ACONTRA---------//
     suspend fun getAcontra(jsonParam: String): GetBrandedContentResponse {
         return withContext(Dispatchers.IO) {
-
-            cache.getAcontraContent()?.let { return@withContext it }
             val response = baseUrlApi.getAcontra(jsonParam)
             if (!response.isSuccessful) {
                 val errorBody = response.errorBody()?.string()?.toResponseBody()
                 throw HttpException(Response.error<Any>(response.code(), errorBody))
             }
-            val acontraData =
-                response.body() ?: throw IllegalStateException("Response body is null")
-            cache.setAcontraContent(acontraData)
-            acontraData
+            response.body() ?: throw IllegalStateException("Response body is null")
         }
-    }
-
-    fun getCachedAcontra(): GetBrandedContentResponse? {
-        return cache.getAcontraContent()
     }
 
     //----------AMC---------//
     suspend fun getAMC(jsonParam: String): GetBrandedContentResponse {
         return withContext(Dispatchers.IO) {
-
-            cache.getAMCContent()?.let { return@withContext it }
             val response = baseUrlApi.getAMC(jsonParam)
             if (!response.isSuccessful) {
                 val errorBody = response.errorBody()?.string()?.toResponseBody()
                 throw HttpException(Response.error<Any>(response.code(), errorBody))
             }
-            val amcData = response.body() ?: throw IllegalStateException("Response body is null")
-            cache.setAMCContent(amcData)
-            amcData
+            response.body() ?: throw IllegalStateException("Response body is null")
         }
-    }
-
-    fun getCachedAMC(): GetBrandedContentResponse? {
-        return cache.getAMCContent()
     }
 
     //----------SERIES - SEASON CONTENT---------//
@@ -484,30 +389,13 @@ class RemoteDatasource @Inject constructor(
             if (!response.isSuccessful) {
                 throw response.code().toGetMemoriesException()
             }
-            val memoriesResponse =
-                response.body() ?: throw IllegalStateException("Response body is null")
-            cache.setMyMemories(memoriesResponse)
-
             response.body() ?: throw IllegalStateException("Response body is null")
         }
     }
 
-    fun getCachedMemories(): GetMemoriesResponse? {
-        return cache.getMyMemories()
-    }
-
     //----------BOOKMARKS---------//
     suspend fun getBookmarks(): List<Bookmark> {
-        cache.getBookmarks()?.let {
-            return it
-        }
-        val response = customContentApi.getBookmarks()
-        cache.setBookmarks(response)
-        return response
-    }
-
-    fun getCachedBookmarks(): List<Bookmark> {
-        return cache.getBookmarks() ?: emptyList()
+        return customContentApi.getBookmarks()
     }
 
     suspend fun saveBookmark(type: String, contentId: Int, time: Long) {
@@ -528,30 +416,12 @@ class RemoteDatasource @Inject constructor(
 
     //----------MOST WATCHED---------//
     suspend fun getMostWatched(): List<MostWatchedContent> {
-        cache.getMostWatched()?.let {
-            return it
-        }
-        val response = customContentApi.getMostWatched()
-        cache.setMostWatched(response)
-        return response
-    }
-
-    fun getCachedMostWatched(): List<MostWatchedContent> {
-        return cache.getMostWatched() ?: emptyList()
+        return customContentApi.getMostWatched()
     }
 
     //----------RECOMMENDED---------//
     suspend fun getRecommended(): GetRecommendedResponse {
-        cache.getRecommended()?.let {
-            return it
-        }
-        val response = customContentApi.getRecommended()
-        cache.setRecommended(response)
-        return response
-    }
-
-    fun getCachedRecommended(): GetRecommendedResponse? {
-        return cache.getRecommended()
+        return customContentApi.getRecommended()
     }
 
     //----------SIMILAR CONTENT---------//
@@ -572,9 +442,7 @@ class RemoteDatasource @Inject constructor(
         }
     }
 
-    fun clearCache() {
-        cache.clear()
-    }
+
 
     //----------DIAGNOSTIC---------//
     suspend fun getDiagNodes(): DiagResponseDto {
