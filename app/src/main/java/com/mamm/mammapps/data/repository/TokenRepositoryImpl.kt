@@ -1,17 +1,15 @@
 package com.mamm.mammapps.data.repository
 
 import android.content.Context
-import android.net.Uri
-import com.mamm.mammapps.data.model.player.STokenData
+import androidx.core.net.toUri
 import com.example.openstream_flutter_rw.data.security.AES128KeyDecryptor
 import com.example.openstream_flutter_rw.data.security.AES256Encryptor
 import com.mamm.mammapps.data.config.Config
+import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
-import com.mamm.mammapps.data.di.ChromecastDeviceTypeQualifier
-import com.mamm.mammapps.data.di.DeviceSerialQualifier
-import com.mamm.mammapps.data.di.DeviceTypeQualifier
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.player.JwTokenData
+import com.mamm.mammapps.data.model.player.STokenData
 import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.domain.interfaces.TokenRepository
 import com.mamm.mammapps.util.AppConstants.Companion.STOKEN_PARAM_NAME
@@ -30,9 +28,7 @@ import javax.inject.Inject
 class TokenRepositoryImpl @Inject constructor(
     @ApplicationContext context: Context,
     private val remoteDatasource: RemoteDatasource,
-    @DeviceSerialQualifier private val deviceSerial: String,
-    @DeviceTypeQualifier private val deviceType: String,
-    @ChromecastDeviceTypeQualifier private val ccastDeviceType: String,
+    private val localDataSource: LocalDataSource,
     private val sessionManager: SessionManager,
     private val logger: Logger
 ) : TokenRepository {
@@ -93,7 +89,7 @@ class TokenRepositoryImpl @Inject constructor(
 
     private suspend fun decryptK2Key(url: String): Result<String> {
         return runCatching {
-            val uri = Uri.parse(url)
+            val uri = url.toUri()
             val stoken = uri.getQueryParameter("stoken")
 
             if (stoken.isNullOrEmpty()) {
@@ -173,13 +169,13 @@ class TokenRepositoryImpl @Inject constructor(
 
     override fun generateJwtToken(contentID: String, eventType: String, chromecast: Boolean): String {
         val currentTimeSeconds = System.currentTimeMillis().div(1000)
-        val finalDeviceType : Int = (if (chromecast) ccastDeviceType.toIntOrNull() else deviceType.toIntOrNull()) ?: 0
+        val finalDeviceType : Int = (if (chromecast) localDataSource.getChromecastDeviceType().toIntOrNull() else localDataSource.getDeviceType().toIntOrNull()) ?: 0
 
         val tokenData = JwTokenData(
             uID = sessionManager.loginData?.userId ?: 0,
             cID = contentID,
             sType = eventType,
-            dvID = deviceSerial,
+            dvID = localDataSource.getDeviceSerial(),
             dvTag = finalDeviceType,
             opName = Config.operatorNameDRM
         )

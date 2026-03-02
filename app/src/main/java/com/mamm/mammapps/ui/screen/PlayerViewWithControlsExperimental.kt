@@ -141,7 +141,7 @@ fun PlayerViewWithControlsExperimental(
 
     LaunchedEffect(tickerList) {
         if (tickerList.isNotEmpty()) {
-            Log.d("PlayerViewWithControlsExperimental", "TickerList ha cambiado, comenzamos autoresize $tickerList")
+            Log.d("PlayerViewWithControls", "TickerList ha cambiado, comenzamos autoresize $tickerList")
             videoResizeManager?.replaceTickers(tickerList)
             videoResizeManager?.setAutoResize(
                 true,
