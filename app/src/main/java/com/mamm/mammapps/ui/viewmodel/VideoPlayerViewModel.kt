@@ -16,16 +16,21 @@ import com.google.android.exoplayer2.MediaMetadata
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.analytics.PlaybackStatsListener
+import com.google.android.exoplayer2.drm.DefaultDrmSessionManager
+import com.google.android.exoplayer2.drm.DefaultDrmSessionManagerProvider
+import com.google.android.exoplayer2.drm.DrmSessionManagerProvider
 import com.google.android.exoplayer2.source.dash.DashMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.StyledPlayerView
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.util.MimeTypes
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.extension.getCurrentDate
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.model.player.Ticker
+import com.mamm.mammapps.data.model.player.customdatasourcefactory.DynamicHttpMediaDrmCallback
 import com.mamm.mammapps.data.model.player.customdatasourcefactory.TokenParamDataSourceFactory
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
 import com.mamm.mammapps.domain.usecases.content.GetChannelsUseCase
@@ -240,36 +245,47 @@ class VideoPlayerViewModel @Inject constructor(
     private fun setPlayerUrls(videoUrl: String, drmUrl: String = "") {
         val player = _player.value
         val content = _content.value
-        var requestHeaders = emptyMap<String, String>()
+
         val mimeType = if (videoUrl.contains(M3U8_EXTENSION)) {
             MimeTypes.APPLICATION_M3U8
         } else {
             MimeTypes.APPLICATION_MPD
         }
 
-        getJwTokenUseCase(_content.value).onSuccess { token ->
-            requestHeaders = hashMapOf("Authorization" to "Bearer $token")
-        }
-
         val mediaItem = MediaItem.Builder()
             .setUri(videoUrl)
             .setMediaMetadata(MediaMetadata.Builder().setTitle("").build())
             .setMimeType(mimeType)
-            .setDrmConfiguration(
-                MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
-                    .setLicenseUri(drmUrl)
-                    .setLicenseRequestHeaders(requestHeaders)
-                    .setMultiSession(true)
-                    .build()
-            ).build()
+            .build()
 
         val dataSourceFactory = tokenParamDataSourceFactory.also { it.resetTokenMode() }
 
+        // Setting up the DRM Provider
+        val drmSessionManagerProvider = if (drmUrl.isNotEmpty()) {
+            DrmSessionManagerProvider { _ ->
+                val drmCallback = DynamicHttpMediaDrmCallback(
+                    defaultLicenseUrl = drmUrl,
+                    dataSourceFactory = DefaultHttpDataSource.Factory(),
+                    tokenProvider = { getJwTokenUseCase(_content.value).getOrNull() }
+                )
+
+                DefaultDrmSessionManager.Builder()
+                    .setMultiSession(true)
+                    .setPlayClearSamplesWithoutKeys(true)
+                    .setUseDrmSessionsForClearContent(C.TRACK_TYPE_VIDEO, C.TRACK_TYPE_AUDIO)
+                    .build(drmCallback)
+            }
+        } else {
+            DefaultDrmSessionManagerProvider()
+        }
+
         val mediaSource = if (mimeType == MimeTypes.APPLICATION_M3U8) {
             HlsMediaSource.Factory(dataSourceFactory)
+                .setDrmSessionManagerProvider(drmSessionManagerProvider)
                 .createMediaSource(mediaItem)
         } else {
             DashMediaSource.Factory(dataSourceFactory)
+                .setDrmSessionManagerProvider(drmSessionManagerProvider)
                 .createMediaSource(mediaItem)
         }
 
