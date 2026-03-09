@@ -24,6 +24,7 @@ import com.mamm.mammapps.data.model.section.SectionVod
 import com.mamm.mammapps.data.model.serie.Episode
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.data.model.serie.TbContentSeason
+import com.mamm.mammapps.domain.model.topchannels.TopChannels
 import com.mamm.mammapps.ui.constant.UIConstant
 import com.mamm.mammapps.ui.extension.adult
 import com.mamm.mammapps.ui.extension.landscape
@@ -726,6 +727,30 @@ fun List<ContentRowUI>.insertMostWatched(
     } else {
         return this
     }
+}
+
+fun List<ContentRowUI>.insertTopChannels(
+    topChannels: TopChannels?,
+    availableChannels: List<Channel>?
+): List<ContentRowUI> {
+    if (topChannels == null || topChannels.channels.isEmpty() || availableChannels.isNullOrEmpty()) return this
+
+    val topChannelIds = topChannels.channels.mapNotNull { it.channelId.toIntOrNull() }
+
+    val sortedChannels = topChannelIds.mapNotNull { id ->
+        availableChannels.find { it.id == id }
+    }
+
+    if (sortedChannels.isNotEmpty()) {
+        ContentRowUI(
+            categoryId = getRandomHashCode(),
+            categoryName = "Mis canales favoritos",
+            items = sortedChannels.map { it.toContentEntityUI() }
+        ).let {
+            return listOf(it) + this
+        }
+    }
+    return this
 }
 
 fun List<ContentRowUI>.insertChannelRow(channels: List<Channel>?): List<ContentRowUI> {

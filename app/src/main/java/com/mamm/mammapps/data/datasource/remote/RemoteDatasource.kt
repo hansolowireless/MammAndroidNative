@@ -378,6 +378,20 @@ class RemoteDatasource @Inject constructor(
         }
     }
 
+    //----------TOP CHANNELS---------//
+    suspend fun getTopChannels(): com.mamm.mammapps.data.model.topchannels.TopChannelsResponseDto {
+        return withContext(Dispatchers.IO) {
+            val email = securePreferencesManager.getCredentials().first ?: throw IllegalStateException("User email not found")
+            val url = "https://masmedia.b-cdn.net/userdata/topchannels/$email.json"
+            val response = noBaseUrlApi.getTopChannels(url)
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()?.string()?.toResponseBody()
+                throw HttpException(Response.error<Any>(response.code(), errorBody))
+            }
+            response.body() ?: throw IllegalStateException("Response body is null")
+        }
+    }
+
     //----------MEMORIES---------//
     suspend fun getMyMemories(): GetMemoriesResponse {
         return withContext(Dispatchers.IO) {
