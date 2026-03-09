@@ -1,11 +1,14 @@
 package com.mamm.mammapps.data.di
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.mamm.mammapps.BuildConfig
 import com.mamm.mammapps.data.config.Config
 import com.mamm.mammapps.data.local.SecurePreferencesManager
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.remote.ApiService
+import com.mamm.mammapps.remote.NullStringAdapter
 import com.mamm.mammapps.remote.interceptor.AuthInterceptor
 import com.mamm.mammapps.remote.interceptor.DynamicUrlInterceptor
 import com.mamm.mammapps.remote.interceptor.QosAuthInterceptor
@@ -85,7 +88,11 @@ object NetworkModule {
     @IdmApi
     @Provides
     @Singleton
-    fun provideIdmRetrofit(okHttpClient: OkHttpClient, sessionManager: SessionManager): Retrofit {
+    fun provideIdmRetrofit(
+        okHttpClient: OkHttpClient,
+        sessionManager: SessionManager,
+        gson: Gson
+    ): Retrofit {
         val idmClient = okHttpClient.newBuilder()
             .addInterceptor(AuthInterceptor(sessionManager))
             .addInterceptor(DynamicUrlInterceptor())
@@ -94,7 +101,7 @@ object NetworkModule {
         return Retrofit.Builder()
             .baseUrl(Config.idmUrl)
             .client(idmClient)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
 
