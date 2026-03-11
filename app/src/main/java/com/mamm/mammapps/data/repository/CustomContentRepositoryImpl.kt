@@ -10,6 +10,7 @@ import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
 import com.mamm.mammapps.domain.interfaces.CustomContentRepository
 import com.mamm.mammapps.ui.model.CustomizedContent
 import javax.inject.Inject
+import com.mamm.mammapps.data.mapper.topchannels.toDomain
 
 class CustomContentRepositoryImpl @Inject constructor(
     private val remoteDatasource: RemoteDatasource,
@@ -97,6 +98,15 @@ class CustomContentRepositoryImpl @Inject constructor(
             remoteDatasource.search(query = query)
         }.onFailure {
             logger.error(TAG, "searchContent failed: ${it.message}, $it")
+        }
+    }
+
+    override suspend fun getTopChannels(): Result<com.mamm.mammapps.domain.model.topchannels.TopChannels> {
+        return runCatching {
+            val response = remoteDatasource.getTopChannels()
+            response.toDomain()
+        }.onFailure {
+            logger.error(TAG, "getTopChannels failed: ${it.message}, $it")
         }
     }
 

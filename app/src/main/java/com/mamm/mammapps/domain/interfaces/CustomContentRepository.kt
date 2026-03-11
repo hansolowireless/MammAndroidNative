@@ -24,4 +24,5 @@ interface CustomContentRepository {
 
     suspend fun searchContent (query: String): Result<List<Bookmark>>
 
+    suspend fun getTopChannels(): Result<com.mamm.mammapps.domain.model.topchannels.TopChannels>
 }

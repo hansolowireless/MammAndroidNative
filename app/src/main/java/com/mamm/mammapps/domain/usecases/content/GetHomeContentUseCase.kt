@@ -7,6 +7,7 @@ import com.mamm.mammapps.ui.mapper.insertBookmarks
 import com.mamm.mammapps.ui.mapper.insertFeatured
 import com.mamm.mammapps.ui.mapper.insertMostWatched
 import com.mamm.mammapps.ui.mapper.insertRecommended
+import com.mamm.mammapps.ui.mapper.insertTopChannels
 import com.mamm.mammapps.ui.mapper.toContentUIRows
 import com.mamm.mammapps.ui.model.ContentRowUI
 import kotlinx.coroutines.async
@@ -30,12 +31,14 @@ class GetHomeContentUseCase @Inject constructor(
                 val bookmarks = async { customContentRepository.getBookmarks() }
                 val mostWatched = async { customContentRepository.getMostWatched() }
                 val recommended = async { customContentRepository.getRecommended() }
+                val topChannels = async { customContentRepository.getTopChannels() }
 
                 //Wait for all to complete
                 val homeResult = homeContent.await()
                 val bookmarksResult = bookmarks.await()
                 val mostWatchedResult = mostWatched.await()
                 val recommendedResult = recommended.await()
+                val topChannelsResult = topChannels.await()
 
                 // Now check if home content succeeded (it's required)
                 if (homeResult.isFailure) {
@@ -51,6 +54,7 @@ class GetHomeContentUseCase @Inject constructor(
                     .insertBookmarks(bookmarksResult.getOrElse { emptyList() })
                     .insertRecommended(recommendedResult.getOrElse { emptyList() })
                     .insertMostWatched(mostWatchedResult.getOrElse { emptyList() })
+                    .insertTopChannels(topChannelsResult.getOrNull(), homeResult.getOrThrow().channels)
                     .insertFeatured(homeResult.getOrThrow().featured)
 
                 Result.success(contentRows)

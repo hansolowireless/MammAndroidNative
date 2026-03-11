@@ -309,4 +309,14 @@ interface ApiService {
     )
     suspend fun getFootballEvents(): Response<com.mamm.mammapps.data.model.sportsevent.SportsEventListDto>
 
+    // ---------- Top Channels ----------
+    @GET
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getTopChannels(
+        @Url url: String
+    ): Response<com.mamm.mammapps.data.model.topchannels.TopChannelsResponseDto>
+
 }

@@ -334,6 +334,12 @@ class MammRepositoryImpl @Inject constructor(
     }
 
     override fun shouldRequestPin(): Boolean {
+
+        if (sessionManager.pinParental.isNullOrBlank()) {
+            logger.info(TAG, "No PIN found for User, No PIN request is needed.")
+            return false
+        }
+
         // Obtener la última fecha guardada desde el LocalDataSource.
         val lastPinTime: ZonedDateTime? = localDataSource.getLastTimePinWasCorrect()
 
