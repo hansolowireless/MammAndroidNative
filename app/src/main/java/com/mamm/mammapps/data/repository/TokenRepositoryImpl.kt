@@ -35,7 +35,7 @@ class TokenRepositoryImpl @Inject constructor(
 
     companion object {
         private const val TAG = "TokenRepositoryImpl"
-        const val JWTOKEN_EXPIRATION_TIME_SECS = 2 * 60 // 2 minutos
+        const val JWTOKEN_EXPIRATION_TIME_SECS = 12 * 60 * 60 // 12 horas de vigencia
         const val STOKEN_EXPIRATION_TIME_SECS = 20
         const val IP_CACHE_DURATION_MS = 12 * 60 * 5 * 60 * 1000L // 12 horas de cache
     }
