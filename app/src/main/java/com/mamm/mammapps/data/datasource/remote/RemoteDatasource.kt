@@ -41,6 +41,8 @@ import com.mamm.mammapps.data.model.player.GetTickersResponse
 import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.model.player.heartbeat.HeartBeatRequest
 import com.mamm.mammapps.data.model.player.playback.CLMRequest
+import com.mamm.mammapps.data.model.player.streamvx.StreamVxTokenRequest
+import com.mamm.mammapps.data.model.player.streamvx.StreamVxTokenResponse
 import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.data.session.SessionManager
@@ -338,6 +340,19 @@ class RemoteDatasource @Inject constructor(
                 val errorBody = response.errorBody()
                 throw HttpException(response)
             }
+        }
+    }
+
+    suspend fun getxToken(request: StreamVxTokenRequest): StreamVxTokenResponse {
+        return withContext(Dispatchers.IO) {
+            val response = idmApi.getStreamVxToken(request)
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()?.string()
+                logger.error("RemoteDatasource", "getStreamVxToken error: $errorBody")
+                throw HttpException(response)
+            }
+            val body = response.body() ?: throw IllegalStateException("Response body is null")
+            body
         }
     }
 

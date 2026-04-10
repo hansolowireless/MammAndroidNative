@@ -15,8 +15,11 @@ import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.player.GetTickersResponse
 import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.model.player.heartbeat.HeartBeatRequest
+import com.mamm.mammapps.data.model.player.streamvx.StreamVxTokenRequest
+import com.mamm.mammapps.data.model.player.streamvx.StreamVxTokenResponse
 import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
+import com.mamm.mammapps.data.model.sportsevent.SportsEventListDto
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -193,6 +196,17 @@ interface ApiService {
         @Body heartBeatRequest: HeartBeatRequest
     ): Response<Unit>
 
+    @POST("/aaservice/streamvxtoken")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json",
+        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_IDM}",
+        "${ApiServiceConstant.TIMEOUT_HEADER}: ${ApiServiceConstant.STREAMVX_TIMEOUT_VALUE}"
+    )
+    suspend fun getStreamVxToken(
+        @Body request: StreamVxTokenRequest
+    ): Response<StreamVxTokenResponse>
+
     @POST("/QosMonitor/logs")
     @Headers(
         "Content-Type: application/json",
@@ -307,7 +321,7 @@ interface ApiService {
         "Content-Type: application/json",
         "Accept: application/json"
     )
-    suspend fun getFootballEvents(): Response<com.mamm.mammapps.data.model.sportsevent.SportsEventListDto>
+    suspend fun getFootballEvents(): Response<SportsEventListDto>
 
     // ---------- Top Channels ----------
     @GET

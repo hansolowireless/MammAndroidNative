@@ -7,6 +7,7 @@ import com.mamm.mammapps.data.di.DeviceSerialQualifier
 import com.mamm.mammapps.data.di.DeviceTypeQualifier
 import com.mamm.mammapps.data.di.DrmIVQualifier
 import com.mamm.mammapps.data.di.DrmSecretKeyQualifier
+import com.mamm.mammapps.data.di.DrmJwtSecretQualifier
 import com.mamm.mammapps.data.di.DrmUrlQualifier
 import com.mamm.mammapps.data.local.SecurePreferencesManager
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
@@ -29,7 +30,8 @@ class LocalDataSourceImpl @Inject constructor(
     @ChromecastDeviceTypeQualifier private val ccastDeviceType: String,
     @DrmUrlQualifier private val drmUrl: String,
     @DrmIVQualifier private val iV64: ByteArray,
-    @DrmSecretKeyQualifier private val secretKey64: ByteArray
+    @DrmSecretKeyQualifier private val secretKey64: ByteArray,
+    @DrmJwtSecretQualifier private val jwtSecretKey: ByteArray
 ) : LocalDataSource {
 
     override suspend fun saveUserCredentials(username: String, password: String) {
@@ -138,6 +140,10 @@ class LocalDataSourceImpl @Inject constructor(
 
     override fun getDrmSecretKey64() : ByteArray {
         return secretKey64
+    }
+
+    override fun getDrmJwtSecretKey() : ByteArray {
+        return jwtSecretKey
     }
 
     override fun getApplicationVersion(): String {

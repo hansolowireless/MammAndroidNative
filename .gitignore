@@ -47,6 +47,10 @@ captures/
 .idea/modules.xml
 .idea/.name
 .idea/misc.xml
+.idea/codeStyles/
+.idea/codeStyleConfig.xml
+.idea/Project.xml
+.idea/studiobot.xml
 
 # Keystore files
 *.jks
