@@ -7,17 +7,16 @@ import javax.inject.Inject
 class GetJwTokenUseCase @Inject constructor(
     private val tokenRepository: TokenRepository
 ) {
-    operator fun invoke(
+    suspend operator fun invoke(
         content: ContentToPlayUI?,
         chromecast: Boolean = false
     ): Result<String> {
         require(content != null) {"GetJwTokenUseCase requires content to be not null"}
-        return runCatching {
-            tokenRepository.generateJwtToken(
-                contentID = content.identifier.getIdValue().toString(),
-                eventType = content.getDRMString(),
-                chromecast = chromecast
-            )
-        }
+        val streamID = content.epgEventInfo?.fatherChannelId ?: content.identifier.getIdValue()
+        return tokenRepository.generateJwtToken(
+            contentID = streamID.toString(),
+            eventType = content.getDRMString(),
+            chromecast = chromecast
+        )
     }
 }

@@ -50,6 +50,7 @@ captures/
 .idea/codeStyles/
 .idea/codeStyleConfig.xml
 .idea/Project.xml
+.idea/studiobot.xml
 
 # Keystore files
 *.jks

@@ -8,17 +8,11 @@ import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.player.GetTickersResponse
 import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.session.SessionManager
+import com.mamm.mammapps.data.util.DrmAuthUtil
 import com.mamm.mammapps.domain.interfaces.PlaybackRepository
-import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import kotlinx.coroutines.flow.Flow
-import java.net.URLEncoder
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import javax.crypto.Cipher
-import javax.crypto.Mac
-import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.SecretKeySpec
+import java.time.Duration
 import javax.inject.Inject
 
 class PlaybackRepositoryImpl @Inject constructor(
@@ -30,6 +24,10 @@ class PlaybackRepositoryImpl @Inject constructor(
 
     companion object {
         private const val TAG = "PlaybackRepositoryImpl"
+        private const val JSON_KEY_USER_ID = "\"UserID\""
+        private const val JSON_KEY_STREAM_NAME = "\"StreamName\""
+        private const val JSON_KEY_OPERATOR = "\"Operator\""
+        private const val JSON_KEY_AUTH_STRING = "\"AuthenticationString\""
     }
 
     override suspend fun getVideoUrlFromCLM(
@@ -59,75 +57,40 @@ class PlaybackRepositoryImpl @Inject constructor(
             val deviceType = localDatasource.getDeviceType()
             val streamID = content.epgEventInfo?.fatherChannelId ?: content.identifier.getIdValue()
 
-            // Current date
-            val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-            val nowString = dateFormat.format(ZonedDateTime.now())
-
-            val signature =
-                "$userID|$deviceType|${localDatasource.getDeviceSerial()}|$nowString"
-            logger.debug(TAG, signature)
-
-            // HMAC SHA-1
-            val key = token?.toByteArray(Charsets.UTF_8)
-            val signatureBytes = signature.toByteArray(Charsets.UTF_8)
-
-            val mac = Mac.getInstance("HmacSHA1")
-            val secretKeySpecSignature = SecretKeySpec(key, "HmacSHA1")
-            mac.init(secretKeySpecSignature)
-            val digest = mac.doFinal(signatureBytes)
-            val digestString = digest.joinToString("") { "%02x".format(it) }
-
-            // AuthString JSON
-            val authString = """{
-                "deviceID":"${localDatasource.getDeviceSerial()}",
-                "signature":"$digestString",
-                "expire":"$nowString",
-                "contentType":"${content.getDRMString()}",
-                "deviceType":"$deviceType"
-                }""".trimMargin()
-            logger.debug(TAG, authString)
-
-            // Base64 encoding
-            val encoded =
-                Base64.encodeToString(authString.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
-
-            // AES Encryption (CBC mode with PKCS7 padding)
-            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
-            val secretKeySpec = SecretKeySpec(localDatasource.getDrmSecretKey64(), "AES")
-            val ivSpec = IvParameterSpec(localDatasource.getDrmiV64())
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivSpec)
-
-            val encrypted = cipher.doFinal(encoded.toByteArray(Charsets.UTF_8))
-            val encryptedString = URLEncoder.encode(
-                Base64.encodeToString(encrypted, Base64.NO_WRAP),
-                "UTF-8"
-            )
-
-            // Custom data JSON
-            val customData = """{
-                "UserID":"$userID",
-                "StreamName":"$streamID",
-                "Operator":"$operatorName",
-                "AuthenticationString":"$encryptedString"
-                }""".trimMargin()
-            logger.debug(TAG, customData)
-
-            val customDataEncoded = Base64.encodeToString(
-                customData.toByteArray(Charsets.UTF_8),
-                Base64.NO_WRAP
+            val drmPayload = DrmAuthUtil.generateAuthPayload(
+                eventType = content.getDRMString(),
+                deviceTypeStr = deviceType,
+                userName = userName ?: "",
+                deviceSerial = localDatasource.getDeviceSerial(),
+                sessionToken = token,
+                drmSecretKey64 = localDatasource.getDrmSecretKey64(),
+                drmiV64 = localDatasource.getDrmiV64(),
+                expireDuration = Duration.ZERO,
+                urlEncode = true,
+                base64BeforeAes = true
             )
 
             // License URL construction (always widevine for Android)
             val licenseURL =
                 (content.drmUrl) ?: ("${localDatasource.getDrmBaseUrl()}widevine/getLicense?" +
                         "userID=$userID&" +
-                        "authenticationString=$encryptedString&" +
+                        "authenticationString=$drmPayload&" +
                         "streamName=$streamID&" +
                         "operator=$operatorName")
 
             logger.debug(TAG, "getDRMUrl - $licenseURL")
 
+            val customDataJson = "{\n" +
+                    "                $JSON_KEY_USER_ID:\"$userID\",\n" +
+                    "                $JSON_KEY_STREAM_NAME:\"$streamID\",\n" +
+                    "                $JSON_KEY_OPERATOR:\"$operatorName\",\n" +
+                    "                $JSON_KEY_AUTH_STRING:\"$drmPayload\"\n" +
+                    "                }"
+
+            val customDataEncoded = Base64.encodeToString(customDataJson.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
+
             Pair(licenseURL, customDataEncoded)
+
         }.onFailure { exception ->
             logger.error(TAG, "error getting DRM URL $exception.message")
 

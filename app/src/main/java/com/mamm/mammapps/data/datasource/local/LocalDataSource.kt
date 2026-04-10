@@ -42,6 +42,7 @@ interface LocalDataSource {
     fun getDrmBaseUrl(): String
     fun getDrmiV64(): ByteArray
     fun getDrmSecretKey64() : ByteArray
+    fun getDrmJwtSecretKey() : ByteArray
     fun getApplicationVersion(): String
     fun getContentPlayProgress(contentId: String): Long
     fun getContentProgressFlow(): Flow<Map<String, Long>>

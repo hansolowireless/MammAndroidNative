@@ -76,6 +76,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.time.Duration
 import javax.inject.Inject
@@ -242,66 +243,79 @@ class VideoPlayerViewModel @Inject constructor(
 
     }
 
-    private fun setPlayerUrls(videoUrl: String, drmUrl: String = "") {
-        val player = _player.value
-        val content = _content.value
+    private suspend fun setPlayerUrls(videoUrl: String, drmUrl: String = "") {
+        withContext(Dispatchers.Main) {
+            val player = _player.value
+            val content = _content.value
 
-        val mimeType = if (videoUrl.contains(M3U8_EXTENSION)) {
-            MimeTypes.APPLICATION_M3U8
-        } else {
-            MimeTypes.APPLICATION_MPD
-        }
-
-        val mediaItem = MediaItem.Builder()
-            .setUri(videoUrl)
-            .setMediaMetadata(MediaMetadata.Builder().setTitle("").build())
-            .setMimeType(mimeType)
-            .build()
-
-        val dataSourceFactory = tokenParamDataSourceFactory.also { it.resetTokenMode() }
-
-        // Setting up the DRM Provider
-        val drmSessionManagerProvider = if (drmUrl.isNotEmpty()) {
-            DrmSessionManagerProvider { _ ->
-                val drmCallback = DynamicHttpMediaDrmCallback(
-                    defaultLicenseUrl = drmUrl,
-                    dataSourceFactory = DefaultHttpDataSource.Factory(),
-                    tokenProvider = { getJwTokenUseCase(_content.value).getOrNull() }
-                )
-
-                DefaultDrmSessionManager.Builder()
-                    .setMultiSession(true)
-                    .setPlayClearSamplesWithoutKeys(true)
-                    .setUseDrmSessionsForClearContent(C.TRACK_TYPE_VIDEO, C.TRACK_TYPE_AUDIO)
-                    .build(drmCallback)
+            val mimeType = if (videoUrl.contains(M3U8_EXTENSION)) {
+                MimeTypes.APPLICATION_M3U8
+            } else {
+                MimeTypes.APPLICATION_MPD
             }
-        } else {
-            DefaultDrmSessionManagerProvider()
+
+            val mediaItemBuilder = MediaItem.Builder()
+                .setUri(videoUrl)
+                .setMediaMetadata(MediaMetadata.Builder().setTitle("").build())
+                .setMimeType(mimeType)
+
+            if (drmUrl.isNotEmpty()) {
+                mediaItemBuilder.setDrmConfiguration(
+                    MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                        .setLicenseUri(drmUrl)
+                        .setMultiSession(true)
+                        .build()
+                )
+            }
+
+            val mediaItem = mediaItemBuilder.build()
+
+            val dataSourceFactory = tokenParamDataSourceFactory.also { it.resetTokenMode() }
+
+            // DRM con renovación dinámica del token por cada KeyRequest
+            val drmSessionManagerProvider = if (drmUrl.isNotEmpty()) {
+                DrmSessionManagerProvider { _ ->
+                    val drmCallback = DynamicHttpMediaDrmCallback(
+                        defaultLicenseUrl = drmUrl,
+                        dataSourceFactory = DefaultHttpDataSource.Factory(),
+                        tokenProvider = { runBlocking { getJwTokenUseCase(_content.value).getOrNull() } },
+                        logger = logger
+                    )
+
+                    DefaultDrmSessionManager.Builder()
+                        .setMultiSession(true)
+                        .setPlayClearSamplesWithoutKeys(true)
+                        .setUseDrmSessionsForClearContent(C.TRACK_TYPE_VIDEO, C.TRACK_TYPE_AUDIO)
+                        .build(drmCallback)
+                }
+            } else {
+                DefaultDrmSessionManagerProvider()
+            }
+
+            val mediaSource = if (mimeType == MimeTypes.APPLICATION_M3U8) {
+                HlsMediaSource.Factory(dataSourceFactory)
+                    .setDrmSessionManagerProvider(drmSessionManagerProvider)
+                    .createMediaSource(mediaItem)
+            } else {
+                DashMediaSource.Factory(dataSourceFactory)
+                    .setDrmSessionManagerProvider(drmSessionManagerProvider)
+                    .createMediaSource(mediaItem)
+            }
+
+            player?.setMediaSource(mediaSource)
+
+            if ((content.initialPlayPositionMs) > 0) {
+                player?.seekTo(content.initialPlayPositionMs ?: 0)
+            } else if (tstvInitialPlayPositionMs > 0) {
+                player?.seekTo(tstvInitialPlayPositionMs)
+                tstvInitialPlayPositionMs = 0
+            } else {
+                player?.seekTo(getPlayProgress())
+            }
+
+            player?.prepare()
+            player?.playWhenReady = true
         }
-
-        val mediaSource = if (mimeType == MimeTypes.APPLICATION_M3U8) {
-            HlsMediaSource.Factory(dataSourceFactory)
-                .setDrmSessionManagerProvider(drmSessionManagerProvider)
-                .createMediaSource(mediaItem)
-        } else {
-            DashMediaSource.Factory(dataSourceFactory)
-                .setDrmSessionManagerProvider(drmSessionManagerProvider)
-                .createMediaSource(mediaItem)
-        }
-
-        player?.setMediaSource(mediaSource)
-
-        if ((content.initialPlayPositionMs) > 0) {
-            player?.seekTo(content.initialPlayPositionMs ?: 0)
-        } else if (tstvInitialPlayPositionMs > 0) {
-            player?.seekTo(tstvInitialPlayPositionMs)
-            tstvInitialPlayPositionMs = 0
-        } else {
-            player?.seekTo(getPlayProgress())
-        }
-
-        player?.prepare()
-        player?.playWhenReady = true
     }
 
     fun pausePlayer() {
@@ -594,9 +608,7 @@ class VideoPlayerViewModel @Inject constructor(
                             tstvInitialPlayPositionMs = progress
                             _isTstvMode.update { true }
 
-                            withContext(Dispatchers.Main) {
-                                setPlayerUrls(videoUrl = url)
-                            }
+                            setPlayerUrls(videoUrl = url)
 
                         }.onFailure {
                             logger.error(TAG, "handleScrubStop Failed to get TSTV url, defaulting to Live Url")
@@ -604,16 +616,17 @@ class VideoPlayerViewModel @Inject constructor(
                             previewBar?.isTstvMode = false
                             _isTstvMode.update { false }
 
-                            withContext(Dispatchers.Main) {
-                                setPlayerUrls(videoUrl = playableUrl, drmUrl = playableLicenseUrl)
-                            }
+                            setPlayerUrls(videoUrl = playableUrl, drmUrl = playableLicenseUrl)
+
                         }
                 }
             } else {
                 logger.debug(TAG, "handleScrubStop Difference is not sufficient to get into TSTV Mode! Still in live...")
                 previewBar?.isTstvMode = false
                 _isTstvMode.update { false }
-                setPlayerUrls(videoUrl = playableUrl, drmUrl = playableLicenseUrl)
+                viewModelScope.launch {
+                    setPlayerUrls(videoUrl = playableUrl, drmUrl = playableLicenseUrl)
+                }
             }
         } else {
             logger.debug(TAG, "handleScrubStop No action needed after scrub stop")

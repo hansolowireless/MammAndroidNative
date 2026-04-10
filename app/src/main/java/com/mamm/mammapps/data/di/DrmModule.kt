@@ -19,6 +19,10 @@ annotation class DrmIVQualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class DrmSecretKeyQualifier
 
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class DrmJwtSecretQualifier
+
 @Module
 @InstallIn(SingletonComponent::class)
 object DrmModule {
@@ -39,6 +43,12 @@ object DrmModule {
     @DrmSecretKeyQualifier
     fun provideDrmSecretKey(): ByteArray {
         return Base64.decode("Wd5NgVL4FgPmZqfPoJxXJw==", Base64.DEFAULT)
+    }
+
+    @Provides
+    @DrmJwtSecretQualifier
+    fun provideDrmJwtSecretKey(): ByteArray {
+        return "cm6UHoomNyD9rPkaZOzhRMsYqlfaKKuN".toByteArray(Charsets.UTF_8)
     }
 }
 
