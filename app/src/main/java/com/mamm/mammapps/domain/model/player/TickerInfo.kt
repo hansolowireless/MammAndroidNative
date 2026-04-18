@@ -1,42 +1,23 @@
-package com.mamm.mammapps.data.model.player
+package com.mamm.mammapps.domain.model.player
 
 import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-data class GetTickersResponse(
-    @SerializedName("fecha_generacion")
+data class TickerInfo (
     val fechaGeneracion: String,
-
-    @SerializedName("tickets")
-    val tickers: List<Ticker>
+    val tickers: List<Ticker>,
+    val disabledChannels: List<Int> = emptyList()
 )
 
-data class Ticker(
-    @SerializedName("titulo")
-    val titulo: String,
-
-    @SerializedName("textos")
-    val textos: List<String>,
-
-    @SerializedName("activo")
+data class Ticker (
     val activo: Boolean,
-
-    @SerializedName("fecha_desde")
     val fechaDesde: String,
-
-    @SerializedName("fecha_hasta")
     val fechaHasta: String,
-
-    @SerializedName("fondo")
-    val fondo: String,
-
-    @SerializedName("tiempo_duracion")
     val tiempoDuracion: Int,
-
-    @SerializedName("tiempo_entre_apariciones")
-    val tiempoEntreApariciones: Int
+    val tiempoEntreApariciones: Int,
+    val htmlUrl: String? = null
 ) {
     /**
      * Valida si el ticker es válido basado en:
@@ -45,6 +26,7 @@ data class Ticker(
      */
     fun isValid(): Boolean {
         if (!activo) return false
+        if (htmlUrl == null) return false
 
         return try {
             val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.getDefault())

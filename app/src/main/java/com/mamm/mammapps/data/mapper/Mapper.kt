@@ -1,9 +1,13 @@
 package com.mamm.mammapps.data.mapper
 
 import com.mamm.mammapps.data.model.diagnostic.DiagResponseDto
+import com.mamm.mammapps.data.model.player.GetTickersResponseDto
+import com.mamm.mammapps.data.model.player.TickerDto
 import com.mamm.mammapps.data.model.sportsevent.SportsEventDto
 import com.mamm.mammapps.domain.model.DiagnosticInfo
 import com.mamm.mammapps.domain.model.SportsEvent
+import com.mamm.mammapps.domain.model.player.Ticker
+import com.mamm.mammapps.domain.model.player.TickerInfo
 import com.mamm.mammapps.util.parseSportEventDate
 
 fun DiagResponseDto.toDomain(): DiagnosticInfo {
@@ -24,6 +28,25 @@ fun SportsEventDto.toDomain() : SportsEvent {
         channelId = this.channel ?: "",
         horizontalImage = this.icons?.find { it.contains("_B") }.orEmpty(),
         verticalImage = this.icons?.find { it.contains("_P") }.orEmpty()
+    )
+}
+
+fun GetTickersResponseDto.toDomain() : TickerInfo {
+    return TickerInfo(
+        fechaGeneracion = this.fechaGeneracion,
+        tickers = this.tickers.map {it.toDomain()},
+        disabledChannels = this.disabledChannels
+    )
+}
+
+fun TickerDto.toDomain() : Ticker {
+    return Ticker(
+        activo = this.activo,
+        fechaDesde = this.fechaDesde,
+        fechaHasta = this.fechaHasta,
+        tiempoDuracion = this.tiempoDuracion,
+        tiempoEntreApariciones = this.tiempoEntreApariciones,
+        htmlUrl = this.htmlUrl
     )
 }
 

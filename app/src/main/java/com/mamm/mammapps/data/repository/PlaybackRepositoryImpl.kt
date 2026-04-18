@@ -5,11 +5,13 @@ import com.mamm.mammapps.data.config.Config
 import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.player.GetTickersResponse
+import com.mamm.mammapps.data.mapper.toDomain
+import com.mamm.mammapps.data.model.player.GetTickersResponseDto
 import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.session.SessionManager
 import com.mamm.mammapps.data.util.DrmAuthUtil
 import com.mamm.mammapps.domain.interfaces.PlaybackRepository
+import com.mamm.mammapps.domain.model.player.TickerInfo
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import kotlinx.coroutines.flow.Flow
 import java.time.Duration
@@ -97,9 +99,9 @@ class PlaybackRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getTickers(): Result<GetTickersResponse> {
+    override suspend fun getTickers(): Result<TickerInfo> {
         return runCatching {
-            remoteDatasource.getTickers()
+            remoteDatasource.getTickers().toDomain()
         }.onFailure {
             logger.error(TAG, "error getting tickers $it.message")
         }

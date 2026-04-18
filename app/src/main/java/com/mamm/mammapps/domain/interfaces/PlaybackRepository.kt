@@ -1,7 +1,8 @@
 package com.mamm.mammapps.domain.interfaces
 
-import com.mamm.mammapps.data.model.player.GetTickersResponse
+import com.mamm.mammapps.data.model.player.GetTickersResponseDto
 import com.mamm.mammapps.data.model.player.QosData
+import com.mamm.mammapps.domain.model.player.TickerInfo
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import kotlinx.coroutines.flow.Flow
 
@@ -16,7 +17,7 @@ interface PlaybackRepository {
         content: ContentToPlayUI
     ) : Result<Pair<String, String>>
 
-    suspend fun getTickers () : Result<GetTickersResponse>
+    suspend fun getTickers () : Result<TickerInfo>
 
     suspend fun getTickerQoSData(contentId: Int) : Result<QosData>
 
