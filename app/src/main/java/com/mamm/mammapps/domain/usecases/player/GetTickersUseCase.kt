@@ -1,9 +1,11 @@
 package com.mamm.mammapps.domain.usecases.player
 
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.player.GetTickersResponse
-import com.mamm.mammapps.data.model.player.Ticker
+import com.mamm.mammapps.data.model.player.GetTickersResponseDto
+import com.mamm.mammapps.data.model.player.TickerDto
 import com.mamm.mammapps.domain.interfaces.PlaybackRepository
+import com.mamm.mammapps.domain.model.player.Ticker
+import com.mamm.mammapps.domain.model.player.TickerInfo
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +23,7 @@ class GetTickersUseCase @Inject constructor(
         private const val TAG = "GetTickersUseCase"
     }
 
-    suspend operator fun invoke(): GetTickersResponse {
+    suspend operator fun invoke(): TickerInfo {
         return playbackRepository.getTickers().fold(
             onSuccess = {
                 it
@@ -33,7 +35,7 @@ class GetTickersUseCase @Inject constructor(
         )
     }
 
-    fun observeTickers(): Flow<List<Ticker>> = flow {
+    fun observeTickers(): Flow<TickerInfo> = flow {
         var currentFechaGeneracion: String? = null
         while (currentCoroutineContext().isActive) {
             runCatching { invoke() }
@@ -44,7 +46,7 @@ class GetTickersUseCase @Inject constructor(
                             "observeTickers Success getting list of tickers, it is a new list"
                         )
                         currentFechaGeneracion = response.fechaGeneracion
-                        emit(response.tickers)
+                        emit(response)
                     }
                 }
                 .onFailure {

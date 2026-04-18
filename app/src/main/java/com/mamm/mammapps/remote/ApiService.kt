@@ -12,7 +12,7 @@ import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
 import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
-import com.mamm.mammapps.data.model.player.GetTickersResponse
+import com.mamm.mammapps.data.model.player.GetTickersResponseDto
 import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.model.player.heartbeat.HeartBeatRequest
 import com.mamm.mammapps.data.model.player.streamvx.StreamVxTokenRequest
@@ -280,7 +280,7 @@ interface ApiService {
     )
     suspend fun getTickers(
         @Url url: String
-    ): Response<GetTickersResponse>
+    ): Response<GetTickersResponseDto>
 
     // ---------- Memories ----------
     @GET

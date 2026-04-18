@@ -29,9 +29,9 @@ import com.mamm.mammapps.R
 import com.mamm.mammapps.data.extension.getCurrentDate
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.player.QosData
-import com.mamm.mammapps.data.model.player.Ticker
 import com.mamm.mammapps.data.model.player.customdatasourcefactory.DynamicHttpMediaDrmCallback
 import com.mamm.mammapps.data.model.player.customdatasourcefactory.TokenParamDataSourceFactory
+import com.mamm.mammapps.domain.model.player.TickerInfo
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
 import com.mamm.mammapps.domain.usecases.content.GetChannelsUseCase
 import com.mamm.mammapps.domain.usecases.player.GetDRMUrlUseCase
@@ -127,8 +127,8 @@ class VideoPlayerViewModel @Inject constructor(
     val liveEventInfo = _liveEventInfo.asStateFlow()
 
     //Tickers
-    private val _tickerList = MutableStateFlow<List<Ticker>>(emptyList())
-    val tickerList = _tickerList.asStateFlow()
+    private val _tickerInfo = MutableStateFlow<TickerInfo?>(null)
+    val tickerInfo = _tickerInfo.asStateFlow()
 
     //Display del número del canal para hacer zapping
     private val _zappingNumberDisplay = MutableStateFlow<String>("")
@@ -342,7 +342,7 @@ class VideoPlayerViewModel @Inject constructor(
 
     fun observeTickers() {
         getTickersUseCase.observeTickers().onEach { tickers ->
-            _tickerList.value = tickers
+            _tickerInfo.value = tickers
         }.launchIn(viewModelScope)
     }
 

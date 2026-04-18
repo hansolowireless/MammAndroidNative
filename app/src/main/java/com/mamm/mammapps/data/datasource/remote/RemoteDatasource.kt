@@ -27,7 +27,6 @@ import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetEPGResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
-import com.mamm.mammapps.data.model.Subgenre
 import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.data.model.bookmark.SetBookmarkRequest
 import com.mamm.mammapps.data.model.diagnostic.DiagResponseDto
@@ -37,7 +36,7 @@ import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
 import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
-import com.mamm.mammapps.data.model.player.GetTickersResponse
+import com.mamm.mammapps.data.model.player.GetTickersResponseDto
 import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.model.player.heartbeat.HeartBeatRequest
 import com.mamm.mammapps.data.model.player.playback.CLMRequest
@@ -377,7 +376,7 @@ class RemoteDatasource @Inject constructor(
     }
 
     //----------TICKERS---------//
-    suspend fun getTickers(): GetTickersResponse {
+    suspend fun getTickers(): GetTickersResponseDto {
         return withContext(Dispatchers.IO) {
             val url = "https://mammticker.b-cdn.net/" +
                     "${sessionManager.loginData?.userId}_tickets.json" +
