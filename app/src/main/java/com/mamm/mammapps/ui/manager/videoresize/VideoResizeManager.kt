@@ -10,19 +10,20 @@ import android.view.animation.PathInterpolator
 import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import com.mamm.mammapps.domain.model.player.TickerInfo
 
 /**
  * VideoResizeManager que implementa un enfoque directo para posicionar el video
  * en la parte superior y mantener la relación de aspecto 16:9.
  */
 open class VideoResizeManager(
-    private val fragment: Fragment,
-    private val frameLayoutId: Int
+    fragment: Fragment,
+    frameLayoutId: Int
 ) {
 
     companion object {
         // Factor de escala para el tamaño reducido (70% de la altura original)
-        private const val SMALL_SIZE_SCALE = 0.789f
+        private const val SMALL_SIZE_SCALE = 0.75f
     }
 
     enum class VideoSize {
@@ -48,22 +49,23 @@ open class VideoResizeManager(
 
     private val mainHandler = Handler(Looper.getMainLooper())
 
-    // Runnable para redimensionamiento automático
-    private val resizeRunnable = object : Runnable {
+    // Runnables explícitos para poder cancelar ambos tiempos y evitar solapamientos
+    private val resizeToSmallRunnable: Runnable = object : Runnable {
         override fun run() {
-            if (autoResizeEnabled) {
-                if (currentSize == VideoSize.FULL_SIZE) {
-                    Log.d("VideoResizeManager", "Reduciendo tamaño automáticamente")
-                    resizeTo(VideoSize.SMALL_SIZE)
+            if (autoResizeEnabled && currentSize == VideoSize.FULL_SIZE) {
+                Log.d("VideoResizeManager", "Reduciendo tamaño automáticamente")
+                resizeTo(VideoSize.SMALL_SIZE)
+                mainHandler.postDelayed(resizeToFullRunnable, smallSizeDurationMs)
+            }
+        }
+    }
 
-                    mainHandler.postDelayed({
-                        if (autoResizeEnabled && currentSize != VideoSize.FULL_SIZE) {
-                            Log.d("VideoResizeManager", "Volviendo a tamaño completo automáticamente")
-                            resizeTo(VideoSize.FULL_SIZE)
-                            mainHandler.postDelayed(this, autoResizeIntervalMs)
-                        }
-                    }, smallSizeDurationMs)
-                }
+    private val resizeToFullRunnable: Runnable = object : Runnable {
+        override fun run() {
+            if (autoResizeEnabled && currentSize != VideoSize.FULL_SIZE) {
+                Log.d("VideoResizeManager", "Volviendo a tamaño completo automáticamente")
+                resizeTo(VideoSize.FULL_SIZE)
+                mainHandler.postDelayed(resizeToSmallRunnable, autoResizeIntervalMs)
             }
         }
     }
@@ -104,14 +106,21 @@ open class VideoResizeManager(
             // Crear nuevos parámetros de layout para evitar cualquier configuración problemática
             val params = ConstraintLayout.LayoutParams(width, height)
 
-            // Configurar constraints para mantener en la parte superior
-            params.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
-            params.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID
-            params.rightToRight = ConstraintLayout.LayoutParams.PARENT_ID
-
-            // Eliminar cualquier enlace a la parte inferior
-            params.bottomToBottom = ConstraintLayout.LayoutParams.UNSET
-            params.bottomToTop = ConstraintLayout.LayoutParams.UNSET
+            if (isFullSize) {
+                // Comportamiento de tamaño completo: anclado arriba y centrado horizontalmente
+                params.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                params.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID
+                params.rightToRight = ConstraintLayout.LayoutParams.PARENT_ID
+                params.bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+                params.bottomToTop = ConstraintLayout.LayoutParams.UNSET
+            } else {
+                // Comportamiento de tamaño reducido (Ticker): pegado en la esquina superior izquierda
+                params.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                params.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID
+                params.rightToRight = ConstraintLayout.LayoutParams.UNSET
+                params.bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+                params.bottomToTop = ConstraintLayout.LayoutParams.UNSET
+            }
 
             // Configurar márgenes
             params.topMargin = 0
@@ -254,34 +263,72 @@ open class VideoResizeManager(
     }
 
     /**
-     * Activa o desactiva el redimensionamiento automático
+     * Activa o desactiva el redimensionamiento automático analizando la información del TickerInfo
+     *
+     * @param tickerInfo Objeto que contiene la lista de tickers y canales deshabilitados
+     * @param currentChannelId ID del canal actual para verificar restricciones
      */
-    fun setAutoResize(enabled: Boolean, intervalSecs: Long? = 0, smallDurationSecs: Long? = 0) {
-        Log.d("VTManager", "Ticker function for this content is enabled: $enabled, intervalo: $intervalSecs, duracion: $smallDurationSecs")
-        mainHandler.removeCallbacks(resizeRunnable)
+    fun setAutoResize(tickerInfo: TickerInfo?, currentChannelId: Int?) {
 
-        autoResizeEnabled = enabled
-        if (intervalSecs != null && intervalSecs > 0) {
-            autoResizeIntervalMs = intervalSecs.times(1000)
+        if (tickerInfo == null) {
+            Log.d("VideoResizeManager", "TickerInfo nulo, desactivando AutoResize")
+            stopAutoResize()
+            return
         }
 
-        if (smallDurationSecs != null && smallDurationSecs > 0) {
-            smallSizeDurationMs = smallDurationSecs.times(1000)
-        }
+        // 1. Definir si debe estar habilitado: lista no vacía Y canal no bloqueado
+        val hasTickers = tickerInfo.tickers.isNotEmpty()
+        val isChannelDisabled = tickerInfo.disabledChannels.contains(currentChannelId)
 
-        if (enabled) {
-            Log.d("VideoResizeManager", "Iniciando redimensionamiento automático")
+        val shouldEnable = hasTickers && !isChannelDisabled
 
-            // Si comenzamos reducidos, volver a tamaño completo
+        Log.d("VideoResizeManager", "Configurando AutoResize: hasTickers=$hasTickers, channelDisabled=$isChannelDisabled")
+
+        // Detener cualquier ejecución previa
+        mainHandler.removeCallbacks(resizeToSmallRunnable)
+        mainHandler.removeCallbacks(resizeToFullRunnable)
+
+        autoResizeEnabled = shouldEnable
+
+        if (shouldEnable) {
+            // 2. Extraer tiempos del primer ticker disponible
+            val firstTicker = tickerInfo.tickers.first()
+
+            if (firstTicker.tiempoEntreApariciones > 0) {
+                autoResizeIntervalMs = firstTicker.tiempoEntreApariciones.toLong() * 1000
+            }
+
+            if (firstTicker.tiempoDuracion > 0) {
+                smallSizeDurationMs = firstTicker.tiempoDuracion.toLong() * 1000
+            }
+
+            Log.d("VideoResizeManager", "AutoResize activado: Intervalo ${autoResizeIntervalMs}ms, Duración ${smallSizeDurationMs}ms")
+
+            // Si el video no está en tamaño completo, lo restauramos para iniciar el ciclo limpio
             if (currentSize != VideoSize.FULL_SIZE) {
                 resizeTo(VideoSize.FULL_SIZE)
             }
 
-            // Iniciar el ciclo
-            mainHandler.postDelayed(resizeRunnable, autoResizeIntervalMs)
+            // Iniciar el ciclo de redimensionamiento
+            mainHandler.postDelayed(resizeToSmallRunnable, autoResizeIntervalMs)
         } else {
-            Log.d("VideoResizeManager", "Redimensionamiento automático desactivado")
-            release()
+            Log.d("VideoResizeManager", "AutoResize desactivado (Lista vacía o canal bloqueado)")
+            // stopAutoResize() se encarga de parar el handler, poner enabled a false y restaurar el tamaño
+            stopAutoResize()
+        }
+    }
+
+    /**
+     * Detiene el ciclo de redimensionamiento automático y restaura el tamaño original
+     */
+    open fun stopAutoResize() {
+        mainHandler.removeCallbacks(resizeToSmallRunnable)
+        mainHandler.removeCallbacks(resizeToFullRunnable)
+        autoResizeEnabled = false
+
+        // Restaurar tamaño original
+        if (currentSize != VideoSize.FULL_SIZE && originalHeight > 0) {
+            forceResize(false)
         }
     }
 
@@ -289,13 +336,7 @@ open class VideoResizeManager(
      * Libera recursos
      */
     open fun release() {
-        mainHandler.removeCallbacks(resizeRunnable)
-        autoResizeEnabled = false
-
-        // Restaurar tamaño original
-        if (currentSize != VideoSize.FULL_SIZE && originalHeight > 0) {
-            forceResize(false)
-        }
+        stopAutoResize()
     }
 
     // Interface para notificar cambios

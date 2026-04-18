@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -105,7 +106,7 @@ fun PlayerViewWithControlsExperimental(
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     //--------------TICKERS-------------------------
-    val tickerList by viewModel.tickerList.collectAsStateWithLifecycle()
+    val tickerInfo by viewModel.tickerInfo.collectAsStateWithLifecycle()
     var videoResizeManager by remember { mutableStateOf<VideoResizeManagerWithTicker?>(null) }
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -139,14 +140,13 @@ fun PlayerViewWithControlsExperimental(
         }
     }
 
-    LaunchedEffect(tickerList) {
-        if (tickerList.isNotEmpty()) {
-            Log.d("PlayerViewWithControls", "TickerList ha cambiado, comenzamos autoresize $tickerList")
-            videoResizeManager?.replaceTickers(tickerList)
+    LaunchedEffect(tickerInfo, content) {
+        tickerInfo?.tickers?.let {
+            Log.d("PlayerViewWithControls", "TickerList ha cambiado, comenzamos autoresize $tickerInfo")
+            videoResizeManager?.replaceTickers(it)
             videoResizeManager?.setAutoResize(
-                true,
-                tickerList.first().tiempoEntreApariciones.toLong(),
-                tickerList.first().tiempoDuracion.toLong()
+                tickerInfo = tickerInfo,
+                currentChannelId = content?.identifier?.id
             )
         }
     }
@@ -154,6 +154,7 @@ fun PlayerViewWithControlsExperimental(
     DisposableEffect(Unit) {
         onDispose {
             fingerprintController.stop()
+            videoResizeManager?.release()
         }
     }
 

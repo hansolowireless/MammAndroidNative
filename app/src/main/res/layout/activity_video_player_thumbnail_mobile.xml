@@ -8,15 +8,16 @@
 
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Imagen de fondo que ocupa toda la pantalla -->
-    <ImageView
-        android:id="@+id/ticker_background_image"
+
+    <WebView
+        android:id="@+id/ticker_webview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:contentDescription=""
-        android:scaleType="centerCrop"
-        android:visibility="visible"
-        />
+        android:background="@android:color/transparent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <FrameLayout
         android:id="@+id/root"
@@ -29,7 +30,6 @@
         android:keepScreenOn="true"
         app:layout_constraintDimensionRatio="16:9"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/ticker_container"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -58,29 +58,5 @@
         </com.google.android.exoplayer2.ui.StyledPlayerView>
 
     </FrameLayout>
-
-    <!-- Contenedor del ticker publicitario -->
-    <FrameLayout
-        android:id="@+id/ticker_container"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@android:color/transparent"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@+id/root"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <TextView
-            android:id="@+id/ticker_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:padding="12dp"
-            android:singleLine="true"
-            android:text="" />
-    </FrameLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
