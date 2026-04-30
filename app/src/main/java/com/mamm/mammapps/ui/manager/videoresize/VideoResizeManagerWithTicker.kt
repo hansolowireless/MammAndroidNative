@@ -1,6 +1,7 @@
 package com.mamm.mammapps.ui.manager.videoresize
 
 import android.util.Log
+import android.view.View
 import android.webkit.WebView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -51,6 +52,7 @@ class VideoResizeManagerWithTicker(
             isHorizontalScrollBarEnabled = false
             isFocusable = false
             setOnTouchListener { _, _ -> true }
+            visibility = View.GONE
 
             webChromeClient = object : android.webkit.WebChromeClient() {
                 override fun getDefaultVideoPoster(): android.graphics.Bitmap? {
@@ -99,12 +101,14 @@ class VideoResizeManagerWithTicker(
     }
 
     private fun showTicker() {
+        tickerWebView?.visibility = View.VISIBLE
         advanceToNextValidTicker()
         loadRemoteTicker()
         onTickerShown()
     }
 
     private fun hideTicker() {
+        tickerWebView?.visibility = View.GONE
         tickerWebView?.loadUrl("about:blank")
     }
 
