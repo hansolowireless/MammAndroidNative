@@ -6,6 +6,7 @@ import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.mapper.toDomain
+import com.mamm.mammapps.data.model.exception.TickerException
 import com.mamm.mammapps.data.model.player.GetTickersResponseDto
 import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.session.SessionManager
@@ -101,7 +102,9 @@ class PlaybackRepositoryImpl @Inject constructor(
 
     override suspend fun getTickers(): Result<TickerInfo> {
         return runCatching {
-            remoteDatasource.getTickers().toDomain()
+            sessionManager.loginData?.tickerUrl?.let {
+                remoteDatasource.getTickers(url = it).toDomain()
+            } ?: throw TickerException.MissingData
         }.onFailure {
             logger.error(TAG, "error getting tickers $it.message")
         }
