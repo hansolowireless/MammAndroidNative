@@ -376,13 +376,10 @@ class RemoteDatasource @Inject constructor(
     }
 
     //----------TICKERS---------//
-    suspend fun getTickers(): GetTickersResponseDto {
+    suspend fun getTickers(url: String): GetTickersResponseDto {
         return withContext(Dispatchers.IO) {
-            val url = "https://mammticker.b-cdn.net/" +
-                    "${sessionManager.loginData?.userId}_tickets.json" +
-                    "?t=${getCurrentDate().toDate().time}"
-
-            val response = noBaseUrlApi.getTickers(url)
+            val finalUrl = url + "?t=${getCurrentDate().toDate().time}"
+            val response = noBaseUrlApi.getTickers(finalUrl)
             if (!response.isSuccessful) {
                 val errorBody = response.errorBody()?.string()?.toResponseBody()
                 throw HttpException(Response.error<Any>(response.code(), errorBody))

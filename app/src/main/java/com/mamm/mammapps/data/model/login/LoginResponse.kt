@@ -21,7 +21,9 @@ data class LoginData(
     @SerializedName("skin")
     val skin: Skin?,
     @SerializedName("channel_order")
-    val channelOrder: String?
+    val channelOrder: String?,
+    @SerializedName("ticker_url")
+    val tickerUrl: String? = null
 )
 
 data class Skin(
