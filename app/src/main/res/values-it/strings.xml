@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">MammApps</string>
+
+    <!--region common-->
+    <string name="empty"></string>
+    <string name="exit">Esci</string>
+    <string name="yes">Sì</string>
+    <string name="no">No</string>
+    <string name="do_you_want_exit">Vuoi uscire dall\'applicazione?</string>
+    <!--region common-->
+
+    <!--region Login-->
+    <string name="type_credentials">Inserisci i tuoi dati di accesso</string>
+    <string name="email">E-mail</string>
+    <string name="password">Password</string>
+    <string name="login">Accedi</string>
+    <string name="logout">Disconnetti</string>
+    <string name="forgot_password">Hai dimenticato la password?</string>
+    <!--endregion Login-->
+
+    <!--region Home-->
+    <string name="expand_category_content_title">Tocca per vedere più contenuti</string>
+    <!--endregion Home-->
+
+    <!--region Channels-->
+    <string name="search_channel_placeholder">Cerca canale…</string>
+    <string name="filter_by_genre_action">Filtra per genere</string>
+    <string name="filter_by_genre_title">Filtra per Genere</string>
+    <string name="all">Tutti</string>
+    <!--endregion Channels-->
+
+    <!--Details-->
+    <string name="duration_minutes">%1$s min.</string>
+    <string name="separator">|</string>
+    <string name="director_label">Regista: %1$s</string>
+    <string name="original_title_label">Titolo originale: %1$s</string>
+    <string name="available_until_label">Disponibile fino a: %1$s</string>
+    <string name="play">Riproduci</string>
+    <string name="continue_watching">Continua</string>
+    <string name="cast">Cast</string>
+    <string name="show_less">Mostra meno</string>
+    <string name="show_more">Mostra altro</string>
+    <!--endregion Details-->
+
+    <!--region EPG-->
+    <string name="no_title">Senza titolo</string>
+    <string name="day_before_yesterday">L\'altro ieri</string>
+    <string name="yesterday">Ieri</string>
+    <string name="today">Oggi</string>
+    <string name="tomorrow">Domani</string>
+    <string name="day_after_tomorrow">Dopodomani</string>
+    <string name="live">Diretta</string>
+    <string name="days_ago">%d giorni fa</string>
+    <string name="in_days">Tra %d giorni</string>
+    <!--endregion EPG-->
+
+    <!-- region SEARCH -->
+    <string name="search_field_label">Cerca film, serie e altro…</string>
+    <string name="search_initial_prompt">Trova i tuoi contenuti preferiti.</string>
+    <string name="search_no_results">Nessun risultato trovato per \"%1$s\"</string>
+    <!--endregion SEARCH-->
+
+    <!-- region ABOUT -->
+    <string name="username">Utente: </string>
+    <string name="application_version">Versione dell\'applicazione: </string>
+    <string name="start_diagnostic">Avvia diagnostica</string>
+    <string name="loading_diagnostic">Esecuzione diagnostica</string>
+    <string name="node">Nodo</string>
+    <!-- endregion ABOUT -->
+
+    <!--Track selector Strings!-->
+    <string name="track_selection_title">Qualità Video</string>
+    <string name="subtitle_selection_title">Sottotitoli</string>
+    <string name="audiotrack_selection_title">Audio</string>
+
+    <string name="error_no_decoder">Questo dispositivo non fornisce un decoder per <xliff:g id="mime_type">%1$s</xliff:g></string>
+    <string name="error_no_secure_decoder">Questo dispositivo non fornisce un decoder sicuro per <xliff:g id="mime_type">%1$s</xliff:g></string>
+    <string name="error_querying_decoders">Impossibile interrogare i decoder del dispositivo</string>
+    <string name="error_instantiating_decoder">Impossibile istanziare il decoder <xliff:g id="decoder_name">%1$s</xliff:g></string>
+    <string name="error_generic">Riproduzione fallita</string>
+
+    <!--region Player-->
+    <string name="live_content">Live</string>
+    <string name="no_event_info">Nessuna informazione sull\'evento</string>
+    <!--endregion Player-->
+
+    <!-- Navigation Labels -->
+    <string name="nav_home">Home</string>
+    <string name="nav_epg">Guida</string>
+    <string name="nav_channels">Canali</string>
+    <string name="nav_movies">Cinema</string>
+    <string name="nav_documentaries">Documentari</string>
+    <string name="nav_series">Serie TV</string>
+    <string name="nav_sports">Sport</string>
+    <string name="nav_adults">Adulti</string>
+    <string name="nav_sport_calendar">Cal. Sportivo</string>
+    <string name="nav_kids">Bambini</string>
+    <string name="nav_warner">Warner</string>
+    <string name="nav_acontra">Acontra+</string>
+    <string name="nav_amc">AMC</string>
+    <string name="nav_movies_amc">Cinema AMC</string>
+    <string name="nav_series_amc">Serie AMC</string>
+    <string name="nav_my_memories">I miei ricordi</string>
+    <string name="nav_search">Cerca</string>
+    <string name="nav_diagnostics">Informazioni</string>
+    <string name="nav_change_user">Cambia utente</string>
+    <string name="nav_exit">Esci</string>
+    <!--endregion Navigation Labels-->
+
+    <!--Error-->
+    <string name="generic_error">Errore</string>
+    <string name="error_loading_epg">Errore durante il caricamento della Guida</string>
+    <string name="error_subscription_in_process">Il tuo abbonamento è in fase di elaborazione. Consulta il tuo operatore</string>
+    <string name="error_content_generic">Nessun contenuto da mostrare</string>
+    <string name="error_invalid_credentials">Nome utente o password non validi</string>
+    <string name="error_memories_no_content">Non hai ancora nessun ricordo caricato sul tuo account!\n\nAccedi con il tuo utente a misrecuerdos.masmediatv.es per caricare i video e le foto che desideri archiviare e visualizzare in streaming. Da lì potrai convertirli in formato video streaming, per guardarli quando vuoi da qualsiasi dispositivo tramite l\'App +MEDIA\n\nRichiedi maggiori informazioni su questo servizio al tuo operatore e inizia subito a goderti e condividere i tuoi ricordi preferiti!</string>
+    <!--endregion Error-->
+
+    <!--region PIN DIALOG-->
+    <string name="pin_dialog_title">Accesso Limitato</string>
+    <string name="pin_dialog_message">Inserisci il tuo PIN per continuare.</string>
+    <string name="pin_field_label">PIN</string>
+    <string name="confirm_button_label">Conferma</string>
+    <string name="cancel_button_label">Annulla</string>
+    <!--endregion PIN DIALOG-->
+
+    <!--region Accessibility-->
+    <string name="accessibility_clear_search_action">Cancella ricerca</string>
+    <string name="accessibility_close">Chiudi</string>
+    <string name="accessibility_expandcategory">Espandi categoria</string>
+    <string name="accessibility_toggle_drawer">Apri pannello di navigazione</string>
+    <string name="accessibility_rating_content_description">Valutazione</string>
+    <string name="accessibility_play_icon_content_description">Icona riproduci</string>
+    <!--endregion Accessibility-->
+
+</resources>
