@@ -138,7 +138,9 @@ class PlaybackRepositoryImpl @Inject constructor(
 
     override suspend fun sendQosData(qosData: QosData): Result<Unit> {
         return runCatching {
-            val completeQosData = qosData.copy(deviceType = localDatasource.getDeviceType())
+            val completeQosData = qosData
+                .copy(deviceType = localDatasource.getDeviceType())
+                .copy(ip = remoteDatasource.getCurrentUserIp())
             logger.debug(TAG, "sendQoSData qosData: $completeQosData")
             remoteDatasource.sendQosData(completeQosData)
         }.onFailure {
