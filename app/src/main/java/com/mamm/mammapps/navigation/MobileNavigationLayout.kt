@@ -2,6 +2,7 @@ package com.mamm.mammapps.navigation
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -33,6 +34,7 @@ import com.mamm.mammapps.R
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.navigation.viewModel.NavigationViewModel
 import com.mamm.mammapps.ui.component.chromecast.CastButton
+import com.mamm.mammapps.ui.component.common.OperatorLogoImage
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,11 +48,14 @@ fun MobileNavigationLayout(
     val scope = rememberCoroutineScope()
 
     val menuItems by viewModel.menuItems.collectAsStateWithLifecycle()
+    val operatorLogo by viewModel.operatorLogo.collectAsStateWithLifecycle()
     val showNavigationDrawer = currentRoute in menuItems.map { it.route }
 
     LaunchedEffect (currentRoute) {
-        if (currentRoute == AppRoute.HOME.route)
+        if (currentRoute == AppRoute.HOME.route) {
             viewModel.setMenuItems()
+            viewModel.getOperatorLogo()
+        }
     }
 
     ModalNavigationDrawer(
@@ -59,6 +64,12 @@ fun MobileNavigationLayout(
         drawerContent = {
             ModalDrawerSheet {
                 Spacer(modifier = Modifier.padding(12.dp))
+                OperatorLogoImage(
+                    modifier = Modifier
+                        .width(150.dp)
+                        .padding(horizontal = 16.dp, vertical = 16.dp),
+                    logoUrl = operatorLogo
+                )
                 LazyColumn {
                     items(menuItems) { item ->
                         NavigationDrawerItem(

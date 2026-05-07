@@ -78,6 +78,7 @@ class RemoteDatasource @Inject constructor(
 ) {
 
     companion object {
+        private const val TAG = "RemoteDatasource"
         private const val BUFFER_SIZE = 8192
     }
 

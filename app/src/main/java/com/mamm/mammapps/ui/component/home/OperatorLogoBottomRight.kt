@@ -41,9 +41,9 @@ fun OperatorLogoBottomRight(
             OperatorLogoImage(
                 logoUrl = it,
                 modifier = Modifier
-                    .width(200.dp)
+                    .width(150.dp)
                     .align(Alignment.BottomEnd)
-                    .padding(Dimensions.paddingLarge)
+                    .padding(Dimensions.paddingMedium)
             )
         }
     }
