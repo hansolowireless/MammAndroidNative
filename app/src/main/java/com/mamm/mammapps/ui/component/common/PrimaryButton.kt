@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,7 +21,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Glow
 import com.mamm.mammapps.ui.component.LocalIsTV
-import com.mamm.mammapps.ui.extension.glow
 import com.mamm.mammapps.ui.theme.ButtonColor
 import com.mamm.mammapps.ui.theme.Dimensions
 import androidx.compose.material3.Button as MobileButton
@@ -73,6 +71,7 @@ fun PrimaryButton(
             enabled = enabled
         ) {
             Row(
+                modifier = Modifier.fillMaxSize(),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
