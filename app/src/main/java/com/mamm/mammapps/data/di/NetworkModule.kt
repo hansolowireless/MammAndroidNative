@@ -3,9 +3,9 @@ package com.mamm.mammapps.data.di
 import com.google.gson.Gson
 import com.mamm.mammapps.BuildConfig
 import com.mamm.mammapps.data.config.Config
-import com.mamm.mammapps.data.local.SecurePreferencesManager
+import com.mamm.mammapps.data.local.SharedPreferencesManager
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.session.SessionManager
+import com.mamm.mammapps.data.datasource.session.SessionDatasource
 import com.mamm.mammapps.remote.ApiService
 import com.mamm.mammapps.remote.interceptor.AuthInterceptor
 import com.mamm.mammapps.remote.interceptor.DynamicTimeoutInterceptor
@@ -89,14 +89,14 @@ object NetworkModule {
     @Singleton
     fun provideIdmRetrofit(
         okHttpClient: OkHttpClient,
-        sessionManager: SessionManager,
         dynamicUrlInterceptor: DynamicUrlInterceptor,
         dynamicTimeoutInterceptor: DynamicTimeoutInterceptor,
+        authInterceptor: AuthInterceptor,
         gson: Gson
     ): Retrofit {
         val idmClient = okHttpClient.newBuilder()
             .addInterceptor(dynamicTimeoutInterceptor)
-            .addInterceptor(AuthInterceptor(sessionManager))
+            .addInterceptor(authInterceptor)
             .addInterceptor(dynamicUrlInterceptor)
             .build()
 
@@ -163,10 +163,14 @@ object NetworkModule {
     @NoBaseUrlNoRedirectApi
     @Provides
     @Singleton
-    fun provideNoRedirectContentRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    fun provideNoRedirectContentRetrofit(
+        okHttpClient: OkHttpClient,
+        authInterceptor: AuthInterceptor
+    ): Retrofit {
         val noRedirectClient = okHttpClient.newBuilder()
             .followRedirects(false)
             .followSslRedirects(false)
+            .addInterceptor (authInterceptor)
             .build()
 
         return Retrofit.Builder()
@@ -181,8 +185,8 @@ object NetworkModule {
     @Singleton
     fun provideQosRetrofit(
         okHttpClient: OkHttpClient,
-        securePreferencesManager: SecurePreferencesManager,
-        sessionManager: SessionManager
+        securePreferencesManager: SharedPreferencesManager,
+        sessionManager: SessionDatasource
     ): Retrofit {
         val qosClient = okHttpClient.newBuilder()
             .addInterceptor(QosAuthInterceptor(sessionManager, securePreferencesManager))
@@ -200,10 +204,10 @@ object NetworkModule {
     @Singleton
     fun provideBookmarksRetrofit(
         okHttpClient: OkHttpClient,
-        sessionManager: SessionManager
+        authInterceptor: AuthInterceptor
     ): Retrofit {
         val bookmarksClient = okHttpClient.newBuilder()
-            .addInterceptor(AuthInterceptor(sessionManager))
+            .addInterceptor(authInterceptor)
             .build()
         return Retrofit.Builder()
             .baseUrl(Config.customContentUrl)

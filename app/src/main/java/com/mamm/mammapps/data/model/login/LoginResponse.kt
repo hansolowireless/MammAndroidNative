@@ -16,8 +16,10 @@ data class LoginData(
     val jsonFile: String?,
     @SerializedName("pinparental")
     val pinparental: String?,
-    @SerializedName("jwtoken")
+    @SerializedName("access_token", alternate = ["jwtoken"])
     val jwtoken: String?,
+    @SerializedName("refresh_token")
+    val refreshToken: String?,
     @SerializedName("skin")
     val skin: Skin?,
     @SerializedName("channel_order")

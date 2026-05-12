@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -70,6 +69,7 @@ import com.mamm.mammapps.ui.extension.toDigitString
 import com.mamm.mammapps.ui.manager.videoresize.VideoResizeManagerWithTicker
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
+import com.mamm.mammapps.ui.model.uistate.PlayerUIState
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.PlayerColor
 import com.mamm.mammapps.ui.viewmodel.VideoPlayerViewModel
@@ -81,7 +81,7 @@ private enum class TrackType { AUDIO, CC, VIDEO }
 
 //TODO dejar aqui solo la lógica onPressed y llevar el resto a VideoPlayer (la clase padre)
 @Composable
-fun PlayerViewWithControlsExperimental(
+fun PlayerViewWithControls(
     modifier: Modifier = Modifier,
     viewModel: VideoPlayerViewModel,
     player: ExoPlayer?,
@@ -140,14 +140,24 @@ fun PlayerViewWithControlsExperimental(
         }
     }
 
-    LaunchedEffect(tickerInfo, content) {
-        tickerInfo?.tickers?.let {
-            Log.d("PlayerViewWithControls", "TickerList ha cambiado, comenzamos autoresize $tickerInfo")
-            videoResizeManager?.replaceTickers(it)
-            videoResizeManager?.setAutoResize(
-                tickerInfo = tickerInfo,
-                currentChannelId = content?.identifier?.id
-            )
+    LaunchedEffect(tickerInfo, content, playerState) {
+        when (playerState) {
+            PlayerUIState.Playing -> {
+                Log.d("PlayerViewWithControls", "TickerList ha cambiado, comenzamos autoresize $tickerInfo")
+                videoResizeManager?.replaceTickers(tickerInfo?.tickers)
+                videoResizeManager?.setAutoResize(
+                    tickerInfo = tickerInfo,
+                    currentChannelId = content?.identifier?.id
+                )
+            }
+            else -> {
+                Log.d("PlayerViewWithControls", "PlayerState no es Playing, paramos autoresize")
+                videoResizeManager?.replaceTickers(null)
+                videoResizeManager?.setAutoResize(
+                    tickerInfo = null,
+                    currentChannelId = content?.identifier?.id
+                )
+            }
         }
     }
 
@@ -243,7 +253,8 @@ fun PlayerViewWithControlsExperimental(
 
                     val playingContent = parentView.tag as? ContentToPlayUI
 
-                    val styledPlayerView = parentView.findViewById<StyledPlayerView>(R.id.player_view).also {
+                    val styledPlayerView =
+                        parentView.findViewById<StyledPlayerView>(R.id.player_view).also {
                             playerViewRef.value = it
                         }
 
@@ -279,8 +290,14 @@ fun PlayerViewWithControlsExperimental(
                     previewTimeBar.addOnScrubListener(object : PreviewBar.OnScrubListener {
                         override fun onScrubStart(previewBar: PreviewBar) {
                         }
-                        override fun onScrubMove(previewBar: PreviewBar, progress: Int, fromUser: Boolean) {
+
+                        override fun onScrubMove(
+                            previewBar: PreviewBar,
+                            progress: Int,
+                            fromUser: Boolean
+                        ) {
                         }
+
                         override fun onScrubStop(previewBar: PreviewBar?) {
                             viewModel.triggerTSTVMode(previewTimeBar)
                         }
@@ -323,7 +340,7 @@ fun PlayerViewWithControlsExperimental(
                             forcePosition = 0
                         )
                     }
-                    returnToLivePointButton.setOnClickListener{
+                    returnToLivePointButton.setOnClickListener {
                         viewModel.setLivePosition(previewTimeBar)
                     }
 
@@ -430,7 +447,7 @@ fun PlayerViewWithControlsExperimental(
             )
         }
 
-        LaunchedEffect (zappingNumberDisplay)
+        LaunchedEffect(zappingNumberDisplay)
         {
             delay(PlayerConstant.CHANNEL_NUMBER_ZAPPING_WAITTIME)
             viewModel.navigateToChannel(zappingNumberDisplay)

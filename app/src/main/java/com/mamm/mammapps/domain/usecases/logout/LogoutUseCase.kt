@@ -15,7 +15,11 @@ class LogoutUseCase @Inject constructor(
     private val epgRepository: EPGRepository,
     private val logger: Logger
 ) {
+    companion object {
+        private const val TAG = "LogoutUseCase"
+    }
     operator fun invoke() {
+        logger.debug(TAG, "invoke")
         epgRepository.clearCache()
         repository.clearCaches()
     }

@@ -7,9 +7,8 @@ import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.mapper.toDomain
 import com.mamm.mammapps.data.model.exception.TickerException
-import com.mamm.mammapps.data.model.player.GetTickersResponseDto
 import com.mamm.mammapps.data.model.player.QosData
-import com.mamm.mammapps.data.session.SessionManager
+import com.mamm.mammapps.data.datasource.session.SessionDatasource
 import com.mamm.mammapps.data.util.DrmAuthUtil
 import com.mamm.mammapps.domain.interfaces.PlaybackRepository
 import com.mamm.mammapps.domain.model.player.TickerInfo
@@ -21,7 +20,7 @@ import javax.inject.Inject
 class PlaybackRepositoryImpl @Inject constructor(
     private val remoteDatasource: RemoteDatasource,
     private val localDatasource: LocalDataSource,
-    private val sessionManager: SessionManager,
+    private val sessionDatasource: SessionDatasource,
     private val logger: Logger
 ) : PlaybackRepository {
 
@@ -53,9 +52,9 @@ class PlaybackRepositoryImpl @Inject constructor(
         content: ContentToPlayUI
     ): Result<Pair<String, String>> {
         return runCatching {
-            val userName = localDatasource.getUserCredentials().first
-            val token = sessionManager.loginData?.token
-            val userID = sessionManager.loginData?.userId
+            val userName = sessionDatasource.getUserCredentials().first
+            val token = sessionDatasource.loginData?.token
+            val userID = sessionDatasource.loginData?.userId
             val operatorName = Config.operatorNameDRM
             val deviceType = localDatasource.getDeviceType()
             val streamID = content.epgEventInfo?.fatherChannelId ?: content.identifier.getIdValue()
@@ -102,7 +101,7 @@ class PlaybackRepositoryImpl @Inject constructor(
 
     override suspend fun getTickers(): Result<TickerInfo> {
         return runCatching {
-            sessionManager.loginData?.tickerUrl?.let {
+            sessionDatasource.loginData?.tickerUrl?.let {
                 remoteDatasource.getTickers(url = it).toDomain()
             } ?: throw TickerException.MissingData
         }.onFailure {

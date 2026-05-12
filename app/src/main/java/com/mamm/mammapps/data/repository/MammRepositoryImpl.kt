@@ -13,7 +13,7 @@ import com.mamm.mammapps.data.model.Subgenre
 import com.mamm.mammapps.data.model.exception.GetMemoriesException
 import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
-import com.mamm.mammapps.data.session.SessionManager
+import com.mamm.mammapps.data.datasource.session.SessionDatasource
 import com.mamm.mammapps.domain.interfaces.MammRepository
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.util.AppConstants
@@ -24,7 +24,7 @@ import javax.inject.Inject
 class MammRepositoryImpl @Inject constructor(
     private val remoteDatasource: RemoteDatasource,
     private val localDataSource: LocalDataSource,
-    private val sessionManager: SessionManager,
+    private val sessionManager: SessionDatasource,
     private val logger: Logger
 ) : MammRepository {
 

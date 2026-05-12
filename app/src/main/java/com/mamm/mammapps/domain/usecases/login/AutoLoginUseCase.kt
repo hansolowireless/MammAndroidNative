@@ -2,13 +2,13 @@ package com.mamm.mammapps.domain.usecases.login
 
 import com.mamm.mammapps.data.config.Config
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.session.SessionManager
+import com.mamm.mammapps.data.datasource.session.SessionDatasource
 import com.mamm.mammapps.domain.interfaces.LoginRepository
 import javax.inject.Inject
 
 class AutoLoginUseCase @Inject constructor(
     private val repository: LoginRepository,
-    private val session: SessionManager,
+    private val session: SessionDatasource,
     private val logger: Logger
 ) {
     companion object {
@@ -18,7 +18,7 @@ class AutoLoginUseCase @Inject constructor(
     suspend operator fun invoke(): Result<Unit> {
         logger.debug(TAG, "Checking for stored credentials...")
 
-        return repository.getUserCredentials().fold(
+        return repository.getCredentials().fold(
             onSuccess = { (username, password) ->
                 if (username != null && password != null) {
                     logger.debug(TAG, "autologinUseCase Found valid credentials, attempting auto-login...")
@@ -42,8 +42,6 @@ class AutoLoginUseCase @Inject constructor(
                     repository.login(username, password).fold(
                         onSuccess = { response ->
                             logger.debug(TAG, "autologinUseCase Auto-login successful")
-                            response.data?.let { session.startNewSession(it) }
-
                             Result.success(Unit)
                         },
                         onFailure = { exception ->

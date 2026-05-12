@@ -18,11 +18,12 @@ import com.mamm.mammapps.data.extension.getCurrentDate
 import com.mamm.mammapps.data.extension.isRedirect
 import com.mamm.mammapps.data.extension.toEPGRequestDate
 import com.mamm.mammapps.data.extension.transformData
-import com.mamm.mammapps.data.local.SecurePreferencesManager
+import com.mamm.mammapps.data.local.SharedPreferencesManager
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.mapper.toGetHomeContentException
 import com.mamm.mammapps.data.mapper.toGetMemoriesException
 import com.mamm.mammapps.data.mapper.toLoginException
+import com.mamm.mammapps.data.mapper.toSessionException
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetEPGResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
@@ -44,7 +45,9 @@ import com.mamm.mammapps.data.model.player.streamvx.StreamVxTokenRequest
 import com.mamm.mammapps.data.model.player.streamvx.StreamVxTokenResponse
 import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
-import com.mamm.mammapps.data.session.SessionManager
+import com.mamm.mammapps.data.model.session.RefreshTokenRequest
+import com.mamm.mammapps.data.model.session.RefreshTokenResponse
+import com.mamm.mammapps.data.datasource.session.SessionDatasource
 import com.mamm.mammapps.remote.ApiService
 import com.mamm.mammapps.ui.extension.toDate
 import com.mamm.mammapps.util.calculateMbps
@@ -72,8 +75,8 @@ class RemoteDatasource @Inject constructor(
     @DeviceSerialQualifier private val deviceSerial: String,
     @ChromecastDeviceTypeQualifier private val ccastDeviceType: String,
     @DeviceModelQualifier private val deviceModel: String,
-    private val sessionManager: SessionManager,
-    private val securePreferencesManager: SecurePreferencesManager,
+    private val sessionManager: SessionDatasource,
+    private val securePreferencesManager: SharedPreferencesManager,
     private val logger: Logger
 ) {
 
@@ -287,8 +290,7 @@ class RemoteDatasource @Inject constructor(
             typeOfContentString = typeOfContentString,
             model = deviceModel,
             deviceType = if (chromecast) ccastDeviceType else deviceType,
-            operator = sessionManager.loginData?.skin?.operator!!,
-            jwt = sessionManager.jwToken!!
+            operator = sessionManager.loginData?.skin?.operator!!
         )
 
         var fullUrl = if (deliveryURL.endsWith("/")) {
@@ -309,8 +311,7 @@ class RemoteDatasource @Inject constructor(
         val response = clmApi.getUrlFromCLM(finalUrl)
 
         if (!response.isSuccessful && !response.isRedirect()) {
-            val errorBody = response.errorBody()?.string()?.toResponseBody()
-            throw HttpException(Response.error<Any>(response.code(), errorBody))
+            throw response.code().toSessionException()
         }
 
         val locationHeader = response.headers()["location"]
@@ -326,9 +327,18 @@ class RemoteDatasource @Inject constructor(
         withContext(Dispatchers.IO) {
             val response = idmApi.sendHeartBeat(request)
             if (!response.isSuccessful) {
-                val errorBody = response.errorBody()
-                throw HttpException(response)
+                throw response.code().toSessionException()
             }
+        }
+    }
+
+    suspend fun refreshToken(request: RefreshTokenRequest) : RefreshTokenResponse {
+        return withContext(Dispatchers.IO) {
+            val response = idmApi.refreshToken(request)
+            if (!response.isSuccessful) {
+                throw response.code().toSessionException()
+            }
+            response.body() ?: throw IllegalStateException("Response body is null")
         }
     }
 
@@ -347,7 +357,6 @@ class RemoteDatasource @Inject constructor(
             val response = idmApi.getStreamVxToken(request)
             if (!response.isSuccessful) {
                 val errorBody = response.errorBody()?.string()
-                logger.error("RemoteDatasource", "getStreamVxToken error: $errorBody")
                 throw HttpException(response)
             }
             val body = response.body() ?: throw IllegalStateException("Response body is null")

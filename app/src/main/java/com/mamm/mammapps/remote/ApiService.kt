@@ -17,6 +17,8 @@ import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.model.player.heartbeat.HeartBeatRequest
 import com.mamm.mammapps.data.model.player.streamvx.StreamVxTokenRequest
 import com.mamm.mammapps.data.model.player.streamvx.StreamVxTokenResponse
+import com.mamm.mammapps.data.model.session.RefreshTokenRequest
+import com.mamm.mammapps.data.model.session.RefreshTokenResponse
 import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.data.model.sportsevent.SportsEventListDto
@@ -195,6 +197,16 @@ interface ApiService {
     suspend fun sendHeartBeat(
         @Body heartBeatRequest: HeartBeatRequest
     ): Response<Unit>
+
+    @POST("/aaservice/refresh-token")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json",
+        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_IDM}"
+    )
+    suspend fun refreshToken(
+        @Body refreshToken: RefreshTokenRequest
+    ): Response<RefreshTokenResponse>
 
     @POST("/aaservice/streamvxtoken")
     @Headers(

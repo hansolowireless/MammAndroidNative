@@ -85,7 +85,14 @@ class VideoResizeManagerWithTicker(
     /**
      * Actualiza la lista de tickers dinámicamente.
      */
-    fun replaceTickers(newTickerList: List<Ticker>) {
+    fun replaceTickers(newTickerList: List<Ticker>?) {
+
+        if (newTickerList == null) {
+            Log.e(TAG, "replaceTickers llamado con lista nula")
+            hideTicker()
+            return
+        }
+
         Log.d(TAG, "replaceTickers llamado con: $newTickerList")
         tickerList = newTickerList
         currentTickerIndex = 0

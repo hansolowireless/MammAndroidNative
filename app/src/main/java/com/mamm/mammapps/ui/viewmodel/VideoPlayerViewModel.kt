@@ -28,12 +28,14 @@ import com.google.android.exoplayer2.util.MimeTypes
 import com.mamm.mammapps.R
 import com.mamm.mammapps.data.extension.getCurrentDate
 import com.mamm.mammapps.data.logger.Logger
+import com.mamm.mammapps.data.model.exception.SessionException
 import com.mamm.mammapps.data.model.player.QosData
 import com.mamm.mammapps.data.model.player.customdatasourcefactory.DynamicHttpMediaDrmCallback
 import com.mamm.mammapps.data.model.player.customdatasourcefactory.TokenParamDataSourceFactory
 import com.mamm.mammapps.domain.model.player.TickerInfo
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
 import com.mamm.mammapps.domain.usecases.content.GetChannelsUseCase
+import com.mamm.mammapps.domain.usecases.logout.LogoutUseCase
 import com.mamm.mammapps.domain.usecases.player.GetDRMUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.GetJwTokenUseCase
 import com.mamm.mammapps.domain.usecases.player.GetPlayableUrlUseCase
@@ -97,6 +99,7 @@ class VideoPlayerViewModel @Inject constructor(
     private val getTickersUseCase: GetTickersUseCase,
     private val savePlayProgressUseCase: SavePlayProgressUseCase,
     private val getPlayProgressUseCase: GetPlayProgressUseCaseSync,
+    private val logoutUseCase: LogoutUseCase,
     @ApplicationContext private val context: Context,
     private val logger: Logger
 ) : ViewModel() {
@@ -191,8 +194,9 @@ class VideoPlayerViewModel @Inject constructor(
                     logger.error(TAG, "initializeWithContent getPlayableUrlUseCase error = ${error?.message}")
                     //TODO SHOW ERROR
                 }
-            }.onFailure { exception ->
+            }.onFailure {
                 //TODO SHOW ERROR
+                handleSessionExpired(it)
             }
         }
     }
@@ -356,12 +360,29 @@ class VideoPlayerViewModel @Inject constructor(
         heartbeatJob?.cancel()
         heartbeatJob = viewModelScope.launch(Dispatchers.IO) {
             logger.debug(TAG, "startHeartbeat Starting to send heartbeat...")
-            sendHeartbeatUseCase()
+            sendHeartbeatUseCase().onFailure {
+                handleSessionExpired(it)
+            }
             while (true) {
                 delay(120000)
 
                 logger.debug(TAG, "startHeartbeat Sending another heartbeat...")
-                sendHeartbeatUseCase()
+                sendHeartbeatUseCase().onFailure {
+                    handleSessionExpired(it)
+                }
+            }
+        }
+    }
+
+    private suspend fun handleSessionExpired(exception: Throwable) {
+        withContext(Dispatchers.Main) {
+            if (exception is SessionException) {
+                _playerState.update { PlayerUIState.Session }
+                releaseVariables()
+                logoutUseCase.invoke()
+            }
+            else {
+                logger.warn(TAG, "handleSessionExpired - Error in pushSession or CLM request, but was not unauthorized: ${exception.message}")
             }
         }
     }

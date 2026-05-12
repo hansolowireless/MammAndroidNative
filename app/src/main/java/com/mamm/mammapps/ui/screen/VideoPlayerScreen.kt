@@ -22,7 +22,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mamm.mammapps.ui.component.LocalIsTV
+import com.mamm.mammapps.ui.component.dialog.SessionExpiredDialog
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import com.mamm.mammapps.ui.model.uistate.PlayerUIState
 import com.mamm.mammapps.ui.theme.SnackbarColor
@@ -32,7 +32,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun VideoPlayerScreen(
     viewModel: VideoPlayerViewModel = hiltViewModel(),
-    playedContent: ContentToPlayUI
+    playedContent: ContentToPlayUI,
+    onSessionExpired: () -> Unit
 ) {
 
     val player by viewModel.player.collectAsStateWithLifecycle()
@@ -99,7 +100,7 @@ fun VideoPlayerScreen(
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        PlayerViewWithControlsExperimental(
+        PlayerViewWithControls(
             modifier = Modifier.fillMaxSize(),
             viewModel = viewModel,
             player = player,
@@ -121,6 +122,12 @@ fun VideoPlayerScreen(
                 )
             }
         )
+        
+        if (playerState is PlayerUIState.Session) {
+            SessionExpiredDialog(
+                onConfirm = onSessionExpired
+            )
+        }
     }
 }
 

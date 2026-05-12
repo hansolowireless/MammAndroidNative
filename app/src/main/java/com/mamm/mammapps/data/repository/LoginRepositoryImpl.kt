@@ -2,18 +2,17 @@ package com.mamm.mammapps.data.repository
 
 import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
-import com.mamm.mammapps.data.local.SecurePreferencesManager
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginResponse
-import com.mamm.mammapps.data.session.SessionManager
+import com.mamm.mammapps.data.datasource.session.SessionDatasource
 import com.mamm.mammapps.domain.interfaces.LoginRepository
 import javax.inject.Inject
 
 class LoginRepositoryImpl @Inject constructor(
-    private val remoteDatasource: RemoteDatasource,
+    private val remoteDataSource: RemoteDatasource,
     private val localDataSource: LocalDataSource,
-    private val sessionManager: SessionManager,
+    private val sessionDataSource: SessionDatasource,
     private val logger: Logger
 ) : LoginRepository {
 
@@ -23,19 +22,22 @@ class LoginRepositoryImpl @Inject constructor(
 
     override suspend fun login(username: String, password: String): Result<LoginResponse> {
         return runCatching {
-            remoteDatasource.login(username, password)
+            remoteDataSource.login(username, password)
+        }.onSuccess { response ->
+            response.data?.let {
+                clearCaches()
+                sessionDataSource.saveUserCredentials(
+                    username = username,
+                    password = password,
+                    loginData = response.data
+                )
+            } ?: throw IllegalStateException("login - response data is null")
         }
     }
 
     override suspend fun checkLocator(username: String): Result<LocatorResponse> {
         return runCatching {
-            remoteDatasource.checkLocator(username)
-        }
-    }
-
-    override suspend fun saveUserCredentials(username: String, password: String): Result<Unit> {
-        return runCatching {
-            localDataSource.saveUserCredentials(username, password)
+            remoteDataSource.checkLocator(username)
         }
     }
 
@@ -52,19 +54,19 @@ class LoginRepositoryImpl @Inject constructor(
 
     override fun getUserIsHoreca(): Result<Boolean> {
         return runCatching {
-            sessionManager.isHoreca()
+            sessionDataSource.isHoreca()
         }
     }
 
     override fun getOperatorLogoUrl() : Result<String> {
         return runCatching {
-            remoteDatasource.getOperatorLogoUrl() ?: throw IllegalStateException("Operator logo URL is null")
+            remoteDataSource.getOperatorLogoUrl() ?: throw IllegalStateException("Operator logo URL is null")
         }
     }
 
-    override suspend fun getUserCredentials(): Result<Pair<String?, String?>> {
+    override suspend fun getCredentials(): Result<Pair<String?, String?>> {
         return runCatching {
-            val credentials = localDataSource.getUserCredentials()
+            val credentials = sessionDataSource.getUserCredentials()
             val (username, password) = credentials
             if (username.isNullOrEmpty() || password.isNullOrEmpty()) {
                 throw IllegalStateException("Invalid credentials: username or password is null/empty")
@@ -73,12 +75,14 @@ class LoginRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun setSessionToken(newRefresh: String, newAccess: String) {
+        sessionDataSource.updateToken(newRefresh, newAccess)
+    }
 
     override fun clearCaches() : Result<Unit> {
         return runCatching {
-            sessionManager.clear()
+            sessionDataSource.clear()
             localDataSource.clearCache()
-            localDataSource.clearUserCredentials()
         }
     }
 }

@@ -1,12 +1,14 @@
-package com.mamm.mammapps.data.session
+package com.mamm.mammapps.data.datasource.session
 
+import com.mamm.mammapps.data.local.SharedPreferencesManager
 import com.mamm.mammapps.data.model.login.LoginData
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.math.log
 
 @Singleton
-class SessionManager @Inject constructor(
-    private val sessionStorage: SessionStorage
+class SessionDatasource @Inject constructor(
+    private val sharedPreferencesManager: SharedPreferencesManager
 ) {
     // Datos que vienen directamente de la API
     var loginData: LoginData? = null
@@ -26,20 +28,20 @@ class SessionManager @Inject constructor(
     val pinParental: String? get() = loginData?.pinparental
     val operatorLogoUrl : String? get() = skinImages[5001] ?: skinImages[1501]
 
-    // Bloque de inicialización para restaurar la sesión
     init {
-        val restoredData = sessionStorage.getLoginData()
+        val restoredData = sharedPreferencesManager.getLoginData()
         if (restoredData != null) {
             processLoginData(restoredData)
         }
     }
 
-    fun startNewSession(data: LoginData) {
-        sessionStorage.saveLoginData(data)
+    private fun startNewSession(data: LoginData) {
+        sharedPreferencesManager.setLoginData(data)
         processLoginData(data)
     }
 
     private fun processLoginData(data: LoginData) {
+        //Asignar el login data
         loginData = data
 
         // Procesar availablePackages desde jsonFile
@@ -72,13 +74,43 @@ class SessionManager @Inject constructor(
         }
     }
 
+    fun saveUserCredentials(
+        username: String,
+        password: String,
+        loginData: LoginData
+    ) {
+        startNewSession(loginData)
+        sharedPreferencesManager.saveCredentials(
+            username = username,
+            password = password,
+            loginData = loginData
+        )
+    }
+
+    fun getUserCredentials(): Pair<String?, String?> {
+        return sharedPreferencesManager.getCredentials()
+    }
+
+    /*
+    * Actualiza el token de sesión (refresh) y el access
+    */
+    fun updateToken(newRefresh: String, newAccess: String) {
+        val currentData = loginData ?: return
+        currentData.copy(
+            refreshToken = newRefresh,
+            jwtoken = newAccess
+        ).let { updatedData ->
+            startNewSession(updatedData)
+        }
+    }
+
     fun isHoreca(): Boolean {
         val horecaIds = listOf(226, 225, 206, 224)
         return availablePackages.any { it in horecaIds }
     }
 
     fun clear() {
-        sessionStorage.clear() // ¡Importante! Limpiar también el almacenamiento persistente
+        sharedPreferencesManager.clearCredentials()
         loginData = null
         availablePackages = emptyList()
         skinImages.clear()

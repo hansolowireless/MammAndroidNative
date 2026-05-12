@@ -9,7 +9,7 @@ import com.mamm.mammapps.data.di.DrmIVQualifier
 import com.mamm.mammapps.data.di.DrmSecretKeyQualifier
 import com.mamm.mammapps.data.di.DrmJwtSecretQualifier
 import com.mamm.mammapps.data.di.DrmUrlQualifier
-import com.mamm.mammapps.data.local.SecurePreferencesManager
+import com.mamm.mammapps.data.local.SharedPreferencesManager
 import com.mamm.mammapps.data.model.GetBrandedContentResponse
 import com.mamm.mammapps.data.model.GetHomeContentResponse
 import com.mamm.mammapps.data.model.GetOtherContentResponse
@@ -23,7 +23,7 @@ import java.time.ZonedDateTime
 import javax.inject.Inject
 
 class LocalDataSourceImpl @Inject constructor(
-    private val securePreferencesManager: SecurePreferencesManager,
+    private val sharedPreferencesManager: SharedPreferencesManager,
     private val cache: Cache,
     @DeviceSerialQualifier private val deviceSerial: String,
     @DeviceTypeQualifier private val deviceType: String,
@@ -33,10 +33,6 @@ class LocalDataSourceImpl @Inject constructor(
     @DrmSecretKeyQualifier private val secretKey64: ByteArray,
     @DrmJwtSecretQualifier private val jwtSecretKey: ByteArray
 ) : LocalDataSource {
-
-    override suspend fun saveUserCredentials(username: String, password: String) {
-        securePreferencesManager.saveCredentials(username, password)
-    }
 
     override fun setShowBrandedContentMenus(show: Boolean) {
         cache.setShowBrandedContentMenus(show)
@@ -104,10 +100,6 @@ class LocalDataSourceImpl @Inject constructor(
 
     override fun setRecommended(recommended: GetRecommendedResponse) {
         cache.setRecommended(recommended)
-    }
-
-    override suspend fun getUserCredentials(): Pair<String?, String?> {
-        return securePreferencesManager.getCredentials()
     }
 
     override fun getShowBrandedContentMenus(): Boolean? {
@@ -212,10 +204,6 @@ class LocalDataSourceImpl @Inject constructor(
 
     override fun getRecommended(): GetRecommendedResponse? {
         return cache.getRecommended()
-    }
-
-    override fun clearUserCredentials() {
-        securePreferencesManager.clearCredentials()
     }
 
     override fun clearContentPlayProgress() {

@@ -3,32 +3,41 @@ package com.mamm.mammapps.data.local
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.google.gson.Gson
 import com.mamm.mammapps.data.logger.Logger
+import com.mamm.mammapps.data.model.login.LoginData
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SecurePreferencesManager @Inject constructor(
+class SharedPreferencesManager @Inject constructor(
     private val context: Context,
+    private val gson: Gson,
     private val logger: Logger
 ) {
-    // Usar las MISMAS SharedPreferences que Flutter - nombre "preferences"
     private val sharedPrefs: SharedPreferences by lazy {
         context.getSharedPreferences("preferences", Context.MODE_PRIVATE)
     }
 
     companion object {
-        private const val TAG = "SecurePreferencesManager"
+        private const val TAG = "SharedPreferencesManager"
         private const val KEY_USERNAME = "uE"
         private const val KEY_PASSWORD = "uP"
+        private const val KEY_REFRESH_TOKEN = "uRT"
+        private val KEY_LOGIN_DATA = "login_data_json"
     }
 
     // Guardar credenciales (MISMO formato que Flutter)
-    fun saveCredentials(username: String, password: String) {
+    fun saveCredentials(
+        username: String,
+        password: String,
+        loginData: LoginData
+    ) {
         try {
             sharedPrefs.edit {
                 putString(KEY_USERNAME, username)
                 putString(KEY_PASSWORD, password)
+                setLoginData(loginData)
             }
             logger.info(TAG, "Credentials saved successfully")
         } catch (e: Exception) {
@@ -55,17 +64,21 @@ class SecurePreferencesManager @Inject constructor(
         }
     }
 
-    // Verificar si existen credenciales
-    fun hasCredentials(): Boolean {
-        return try {
-            val username = getUsername()
-            val password = getPassword()
-            val hasData = !username.isNullOrEmpty() && !password.isNullOrEmpty()
-            logger.info(TAG, "Has credentials: $hasData")
-            hasData
-        } catch (e: Exception) {
-            logger.error(TAG, "Failed to check credentials: ${e.message}")
-            false
+    fun setLoginData(data: LoginData) {
+        val jsonString = gson.toJson(data)
+        sharedPrefs.edit {
+            putString(KEY_LOGIN_DATA, jsonString)
+        }
+    }
+
+    fun getLoginData(): LoginData? {
+        val jsonString = sharedPrefs.getString(KEY_LOGIN_DATA, null)
+        return jsonString?.let {
+            try {
+                gson.fromJson(it, LoginData::class.java)
+            } catch (e: Exception) {
+                null
+            }
         }
     }
 
