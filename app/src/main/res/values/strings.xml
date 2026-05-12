@@ -16,6 +16,15 @@
     <string name="login">Iniciar sesión</string>
     <string name="logout">Cerrar sesión</string>
     <string name="forgot_password">¿Olvidaste tu contraseña?</string>
+    <string name="tv_code">Código TV</string>
+    <string name="tv_code_instructions">Accede con tu aplicación móvil a la sección "Acerca de" e introduce este código.</string>
+    <string name="tv_code_expiration">El código expirará en %d segundos.</string>
+    <string name="tv_code_expired">El código ha expirado</string>
+    <string name="request_new_code">Solicitar nuevo código</string>
+    <string name="auth_tv_code_button">Autenticar dispositivo TV</string>
+    <string name="auth_tv_code_dialog_title">Autenticar TV</string>
+    <string name="auth_tv_code_dialog_message">Inserta el código que muestra la TV.</string>
+    <string name="auth_tv_code_success">Dispositivo autenticado con éxito.</string>
     <!--endregion Login-->
 
     <!--region Home-->
@@ -119,8 +128,8 @@
     <!--endregion Error-->
 
     <!--region PIN DIALOG-->
-    <string name="pin_dialog_title">Acceso Restringido</string>
-    <string name="pin_dialog_message">Por favor, introduce tu PIN para continuar.</string>
+    <string name="parental_pin_dialog_title">Acceso Restringido</string>
+    <string name="parental_pin_dialog_message">Por favor, introduce tu PIN para continuar.</string>
     <string name="pin_field_label">PIN</string>
     <string name="confirm_button_label">Confirmar</string>
     <string name="cancel_button_label">Cancelar</string>

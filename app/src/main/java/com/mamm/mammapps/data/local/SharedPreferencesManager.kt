@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.google.gson.Gson
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.login.LoginData
+import com.mamm.mammapps.data.model.login.LoginDataDto
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,8 +30,8 @@ class SharedPreferencesManager @Inject constructor(
     // Guardar credenciales (MISMO formato que Flutter)
     fun saveCredentials(
         username: String,
-        password: String,
-        loginData: LoginData
+        password: String?,
+        loginData: LoginDataDto
     ) {
         try {
             sharedPrefs.edit {
@@ -64,18 +64,18 @@ class SharedPreferencesManager @Inject constructor(
         }
     }
 
-    fun setLoginData(data: LoginData) {
+    fun setLoginData(data: LoginDataDto) {
         val jsonString = gson.toJson(data)
         sharedPrefs.edit {
             putString(KEY_LOGIN_DATA, jsonString)
         }
     }
 
-    fun getLoginData(): LoginData? {
+    fun getLoginData(): LoginDataDto? {
         val jsonString = sharedPrefs.getString(KEY_LOGIN_DATA, null)
         return jsonString?.let {
             try {
-                gson.fromJson(it, LoginData::class.java)
+                gson.fromJson(it, LoginDataDto::class.java)
             } catch (e: Exception) {
                 null
             }

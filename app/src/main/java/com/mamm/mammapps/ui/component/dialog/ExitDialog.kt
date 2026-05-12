@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.mamm.mammapps.R
+import com.mamm.mammapps.ui.theme.MammAppsTheme
 
 @Composable
 fun ExitDialog(
@@ -48,15 +49,10 @@ fun ExitDialog(
 @Preview(showBackground = true)
 @Composable
 fun ExitDialogPreview() {
-    // Para que la vista previa funcione, necesitarás añadir estos recursos de string
-    // a un archivo de strings de prueba o a tus strings principales.
-    // Ejemplo en res/values/strings.xml:
-    // <string name="exit_dialog_title">Confirmación</string>
-    // <string name="do_you_want_exit">¿Quieres salir?</string>
-    // <string name="yes">Sí</string>
-    // <string name="no">No</string>
-    ExitDialog(
-        onDismissRequest = {},
-        onConfirmation = {}
-    )
+    MammAppsTheme {
+       ExitDialog(
+           onDismissRequest = {},
+           onConfirmation = {}
+       )
+   }
 }

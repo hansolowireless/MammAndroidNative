@@ -22,6 +22,10 @@ import com.mamm.mammapps.data.model.session.RefreshTokenResponse
 import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
 import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
 import com.mamm.mammapps.data.model.sportsevent.SportsEventListDto
+import com.mamm.mammapps.data.model.loginwithcode.LoginCodeGenerateRequest
+import com.mamm.mammapps.data.model.loginwithcode.LoginCodeGenerateResponseDto
+import com.mamm.mammapps.data.model.loginwithcode.LoginCodeStatusResponseDto
+import com.mamm.mammapps.data.model.loginwithcode.AuthLoginCodeRequest
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -345,4 +349,34 @@ interface ApiService {
         @Url url: String
     ): Response<com.mamm.mammapps.data.model.topchannels.TopChannelsResponseDto>
 
+    // ---------- TV Code ----------
+    @POST("tb-user/tv-code/generate")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json",
+        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_IDM}"
+    )
+    suspend fun generateTvCode(
+        @Body request: LoginCodeGenerateRequest
+    ): Response<LoginCodeGenerateResponseDto>
+
+    @GET("tb-user/tv-code/status/{code}")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json",
+        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_IDM}"
+    )
+    suspend fun checkTvCodeStatus(
+        @Path("code") code: String
+    ): Response<LoginCodeStatusResponseDto>
+
+    @POST("tb-user/tv-code/auth")
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json",
+        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_IDM}"
+    )
+    suspend fun authLoginCode(
+        @Body request: AuthLoginCodeRequest
+    ): Response<Unit>
 }

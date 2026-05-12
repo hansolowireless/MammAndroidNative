@@ -4,10 +4,10 @@ import com.google.gson.annotations.SerializedName
 
 data class LoginResponse(
     @SerializedName("data")
-    val data: LoginData?
+    val data: LoginDataDto?
 )
 
-data class LoginData(
+data class LoginDataDto(
     @SerializedName("token")
     val token: String?,
     @SerializedName("user_id")
@@ -21,21 +21,23 @@ data class LoginData(
     @SerializedName("refresh_token")
     val refreshToken: String?,
     @SerializedName("skin")
-    val skin: Skin?,
+    val skin: SkinDto?,
     @SerializedName("channel_order")
     val channelOrder: String?,
     @SerializedName("ticker_url")
-    val tickerUrl: String? = null
+    val tickerUrl: String? = null,
+    @SerializedName("login_user")
+    val loginUser: String? = null
 )
 
-data class Skin(
+data class SkinDto(
     @SerializedName("operator")
     val operator: String?,
     @SerializedName("logos")
-    val logos: List<SkinLogo>?
+    val logos: List<SkinLogoDto>?
 )
 
-data class SkinLogo(
+data class SkinLogoDto(
     @SerializedName("type")
     val type: String?,
     @SerializedName("url")

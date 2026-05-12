@@ -3,10 +3,13 @@ package com.mamm.mammapps.data.repository
 import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.logger.Logger
+import com.mamm.mammapps.data.mapper.toDomain
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginResponse
 import com.mamm.mammapps.data.datasource.session.SessionDatasource
 import com.mamm.mammapps.domain.interfaces.LoginRepository
+import com.mamm.mammapps.domain.model.loginwithcode.LoginCodeGenerate
+import com.mamm.mammapps.domain.model.loginwithcode.LoginCodeStatus
 import javax.inject.Inject
 
 class LoginRepositoryImpl @Inject constructor(
@@ -18,6 +21,37 @@ class LoginRepositoryImpl @Inject constructor(
 
     companion object {
         private const val TAG = "LoginRepositoryImpl"
+    }
+
+    override suspend fun generateLoginCode(): Result<LoginCodeGenerate> {
+        return runCatching {
+            remoteDataSource.generateLoginCode().toDomain()
+        }
+    }
+
+    override suspend fun checkLoginCodeStatus(code: String): Result<LoginCodeStatus> {
+        return runCatching {
+            remoteDataSource.checkTvCodeStatus(code).let { status ->
+                val loginData = status.data
+                if (loginData != null && loginData.loginUser != null) {
+                    logger.debug(TAG, "checkLoginCodeStatus - guardamos credenciales tras PIN correcto")
+                    clearCaches()
+                    sessionDataSource.saveUserCredentials(
+                        username = loginData.loginUser,
+                        loginData = loginData
+                    )
+                } else {
+                    logger.debug(TAG, "checkLoginCodeStatus - No se guardaron credenciales porque username o loginData son null")
+                }
+                status.toDomain()
+            }
+        }
+    }
+
+    override suspend fun authLoginCode(code: String): Result<Unit> {
+        return runCatching {
+            remoteDataSource.authLoginCode(code)
+        }
     }
 
     override suspend fun login(username: String, password: String): Result<LoginResponse> {

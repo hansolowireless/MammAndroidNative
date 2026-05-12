@@ -1,4 +1,4 @@
-package com.mamm.mammapps.data.mapper.topchannels
+package com.mamm.mammapps.data.mapper
 
 import com.mamm.mammapps.data.model.topchannels.TopChannelDto
 import com.mamm.mammapps.data.model.topchannels.TopChannelsResponseDto

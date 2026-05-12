@@ -8,7 +8,6 @@ import javax.inject.Inject
 
 class AutoLoginUseCase @Inject constructor(
     private val repository: LoginRepository,
-    private val session: SessionDatasource,
     private val logger: Logger
 ) {
     companion object {

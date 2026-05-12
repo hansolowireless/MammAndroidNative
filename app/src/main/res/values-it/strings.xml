@@ -8,6 +8,15 @@
     <string name="yes">Sì</string>
     <string name="no">No</string>
     <string name="do_you_want_exit">Vuoi uscire dall\'applicazione?</string>
+    <string name="tv_code">Codice TV</string>
+    <string name="tv_code_instructions">Accedi con la tua applicazione mobile alla sezione "Informazioni" e inserisci questo codice.</string>
+    <string name="tv_code_expiration">Il codice scadrà tra %d secondi.</string>
+    <string name="tv_code_expired">Il codice è scaduto</string>
+    <string name="request_new_code">Richiedi nuovo codice</string>
+    <string name="auth_tv_code_button">Autentica dispositivo TV</string>
+    <string name="auth_tv_code_dialog_title">Autentica TV</string>
+    <string name="auth_tv_code_dialog_message">Inserisci il codice mostrato sulla TV.</string>
+    <string name="auth_tv_code_success">Dispositivo autenticato con successo.</string>
     <!--region common-->
 
     <!--region Login-->
@@ -118,8 +127,8 @@
     <!--endregion Error-->
 
     <!--region PIN DIALOG-->
-    <string name="pin_dialog_title">Accesso Limitato</string>
-    <string name="pin_dialog_message">Inserisci il tuo PIN per continuare.</string>
+    <string name="parental_pin_dialog_title">Accesso Limitato</string>
+    <string name="parental_pin_dialog_message">Inserisci il tuo PIN per continuare.</string>
     <string name="pin_field_label">PIN</string>
     <string name="confirm_button_label">Conferma</string>
     <string name="cancel_button_label">Annulla</string>

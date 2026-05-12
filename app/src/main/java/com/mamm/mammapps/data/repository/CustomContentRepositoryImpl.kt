@@ -10,7 +10,7 @@ import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
 import com.mamm.mammapps.domain.interfaces.CustomContentRepository
 import com.mamm.mammapps.ui.model.CustomizedContent
 import javax.inject.Inject
-import com.mamm.mammapps.data.mapper.topchannels.toDomain
+import com.mamm.mammapps.data.mapper.toDomain
 
 class CustomContentRepositoryImpl @Inject constructor(
     private val remoteDatasource: RemoteDatasource,

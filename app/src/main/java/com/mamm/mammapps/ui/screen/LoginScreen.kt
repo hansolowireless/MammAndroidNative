@@ -9,7 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamm.mammapps.ui.component.LocalIsTV
@@ -27,13 +26,13 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val loginState by viewModel.loginState.collectAsStateWithLifecycle()
+    val loginCode by viewModel.tvCode.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         if (enableAutologin) {
             viewModel.trytoAutoLogin()
-        }
-        else {
+        } else {
             viewModel.setIdleState()
         }
     }
@@ -69,7 +68,16 @@ fun LoginScreen(
 
             else -> {
                 if (LocalIsTV.current) {
-                    LoginTV(onLogin = { email, password -> viewModel.login(email, password) })
+                    LoginTV(
+                        tvCodeData = loginCode,
+                        onLogin = { email, password -> viewModel.login(email, password) },
+                        onTvCodeTabSelected = {
+                            viewModel.generateTvCode()
+                        },
+                        onCancelCodePoll = {
+                            viewModel.cancelTvCodePolling()
+                        }
+                    )
                 } else {
                     LoginMobile(onLogin = { email, password -> viewModel.login(email, password) })
                 }
