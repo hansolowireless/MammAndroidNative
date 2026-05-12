@@ -10,7 +10,7 @@ import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.player.STokenData
 import com.mamm.mammapps.data.model.player.streamvx.StreamVxTokenRequest
-import com.mamm.mammapps.data.session.SessionManager
+import com.mamm.mammapps.data.datasource.session.SessionDatasource
 import com.mamm.mammapps.data.util.DrmAuthUtil
 import com.mamm.mammapps.domain.interfaces.TokenRepository
 import com.mamm.mammapps.util.AppConstants.Companion.STOKEN_PARAM_NAME
@@ -27,7 +27,7 @@ import javax.inject.Inject
 class TokenRepositoryImpl @Inject constructor(
     private val remoteDatasource: RemoteDatasource,
     private val localDataSource: LocalDataSource,
-    private val sessionManager: SessionManager,
+    private val sessionDatasource: SessionDatasource,
     private val logger: Logger
 ) : TokenRepository {
 
@@ -91,7 +91,6 @@ class TokenRepositoryImpl @Inject constructor(
                 ipCacheTime = System.currentTimeMillis()
             }
             logger.debug(TAG, "refreshIp IP refrescada con éxito")
-            Unit
         }.onFailure { excp ->
             logger.debug(TAG, "refreshIp ❌ No se pudo refrescar la IP")
             Result.failure<Unit>(excp)
@@ -165,8 +164,8 @@ class TokenRepositoryImpl @Inject constructor(
 
             while (retryCount < 3 && finalToken == null) {
                 try {
-                    val userName = localDataSource.getUserCredentials().first ?: ""
-                    val userID = sessionManager.loginData?.userId ?: 0
+                    val userName = sessionDatasource.getUserCredentials().first ?: ""
+                    val userID = sessionDatasource.loginData?.userId ?: 0
                     val operatorName = Config.operatorNameDRM
                     val deviceTypeInt = (if (chromecast) localDataSource.getChromecastDeviceType().toIntOrNull() else localDataSource.getDeviceType().toIntOrNull()) ?: 0
                     val deviceSerial = localDataSource.getDeviceSerial()
@@ -177,7 +176,7 @@ class TokenRepositoryImpl @Inject constructor(
                         deviceTypeStr = deviceTypeInt.toString(),
                         userName = userName,
                         deviceSerial = deviceSerial,
-                        sessionToken = sessionManager.loginData?.token,
+                        sessionToken = sessionDatasource.loginData?.token,
                         drmSecretKey64 = localDataSource.getDrmSecretKey64(),
                         drmiV64 = localDataSource.getDrmiV64(),
                         expireDuration = Duration.ofHours(2),

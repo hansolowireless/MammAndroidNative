@@ -2,7 +2,7 @@ package com.mamm.mammapps.domain.usecases.login
 
 import com.mamm.mammapps.data.config.Config
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.session.SessionManager
+import com.mamm.mammapps.data.datasource.session.SessionDatasource
 import com.mamm.mammapps.domain.interfaces.EPGRepository
 import com.mamm.mammapps.domain.interfaces.LoginRepository
 import javax.inject.Inject
@@ -10,7 +10,6 @@ import javax.inject.Inject
 class LoginUseCase @Inject constructor(
     private val repository: LoginRepository,
     private val epgRepository: EPGRepository,
-    private val session: SessionManager,
     private val logger: Logger
 ) {
     companion object {
@@ -40,17 +39,8 @@ class LoginUseCase @Inject constructor(
             onSuccess = { response ->
                 logger.debug(TAG, "invoke Login successful, ${response.data}")
 
-                //Limpiar credenciales y datos si quedaran
-                //ANTES DE GUARDAR LOS NUEVOS!!!!
+                //Limpiar datos de EPG
                 epgRepository.clearCache()
-                repository.clearCaches()
-
-                //Almacenar los nuevos datos de sesión
-                response.data?.let { session.startNewSession(it) }
-
-                // Guardar credenciales
-                repository.saveUserCredentials(username, password)
-                logger.debug(TAG, "User credentials saved securely")
 
                 Result.success(Unit)
             },

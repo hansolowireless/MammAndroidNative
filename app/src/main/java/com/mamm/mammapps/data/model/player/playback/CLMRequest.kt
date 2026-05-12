@@ -16,18 +16,14 @@ data class CLMRequest(
     val deviceType: String,
 
     @field:SerializedName("operator")
-    val operator: String,
-
-    @field:SerializedName("jwt")
-    val jwt: String
+    val operator: String
 ) {
     fun toQueryMap(): Map<String, String> {
         return mapOf(
             "user" to user,
             "model" to model,
             "type" to deviceType,
-            "operator" to operator,
-            "jwt" to jwt
+            "operator" to operator
         )
     }
 }

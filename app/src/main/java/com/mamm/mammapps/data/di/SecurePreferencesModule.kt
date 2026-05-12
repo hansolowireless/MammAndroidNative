@@ -1,7 +1,8 @@
 package com.mamm.mammapps.data.di
 
 import android.content.Context
-import com.mamm.mammapps.data.local.SecurePreferencesManager
+import com.google.gson.Gson
+import com.mamm.mammapps.data.local.SharedPreferencesManager
 import com.mamm.mammapps.data.logger.Logger
 import dagger.Module
 import dagger.Provides
@@ -16,7 +17,11 @@ object SecurePreferencesModule {
 
     @Provides
     @Singleton
-    fun provideSecurePreferencesManager(@ApplicationContext context: Context, logger: Logger): SecurePreferencesManager {
-        return SecurePreferencesManager(context, logger)
+    fun provideSecurePreferencesManager(
+        @ApplicationContext context: Context,
+        gson: Gson,
+        logger: Logger
+    ): SharedPreferencesManager {
+        return SharedPreferencesManager(context, gson, logger)
     }
 }

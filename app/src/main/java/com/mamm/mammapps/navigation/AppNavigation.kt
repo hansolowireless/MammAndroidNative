@@ -189,7 +189,12 @@ fun NavGraphBuilder.navigationGraph(navController: NavHostController) {
 
         contentItem?.toContentToPlayUI()?.let {
             VideoPlayerScreen(
-                playedContent = it
+                playedContent = it,
+                onSessionExpired = {
+                    navController.navigate(AppRoute.LOGIN.route) {
+                        popUpTo(AppRoute.LOGOUT.route) { inclusive = true }
+                    }
+                }
             )
         }
     }

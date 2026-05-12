@@ -7,6 +7,13 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
+/**
+* Se emplea en el IdmApi.
+* Se puede programar un Timeout más corto si se incluye el TIMEOUT_HEADER en la llamada
+ * Por ejemplo, para obtener el token de StreamVX durante la reproducción de vídeo,
+ * se usa un timeout más corto para que el player reintente rápido en caso de fallo
+ **/
 @Singleton
 class DynamicTimeoutInterceptor @Inject constructor() : Interceptor {
 
@@ -15,7 +22,7 @@ class DynamicTimeoutInterceptor @Inject constructor() : Interceptor {
         val timeoutHeader = request.header(TIMEOUT_HEADER)
 
         return if (timeoutHeader != null) {
-            val timeout = timeoutHeader.toLongOrNull() ?: 30000L // Default si falla el parseo
+            val timeout = timeoutHeader.toLongOrNull() ?: 30000L
 
             val newChain = chain
                 .withConnectTimeout(timeout.toInt(), TimeUnit.MILLISECONDS)

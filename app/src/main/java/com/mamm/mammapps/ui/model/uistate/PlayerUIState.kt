@@ -5,6 +5,7 @@ sealed class PlayerUIState : UIState<Nothing>() {
     data object Playing : PlayerUIState()
     data object Paused : PlayerUIState()
     data class Error(val message: String) : PlayerUIState()
+    data object Session: PlayerUIState()
 }
 
 

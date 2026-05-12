@@ -2,6 +2,7 @@ package com.mamm.mammapps.data.repository
 
 import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
+import com.mamm.mammapps.data.datasource.session.SessionDatasource
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.mapper.toDomain
 import com.mamm.mammapps.domain.model.AboutInfo
@@ -13,6 +14,7 @@ import javax.inject.Inject
 class DiagnosticsRepositoryImpl @Inject constructor(
     private val localDatasource: LocalDataSource,
     private val remoteDatasource: RemoteDatasource,
+    private val sessionDatasource: SessionDatasource,
     private val logger: Logger
 ) : DiagnosticsRepository
 {
@@ -24,7 +26,7 @@ class DiagnosticsRepositoryImpl @Inject constructor(
         return runCatching {
             AboutInfo(
                 appVersion = localDatasource.getApplicationVersion(),
-                userName = localDatasource.getUserCredentials().first.orEmpty(),
+                userName = sessionDatasource.getUserCredentials().first.orEmpty(),
                 userIp = remoteDatasource.getCurrentUserIp()
             )
         }
