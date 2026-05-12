@@ -6,6 +6,7 @@ import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.model.AboutInfo
 import com.mamm.mammapps.domain.usecases.diagnostic.GetAboutInfoUseCase
 import com.mamm.mammapps.domain.usecases.diagnostic.RunFullServerDiagnosticUseCase
+import com.mamm.mammapps.domain.usecases.login.AuthLoginCodeUseCase
 import com.mamm.mammapps.domain.usecases.login.GetOperatorLogoUseCase
 import com.mamm.mammapps.ui.model.uistate.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +21,7 @@ class AboutViewModel @Inject constructor(
     private val getOperatorLogoUseCase: GetOperatorLogoUseCase,
     private val getAboutInfoUseCase: GetAboutInfoUseCase,
     private val runFullServerDiagnosticUseCase: RunFullServerDiagnosticUseCase,
+    private val authLoginCodeUseCase: AuthLoginCodeUseCase,
     private val logger: Logger
 ) : ViewModel() {
 
@@ -35,6 +37,9 @@ class AboutViewModel @Inject constructor(
 
     private val _diagnosticUiState = MutableStateFlow<UIState<*>>(UIState.Idle)
     val diagnosticUiState: StateFlow<UIState<*>> = _diagnosticUiState
+
+    private val _authTvCodeUiState = MutableStateFlow<UIState<Unit>>(UIState.Idle)
+    val authTvCodeUiState: StateFlow<UIState<Unit>> = _authTvCodeUiState
 
     fun getOperatorLogo() {
         viewModelScope.launch (Dispatchers.IO) {
@@ -69,6 +74,23 @@ class AboutViewModel @Inject constructor(
                 _diagnosticUiState.value = UIState.Error(error.message ?: "Unknown error")
             }
         }
+    }
+
+    fun authTvCode(code: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _authTvCodeUiState.value = UIState.Loading
+            authLoginCodeUseCase(code).onSuccess {
+                logger.debug(TAG, "authTvCode: Success")
+                _authTvCodeUiState.value = UIState.Success(Unit)
+            }.onFailure { error ->
+                logger.error(TAG, "authTvCode: Error ${error.message}")
+                _authTvCodeUiState.value = UIState.Error(error.message ?: "Unknown error")
+            }
+        }
+    }
+
+    fun resetAuthTvCodeState() {
+        _authTvCodeUiState.value = UIState.Idle
     }
 
 }

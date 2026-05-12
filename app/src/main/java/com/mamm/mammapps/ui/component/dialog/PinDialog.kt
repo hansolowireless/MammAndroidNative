@@ -24,26 +24,28 @@ import com.mamm.mammapps.ui.component.common.TextInput
 @Composable
 fun PinDialog(
     onDismissRequest: () -> Unit,
-    onConfirm: (pin: String) -> Unit
+    onConfirm: (pin: String) -> Unit,
+    title: String = stringResource(R.string.parental_pin_dialog_title),
+    message: String = stringResource(R.string.parental_pin_dialog_message),
+    isPassword: Boolean = true
 ) {
     var pinValue by remember { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = onDismissRequest,
         title = {
-            Text(text = stringResource(R.string.pin_dialog_title))
+            Text(text = title)
         },
         text = {
             Column {
-                Text(text = stringResource(R.string.pin_dialog_message))
+                Text(text = message)
                 Spacer(modifier = Modifier.height(16.dp))
-                // Usamos tu componente TextInput ya existente
                 TextInput(
                     value = pinValue,
                     onValueChange = { pinValue = it },
                     label = stringResource(R.string.pin_field_label),
                     keyboardType = KeyboardType.NumberPassword,
-                    isPassword = true,
+                    isPassword = isPassword,
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Done,
                         keyboardType = KeyboardType.NumberPassword

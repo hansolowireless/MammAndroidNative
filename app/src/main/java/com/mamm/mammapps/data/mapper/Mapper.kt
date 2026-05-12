@@ -1,21 +1,29 @@
 package com.mamm.mammapps.data.mapper
 
 import com.mamm.mammapps.data.model.diagnostic.DiagResponseDto
+import com.mamm.mammapps.data.model.login.LoginDataDto
+import com.mamm.mammapps.data.model.login.SkinDto
+import com.mamm.mammapps.data.model.login.SkinLogoDto
 import com.mamm.mammapps.data.model.player.GetTickersResponseDto
 import com.mamm.mammapps.data.model.player.TickerDto
 import com.mamm.mammapps.data.model.sportsevent.SportsEventDto
+import com.mamm.mammapps.data.util.formatNodeUrl
 import com.mamm.mammapps.domain.model.DiagnosticInfo
 import com.mamm.mammapps.domain.model.SportsEvent
+import com.mamm.mammapps.domain.model.loginwithcode.LoginData
+import com.mamm.mammapps.domain.model.loginwithcode.Skin
+import com.mamm.mammapps.domain.model.loginwithcode.SkinLogo
 import com.mamm.mammapps.domain.model.player.Ticker
 import com.mamm.mammapps.domain.model.player.TickerInfo
+import com.mamm.mammapps.util.orRandom
 import com.mamm.mammapps.util.parseSportEventDate
 
 fun DiagResponseDto.toDomain(): DiagnosticInfo {
     return DiagnosticInfo(
-        node1Url = formatUrl(this.nodeHA.node01),
-        node2Url = formatUrl(this.nodeHA.node02),
-        node3Url = formatUrl(this.nodeDir.node01),
-        node4Url = formatUrl(this.nodeDir.node02)
+        node1Url = formatNodeUrl(this.nodeHA.node01),
+        node2Url = formatNodeUrl(this.nodeHA.node02),
+        node3Url = formatNodeUrl(this.nodeDir.node01),
+        node4Url = formatNodeUrl(this.nodeDir.node02)
     )
 }
 
@@ -50,19 +58,35 @@ fun TickerDto.toDomain() : Ticker {
     )
 }
 
-private fun formatUrl(rawUrl: String?): String {
-    if (rawUrl.isNullOrBlank()) return ""
+fun LoginDataDto.toDomain() : LoginData {
 
-    // 1. Limpiar espacios y asegurar protocolo https
-    val baseUrl = if (rawUrl.startsWith("http", ignoreCase = true)) {
-        rawUrl.trim()
-    } else {
-        "https://${rawUrl.trim()}"
+    fun SkinLogoDto.toDomain() : SkinLogo {
+        return SkinLogo(
+            type = this.type,
+            url = this.url
+        )
     }
 
-    // 2. Eliminar la barra diagonal final si existe para evitar doble barra (//)
-    val cleanBaseUrl = baseUrl.removeSuffix("/")
+    fun SkinDto.toDomain() : Skin {
+        return Skin(
+            operator = this.operator,
+            logos = this.logos?.map { it.toDomain() }
+        )
+    }
 
-    // 3. Añadir el path específico requerido
-    return "$cleanBaseUrl/media_0.ts"
+    return LoginData(
+        token = this.token,
+        userId = this.userId,
+        jsonFile = this.jsonFile,
+        pinparental = this.pinparental,
+        jwtoken = this.jwtoken,
+        refreshToken = this.refreshToken,
+        skin = this.skin?.toDomain(),
+        channelOrder = this.channelOrder,
+        tickerUrl = this.tickerUrl,
+        loginUser = this.loginUser
+    )
 }
+
+
+

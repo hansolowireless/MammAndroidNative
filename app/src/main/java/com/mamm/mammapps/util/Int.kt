@@ -13,3 +13,7 @@ fun Int?.orRandom() : Int {
 fun getRandomHashCode() : Int {
     return Uuid.random().hashCode().absoluteValue
 }
+
+fun Int.secondsToMiilliseconds() : Long {
+    return this * 1000L
+}

@@ -1,17 +1,16 @@
 package com.mamm.mammapps.data.datasource.session
 
 import com.mamm.mammapps.data.local.SharedPreferencesManager
-import com.mamm.mammapps.data.model.login.LoginData
+import com.mamm.mammapps.data.model.login.LoginDataDto
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.math.log
 
 @Singleton
 class SessionDatasource @Inject constructor(
     private val sharedPreferencesManager: SharedPreferencesManager
 ) {
     // Datos que vienen directamente de la API
-    var loginData: LoginData? = null
+    var loginData: LoginDataDto? = null
         private set
 
     // Datos derivados o procesados
@@ -35,12 +34,12 @@ class SessionDatasource @Inject constructor(
         }
     }
 
-    private fun startNewSession(data: LoginData) {
+    private fun startNewSession(data: LoginDataDto) {
         sharedPreferencesManager.setLoginData(data)
         processLoginData(data)
     }
 
-    private fun processLoginData(data: LoginData) {
+    private fun processLoginData(data: LoginDataDto) {
         //Asignar el login data
         loginData = data
 
@@ -76,8 +75,8 @@ class SessionDatasource @Inject constructor(
 
     fun saveUserCredentials(
         username: String,
-        password: String,
-        loginData: LoginData
+        password: String? = null,
+        loginData: LoginDataDto
     ) {
         startNewSession(loginData)
         sharedPreferencesManager.saveCredentials(

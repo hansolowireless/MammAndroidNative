@@ -35,6 +35,10 @@ import com.mamm.mammapps.domain.model.DownloadSpeedResult
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
+import com.mamm.mammapps.data.model.loginwithcode.LoginCodeGenerateRequest
+import com.mamm.mammapps.data.model.loginwithcode.LoginCodeGenerateResponseDto
+import com.mamm.mammapps.data.model.loginwithcode.LoginCodeStatusResponseDto
+import com.mamm.mammapps.data.model.loginwithcode.AuthLoginCodeRequest
 import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
 import com.mamm.mammapps.data.model.player.GetTickersResponseDto
@@ -85,6 +89,7 @@ class RemoteDatasource @Inject constructor(
         private const val BUFFER_SIZE = 8192
     }
 
+    //----------region LOGIN---------//
     suspend fun login(username: String, password: String): LoginResponse {
         val response = idmApi.login(
             LoginRequest(
@@ -101,6 +106,42 @@ class RemoteDatasource @Inject constructor(
     suspend fun checkLocator(userName: String): LocatorResponse {
         return locatorApi.checkLocator(userName)
     }
+    suspend fun generateLoginCode(): LoginCodeGenerateResponseDto {
+        return withContext(Dispatchers.IO) {
+            val request = LoginCodeGenerateRequest(
+                deviceType = deviceType,
+                deviceSerial = deviceSerial
+            )
+            val response = idmApi.generateTvCode(request)
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()?.string()?.toResponseBody()
+                throw HttpException(Response.error<Any>(response.code(), errorBody))
+            }
+            response.body() ?: throw IllegalStateException("Response body is null")
+        }
+    }
+    suspend fun checkTvCodeStatus(code: String): LoginCodeStatusResponseDto {
+        return withContext(Dispatchers.IO) {
+            val response = idmApi.checkTvCodeStatus(code)
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()?.string()?.toResponseBody()
+                throw HttpException(Response.error<Any>(response.code(), errorBody))
+            }
+            response.body() ?: throw IllegalStateException("Response body is null")
+        }
+    }
+
+    suspend fun authLoginCode(code: String) {
+        return withContext(Dispatchers.IO) {
+            val request = AuthLoginCodeRequest(code = code)
+            val response = idmApi.authLoginCode(request)
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()?.string()?.toResponseBody()
+                throw HttpException(Response.error<Any>(response.code(), errorBody))
+            }
+        }
+    }
+    //----------endregion LOGIN---------//
 
     fun getOperatorLogoUrl(): String? {
         return sessionManager.operatorLogoUrl

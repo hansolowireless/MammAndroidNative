@@ -1,6 +1,5 @@
 package com.mamm.mammapps.ui.screen
 
-import android.util.Log
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,7 +32,6 @@ import com.mamm.mammapps.ui.component.home.HomeGridTop
 import com.mamm.mammapps.ui.component.home.OperatorLogoBottomRight
 import com.mamm.mammapps.ui.mapper.toContentToPlayUI
 import com.mamm.mammapps.ui.mapper.toResId
-import com.mamm.mammapps.ui.mapper.toResponseBodyMessage
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.uistate.CastState
@@ -41,7 +39,6 @@ import com.mamm.mammapps.ui.model.uistate.HomeContentUIState
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.viewmodel.CastViewModel
 import com.mamm.mammapps.ui.viewmodel.HomeViewModel
-import retrofit2.HttpException
 
 
 @Composable
