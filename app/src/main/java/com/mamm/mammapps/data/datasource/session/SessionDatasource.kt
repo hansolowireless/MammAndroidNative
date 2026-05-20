@@ -26,6 +26,7 @@ class SessionDatasource @Inject constructor(
     val jwToken: String? get() = loginData?.jwtoken
     val pinParental: String? get() = loginData?.pinparental
     val operatorLogoUrl : String? get() = skinImages[5001] ?: skinImages[1501]
+    val refreshToken: String? get() = loginData?.refreshToken
 
     init {
         val restoredData = sharedPreferencesManager.getLoginData()
@@ -93,14 +94,8 @@ class SessionDatasource @Inject constructor(
     /*
     * Actualiza el token de sesión (refresh) y el access
     */
-    fun updateToken(newRefresh: String, newAccess: String) {
-        val currentData = loginData ?: return
-        currentData.copy(
-            refreshToken = newRefresh,
-            jwtoken = newAccess
-        ).let { updatedData ->
-            startNewSession(updatedData)
-        }
+    fun updateLoginData(newLoginData: LoginDataDto) {
+        startNewSession(newLoginData)
     }
 
     fun isHoreca(): Boolean {

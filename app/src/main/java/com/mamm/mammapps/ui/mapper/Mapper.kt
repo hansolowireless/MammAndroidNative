@@ -149,8 +149,8 @@ fun HomeFeatured.toContentEntityUI(): ContentEntityUI? {
             id = id,
             channelById = channelById
         ),
-        imageUrl = imageUrl,
-        horizontalImageUrl = logoURL.orEmpty(),
+        imageUrl = logoURL.orEmpty(),
+        horizontalImageUrl = imageUrl,
         title = title.orEmpty(),
         isFeatured = true,
         detailInfo = DetailInfoUI(

@@ -17,44 +17,13 @@ class AutoLoginUseCase @Inject constructor(
     suspend operator fun invoke(): Result<Unit> {
         logger.debug(TAG, "Checking for stored credentials...")
 
-        return repository.getCredentials().fold(
-            onSuccess = { (username, password) ->
-                if (username != null && password != null) {
-                    logger.debug(TAG, "autologinUseCase Found valid credentials, attempting auto-login...")
-                    if (Config.shouldUseDynamicUrls) {
-                        repository.checkLocator(username)
-                            .onSuccess { locatorResponse ->
-                                logger.debug(TAG, "invoke Received locator response: $locatorResponse")
-                                Config.updateDynamicUrls(locatorResponse)
-                                repository.setShowBrandedContentMenus(false)
-                            }
-                            .onFailure {
-                                logger.error(TAG, "invoke Locator failed: $it")
-                                Config.resetDynamicUrls()
-                                repository.setShowBrandedContentMenus(true)
-                            }
-                    }
-                    else {
-                        repository.setShowBrandedContentMenus(true)
-                    }
-
-                    repository.login(username, password).fold(
-                        onSuccess = { response ->
-                            logger.debug(TAG, "autologinUseCase Auto-login successful")
-                            Result.success(Unit)
-                        },
-                        onFailure = { exception ->
-                            logger.debug(TAG, "autologinUseCase Auto-login failed: ${exception.message}")
-                            Result.failure(exception)
-                        }
-                    )
-                } else {
-                    logger.debug(TAG, "autologinUseCase Stored credentials are incomplete")
-                    Result.failure(Exception("autologinUseCase Incomplete credentials"))
-                }
+        return repository.autoLogin().fold(
+            onSuccess = {
+                logger.debug(TAG, "autologinUseCase Auto-login successful")
+                Result.success(Unit)
             },
             onFailure = { exception ->
-                logger.debug(TAG, "autologinUseCase No valid stored credentials: ${exception.message}")
+                logger.debug(TAG, "autologinUseCase Auto-login failed: ${exception.message}")
                 Result.failure(exception)
             }
         )
