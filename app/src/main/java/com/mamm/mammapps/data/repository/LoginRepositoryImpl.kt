@@ -4,8 +4,10 @@ import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.mapper.toDomain
+import com.mamm.mammapps.data.config.Config
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginResponse
+import com.mamm.mammapps.data.model.session.RefreshTokenRequest
 import com.mamm.mammapps.data.datasource.session.SessionDatasource
 import com.mamm.mammapps.domain.interfaces.LoginRepository
 import com.mamm.mammapps.domain.model.loginwithcode.LoginCodeGenerate
@@ -56,6 +58,7 @@ class LoginRepositoryImpl @Inject constructor(
 
     override suspend fun login(username: String, password: String): Result<LoginResponse> {
         return runCatching {
+            updateLocatorConfiguration(username)
             remoteDataSource.login(username, password)
         }.onSuccess { response ->
             response.data?.let {
@@ -69,9 +72,62 @@ class LoginRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun autoLogin(): Result<Unit> {
+        return runCatching {
+            val username = sessionDataSource.getUserCredentials().first
+            
+            updateLocatorConfiguration(username)
+
+            val refreshToken = sessionDataSource.refreshToken
+            if (!refreshToken.isNullOrEmpty()) {
+                try {
+                    val response = remoteDataSource.refreshToken(RefreshTokenRequest(refreshToken))
+                    response.data?.let { newLoginData ->
+                        sessionDataSource.updateLoginData(newLoginData)
+                        return@runCatching
+                    }
+                } catch (e: Exception) {
+                    logger.debug(TAG, "Refresh token failed, falling back to credentials: ${e.message}")
+                }
+            }
+            
+            val password = sessionDataSource.getUserCredentials().second
+            if (username.isNullOrEmpty() || password.isNullOrEmpty()) {
+                throw IllegalStateException("No valid refresh token or stored credentials")
+            }
+            
+            val response = remoteDataSource.login(username, password)
+            response.data?.let {
+                clearCaches()
+                sessionDataSource.saveUserCredentials(
+                    username = username,
+                    password = password,
+                    loginData = it
+                )
+            } ?: throw IllegalStateException("login response data is null")
+        }
+    }
+
     override suspend fun checkLocator(username: String): Result<LocatorResponse> {
         return runCatching {
             remoteDataSource.checkLocator(username)
+        }
+    }
+
+    private suspend fun updateLocatorConfiguration(username: String?) {
+        if (!username.isNullOrEmpty() && Config.shouldUseDynamicUrls) {
+            try {
+                val locatorResponse = remoteDataSource.checkLocator(username)
+                logger.debug(TAG, "updateLocatorConfiguration Received locator response: $locatorResponse")
+                Config.updateDynamicUrls(locatorResponse)
+                setShowBrandedContentMenus(false)
+            } catch (e: Exception) {
+                logger.error(TAG, "updateLocatorConfiguration Locator request failed: ${e.message}")
+                Config.resetDynamicUrls()
+                setShowBrandedContentMenus(true)
+            }
+        } else {
+            setShowBrandedContentMenus(true)
         }
     }
 
@@ -96,21 +152,6 @@ class LoginRepositoryImpl @Inject constructor(
         return runCatching {
             remoteDataSource.getOperatorLogoUrl() ?: throw IllegalStateException("Operator logo URL is null")
         }
-    }
-
-    override suspend fun getCredentials(): Result<Pair<String?, String?>> {
-        return runCatching {
-            val credentials = sessionDataSource.getUserCredentials()
-            val (username, password) = credentials
-            if (username.isNullOrEmpty() || password.isNullOrEmpty()) {
-                throw IllegalStateException("Invalid credentials: username or password is null/empty")
-            }
-            username to password
-        }
-    }
-
-    override fun setSessionToken(newRefresh: String, newAccess: String) {
-        sessionDataSource.updateToken(newRefresh, newAccess)
     }
 
     override fun clearCaches() : Result<Unit> {

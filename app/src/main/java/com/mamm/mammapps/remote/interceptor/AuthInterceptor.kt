@@ -1,11 +1,9 @@
 package com.mamm.mammapps.remote.interceptor
 
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
-import com.mamm.mammapps.data.di.IdmApi
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.session.RefreshTokenRequest
 import com.mamm.mammapps.data.datasource.session.SessionDatasource
-import com.mamm.mammapps.remote.ApiService
 import com.mamm.mammapps.remote.ApiServiceConstant.AUTHORIZATION_HEADER
 import com.mamm.mammapps.remote.ApiServiceConstant.AUTHORIZATION_TYPE_BEARER
 import dagger.Lazy
@@ -17,7 +15,7 @@ import javax.inject.Inject
 
 class AuthInterceptor @Inject constructor(
     private val remoteDatasource: Lazy<RemoteDatasource>,
-    private val sessionDatsource: SessionDatasource,
+    private val sessionDatasource: SessionDatasource,
     private val logger: Logger
 ) : Interceptor {
 
@@ -30,7 +28,7 @@ class AuthInterceptor @Inject constructor(
         val originalRequest = chain.request()
 
         val authenticatedRequest = originalRequest.newBuilder()
-            .header(AUTHORIZATION_HEADER, "$AUTHORIZATION_TYPE_BEARER${sessionDatsource.jwToken}")
+            .header(AUTHORIZATION_HEADER, "$AUTHORIZATION_TYPE_BEARER${sessionDatasource.jwToken}")
             .build()
 
         val response = chain.proceed(authenticatedRequest)
@@ -40,7 +38,7 @@ class AuthInterceptor @Inject constructor(
         ) {
 
             synchronized(this) {
-                val currentAccessToken = sessionDatsource.jwToken
+                val currentAccessToken = sessionDatasource.jwToken
                 val requestToken = authenticatedRequest.header(AUTHORIZATION_HEADER)
                     ?.removePrefix(AUTHORIZATION_TYPE_BEARER)
 
@@ -52,7 +50,7 @@ class AuthInterceptor @Inject constructor(
                     return chain.proceed(retryRequest)
                 }
 
-                sessionDatsource.loginData?.refreshToken?.let { refreshTokenStr ->
+                sessionDatasource.loginData?.refreshToken?.let { refreshTokenStr ->
                     runBlocking {
                         try {
                             remoteDatasource.get().refreshToken(RefreshTokenRequest(refreshTokenStr))
@@ -60,31 +58,21 @@ class AuthInterceptor @Inject constructor(
                             null
                         }
                     }?.let { refreshResponse ->
-                        refreshResponse.data?.let { body ->
-                            val newRefresh = body.refreshToken ?: refreshTokenStr
-                            val newAccess = body.jwtoken
+                        refreshResponse.data?.let { newLoginData ->
+                            sessionDatasource.updateLoginData(newLoginData)
+                            logger.info(TAG, "intercept - success refreshing and updating token")
 
-                            if (newAccess != null) {
-                                sessionDatsource.updateToken(newRefresh, newAccess)
-                                logger.info(TAG, "intercept - success refreshing and updating token")
-
-                                response.close()
-                                val newRequest = originalRequest.newBuilder()
-                                    .header(
-                                        AUTHORIZATION_HEADER,
-                                        "$AUTHORIZATION_TYPE_BEARER$newAccess"
-                                    )
-                                    .build()
-                                return chain.proceed(newRequest)
-                            } else {
-                                logger.error(
-                                    TAG,
-                                    "intercept - failed refreshing token, accessToken in response is null"
+                            response.close()
+                            val newRequest = originalRequest.newBuilder()
+                                .header(
+                                    AUTHORIZATION_HEADER,
+                                    "$AUTHORIZATION_TYPE_BEARER${newLoginData.jwtoken}"
                                 )
-                            }
+                                .build()
+                            return chain.proceed(newRequest)
+
                         }
                     }
-
                 }
             }
         }
