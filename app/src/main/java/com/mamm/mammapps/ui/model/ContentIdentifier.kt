@@ -25,6 +25,7 @@ sealed class ContentIdentifier : Parcelable {
             "live" -> Channel(channelById ?: 0)
             "vod" -> VoD(id)
             "cutv" -> Event(id)
+            "still" -> Serie(id)
             else -> VoD(id)
         }
     }
