@@ -64,6 +64,14 @@ fun configureFlavorWithMasmediaUrls(
     iconMobile: String,
     iconRound: String,
     banner: String,
+    // Valores de Masmedia por defecto. Se pueden cambiar a demanda si un operador necesita una modificación
+    locatorUrl: String = "https://locator.service.openstream.es/",
+    baseUrl: String = "https://dyncont.masmediatv.es/",
+    idmUrl: String = "https://idm.masmediatv.es/",
+    metricsUrl: String = "https://metrics.service.openstream.es/",
+    searchUrl: String = "https://indexsrv-masmediatv.service.openstream.es/",
+    passwordUrl: String = "https://gestionclientes.masmediatv.es/masmediatv_mngr/",
+    staticServiceUrl: String = "https://static.masmediatv.com/",
     signingConfig: ApkSigningConfig? = null
 ) {
     configureCustomFlavor(
@@ -74,13 +82,13 @@ fun configureFlavorWithMasmediaUrls(
         iconMobile = iconMobile,
         iconRound = iconRound,
         banner = banner,
-        locatorUrl = "https://locator.service.openstream.es/",
-        baseUrl = "https://dyncont.masmediatv.es/",
-        idmUrl = "https://idm.masmediatv.es/",
-        metricsUrl = "https://metrics.service.openstream.es/",
-        searchUrl = "https://indexsrv-masmediatv.service.openstream.es/",
-        passwordUrl = "https://gestionclientes.masmediatv.es/masmediatv_mngr/",
-        staticServiceUrl = "https://static.masmediatv.com/",
+        locatorUrl = locatorUrl,
+        baseUrl = baseUrl,
+        idmUrl = idmUrl,
+        metricsUrl = metricsUrl,
+        searchUrl = searchUrl,
+        passwordUrl = passwordUrl,
+        staticServiceUrl = staticServiceUrl,
         dynamicUrls = true,
         operatorNameDRM = "masmediatv",
         signingConfig = signingConfig
@@ -95,7 +103,7 @@ android {
         applicationId = "com.mamm.mammapps"
         minSdk = 21
         targetSdk = 35
-        versionCode = 547
+        versionCode = 548
         versionName = "4.8.032"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -198,6 +206,8 @@ android {
             iconMobile = "@mipmap/ic_launcher_fibrazo",
             iconRound = "@mipmap/ic_launcher_fibrazo_round",
             banner = "@drawable/banner_fibrazo",
+            //La función de PIN requiere que apunte a Colombia por defecto
+            idmUrl = "https://idm.co.masmediatv.es/",
             signingConfig = signingConfigs.getByName("keystoreMamm")
         )
 
