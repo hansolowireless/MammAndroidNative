@@ -112,7 +112,7 @@ class RemoteDatasource @Inject constructor(
                 deviceType = deviceType,
                 deviceSerial = deviceSerial
             )
-            val response = idmApi.generateTvCode(request)
+            val response = locatorApi.generateTvCode(request)
             if (!response.isSuccessful) {
                 val errorBody = response.errorBody()?.string()?.toResponseBody()
                 throw HttpException(Response.error<Any>(response.code(), errorBody))
@@ -122,7 +122,7 @@ class RemoteDatasource @Inject constructor(
     }
     suspend fun checkTvCodeStatus(code: String): LoginCodeStatusResponseDto {
         return withContext(Dispatchers.IO) {
-            val response = idmApi.checkTvCodeStatus(code)
+            val response = locatorApi.checkTvCodeStatus(code)
             if (!response.isSuccessful) {
                 val errorBody = response.errorBody()?.string()?.toResponseBody()
                 throw HttpException(Response.error<Any>(response.code(), errorBody))
@@ -132,12 +132,19 @@ class RemoteDatasource @Inject constructor(
     }
 
     suspend fun authLoginCode(code: String) {
-        return withContext(Dispatchers.IO) {
-            val request = AuthLoginCodeRequest(code = code)
-            val response = idmApi.authLoginCode(request)
-            if (!response.isSuccessful) {
-                val errorBody = response.errorBody()?.string()?.toResponseBody()
-                throw HttpException(Response.error<Any>(response.code(), errorBody))
+        withContext(Dispatchers.IO) {
+            // Obtenemos el username y lanzamos excepción si no existe, todo en una línea
+            val user = securePreferencesManager.getCredentials().first
+                ?: throw IllegalArgumentException("Username must not be null")
+
+            with(locatorApi.authLoginCode(AuthLoginCodeRequest(
+                code = code,
+                login = user
+            ))) {
+                if (!isSuccessful) {
+                    val errorBody = errorBody()?.string()?.toResponseBody()
+                    throw HttpException(Response.error<Any>(code(), errorBody))
+                }
             }
         }
     }

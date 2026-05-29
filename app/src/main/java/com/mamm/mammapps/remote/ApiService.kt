@@ -350,31 +350,28 @@ interface ApiService {
     ): Response<com.mamm.mammapps.data.model.topchannels.TopChannelsResponseDto>
 
     // ---------- TV Code ----------
-    @POST("tb-user/tv-code/generate")
+    @POST("locator/tv-code/generate")
     @Headers(
         "Content-Type: application/json",
-        "Accept: application/json",
-        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_IDM}"
+        "Accept: application/json"
     )
     suspend fun generateTvCode(
         @Body request: LoginCodeGenerateRequest
     ): Response<LoginCodeGenerateResponseDto>
 
-    @GET("tb-user/tv-code/status/{code}")
+    @GET("locator/tv-code/status/{code}")
     @Headers(
         "Content-Type: application/json",
-        "Accept: application/json",
-        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_IDM}"
+        "Accept: application/json"
     )
     suspend fun checkTvCodeStatus(
         @Path("code") code: String
     ): Response<LoginCodeStatusResponseDto>
 
-    @POST("tb-user/tv-code/auth")
+    @POST("locator/tv-code/auth")
     @Headers(
         "Content-Type: application/json",
-        "Accept: application/json",
-        "${ApiServiceConstant.URL_TYPE_HEADER}:${ApiServiceConstant.URL_TYPE_IDM}"
+        "Accept: application/json"
     )
     suspend fun authLoginCode(
         @Body request: AuthLoginCodeRequest

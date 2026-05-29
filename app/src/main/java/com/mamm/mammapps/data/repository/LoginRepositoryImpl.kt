@@ -42,6 +42,7 @@ class LoginRepositoryImpl @Inject constructor(
                         username = loginData.loginUser,
                         loginData = loginData
                     )
+                    updateLocatorConfiguration(loginData.loginUser)
                 } else {
                     logger.debug(TAG, "checkLoginCodeStatus - No se guardaron credenciales porque username o loginData son null")
                 }
