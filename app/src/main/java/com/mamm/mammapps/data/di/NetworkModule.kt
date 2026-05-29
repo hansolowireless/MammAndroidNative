@@ -125,10 +125,17 @@ object NetworkModule {
     @LocatorApi
     @Provides
     @Singleton
-    fun provideLocatorRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    fun provideLocatorRetrofit(
+        okHttpClient: OkHttpClient,
+        authInterceptor: AuthInterceptor
+        ): Retrofit {
+        val locatorClient = okHttpClient.newBuilder()
+            .addInterceptor(authInterceptor)
+            .build()
+
         return Retrofit.Builder()
             .baseUrl(Config.locatorUrl)
-            .client(okHttpClient)
+            .client(locatorClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
