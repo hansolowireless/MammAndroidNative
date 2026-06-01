@@ -103,8 +103,8 @@ android {
         applicationId = "com.mamm.mammapps"
         minSdk = 21
         targetSdk = 35
-        versionCode = 551
-        versionName = "4.8.034"
+        versionCode = 552
+        versionName = "4.8.035"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -219,7 +219,7 @@ android {
             iconMobile = "@mipmap/ic_launcher_eligetv",
             iconRound = "@mipmap/ic_launcher_eligetv_round",
             banner = "@drawable/banner_eligetv",
-            locatorUrl = "https://locator.service.openstream.es/",
+            locatorUrl = "https://idm.openstream.es/",
             baseUrl = "https://dyncont.openstream.es/",
             idmUrl = "https://idm.openstream.es/",
             metricsUrl = "https://metrics.service.openstream.es/",
