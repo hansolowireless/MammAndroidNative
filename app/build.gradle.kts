@@ -219,7 +219,7 @@ android {
             iconMobile = "@mipmap/ic_launcher_eligetv",
             iconRound = "@mipmap/ic_launcher_eligetv_round",
             banner = "@drawable/banner_eligetv",
-            locatorUrl = "http://locator.service.openstream.es/",
+            locatorUrl = "https://locator.service.openstream.es/",
             baseUrl = "https://dyncont.openstream.es/",
             idmUrl = "https://idm.openstream.es/",
             metricsUrl = "https://metrics.service.openstream.es/",
