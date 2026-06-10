@@ -3,7 +3,7 @@ package com.mamm.mammapps.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.domain.model.AboutInfo
+import com.mamm.mammapps.domain.model.about.AboutInfo
 import com.mamm.mammapps.domain.usecases.diagnostic.GetAboutInfoUseCase
 import com.mamm.mammapps.domain.usecases.diagnostic.RunFullServerDiagnosticUseCase
 import com.mamm.mammapps.domain.usecases.login.AuthLoginCodeUseCase

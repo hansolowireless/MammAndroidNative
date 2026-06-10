@@ -3,9 +3,9 @@ package com.mamm.mammapps.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.Channel
-import com.mamm.mammapps.data.model.epg.EPGChannelContent
-import com.mamm.mammapps.data.model.section.EPGEvent
+import com.mamm.mammapps.domain.model.entity.Channel
+import com.mamm.mammapps.domain.model.epg.EPGChannelContent
+import com.mamm.mammapps.domain.model.entity.Event
 import com.mamm.mammapps.domain.usecases.FindContentEntityUseCase
 import com.mamm.mammapps.domain.usecases.content.GetEPGContentUseCase
 import com.mamm.mammapps.navigation.model.AppRoute
@@ -58,7 +58,7 @@ class EPGViewModel @Inject constructor(
         }
     }
 
-    fun findChannel (event: EPGEvent) {
+    fun findChannel (event: Event) {
         val channelIdentifier = ContentIdentifier.Channel(event.getChannelId())
 
         findContentEntityUseCase(

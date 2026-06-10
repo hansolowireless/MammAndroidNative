@@ -30,8 +30,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.mamm.mammapps.data.model.epg.EPGChannelContent
-import com.mamm.mammapps.data.model.section.EPGEvent
+import com.mamm.mammapps.domain.model.epg.EPGChannelContent
+import com.mamm.mammapps.domain.model.entity.Event
 import com.mamm.mammapps.ui.mapper.toContentEPGUI
 import com.mamm.mammapps.ui.theme.EPGMobileColor
 import eu.wewox.programguide.ProgramGuide
@@ -47,7 +47,7 @@ import kotlin.math.roundToInt
 fun EPGMobile(
     modifier: Modifier = Modifier,
     content: List<EPGChannelContent>,
-    onEventClicked: (EPGEvent) -> Unit,
+    onEventClicked: (Event) -> Unit,
     selectedDate: LocalDate,
     onDateSelected: (LocalDate) -> Unit,
 ) {
@@ -184,7 +184,7 @@ private fun ChannelCell(row: EPGChannelContent, modifier: Modifier = Modifier) {
 
 @Composable
 private fun ProgramCell(
-    program: EPGEvent,
+    program: Event,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
 ) {
@@ -229,7 +229,7 @@ private fun ProgramCell(
             contentAlignment = Alignment.CenterStart
         ) {
             Text(
-                text = program.getTitle(),
+                text = program.title,
                 color = if (program.isLive()) EPGMobileColor.eventCellTextLive
                 else EPGMobileColor.eventCellText,
                 fontSize = 12.sp,

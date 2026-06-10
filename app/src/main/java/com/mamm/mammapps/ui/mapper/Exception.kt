@@ -1,12 +1,9 @@
 package com.mamm.mammapps.ui.mapper
 
-import com.google.gson.Gson
 import com.mamm.mammapps.R
-import com.mamm.mammapps.data.model.exception.ErrorResponse
-import com.mamm.mammapps.data.model.exception.GetHomeContentException
-import com.mamm.mammapps.data.model.exception.GetMemoriesException
-import com.mamm.mammapps.data.model.exception.LoginException
-import retrofit2.HttpException
+import com.mamm.mammapps.domain.model.exception.GetHomeContentException
+import com.mamm.mammapps.domain.model.exception.GetMemoriesException
+import com.mamm.mammapps.domain.model.exception.LoginException
 
 fun GetHomeContentException.toResId(): Int {
     return when (this) {
@@ -37,14 +34,6 @@ fun Throwable.toResId(): Int {
         is GetMemoriesException -> toResId()
         else -> R.string.error_content_generic
     }
-}
-
-fun HttpException?.toResponseBodyMessage(): String {
-    val result = runCatching {
-        val errorBody = this?.response()?.errorBody()?.string()
-        Gson().fromJson(errorBody, ErrorResponse::class.java).message
-    }
-    return result.getOrNull() ?: this?.message().orEmpty()
 }
 
 

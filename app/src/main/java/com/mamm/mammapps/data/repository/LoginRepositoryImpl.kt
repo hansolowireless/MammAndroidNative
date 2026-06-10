@@ -57,17 +57,16 @@ class LoginRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun login(username: String, password: String): Result<LoginResponse> {
+    override suspend fun login(username: String, password: String): Result<Unit> {
         return runCatching {
             updateLocatorConfiguration(username)
-            remoteDataSource.login(username, password)
-        }.onSuccess { response ->
+            val response = remoteDataSource.login(username, password)
             response.data?.let {
                 clearCaches()
                 sessionDataSource.saveUserCredentials(
                     username = username,
                     password = password,
-                    loginData = response.data
+                    loginData = it
                 )
             } ?: throw IllegalStateException("login - response data is null")
         }
@@ -109,7 +108,7 @@ class LoginRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun checkLocator(username: String): Result<LocatorResponse> {
+    suspend fun checkLocator(username: String): Result<LocatorResponse> {
         return runCatching {
             remoteDataSource.checkLocator(username)
         }

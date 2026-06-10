@@ -1,8 +1,8 @@
 package com.mamm.mammapps.domain.usecases.content
 
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.Channel
 import com.mamm.mammapps.domain.interfaces.EPGRepository
+import com.mamm.mammapps.domain.model.entity.Channel
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -25,7 +25,7 @@ class FindChannelForMatchUseCase @Inject constructor(
             }
             
             // 1. Direct exact match (e.g popup channels fully named after the match, or EPG event exact match)
-            val exactMatch = liveChannels.find { it.second.getTitle().equals(eventTitle, ignoreCase = true) }
+            val exactMatch = liveChannels.find { it.second.title.equals(eventTitle, ignoreCase = true) }
             if (exactMatch != null) {
                 logger.debug(TAG, "Found exact live event match for: $eventTitle")
                 return@mapCatching exactMatch.first
@@ -41,7 +41,7 @@ class FindChannelForMatchUseCase @Inject constructor(
 
                         // Find any live event that contains AT LEAST ONE team name in its title
                         val matchByTeams = liveChannels.find { pair ->
-                            val liveEventTitle = pair.second.getTitle()
+                            val liveEventTitle = pair.second.title
                             liveEventTitle.contains(teamA, ignoreCase = true) || 
                             liveEventTitle.contains(teamB, ignoreCase = true)
                         }

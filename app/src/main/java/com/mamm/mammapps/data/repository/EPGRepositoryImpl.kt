@@ -3,16 +3,16 @@ package com.mamm.mammapps.data.repository
 import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.epg.EPGChannelContent
-import com.mamm.mammapps.data.model.epg.MultiDayEPG
-import com.mamm.mammapps.data.model.section.EPGEvent
+import com.mamm.mammapps.data.mapper.toDomain
 import com.mamm.mammapps.domain.interfaces.EPGRepository
+import com.mamm.mammapps.domain.model.epg.EPGChannelContent
+import com.mamm.mammapps.domain.model.epg.MultiDayEPG
+import com.mamm.mammapps.domain.model.entity.Event
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import java.time.LocalDate
 import javax.inject.Inject
-
 
 class EPGRepositoryImpl @Inject constructor(
     private val remoteDataSource: RemoteDatasource,
@@ -41,20 +41,23 @@ class EPGRepositoryImpl @Inject constructor(
 
     private suspend fun loadEPGFromAPI(date: LocalDate): Result<Unit> {
         return runCatching {
-            val homeContent = localDataSource.getHomeContent()
+            val homeContentDto = localDataSource.getHomeContent()
             val multiDayEPGMap = cachedMultiDayEPG?.multiDayEPG?.toMutableMap() ?: mutableMapOf()
 
             val epgChannelContentList = coroutineScope {
-                homeContent?.channels
-                    ?.mapNotNull { channel -> channel.id?.let { channel to it } }
-                    ?.map { (channel, channelId) ->
+                homeContentDto?.channels
+                    ?.mapNotNull { channelDto -> channelDto.id?.let { channelDto to it } }
+                    ?.map { (channelDto, channelId) ->
                         async {
                             runCatching {
-                                val epgResponse = remoteDataSource.getChannelEPG(channelId, date)
-                                if (epgResponse.events?.isNotEmpty() == true) {
-                                    EPGChannelContent(channel = channel, events = epgResponse.events)
+                                val epgResponseDto = remoteDataSource.getChannelEPG(channelId, date)
+                                if (epgResponseDto.events?.isNotEmpty() == true) {
+                                    EPGChannelContent(
+                                        channel = channelDto.toDomain(),
+                                        events = epgResponseDto.events.map { it.toDomain() }
+                                    )
                                 } else null
-                            }.onFailure { error ->
+                             }.onFailure { error ->
                                 logger.error(TAG, "Error obteniendo EPG para canal $channelId: ${error.message}")
                             }.getOrNull()
                         }
@@ -69,13 +72,13 @@ class EPGRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getLiveEventForChannel(channelId: Int): EPGEvent? {
+    override fun getLiveEventForChannel(channelId: Int): Event? {
         val todayEPG = cachedMultiDayEPG?.multiDayEPG?.get(LocalDate.now())
         return todayEPG?.find { it.channel.id == channelId }
             ?.events?.find { it.isLive() }
     }
 
-    override fun findContent(channelId: Int, eventId: Int, date: LocalDate) : EPGEvent {
+    override fun findContent(channelId: Int, eventId: Int, date: LocalDate) : Event {
         val todayEPG = cachedMultiDayEPG?.multiDayEPG?.get(date)
         return todayEPG?.find { it.channel.id == channelId }
             ?.events?.find { it.getId() == eventId } ?: throw IllegalStateException("Content not found")

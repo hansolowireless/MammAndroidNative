@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mamm.mammapps.data.model.Channel
+import com.mamm.mammapps.domain.model.entity.Channel
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.channels.ChannelFilter
 import com.mamm.mammapps.ui.component.channels.ChannelFilterTV

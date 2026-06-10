@@ -1,13 +1,13 @@
 package com.mamm.mammapps.data.datasource.local
 
-import com.mamm.mammapps.data.model.GetBrandedContentResponse
-import com.mamm.mammapps.data.model.GetHomeContentResponse
-import com.mamm.mammapps.data.model.GetOtherContentResponse
-import com.mamm.mammapps.data.model.Subgenre
-import com.mamm.mammapps.data.model.bookmark.Bookmark
-import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
-import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
-import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
+import com.mamm.mammapps.data.model.GetBrandedContentResponseDto
+import com.mamm.mammapps.data.model.GetHomeContentResponseDto
+import com.mamm.mammapps.data.model.GetOtherContentResponseDto
+import com.mamm.mammapps.data.model.SubgenreDto
+import com.mamm.mammapps.data.model.bookmark.BookmarkDto
+import com.mamm.mammapps.data.model.memories.GetMemoriesResponseDto
+import com.mamm.mammapps.data.model.mostwatched.MostWatchedContentDto
+import com.mamm.mammapps.data.model.recommended.GetRecommendedResponseDto
 import kotlinx.coroutines.flow.Flow
 import java.time.ZonedDateTime
 
@@ -17,20 +17,20 @@ interface LocalDataSource {
     fun setLastTimePinWasCorrect(lastTimePinWasCorrect: ZonedDateTime)
     fun setContentPlayProgress(contentId: String, progress: Long)
 
-    fun setHomeContent(homeContent: GetHomeContentResponse)
-    fun setCachedSubgenreList(list: List<Subgenre>)
-    fun setMoviesContent(moviesContent: GetOtherContentResponse)
-    fun setDocumentariesContent(documentariesContent: GetOtherContentResponse)
-    fun setSportsContent(sportsContent: GetOtherContentResponse)
-    fun setKidsContent(kidsContent: GetOtherContentResponse)
-    fun setAdultsContent(adultsContent: GetBrandedContentResponse)
-    fun setWarnerContent(warnerContent: GetBrandedContentResponse)
-    fun setAcontraContent(acontraContent: GetBrandedContentResponse)
-    fun setAMCContent(amcContent: GetBrandedContentResponse)
-    fun setMyMemories(memories: GetMemoriesResponse)
-    fun setBookmarks(bookmarks: List<Bookmark>)
-    fun setMostWatched(mostWatched: List<MostWatchedContent>)
-    fun setRecommended(recommended: GetRecommendedResponse)
+    fun setHomeContent(homeContent: GetHomeContentResponseDto)
+    fun setCachedSubgenreList(list: List<SubgenreDto>)
+    fun setMoviesContent(moviesContent: GetOtherContentResponseDto)
+    fun setDocumentariesContent(documentariesContent: GetOtherContentResponseDto)
+    fun setSportsContent(sportsContent: GetOtherContentResponseDto)
+    fun setKidsContent(kidsContent: GetOtherContentResponseDto)
+    fun setAdultsContent(adultsContent: GetBrandedContentResponseDto)
+    fun setWarnerContent(warnerContent: GetBrandedContentResponseDto)
+    fun setAcontraContent(acontraContent: GetBrandedContentResponseDto)
+    fun setAMCContent(amcContent: GetBrandedContentResponseDto)
+    fun setMyMemories(memories: GetMemoriesResponseDto)
+    fun setBookmarks(bookmarks: List<BookmarkDto>)
+    fun setMostWatched(mostWatched: List<MostWatchedContentDto>)
+    fun setRecommended(recommended: GetRecommendedResponseDto)
 
     fun getShowBrandedContentMenus () : Boolean?
     fun getLastTimePinWasCorrect(): ZonedDateTime?
@@ -45,20 +45,20 @@ interface LocalDataSource {
     fun getContentPlayProgress(contentId: String): Long
     fun getContentProgressFlow(): Flow<Map<String, Long>>
 
-    fun getHomeContent(): GetHomeContentResponse?
-    fun getCachedSubgenreList(): List<Subgenre>?
-    fun getMoviesContent(): GetOtherContentResponse?
-    fun getDocumentariesContent(): GetOtherContentResponse?
-    fun getSportsContent(): GetOtherContentResponse?
-    fun getKidsContent(): GetOtherContentResponse?
-    fun getAdultsContent(): GetBrandedContentResponse?
-    fun getWarnerContent(): GetBrandedContentResponse?
-    fun getAcontraContent(): GetBrandedContentResponse?
-    fun getAMCContent(): GetBrandedContentResponse?
-    fun getMyMemories(): GetMemoriesResponse?
-    fun getBookmarks(): List<Bookmark>?
-    fun getMostWatched(): List<MostWatchedContent>?
-    fun getRecommended(): GetRecommendedResponse?
+    fun getHomeContent(): GetHomeContentResponseDto?
+    fun getCachedSubgenreList(): List<SubgenreDto>?
+    fun getMoviesContent(): GetOtherContentResponseDto?
+    fun getDocumentariesContent(): GetOtherContentResponseDto?
+    fun getSportsContent(): GetOtherContentResponseDto?
+    fun getKidsContent(): GetOtherContentResponseDto?
+    fun getAdultsContent(): GetBrandedContentResponseDto?
+    fun getWarnerContent(): GetBrandedContentResponseDto?
+    fun getAcontraContent(): GetBrandedContentResponseDto?
+    fun getAMCContent(): GetBrandedContentResponseDto?
+    fun getMyMemories(): GetMemoriesResponseDto?
+    fun getBookmarks(): List<BookmarkDto>?
+    fun getMostWatched(): List<MostWatchedContentDto>?
+    fun getRecommended(): GetRecommendedResponseDto?
 
     fun clearContentPlayProgress()
     fun clearCache()

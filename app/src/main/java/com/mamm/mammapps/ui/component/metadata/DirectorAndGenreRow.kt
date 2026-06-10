@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.mamm.mammapps.R
-import com.mamm.mammapps.data.model.metadata.Metadata
+import com.mamm.mammapps.domain.model.metadata.Metadata
 import com.mamm.mammapps.ui.theme.DetailColor
 import com.mamm.mammapps.ui.theme.Dimensions
 

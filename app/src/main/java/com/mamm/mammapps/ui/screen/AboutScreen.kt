@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamm.mammapps.R
-import com.mamm.mammapps.domain.model.DownloadSpeedResult
+import com.mamm.mammapps.domain.model.about.DownloadSpeedResult
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.common.OperatorLogoImage
 import com.mamm.mammapps.ui.component.common.PrimaryButton

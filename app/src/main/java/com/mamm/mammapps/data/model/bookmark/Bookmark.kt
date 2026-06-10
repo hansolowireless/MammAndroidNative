@@ -2,19 +2,13 @@ package com.mamm.mammapps.data.model.bookmark
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import com.mamm.mammapps.data.extension.toZonedDateTimeEPG
-import com.mamm.mammapps.data.model.metadata.Metadata
-import com.mamm.mammapps.data.model.section.TbContentItem
-import com.mamm.mammapps.data.model.section.TbEventItem
+import com.mamm.mammapps.data.model.metadata.MetadataDto
+import com.mamm.mammapps.data.model.section.TbContentItemDto
+import com.mamm.mammapps.util.toZonedDateTimeEPG
 import kotlinx.parcelize.Parcelize
 import java.time.ZonedDateTime
 
-/**
- * Define una jerarquía sellada para contenido que puede ser marcado o recomendado.
- * Todas las propiedades comunes se declaran aquí como `abstract`.
- * Al ser `Parcelable`, toda la jerarquía puede pasarse entre componentes de Android.
- */
-sealed class BookmarkContent : Parcelable {
+sealed class BookmarkContentDto : Parcelable {
     abstract val type: String?
     abstract val id: Int?
     abstract val title: String?
@@ -32,26 +26,23 @@ sealed class BookmarkContent : Parcelable {
     abstract val subgenreById: Int?
     abstract val fcIni: String?
     abstract val fcEnd: String?
-    abstract val tbContentItems: List<TbContentItem>?
-    abstract val tbEventItems: List<TbContentItem>?
+    abstract val tbContentItems: List<TbContentItemDto>?
+    abstract val tbEventItems: List<TbContentItemDto>?
 
-    // Propiedades calculadas que se heredan automáticamente
+    // Propiedades calculadas
     val startDateTime: ZonedDateTime?
         get() = fcIni?.toZonedDateTimeEPG()
 
     val endDateTime: ZonedDateTime?
         get() = fcEnd?.toZonedDateTimeEPG()
 
-    fun getMetadata(): Metadata {
-        return Metadata.fromTbContentItems(tbEventItems ?: tbContentItems ?: emptyList())
+    fun getMetadata(): MetadataDto {
+        return MetadataDto.fromTbContentItems(tbEventItems ?: tbContentItems ?: emptyList())
     }
 }
 
-/**
- * Representa un marcador de usuario. Hereda de `BookmarkContent`.
- */
 @Parcelize
-data class Bookmark(
+data class BookmarkDto(
     @SerializedName("type") override val type: String? = null,
     @SerializedName("id") override val id: Int? = null,
     @SerializedName("title") override val title: String? = null,
@@ -69,17 +60,12 @@ data class Bookmark(
     @SerializedName("subgenreById") override val subgenreById: Int? = null,
     @SerializedName("fcIni") override val fcIni: String? = null,
     @SerializedName("fcEnd") override val fcEnd: String? = null,
-    @SerializedName("tbEventItems") override val tbEventItems: List<TbContentItem>? = null,
-    @SerializedName("tbContentItems") override val tbContentItems: List<TbContentItem>? = null
-) : BookmarkContent()
+    @SerializedName("tbEventItems") override val tbEventItems: List<TbContentItemDto>? = null,
+    @SerializedName("tbContentItems") override val tbContentItems: List<TbContentItemDto>? = null
+) : BookmarkContentDto()
 
-
-/**
- * Representa un contenido recomendado. Tiene las mismas propiedades que Bookmark,
- * pero es un tipo diferente para poder distinguirlo.
- */
 @Parcelize
-data class Recommended(
+data class RecommendedDto(
     @SerializedName("type") override val type: String? = null,
     @SerializedName("id") override val id: Int? = null,
     @SerializedName("title") override val title: String? = null,
@@ -97,6 +83,6 @@ data class Recommended(
     @SerializedName("subgenreById") override val subgenreById: Int? = null,
     @SerializedName("fcIni") override val fcIni: String? = null,
     @SerializedName("fcEnd") override val fcEnd: String? = null,
-    @SerializedName("tbEventItems") override val tbEventItems: List<TbContentItem>? = null,
-    @SerializedName("tbContentItems") override val tbContentItems: List<TbContentItem>? = null
-) : BookmarkContent()
+    @SerializedName("tbEventItems") override val tbEventItems: List<TbContentItemDto>? = null,
+    @SerializedName("tbContentItems") override val tbContentItems: List<TbContentItemDto>? = null
+) : BookmarkContentDto()

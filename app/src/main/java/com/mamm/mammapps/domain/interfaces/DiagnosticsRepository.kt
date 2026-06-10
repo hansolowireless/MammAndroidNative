@@ -1,8 +1,8 @@
 package com.mamm.mammapps.domain.interfaces
 
-import com.mamm.mammapps.domain.model.AboutInfo
-import com.mamm.mammapps.domain.model.DownloadSpeedResult
-import com.mamm.mammapps.domain.model.DiagnosticInfo
+import com.mamm.mammapps.domain.model.about.AboutInfo
+import com.mamm.mammapps.domain.model.about.DownloadSpeedResult
+import com.mamm.mammapps.domain.model.about.DiagnosticInfo
 
 interface DiagnosticsRepository {
 

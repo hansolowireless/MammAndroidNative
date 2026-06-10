@@ -7,18 +7,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamm.mammapps.R
-import com.mamm.mammapps.data.model.Channel
-import com.mamm.mammapps.data.model.epg.EPGChannelContent
-import com.mamm.mammapps.data.model.section.EPGEvent
+import com.mamm.mammapps.domain.model.entity.Channel
+import com.mamm.mammapps.domain.model.epg.EPGChannelContent
+import com.mamm.mammapps.domain.model.entity.Event
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.ui.component.epg.EPGMobile
@@ -34,7 +31,7 @@ import java.time.LocalDate
 fun EPGScreen(
     viewModel: EPGViewModel = hiltViewModel(),
     castViewModel: CastViewModel = hiltViewModel(),
-    onShowDetails: (EPGEvent) -> Unit,
+    onShowDetails: (Event) -> Unit,
     onPlayClick: (Channel) -> Unit
 ) {
 

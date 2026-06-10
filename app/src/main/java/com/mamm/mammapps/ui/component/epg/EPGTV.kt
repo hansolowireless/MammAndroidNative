@@ -10,9 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mamm.mammapps.R
-import com.mamm.mammapps.data.model.Channel
-import com.mamm.mammapps.data.model.epg.EPGChannelContent
-import com.mamm.mammapps.data.model.section.EPGEvent
+import com.mamm.mammapps.domain.model.entity.Channel
+import com.mamm.mammapps.domain.model.epg.EPGChannelContent
+import com.mamm.mammapps.domain.model.entity.Event
 import com.mamm.mammapps.ui.component.home.SectionTitle
 import com.mamm.mammapps.ui.mapper.toContentEPGUI
 import com.mamm.mammapps.ui.theme.Dimensions
@@ -25,7 +25,7 @@ fun EPGTV(
     selectedChannel: Channel?,
     onDateSelected: (LocalDate) -> Unit,
     onChannelSelected: (Channel) -> Unit,
-    onEventClicked: (EPGEvent) -> Unit
+    onEventClicked: (Event) -> Unit
 ) {
 
     Column(modifier = Modifier.padding(top = Dimensions.paddingSmall)) {

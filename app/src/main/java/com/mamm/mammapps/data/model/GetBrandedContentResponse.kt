@@ -1,27 +1,23 @@
 package com.mamm.mammapps.data.model
 
 import com.google.gson.annotations.SerializedName
-import com.mamm.mammapps.data.model.branded.BrandedFeatured
-import com.mamm.mammapps.data.model.branded.BrandedVod
-import com.mamm.mammapps.data.model.section.EPGEvent
+import com.mamm.mammapps.data.model.branded.BrandedFeaturedDto
+import com.mamm.mammapps.data.model.branded.BrandedVodDto
+import com.mamm.mammapps.data.model.section.EPGEventDto
 
-
-data class GetBrandedContentResponse(
+data class GetBrandedContentResponseDto(
     @SerializedName("featured")
-    val featured: List<BrandedFeatured>? = null,
+    val featured: List<BrandedFeaturedDto>? = null,
 
     @SerializedName("channels")
-    val channels: List<Channel>? = null,
+    val channels: List<ChannelDto>? = null,
 
     @SerializedName("vods")
-    val vods: List<BrandedVod>? = null,
+    val vods: List<BrandedVodDto>? = null,
 
     @SerializedName("events")
-    val events: List<EPGEvent>? = null,
+    val events: List<EPGEventDto>? = null,
 
     @SerializedName("series")
-    val series: List<Serie>? = null
+    val series: List<SerieDto>? = null
 )
-
-
-

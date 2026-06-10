@@ -2,7 +2,7 @@ package com.mamm.mammapps.ui.model
 
 import android.os.Parcelable
 import androidx.compose.ui.unit.Dp
-import com.mamm.mammapps.data.extension.getCurrentDate
+import com.mamm.mammapps.util.getCurrentDate
 import com.mamm.mammapps.ui.model.player.LiveEventInfoUI
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.Ratios

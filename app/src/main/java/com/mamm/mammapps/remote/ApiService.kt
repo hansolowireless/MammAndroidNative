@@ -1,26 +1,26 @@
 package com.mamm.mammapps.remote
 
-import com.mamm.mammapps.data.model.GetBrandedContentResponse
-import com.mamm.mammapps.data.model.GetEPGResponse
-import com.mamm.mammapps.data.model.GetHomeContentResponse
-import com.mamm.mammapps.data.model.GetOtherContentResponse
-import com.mamm.mammapps.data.model.bookmark.Bookmark
+import com.mamm.mammapps.data.model.GetBrandedContentResponseDto
+import com.mamm.mammapps.data.model.GetEPGResponseDto
+import com.mamm.mammapps.data.model.GetHomeContentResponseDto
+import com.mamm.mammapps.data.model.GetOtherContentResponseDto
+import com.mamm.mammapps.data.model.bookmark.BookmarkDto
 import com.mamm.mammapps.data.model.bookmark.SetBookmarkRequest
 import com.mamm.mammapps.data.model.diagnostic.DiagResponseDto
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
-import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
-import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
+import com.mamm.mammapps.data.model.memories.GetMemoriesResponseDto
+import com.mamm.mammapps.data.model.mostwatched.MostWatchedContentDto
 import com.mamm.mammapps.data.model.player.GetTickersResponseDto
-import com.mamm.mammapps.data.model.player.QosData
+import com.mamm.mammapps.data.model.player.QosDataDto
 import com.mamm.mammapps.data.model.player.heartbeat.HeartBeatRequest
 import com.mamm.mammapps.data.model.player.streamvx.StreamVxTokenRequest
 import com.mamm.mammapps.data.model.player.streamvx.StreamVxTokenResponse
 import com.mamm.mammapps.data.model.session.RefreshTokenRequest
 import com.mamm.mammapps.data.model.session.RefreshTokenResponse
-import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
-import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
+import com.mamm.mammapps.data.model.recommended.GetRecommendedResponseDto
+import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponseDto
 import com.mamm.mammapps.data.model.sportsevent.SportsEventListDto
 import com.mamm.mammapps.data.model.loginwithcode.LoginCodeGenerateRequest
 import com.mamm.mammapps.data.model.loginwithcode.LoginCodeGenerateResponseDto
@@ -68,7 +68,7 @@ interface ApiService {
         "Content-Type: application/json",
         "Accept: application/json"
     )
-    suspend fun getHomeContent(@Url url: String): Response<GetHomeContentResponse>
+    suspend fun getHomeContent(@Url url: String): Response<GetHomeContentResponseDto>
 
     // ---------- EPG ----------
     @GET("epg_files/EPG_{channelID}_{date}.json")
@@ -80,7 +80,7 @@ interface ApiService {
     suspend fun getEPG(
         @Path("channelID") channelID: Int,
         @Path("date") date: String
-    ): Response<GetEPGResponse>
+    ): Response<GetEPGResponseDto>
 
 
     // ---------- MOVIES ----------
@@ -92,7 +92,7 @@ interface ApiService {
     )
     suspend fun getMovies(
         @Path("jsonParam") jsonParam: String
-    ): Response<GetOtherContentResponse>
+    ): Response<GetOtherContentResponseDto>
 
     // ---------- DOCUMENTARIES ----------
     @GET("epg_files/doc_pkg_{jsonParam}")
@@ -103,7 +103,7 @@ interface ApiService {
     )
     suspend fun getDocumentaries(
         @Path("jsonParam") jsonParam: String
-    ): Response<GetOtherContentResponse>
+    ): Response<GetOtherContentResponseDto>
 
     // ---------- SPORTS ----------
     @GET("epg_files/dep_pkg_{jsonParam}")
@@ -114,7 +114,7 @@ interface ApiService {
     )
     suspend fun getSports(
         @Path("jsonParam") jsonParam: String
-    ): Response<GetOtherContentResponse>
+    ): Response<GetOtherContentResponseDto>
 
     // ---------- KIDS ----------
     @GET("epg_files/inf_pkg_{jsonParam}")
@@ -125,7 +125,7 @@ interface ApiService {
     )
     suspend fun getKids(
         @Path("jsonParam") jsonParam: String
-    ): Response<GetOtherContentResponse>
+    ): Response<GetOtherContentResponseDto>
 
     // ---------- ADULTS ----------
     @GET("epg_files/adt_pkg_{jsonParam}")
@@ -136,7 +136,7 @@ interface ApiService {
     )
     suspend fun getAdults(
         @Path("jsonParam") jsonParam: String
-    ): Response<GetBrandedContentResponse>
+    ): Response<GetBrandedContentResponseDto>
 
     // ---------- WARNER ----------
     @GET("epg_files/wb_pkg_{jsonParam}")
@@ -147,7 +147,7 @@ interface ApiService {
     )
     suspend fun getWarner(
         @Path("jsonParam") jsonParam: String
-    ): Response<GetBrandedContentResponse>
+    ): Response<GetBrandedContentResponseDto>
 
     // ---------- ACONTRA ----------
     @GET("epg_files/acf_pkg_{jsonParam}")
@@ -158,7 +158,7 @@ interface ApiService {
     )
     suspend fun getAcontra(
         @Path("jsonParam") jsonParam: String
-    ): Response<GetBrandedContentResponse>
+    ): Response<GetBrandedContentResponseDto>
 
     // ---------- AMC ----------
     @GET("epg_files/amc_pkg_{jsonParam}")
@@ -169,7 +169,7 @@ interface ApiService {
     )
     suspend fun getAMC(
         @Path("jsonParam") jsonParam: String
-    ): Response<GetBrandedContentResponse>
+    ): Response<GetBrandedContentResponseDto>
 
     // ---------- SEASON CONTENT ----------
     @GET("epg_files/serie_{serieId}.json")
@@ -180,7 +180,7 @@ interface ApiService {
     )
     suspend fun getSeasonContent(
         @Path("serieId") jsonParam: String
-    ): Response<GetSeasonInfoResponse>
+    ): Response<GetSeasonInfoResponseDto>
 
     // ---------- Playback ----------
     @GET
@@ -229,12 +229,12 @@ interface ApiService {
         "Accept: application/json"
     )
     suspend fun sendQos(
-        @Body qosRequest: QosData
+        @Body qosRequest: QosDataDto
     ): Response<Unit>
 
     // ---------- Bookmarks ----------
     @GET("keep-watching/get-marks")
-    suspend fun getBookmarks(): List<Bookmark>
+    suspend fun getBookmarks(): List<BookmarkDto>
 
     @POST("keep-watching/set")
     suspend fun setBookmark(
@@ -257,7 +257,7 @@ interface ApiService {
         "Content-Type: application/json",
         "Accept: application/json"
     )
-    suspend fun getMostWatched(): List<MostWatchedContent>
+    suspend fun getMostWatched(): List<MostWatchedContentDto>
 
     //---------Recommended---------------
     @GET("recommendation/get-recommendations")
@@ -265,7 +265,7 @@ interface ApiService {
         "Content-Type: application/json",
         "Accept: application/json"
     )
-    suspend fun getRecommended(): GetRecommendedResponse
+    suspend fun getRecommended(): GetRecommendedResponseDto
 
     //---------Similar Content---------------
     @GET("recommendation/get-similar")
@@ -275,7 +275,7 @@ interface ApiService {
     )
     suspend fun getSimilarContent(
         @Query("subgenre") subgenreId: Int
-    ): GetRecommendedResponse
+    ): GetRecommendedResponseDto
 
     // ---------- Search ----------
     @GET("/content/search")
@@ -286,7 +286,7 @@ interface ApiService {
     )
     suspend fun search(
         @Query("chain") searchQuery: String
-    ): Response<List<Bookmark>>
+    ): Response<List<BookmarkDto>>
 
     // ---------- Tickers ----------
     @GET
@@ -306,7 +306,7 @@ interface ApiService {
     )
     suspend fun getMemories(
         @Url url: String
-    ): Response<GetMemoriesResponse>
+    ): Response<GetMemoriesResponseDto>
 
     // ------- Expand Category ----------
     @GET("epg_files/cat_{categoryId}_pkg_{jsonParam}")
@@ -317,7 +317,7 @@ interface ApiService {
     suspend fun getExpandCategory(
         @Path("categoryId") categoryId: String,
         @Path("jsonParam") jsonParam: String
-    ): Response<GetBrandedContentResponse>
+    ): Response<GetBrandedContentResponseDto>
 
     // ------- Diagnostics ----------
     @GET("diag.json")

@@ -1,8 +1,8 @@
 package com.mamm.mammapps.domain.usecases.content
 
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.epg.EPGChannelContent
 import com.mamm.mammapps.domain.interfaces.EPGRepository
+import com.mamm.mammapps.domain.model.epg.EPGChannelContent
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -27,6 +27,4 @@ class GetEPGContentUseCase @Inject constructor(
             }
         )
     }
-
-
 }

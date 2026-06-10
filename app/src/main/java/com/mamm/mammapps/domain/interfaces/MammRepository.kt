@@ -1,31 +1,31 @@
 package com.mamm.mammapps.domain.interfaces
 
-import com.mamm.mammapps.data.model.Channel
-import com.mamm.mammapps.data.model.Genre
-import com.mamm.mammapps.data.model.GetBrandedContentResponse
-import com.mamm.mammapps.data.model.GetHomeContentResponse
-import com.mamm.mammapps.data.model.GetOtherContentResponse
-import com.mamm.mammapps.data.model.Subgenre
-import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
-import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
+import com.mamm.mammapps.domain.model.entity.Channel
+import com.mamm.mammapps.domain.model.Genre
+import com.mamm.mammapps.domain.model.BrandedContent
+import com.mamm.mammapps.domain.model.HomeContent
+import com.mamm.mammapps.domain.model.OtherContent
+import com.mamm.mammapps.domain.model.Subgenre
+import com.mamm.mammapps.domain.model.memories.Memories
+import com.mamm.mammapps.domain.model.serie.SerieInfo
 import com.mamm.mammapps.ui.model.ContentIdentifier
 
 interface MammRepository {
 
-    suspend fun getHomeContent() : Result<GetHomeContentResponse>
-    suspend fun getMovies(): Result<GetOtherContentResponse>
-    suspend fun getAdults(): Result<GetBrandedContentResponse>
-    suspend fun getDocumentaries(): Result<GetOtherContentResponse>
-    suspend fun getKids(): Result<GetOtherContentResponse>
-    suspend fun getSports(): Result<GetOtherContentResponse>
+    suspend fun getHomeContent() : Result<HomeContent>
+    suspend fun getMovies(): Result<OtherContent>
+    suspend fun getAdults(): Result<BrandedContent>
+    suspend fun getDocumentaries(): Result<OtherContent>
+    suspend fun getKids(): Result<OtherContent>
+    suspend fun getSports(): Result<OtherContent>
 
-    suspend fun getWarner(): Result<GetBrandedContentResponse>
-    suspend fun getAcontra(): Result<GetBrandedContentResponse>
-    suspend fun getAMC(): Result<GetBrandedContentResponse>
-    suspend fun getMemories () : Result<GetMemoriesResponse>
+    suspend fun getWarner(): Result<BrandedContent>
+    suspend fun getAcontra(): Result<BrandedContent>
+    suspend fun getAMC(): Result<BrandedContent>
+    suspend fun getMemories () : Result<Memories>
 
-    suspend fun getSeasonsInfo(serieId: Int): Result<GetSeasonInfoResponse>
-    suspend fun getExpandedCategoryContent(categoryId: Int): Result<GetBrandedContentResponse>
+    suspend fun getSeasonsInfo(serieId: Int): Result<SerieInfo>
+    suspend fun getExpandedCategoryContent(categoryId: Int): Result<BrandedContent>
 
     fun findHomeContent(identifier: ContentIdentifier): Result<Any>?
     fun findMovieContent(identifier: ContentIdentifier): Result<Any>?

@@ -32,10 +32,10 @@ import com.google.android.exoplayer2.Player
 import com.google.android.gms.cast.MediaMetadata
 import com.google.android.gms.common.images.WebImage
 import com.mamm.mammapps.R
-import com.mamm.mammapps.data.extension.getCurrentDate
+import com.mamm.mammapps.util.getCurrentDate
 import com.mamm.mammapps.data.logger.SimpleLogger
 import com.mamm.mammapps.data.model.player.GlideThumbnailTransformation
-import com.mamm.mammapps.data.model.player.WatermarkInfo
+import com.mamm.mammapps.domain.model.player.WatermarkInfo
 import com.mamm.mammapps.ui.constant.PlayerConstant
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
@@ -237,7 +237,7 @@ fun Key.toDigitString(): String? {
 }
 
 fun ContentEntityUI.catchupIsAvailable(availableCatchupHours: Int): Boolean {
-    val startInstant = liveEventInfo?.eventStart?.toInstant()
+    val startInstant = liveEventInfo?.eventStart?.toInstant() ?: return false
     val nowInstant = getCurrentDate().toInstant()
     val differenceInMinutes = ChronoUnit.MINUTES.between(startInstant, nowInstant)
     val differenceInHours = differenceInMinutes / 60.0

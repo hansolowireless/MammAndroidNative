@@ -1,7 +1,7 @@
 package com.mamm.mammapps.domain.usecases.diagnostic
 
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.domain.model.DownloadSpeedResult
+import com.mamm.mammapps.domain.model.about.DownloadSpeedResult
 import com.mamm.mammapps.domain.interfaces.DiagnosticsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

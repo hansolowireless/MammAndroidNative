@@ -20,8 +20,8 @@ class LoginUseCase @Inject constructor(
 
 
         return repository.login(username, password).fold(
-            onSuccess = { response ->
-                logger.debug(TAG, "invoke Login successful, ${response.data}")
+            onSuccess = { _ ->
+                logger.debug(TAG, "invoke Login successful")
 
                 //Limpiar datos de EPG
                 epgRepository.clearCache()

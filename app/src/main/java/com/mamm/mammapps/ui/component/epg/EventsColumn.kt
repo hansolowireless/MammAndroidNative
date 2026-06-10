@@ -12,7 +12,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mamm.mammapps.data.extension.catchupIsAvailable
-import com.mamm.mammapps.data.model.section.EPGEvent
+import com.mamm.mammapps.domain.model.entity.Event
 import com.mamm.mammapps.ui.component.common.ContentEntityListItem
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
 import com.mamm.mammapps.ui.mapper.toContentListUI
@@ -20,10 +20,10 @@ import com.mamm.mammapps.ui.theme.Dimensions
 
 @Composable
 fun EventsColumn(
-    events: List<EPGEvent>,
+    events: List<Event>,
     catchupHours: Int?,
     modifier: Modifier = Modifier,
-    onEventClicked: (EPGEvent) -> Unit = {}
+    onEventClicked: (Event) -> Unit = {}
 ) {
     val listState = rememberLazyListState()
 

@@ -14,7 +14,7 @@ import com.mamm.mammapps.data.di.NoBaseUrlApi
 import com.mamm.mammapps.data.di.NoBaseUrlNoRedirectApi
 import com.mamm.mammapps.data.di.QosApi
 import com.mamm.mammapps.data.extension.correctAdultImages
-import com.mamm.mammapps.data.extension.getCurrentDate
+import com.mamm.mammapps.util.getCurrentDate
 import com.mamm.mammapps.data.extension.isRedirect
 import com.mamm.mammapps.data.extension.toEPGRequestDate
 import com.mamm.mammapps.data.extension.transformData
@@ -24,14 +24,14 @@ import com.mamm.mammapps.data.mapper.toGetHomeContentException
 import com.mamm.mammapps.data.mapper.toGetMemoriesException
 import com.mamm.mammapps.data.mapper.toLoginException
 import com.mamm.mammapps.data.mapper.toSessionException
-import com.mamm.mammapps.data.model.GetBrandedContentResponse
-import com.mamm.mammapps.data.model.GetEPGResponse
-import com.mamm.mammapps.data.model.GetHomeContentResponse
-import com.mamm.mammapps.data.model.GetOtherContentResponse
-import com.mamm.mammapps.data.model.bookmark.Bookmark
+import com.mamm.mammapps.data.model.GetBrandedContentResponseDto
+import com.mamm.mammapps.data.model.GetEPGResponseDto
+import com.mamm.mammapps.data.model.GetHomeContentResponseDto
+import com.mamm.mammapps.data.model.GetOtherContentResponseDto
+import com.mamm.mammapps.data.model.bookmark.BookmarkDto
 import com.mamm.mammapps.data.model.bookmark.SetBookmarkRequest
 import com.mamm.mammapps.data.model.diagnostic.DiagResponseDto
-import com.mamm.mammapps.domain.model.DownloadSpeedResult
+import com.mamm.mammapps.domain.model.about.DownloadSpeedResult
 import com.mamm.mammapps.data.model.login.LocatorResponse
 import com.mamm.mammapps.data.model.login.LoginRequest
 import com.mamm.mammapps.data.model.login.LoginResponse
@@ -39,16 +39,16 @@ import com.mamm.mammapps.data.model.loginwithcode.LoginCodeGenerateRequest
 import com.mamm.mammapps.data.model.loginwithcode.LoginCodeGenerateResponseDto
 import com.mamm.mammapps.data.model.loginwithcode.LoginCodeStatusResponseDto
 import com.mamm.mammapps.data.model.loginwithcode.AuthLoginCodeRequest
-import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
-import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
+import com.mamm.mammapps.data.model.memories.GetMemoriesResponseDto
+import com.mamm.mammapps.data.model.mostwatched.MostWatchedContentDto
 import com.mamm.mammapps.data.model.player.GetTickersResponseDto
-import com.mamm.mammapps.data.model.player.QosData
+import com.mamm.mammapps.data.model.player.QosDataDto
 import com.mamm.mammapps.data.model.player.heartbeat.HeartBeatRequest
 import com.mamm.mammapps.data.model.player.playback.CLMRequest
 import com.mamm.mammapps.data.model.player.streamvx.StreamVxTokenRequest
 import com.mamm.mammapps.data.model.player.streamvx.StreamVxTokenResponse
-import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
-import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
+import com.mamm.mammapps.data.model.recommended.GetRecommendedResponseDto
+import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponseDto
 import com.mamm.mammapps.data.model.session.RefreshTokenRequest
 import com.mamm.mammapps.data.model.session.RefreshTokenResponse
 import com.mamm.mammapps.data.datasource.session.SessionDatasource
@@ -154,7 +154,7 @@ class RemoteDatasource @Inject constructor(
         return sessionManager.operatorLogoUrl
     }
 
-    suspend fun getHomeContent(): GetHomeContentResponse {
+    suspend fun getHomeContent(): GetHomeContentResponseDto {
         return withContext(Dispatchers.IO) {
             val jsonFile = sessionManager.jsonFile
 
@@ -179,7 +179,7 @@ class RemoteDatasource @Inject constructor(
         }
     }
 
-    suspend fun getExpandedCategory(categoryId: Int): GetBrandedContentResponse {
+    suspend fun getExpandedCategory(categoryId: Int): GetBrandedContentResponseDto {
         return withContext(Dispatchers.IO) {
             val jsonFile = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
             require(jsonFile != null) {
@@ -197,7 +197,7 @@ class RemoteDatasource @Inject constructor(
 
 
     //----------EPG---------//
-    suspend fun getChannelEPG(channelId: Int, date: LocalDate): GetEPGResponse {
+    suspend fun getChannelEPG(channelId: Int, date: LocalDate): GetEPGResponseDto {
         return withContext(Dispatchers.IO) {
             val response = baseUrlApi.getEPG(channelId, date.toEPGRequestDate())
             if (!response.isSuccessful) {
@@ -209,7 +209,7 @@ class RemoteDatasource @Inject constructor(
     }
 
     //----------MOVIES---------//
-    suspend fun getMovies(jsonParam: String): GetOtherContentResponse {
+    suspend fun getMovies(jsonParam: String): GetOtherContentResponseDto {
         return withContext(Dispatchers.IO) {
             val response = baseUrlApi.getMovies(jsonParam)
             if (!response.isSuccessful) {
@@ -221,7 +221,7 @@ class RemoteDatasource @Inject constructor(
     }
 
     //----------DOCUMENTARIES---------//
-    suspend fun getDocumentaries(jsonParam: String): GetOtherContentResponse {
+    suspend fun getDocumentaries(jsonParam: String): GetOtherContentResponseDto {
         return withContext(Dispatchers.IO) {
             val response = baseUrlApi.getDocumentaries(jsonParam)
             if (!response.isSuccessful) {
@@ -233,7 +233,7 @@ class RemoteDatasource @Inject constructor(
     }
 
     //----------SPORTS---------//
-    suspend fun getSports(jsonParam: String): GetOtherContentResponse {
+    suspend fun getSports(jsonParam: String): GetOtherContentResponseDto {
         return withContext(Dispatchers.IO) {
             val response = baseUrlApi.getSports(jsonParam)
             if (!response.isSuccessful) {
@@ -245,7 +245,7 @@ class RemoteDatasource @Inject constructor(
     }
 
     //----------KIDS---------//
-    suspend fun getKids(jsonParam: String): GetOtherContentResponse {
+    suspend fun getKids(jsonParam: String): GetOtherContentResponseDto {
         return withContext(Dispatchers.IO) {
             val response = baseUrlApi.getKids(jsonParam)
             if (!response.isSuccessful) {
@@ -257,7 +257,7 @@ class RemoteDatasource @Inject constructor(
     }
 
     //----------ADULTS---------//
-    suspend fun getAdults(jsonParam: String): GetBrandedContentResponse {
+    suspend fun getAdults(jsonParam: String): GetBrandedContentResponseDto {
         return withContext(Dispatchers.IO) {
             baseUrlApi.getAdults(jsonParam).let {
                 if (!it.isSuccessful) {
@@ -271,7 +271,7 @@ class RemoteDatasource @Inject constructor(
     }
 
     //----------WARNER---------//
-    suspend fun getWarner(jsonParam: String): GetBrandedContentResponse {
+    suspend fun getWarner(jsonParam: String): GetBrandedContentResponseDto {
         return withContext(Dispatchers.IO) {
             val response = baseUrlApi.getWarner(jsonParam)
             if (!response.isSuccessful) {
@@ -283,7 +283,7 @@ class RemoteDatasource @Inject constructor(
     }
 
     //----------ACONTRA---------//
-    suspend fun getAcontra(jsonParam: String): GetBrandedContentResponse {
+    suspend fun getAcontra(jsonParam: String): GetBrandedContentResponseDto {
         return withContext(Dispatchers.IO) {
             val response = baseUrlApi.getAcontra(jsonParam)
             if (!response.isSuccessful) {
@@ -295,7 +295,7 @@ class RemoteDatasource @Inject constructor(
     }
 
     //----------AMC---------//
-    suspend fun getAMC(jsonParam: String): GetBrandedContentResponse {
+    suspend fun getAMC(jsonParam: String): GetBrandedContentResponseDto {
         return withContext(Dispatchers.IO) {
             val response = baseUrlApi.getAMC(jsonParam)
             if (!response.isSuccessful) {
@@ -307,7 +307,7 @@ class RemoteDatasource @Inject constructor(
     }
 
     //----------SERIES - SEASON CONTENT---------//
-    suspend fun getSeasonInfo(serieId: Int): GetSeasonInfoResponse {
+    suspend fun getSeasonInfo(serieId: Int): GetSeasonInfoResponseDto {
         return withContext(Dispatchers.IO) {
             val response = baseUrlApi.getSeasonContent(serieId.toString())
             if (!response.isSuccessful) {
@@ -391,7 +391,7 @@ class RemoteDatasource @Inject constructor(
         }
     }
 
-    suspend fun sendQosData(data: QosData) {
+    suspend fun sendQosData(data: QosDataDto) {
         withContext(Dispatchers.IO) {
             val response = qosApi.sendQos(data)
             if (!response.isSuccessful) {
@@ -462,7 +462,7 @@ class RemoteDatasource @Inject constructor(
     }
 
     //----------MEMORIES---------//
-    suspend fun getMyMemories(): GetMemoriesResponse {
+    suspend fun getMyMemories(): GetMemoriesResponseDto {
         return withContext(Dispatchers.IO) {
             val url = "https://masmedia.b-cdn.net/jsonmemories/user_" +
                     "${sessionManager.loginData?.userId}.json" +
@@ -477,7 +477,7 @@ class RemoteDatasource @Inject constructor(
     }
 
     //----------BOOKMARKS---------//
-    suspend fun getBookmarks(): List<Bookmark> {
+    suspend fun getBookmarks(): List<BookmarkDto> {
         return customContentApi.getBookmarks()
     }
 
@@ -498,23 +498,23 @@ class RemoteDatasource @Inject constructor(
         )
 
     //----------MOST WATCHED---------//
-    suspend fun getMostWatched(): List<MostWatchedContent> {
+    suspend fun getMostWatched(): List<MostWatchedContentDto> {
         return customContentApi.getMostWatched()
     }
 
     //----------RECOMMENDED---------//
-    suspend fun getRecommended(): GetRecommendedResponse {
+    suspend fun getRecommended(): GetRecommendedResponseDto {
         return customContentApi.getRecommended()
     }
 
     //----------SIMILAR CONTENT---------//
-    suspend fun getSimilarContent(subgenreId: Int): GetRecommendedResponse {
+    suspend fun getSimilarContent(subgenreId: Int): GetRecommendedResponseDto {
         val response = customContentApi.getSimilarContent(subgenreId)
         return response
     }
 
     //----------SEARCH---------//
-    suspend fun search(query: String): List<Bookmark> {
+    suspend fun search(query: String): List<BookmarkDto> {
         return withContext(Dispatchers.IO) {
             val response = customContentApi.search(query)
             if (!response.isSuccessful) {

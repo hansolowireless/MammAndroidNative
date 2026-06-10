@@ -10,14 +10,14 @@ import com.mamm.mammapps.data.di.DrmSecretKeyQualifier
 import com.mamm.mammapps.data.di.DrmJwtSecretQualifier
 import com.mamm.mammapps.data.di.DrmUrlQualifier
 import com.mamm.mammapps.data.local.SharedPreferencesManager
-import com.mamm.mammapps.data.model.GetBrandedContentResponse
-import com.mamm.mammapps.data.model.GetHomeContentResponse
-import com.mamm.mammapps.data.model.GetOtherContentResponse
-import com.mamm.mammapps.data.model.Subgenre
-import com.mamm.mammapps.data.model.bookmark.Bookmark
-import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
-import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
-import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
+import com.mamm.mammapps.data.model.GetBrandedContentResponseDto
+import com.mamm.mammapps.data.model.GetHomeContentResponseDto
+import com.mamm.mammapps.data.model.GetOtherContentResponseDto
+import com.mamm.mammapps.data.model.SubgenreDto
+import com.mamm.mammapps.data.model.bookmark.BookmarkDto
+import com.mamm.mammapps.data.model.memories.GetMemoriesResponseDto
+import com.mamm.mammapps.data.model.mostwatched.MostWatchedContentDto
+import com.mamm.mammapps.data.model.recommended.GetRecommendedResponseDto
 import kotlinx.coroutines.flow.Flow
 import java.time.ZonedDateTime
 import javax.inject.Inject
@@ -46,59 +46,59 @@ class LocalDataSourceImpl @Inject constructor(
         cache.setLastTimePinWasCorrect(lastTimePinWasCorrect)
     }
 
-    override fun setHomeContent(homeContent: GetHomeContentResponse) {
+    override fun setHomeContent(homeContent: GetHomeContentResponseDto) {
         cache.setHomeContent(homeContent)
     }
 
-    override fun setCachedSubgenreList(list: List<Subgenre>) {
+    override fun setCachedSubgenreList(list: List<SubgenreDto>) {
         cache.setCachedSubgenreList(list)
     }
 
-    override fun setMoviesContent(moviesContent: GetOtherContentResponse) {
+    override fun setMoviesContent(moviesContent: GetOtherContentResponseDto) {
         cache.setMoviesContent(moviesContent)
     }
 
-    override fun setDocumentariesContent(documentariesContent: GetOtherContentResponse) {
+    override fun setDocumentariesContent(documentariesContent: GetOtherContentResponseDto) {
         cache.setDocumentariesContent(documentariesContent)
     }
 
-    override fun setSportsContent(sportsContent: GetOtherContentResponse) {
+    override fun setSportsContent(sportsContent: GetOtherContentResponseDto) {
         cache.setSportsContent(sportsContent)
     }
 
-    override fun setKidsContent(kidsContent: GetOtherContentResponse) {
+    override fun setKidsContent(kidsContent: GetOtherContentResponseDto) {
         cache.setKidsContent(kidsContent)
     }
 
-    override fun setAdultsContent(adultsContent: GetBrandedContentResponse) {
+    override fun setAdultsContent(adultsContent: GetBrandedContentResponseDto) {
         cache.setAdultsContent(adultsContent)
     }
 
-    override fun setWarnerContent(warnerContent: GetBrandedContentResponse) {
+    override fun setWarnerContent(warnerContent: GetBrandedContentResponseDto) {
         cache.setWarnerContent(warnerContent)
     }
 
-    override fun setAcontraContent(acontraContent: GetBrandedContentResponse) {
+    override fun setAcontraContent(acontraContent: GetBrandedContentResponseDto) {
         cache.setAcontraContent(acontraContent)
     }
 
-    override fun setAMCContent(amcContent: GetBrandedContentResponse) {
+    override fun setAMCContent(amcContent: GetBrandedContentResponseDto) {
         cache.setAMCContent(amcContent)
     }
 
-    override fun setMyMemories(memories: GetMemoriesResponse) {
+    override fun setMyMemories(memories: GetMemoriesResponseDto) {
         cache.setMyMemories(memories)
     }
 
-    override fun setBookmarks(bookmarks: List<Bookmark>) {
+    override fun setBookmarks(bookmarks: List<BookmarkDto>) {
         cache.setBookmarks(bookmarks)
     }
 
-    override fun setMostWatched(mostWatched: List<MostWatchedContent>) {
+    override fun setMostWatched(mostWatched: List<MostWatchedContentDto>) {
         cache.setMostWatched(mostWatched)
     }
 
-    override fun setRecommended(recommended: GetRecommendedResponse) {
+    override fun setRecommended(recommended: GetRecommendedResponseDto) {
         cache.setRecommended(recommended)
     }
 
@@ -150,59 +150,59 @@ class LocalDataSourceImpl @Inject constructor(
         return cache.getProgressFlow()
     }
 
-    override fun getHomeContent(): GetHomeContentResponse? {
+    override fun getHomeContent(): GetHomeContentResponseDto? {
         return cache.getHomeContent()
     }
 
-    override fun getCachedSubgenreList(): List<Subgenre>? {
+    override fun getCachedSubgenreList(): List<SubgenreDto>? {
         return cache.getCachedSubgenreList()
     }
 
-    override fun getMoviesContent(): GetOtherContentResponse? {
+    override fun getMoviesContent(): GetOtherContentResponseDto? {
         return cache.getMoviesContent()
     }
 
-    override fun getDocumentariesContent(): GetOtherContentResponse? {
+    override fun getDocumentariesContent(): GetOtherContentResponseDto? {
         return cache.getDocumentariesContent()
     }
 
-    override fun getSportsContent(): GetOtherContentResponse? {
+    override fun getSportsContent(): GetOtherContentResponseDto? {
         return cache.getSportsContent()
     }
 
-    override fun getKidsContent(): GetOtherContentResponse? {
+    override fun getKidsContent(): GetOtherContentResponseDto? {
         return cache.getKidsContent()
     }
 
-    override fun getAdultsContent(): GetBrandedContentResponse? {
+    override fun getAdultsContent(): GetBrandedContentResponseDto? {
         return cache.getAdultsContent()
     }
 
-    override fun getWarnerContent(): GetBrandedContentResponse? {
+    override fun getWarnerContent(): GetBrandedContentResponseDto? {
         return cache.getWarnerContent()
     }
 
-    override fun getAcontraContent(): GetBrandedContentResponse? {
+    override fun getAcontraContent(): GetBrandedContentResponseDto? {
         return cache.getAcontraContent()
     }
 
-    override fun getAMCContent(): GetBrandedContentResponse? {
+    override fun getAMCContent(): GetBrandedContentResponseDto? {
         return cache.getAMCContent()
     }
 
-    override fun getMyMemories(): GetMemoriesResponse? {
+    override fun getMyMemories(): GetMemoriesResponseDto? {
         return cache.getMyMemories()
     }
 
-    override fun getBookmarks(): List<Bookmark>? {
+    override fun getBookmarks(): List<BookmarkDto>? {
         return cache.getBookmarks()
     }
 
-    override fun getMostWatched(): List<MostWatchedContent>? {
+    override fun getMostWatched(): List<MostWatchedContentDto>? {
         return cache.getMostWatched()
     }
 
-    override fun getRecommended(): GetRecommendedResponse? {
+    override fun getRecommended(): GetRecommendedResponseDto? {
         return cache.getRecommended()
     }
 

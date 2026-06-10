@@ -1,9 +1,9 @@
 package com.mamm.mammapps.domain.usecases.content
 
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.GetBrandedContentResponse
-import com.mamm.mammapps.data.model.GetOtherContentResponse
 import com.mamm.mammapps.domain.interfaces.MammRepository
+import com.mamm.mammapps.domain.model.BrandedContent
+import com.mamm.mammapps.domain.model.OtherContent
 import com.mamm.mammapps.navigation.model.AppRoute
 import javax.inject.Inject
 
@@ -54,7 +54,6 @@ class GetCategoryContentUseCase @Inject constructor(
     private suspend fun findContentByRoute(route: AppRoute): Result<Any> {
         logger.debug(TAG, "Executing findContentByRoute for route: ${route.name}")
 
-        // El 'when' determina qué método del repositorio llamar y devuelve su resultado.
         return when (route) {
             AppRoute.MOVIES -> repository.getMovies()
             AppRoute.DOCUMENTARIES -> repository.getDocumentaries()
@@ -73,34 +72,37 @@ class GetCategoryContentUseCase @Inject constructor(
 
     private fun getResponseFromContentFilteredByCategory(content: Any, categoryId: Int) : Any? {
         when (content) {
-            is GetOtherContentResponse -> {
+            is OtherContent -> {
                 val vods = content.vods?.filter { it.subgenreById == categoryId }
-                val events = content.events?.filter { it.idSubgenre?.toInt() == categoryId }
+                val events = content.events?.filter { it.subgenreById == categoryId }
 
                 logger.debug(TAG, "Found ${vods?.size} VODs for category $categoryId")
                 logger.debug(TAG, "Found ${events?.size} EVENTS for category $categoryId")
 
                 if (vods != null || events != null) {
-                    return GetOtherContentResponse(
-                            vods = vods,
-                            events = events
-                        )
+                    return OtherContent(
+                        events = events,
+                        vods = vods
+                    )
                 }
 
                 return null
             }
 
-            is GetBrandedContentResponse -> {
-                val vods = content.vods?.filter { it.idSubgenre?.toInt() == categoryId }
-                val events = content.events?.filter { it.idSubgenre?.toInt() == categoryId }
+            is BrandedContent -> {
+                val vods = content.vods?.filter { it.subgenreById == categoryId }
+                val events = content.events?.filter { it.subgenreById == categoryId }
 
                 logger.debug(TAG, "Found ${vods?.size} VODs for category $categoryId")
                 logger.debug(TAG, "Found ${events?.size} EVENTS for category $categoryId")
 
                 if (vods != null || events != null) {
-                    return GetBrandedContentResponse(
-                            vods = vods,
-                            events = events
+                    return BrandedContent(
+                        featured = content.featured,
+                        channels = content.channels,
+                        vods = vods,
+                        events = events,
+                        series = content.series
                     )
                 }
 
@@ -109,6 +111,5 @@ class GetCategoryContentUseCase @Inject constructor(
 
             else -> { return null}
         }
-
     }
 }

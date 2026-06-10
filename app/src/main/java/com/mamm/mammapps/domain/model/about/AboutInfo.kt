@@ -1,4 +1,4 @@
-package com.mamm.mammapps.domain.model
+package com.mamm.mammapps.domain.model.about
 
 data class AboutInfo(
     val appVersion: String,

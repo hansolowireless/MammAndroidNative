@@ -4,17 +4,18 @@ import androidx.core.net.toUri
 import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.Channel
-import com.mamm.mammapps.data.model.Genre
-import com.mamm.mammapps.data.model.GetBrandedContentResponse
-import com.mamm.mammapps.data.model.GetHomeContentResponse
-import com.mamm.mammapps.data.model.GetOtherContentResponse
-import com.mamm.mammapps.data.model.Subgenre
-import com.mamm.mammapps.data.model.exception.GetMemoriesException
-import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
-import com.mamm.mammapps.data.model.serie.GetSeasonInfoResponse
+import com.mamm.mammapps.data.mapper.toDomain
+import com.mamm.mammapps.domain.model.exception.GetMemoriesException
 import com.mamm.mammapps.data.datasource.session.SessionDatasource
 import com.mamm.mammapps.domain.interfaces.MammRepository
+import com.mamm.mammapps.domain.model.BrandedContent
+import com.mamm.mammapps.domain.model.entity.Channel
+import com.mamm.mammapps.domain.model.Genre
+import com.mamm.mammapps.domain.model.HomeContent
+import com.mamm.mammapps.domain.model.OtherContent
+import com.mamm.mammapps.domain.model.Subgenre
+import com.mamm.mammapps.domain.model.memories.Memories
+import com.mamm.mammapps.domain.model.serie.SerieInfo
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.util.AppConstants
 import java.time.Duration
@@ -32,9 +33,9 @@ class MammRepositoryImpl @Inject constructor(
         private const val TAG = "MammRepositoryImpl"
     }
 
-    override suspend fun getHomeContent(): Result<GetHomeContentResponse> {
+    override suspend fun getHomeContent(): Result<HomeContent> {
         return runCatching {
-            localDataSource.getHomeContent()?.let { return@runCatching it }
+            localDataSource.getHomeContent()?.let { return@runCatching it.toDomain() }
             val response = remoteDatasource.getHomeContent()
             localDataSource.setHomeContent(response)
             localDataSource.setCachedSubgenreList(
@@ -42,152 +43,148 @@ class MammRepositoryImpl @Inject constructor(
                     genre.subgenres ?: emptyList()
                 } ?: emptyList()
             )
-            response
-        }.onSuccess { response ->
+            response.toDomain()
+        }.onSuccess {
             logger.debug(TAG, "getHomeContent Received and saved successful response")
         }.onFailure {
             logger.error(TAG, "getHomeContent Failed: ${it}")
         }
     }
 
-    override suspend fun getMovies(): Result<GetOtherContentResponse> {
+    override suspend fun getMovies(): Result<OtherContent> {
         val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
             ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
 
         return runCatching {
-            localDataSource.getMoviesContent()?.let { return@runCatching it }
+            localDataSource.getMoviesContent()?.let { return@runCatching it.toDomain() }
             val response = remoteDatasource.getMovies(jsonParam)
             localDataSource.setMoviesContent(response)
-            response
-        }.onSuccess { response ->
+            response.toDomain()
+        }.onSuccess {
             logger.debug(TAG, "getMovies Received and saved successful response")
         }
     }
 
-    override suspend fun getDocumentaries(): Result<GetOtherContentResponse> {
+    override suspend fun getDocumentaries(): Result<OtherContent> {
         val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
             ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
 
         return runCatching {
-            localDataSource.getDocumentariesContent()?.let { return@runCatching it }
+            localDataSource.getDocumentariesContent()?.let { return@runCatching it.toDomain() }
             val response = remoteDatasource.getDocumentaries(jsonParam)
             localDataSource.setDocumentariesContent(response)
-            response
-        }.onSuccess { response ->
+            response.toDomain()
+        }.onSuccess {
             logger.debug(TAG, "getDocumentaries Received and saved successful response")
         }
     }
 
-    override suspend fun getAdults(): Result<GetBrandedContentResponse> {
+    override suspend fun getAdults(): Result<BrandedContent> {
         val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
             ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
 
         return runCatching {
-            localDataSource.getAdultsContent()?.let { return@runCatching it }
+            localDataSource.getAdultsContent()?.let { return@runCatching it.toDomain() }
             val response = remoteDatasource.getAdults(jsonParam)
             localDataSource.setAdultsContent(response)
-            response
-        }.onSuccess { response ->
+            response.toDomain()
+        }.onSuccess {
             logger.debug(TAG, "getAdults Received and saved successful response")
         }
     }
 
-    override suspend fun getKids(): Result<GetOtherContentResponse> {
+    override suspend fun getKids(): Result<OtherContent> {
         val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
             ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
 
         return runCatching {
-            localDataSource.getKidsContent()?.let { return@runCatching it }
+            localDataSource.getKidsContent()?.let { return@runCatching it.toDomain() }
             val response = remoteDatasource.getKids(jsonParam)
             localDataSource.setKidsContent(response)
-            response
-        }.onSuccess { response ->
+            response.toDomain()
+        }.onSuccess {
             logger.debug(TAG, "getKids Received and saved successful response")
         }
     }
 
-    override suspend fun getSports(): Result<GetOtherContentResponse> {
+    override suspend fun getSports(): Result<OtherContent> {
         val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
             ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
 
         return runCatching {
-            localDataSource.getSportsContent()?.let { return@runCatching it }
+            localDataSource.getSportsContent()?.let { return@runCatching it.toDomain() }
             val response = remoteDatasource.getSports(jsonParam)
             localDataSource.setSportsContent(response)
-            response
-        }.onSuccess { response ->
+            response.toDomain()
+        }.onSuccess {
             logger.debug(TAG, "getSports Received and saved successful response")
         }
     }
 
-    override suspend fun getWarner(): Result<GetBrandedContentResponse> {
+    override suspend fun getWarner(): Result<BrandedContent> {
         val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
-            ?: return Result
-                .failure(IllegalStateException("No valid path segment found in session file"))
+            ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
         return runCatching {
-            localDataSource.getWarnerContent()?.let { return@runCatching it }
+            localDataSource.getWarnerContent()?.let { return@runCatching it.toDomain() }
             val response = remoteDatasource.getWarner(jsonParam)
             localDataSource.setWarnerContent(response)
-            response
-        }.onSuccess { response ->
+            response.toDomain()
+        }.onSuccess {
             logger.debug(TAG, "getWarner Received and saved successful response")
         }
     }
 
-    override suspend fun getAcontra(): Result<GetBrandedContentResponse> {
+    override suspend fun getAcontra(): Result<BrandedContent> {
         val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
-            ?: return Result
-                .failure(IllegalStateException("No valid path segment found in session file"))
+            ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
         return runCatching {
-            localDataSource.getAcontraContent()?.let { return@runCatching it }
+            localDataSource.getAcontraContent()?.let { return@runCatching it.toDomain() }
             val response = remoteDatasource.getAcontra(jsonParam)
             localDataSource.setAcontraContent(response)
-            response
-        }.onSuccess { response ->
+            response.toDomain()
+        }.onSuccess {
             logger.debug(TAG, "getAcontra Received and saved successful response")
         }
     }
 
-    override suspend fun getAMC(): Result<GetBrandedContentResponse> {
+    override suspend fun getAMC(): Result<BrandedContent> {
         val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
-            ?: return Result
-                .failure(IllegalStateException("No valid path segment found in session file"))
+            ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
         return runCatching {
-            localDataSource.getAMCContent()?.let { return@runCatching it }
+            localDataSource.getAMCContent()?.let { return@runCatching it.toDomain() }
             val response = remoteDatasource.getAMC(jsonParam)
             localDataSource.setAMCContent(response)
-            response
-        }.onSuccess { response ->
+            response.toDomain()
+        }.onSuccess {
             logger.debug(TAG, "getAMC Received and saved successful response")
         }
     }
 
-    override suspend fun getMemories(): Result<GetMemoriesResponse> {
+    override suspend fun getMemories(): Result<Memories> {
         return runCatching {
-            localDataSource.getMyMemories()?.let { return@runCatching it }
+            localDataSource.getMyMemories()?.let { return@runCatching it.toDomain() }
             val response = remoteDatasource.getMyMemories()
             if (response.sections.isNullOrEmpty()) {
                 throw GetMemoriesException.EmptyList
             }
             localDataSource.setMyMemories(response)
-            response
+            response.toDomain()
         }.onFailure {
-            // Este bloque ahora capturará tanto errores de red como tu excepción personalizada
             logger.error(TAG, "getMemories failed: ${it.message}, $it")
         }
     }
 
-    override suspend fun getSeasonsInfo(serieId: Int): Result<GetSeasonInfoResponse> {
+    override suspend fun getSeasonsInfo(serieId: Int): Result<SerieInfo> {
         return runCatching {
-            remoteDatasource.getSeasonInfo(serieId)
+            remoteDatasource.getSeasonInfo(serieId).toDomain()
         }.onSuccess {
             logger.debug(TAG, "getSeasonsInfo Received successful response")
         }
     }
 
-    override suspend fun getExpandedCategoryContent(categoryId: Int): Result<GetBrandedContentResponse> {
+    override suspend fun getExpandedCategoryContent(categoryId: Int): Result<BrandedContent> {
         return runCatching {
-            remoteDatasource.getExpandedCategory(categoryId)
+            remoteDatasource.getExpandedCategory(categoryId).toDomain()
         }.onSuccess {
             logger.debug(TAG, "getExpandedCategory Received successful response")
         }
@@ -195,16 +192,14 @@ class MammRepositoryImpl @Inject constructor(
 
     override fun findHomeContent(identifier: ContentIdentifier): Result<Any>? {
         var content: Any? = when (identifier) {
-            is ContentIdentifier.Channel -> localDataSource.getHomeContent()?.channels?.find { it.id == identifier.id }
-            is ContentIdentifier.VoD -> localDataSource.getHomeContent()?.contents?.find { it.id == identifier.id }
-            is ContentIdentifier.Event -> localDataSource.getHomeContent()?.events?.find { it.id == identifier.id }
-            is ContentIdentifier.Serie -> localDataSource.getHomeContent()?.series?.find { it.id == identifier.id }
+            is ContentIdentifier.Channel -> localDataSource.getHomeContent()?.channels?.find { it.id == identifier.id }?.toDomain()
+            is ContentIdentifier.VoD -> localDataSource.getHomeContent()?.contents?.find { it.id == identifier.id }?.toDomain()
+            is ContentIdentifier.Event -> localDataSource.getHomeContent()?.events?.find { it.id == identifier.id }?.toDomain()
+            is ContentIdentifier.Serie -> localDataSource.getHomeContent()?.series?.find { it.id == identifier.id }?.toDomain()
         }
 
         if (content == null) {
-            //If content is STILL null, try to find it in the featured list
-            content =
-                localDataSource.getHomeContent()?.featured?.find { it.id == identifier.id }
+            content = localDataSource.getHomeContent()?.featured?.find { it.id == identifier.id }?.toDomain()
         }
 
         return content?.let { Result.success(it) }
@@ -212,8 +207,8 @@ class MammRepositoryImpl @Inject constructor(
 
     override fun findMovieContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
-            is ContentIdentifier.VoD -> localDataSource.getMoviesContent()?.vods?.find { it.getId() == identifier.id }
-            is ContentIdentifier.Event -> localDataSource.getMoviesContent()?.events?.find { it.getId() == identifier.id }
+            is ContentIdentifier.VoD -> localDataSource.getMoviesContent()?.vods?.find { it.getId() == identifier.id }?.toDomain()
+            is ContentIdentifier.Event -> localDataSource.getMoviesContent()?.events?.find { it.getId() == identifier.id }?.toDomain()
             else -> null
         }
 
@@ -222,8 +217,8 @@ class MammRepositoryImpl @Inject constructor(
 
     override fun findDocumentaryContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
-            is ContentIdentifier.VoD -> localDataSource.getDocumentariesContent()?.vods?.find { it.getId() == identifier.id }
-            is ContentIdentifier.Event -> localDataSource.getDocumentariesContent()?.events?.find { it.getId() == identifier.id }
+            is ContentIdentifier.VoD -> localDataSource.getDocumentariesContent()?.vods?.find { it.getId() == identifier.id }?.toDomain()
+            is ContentIdentifier.Event -> localDataSource.getDocumentariesContent()?.events?.find { it.getId() == identifier.id }?.toDomain()
             else -> null
         }
 
@@ -232,9 +227,9 @@ class MammRepositoryImpl @Inject constructor(
 
     override fun findAdultContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
-            is ContentIdentifier.VoD -> localDataSource.getAdultsContent()?.vods?.find { it.getId() == identifier.id }
-            is ContentIdentifier.Event -> localDataSource.getAdultsContent()?.events?.find { it.getId() == identifier.id }
-            is ContentIdentifier.Channel -> localDataSource.getHomeContent()?.channels?.find { it.id == identifier.id }
+            is ContentIdentifier.VoD -> localDataSource.getAdultsContent()?.vods?.find { it.getId() == identifier.id }?.toDomain()
+            is ContentIdentifier.Event -> localDataSource.getAdultsContent()?.events?.find { it.getId() == identifier.id }?.toDomain()
+            is ContentIdentifier.Channel -> localDataSource.getHomeContent()?.channels?.find { it.id == identifier.id }?.toDomain()
             else -> null
         }
 
@@ -243,8 +238,8 @@ class MammRepositoryImpl @Inject constructor(
 
     override fun findSportsContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
-            is ContentIdentifier.VoD -> localDataSource.getSportsContent()?.vods?.find { it.getId() == identifier.id }
-            is ContentIdentifier.Event -> localDataSource.getSportsContent()?.events?.find { it.getId() == identifier.id }
+            is ContentIdentifier.VoD -> localDataSource.getSportsContent()?.vods?.find { it.getId() == identifier.id }?.toDomain()
+            is ContentIdentifier.Event -> localDataSource.getSportsContent()?.events?.find { it.getId() == identifier.id }?.toDomain()
             else -> null
         }
 
@@ -253,8 +248,8 @@ class MammRepositoryImpl @Inject constructor(
 
     override fun findKidsContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
-            is ContentIdentifier.VoD -> localDataSource.getKidsContent()?.vods?.find { it.getId() == identifier.id }
-            is ContentIdentifier.Event -> localDataSource.getKidsContent()?.events?.find { it.getId() == identifier.id }
+            is ContentIdentifier.VoD -> localDataSource.getKidsContent()?.vods?.find { it.getId() == identifier.id }?.toDomain()
+            is ContentIdentifier.Event -> localDataSource.getKidsContent()?.events?.find { it.getId() == identifier.id }?.toDomain()
             else -> null
         }
 
@@ -264,10 +259,9 @@ class MammRepositoryImpl @Inject constructor(
     override fun findWarnerContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
             is ContentIdentifier.VoD -> {
-                localDataSource.getWarnerContent()?.vods?.find { it.getId() == identifier.id }
-                    ?: localDataSource.getWarnerContent()?.featured?.find { it.formatId == identifier.id.toString() }
+                localDataSource.getWarnerContent()?.vods?.find { it.getId() == identifier.id }?.toDomain()
+                    ?: localDataSource.getWarnerContent()?.featured?.find { it.formatId == identifier.id.toString() }?.toDomain()
             }
-
             else -> null
         }
         return content?.let { Result.success(it) }
@@ -276,10 +270,9 @@ class MammRepositoryImpl @Inject constructor(
     override fun findAcontraContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
             is ContentIdentifier.VoD -> {
-                localDataSource.getAcontraContent()?.vods?.find { it.getId() == identifier.id }
-                    ?: localDataSource.getAcontraContent()?.featured?.find { it.formatId == identifier.id.toString() }
+                localDataSource.getAcontraContent()?.vods?.find { it.getId() == identifier.id }?.toDomain()
+                    ?: localDataSource.getAcontraContent()?.featured?.find { it.formatId == identifier.id.toString() }?.toDomain()
             }
-
             else -> null
         }
         return content?.let { Result.success(it) }
@@ -288,10 +281,9 @@ class MammRepositoryImpl @Inject constructor(
     override fun findAMCContent(identifier: ContentIdentifier): Result<Any>? {
         val content: Any? = when (identifier) {
             is ContentIdentifier.VoD -> {
-                localDataSource.getAMCContent()?.vods?.find { it.getId() == identifier.id }
-                    ?: localDataSource.getAMCContent()?.featured?.find { it.formatId == identifier.id.toString() }
+                localDataSource.getAMCContent()?.vods?.find { it.getId() == identifier.id }?.toDomain()
+                    ?: localDataSource.getAMCContent()?.featured?.find { it.formatId == identifier.id.toString() }?.toDomain()
             }
-
             else -> null
         }
         return content?.let { Result.success(it) }
@@ -305,8 +297,8 @@ class MammRepositoryImpl @Inject constructor(
                 memories.sections
                     ?.flatMap { it.items }
                     ?.find { it.id == identifier.id }
+                    ?.toDomain()
             }
-
             else -> null
         }
 
@@ -320,6 +312,7 @@ class MammRepositoryImpl @Inject constructor(
             localDataSource.getHomeContent()
                 ?.genres
                 ?.firstOrNull { it.id == id }
+                ?.toDomain()
                 ?: throw NoSuchElementException("Genre with id $id not found")
         }
     }
@@ -329,33 +322,26 @@ class MammRepositoryImpl @Inject constructor(
             localDataSource.getHomeContent()
                 ?.channels
                 ?.find { it.id == id }
+                ?.toDomain()
                 ?: throw NoSuchElementException("Channel with id $id not found")
         }
     }
 
     override fun shouldRequestPin(): Boolean {
-
         if (sessionManager.pinParental.isNullOrBlank()) {
             logger.info(TAG, "No PIN found for User, No PIN request is needed.")
             return false
         }
 
-        // Obtener la última fecha guardada desde el LocalDataSource.
         val lastPinTime: ZonedDateTime? = localDataSource.getLastTimePinWasCorrect()
 
-        // Si nunca se ha guardado una fecha (es nulo), debemos solicitar el PIN.
         if (lastPinTime == null) {
             logger.debug(TAG, "No ZonedDateTime found, PIN request is needed.")
             return true
         }
 
-        // Obtener la hora actual con la misma zona horaria.
         val currentTime = ZonedDateTime.now(lastPinTime.zone)
-
-        // Calcular la duración entre la fecha guardada y la actual.
         val duration = Duration.between(lastPinTime, currentTime)
-
-        // Comparar la duración con 15 minutos.
         val shouldRequest = duration.toMinutes() > AppConstants.PIN_REQUEST_MINS
 
         if (shouldRequest) {
@@ -367,10 +353,7 @@ class MammRepositoryImpl @Inject constructor(
         return shouldRequest
     }
 
-
     override fun validatePin(pin: String): Boolean {
-        // La lógica de validación real.
-        // Asumo que el PIN correcto está en el SessionManager.
         val correctPin = sessionManager.pinParental
         val isCorrect = pin == correctPin
 
@@ -384,7 +367,6 @@ class MammRepositoryImpl @Inject constructor(
     }
 
     override fun savePinSuccessTimestamp() {
-        // Guarda la marca de tiempo actual en el LocalDataSource.
         val currentTime = ZonedDateTime.now()
         localDataSource.setLastTimePinWasCorrect(currentTime)
         logger.debug(TAG, "Saved new PIN success timestamp: $currentTime")
@@ -393,9 +375,8 @@ class MammRepositoryImpl @Inject constructor(
     override fun getSubgenreList(): Result<List<Subgenre>> {
         return runCatching {
             localDataSource.getCachedSubgenreList()
+                ?.map { it.toDomain() }
                 ?: throw NoSuchElementException("Subgenre list not found in cache or is null")
         }
     }
-
-
 }

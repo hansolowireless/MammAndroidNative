@@ -1,7 +1,6 @@
 package com.mamm.mammapps.domain.usecases.content
 
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.exception.GetMemoriesException
 import com.mamm.mammapps.domain.interfaces.MammRepository
 import com.mamm.mammapps.ui.mapper.toContentUIRows
 import com.mamm.mammapps.ui.model.ContentRowUI

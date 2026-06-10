@@ -1,7 +1,7 @@
 package com.mamm.mammapps.domain.usecases.diagnostic
 
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.domain.model.AboutInfo
+import com.mamm.mammapps.domain.model.about.AboutInfo
 import com.mamm.mammapps.domain.interfaces.DiagnosticsRepository
 import javax.inject.Inject
 

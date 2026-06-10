@@ -2,12 +2,12 @@ package com.mamm.mammapps.data.model.branded
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import com.mamm.mammapps.data.model.metadata.Metadata
-import com.mamm.mammapps.data.model.section.TbContentItem
+import com.mamm.mammapps.data.model.metadata.MetadataDto
+import com.mamm.mammapps.data.model.section.TbContentItemDto
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class BrandedVod(
+data class BrandedVodDto(
     @SerializedName("content_logo")
     val contentLogo: String? = null,
 
@@ -15,16 +15,16 @@ data class BrandedVod(
     val contentLogoTitle: String? = null,
 
     @SerializedName("tbContentLanguages")
-    val contentLanguages: List<ContentLanguage>? = null,
+    val contentLanguages: List<ContentLanguageDto>? = null,
 
     @SerializedName("id_operator")
     val idOperator: String? = null,
 
     @SerializedName("tbContentItems")
-    val contentItems: List<TbContentItem>? = null,
+    val contentItems: List<TbContentItemDto>? = null,
 
     @SerializedName("logoTransitions")
-    val logoTransitions: List<LogoTransition>? = null,
+    val logoTransitions: List<LogoTransitionDto>? = null,
 
     @SerializedName("expiry_date")
     val expiryDate: String? = null,
@@ -92,13 +92,13 @@ data class BrandedVod(
         return contentLanguages?.firstOrNull()?.longDescription.orEmpty()
     }
 
-    fun getMetadata(): Metadata {
-        return Metadata.fromTbContentItems(items = contentItems.orEmpty())
+    fun getMetadata(): MetadataDto {
+        return MetadataDto.fromTbContentItems(items = contentItems.orEmpty())
     }
 }
 
 @Parcelize
-data class ContentLanguage(
+data class ContentLanguageDto(
     @SerializedName("short_description")
     val shortDescription: String? = null,
 
@@ -118,23 +118,8 @@ data class ContentLanguage(
     val title: String? = null
 ) : Parcelable
 
-//@Parcelize
-//data class ContentItem(
-//    @SerializedName("id_content")
-//    val idContent: String? = null,
-//
-//    @SerializedName("item_ds")
-//    val itemDs: String? = null,
-//
-//    @SerializedName("id_content_item")
-//    val idContentItem: String? = null,
-//
-//    @SerializedName("item_value")
-//    val itemValue: String? = null
-//) : Parcelable
-
 @Parcelize
-data class LogoTransition(
+data class LogoTransitionDto(
     @SerializedName("url")
     val url: String? = null
 ) : Parcelable

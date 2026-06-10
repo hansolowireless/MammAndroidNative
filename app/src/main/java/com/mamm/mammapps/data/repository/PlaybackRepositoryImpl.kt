@@ -6,11 +6,12 @@ import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.mapper.toDomain
-import com.mamm.mammapps.data.model.exception.TickerException
-import com.mamm.mammapps.data.model.player.QosData
+import com.mamm.mammapps.data.mapper.toDto
+import com.mamm.mammapps.domain.model.exception.TickerException
 import com.mamm.mammapps.data.datasource.session.SessionDatasource
 import com.mamm.mammapps.data.util.DrmAuthUtil
 import com.mamm.mammapps.domain.interfaces.PlaybackRepository
+import com.mamm.mammapps.domain.model.player.QosData
 import com.mamm.mammapps.domain.model.player.TickerInfo
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import kotlinx.coroutines.flow.Flow
@@ -137,11 +138,11 @@ class PlaybackRepositoryImpl @Inject constructor(
 
     override suspend fun sendQosData(qosData: QosData): Result<Unit> {
         return runCatching {
-            val completeQosData = qosData
+            val completeQosDto = qosData.toDto()
                 .copy(deviceType = localDatasource.getDeviceType())
                 .copy(ip = remoteDatasource.getCurrentUserIp())
-            logger.debug(TAG, "sendQoSData qosData: $completeQosData")
-            remoteDatasource.sendQosData(completeQosData)
+            logger.debug(TAG, "sendQoSData qosDataDto: $completeQosDto")
+            remoteDatasource.sendQosData(completeQosDto)
         }.onFailure {
             logger.error(TAG, "sendQoSData error sending qos data $it.message")
         }

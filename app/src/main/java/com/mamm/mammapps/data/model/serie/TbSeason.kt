@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class TbSeason(
+data class TbSeasonDto(
     @SerializedName("featured")
     val featured: String? = null,
 
@@ -34,7 +34,7 @@ data class TbSeason(
     val originalId: String? = null,
 
     @SerializedName("tbContentSeasons")
-    val tbContentSeasons: List<TbContentSeason>? = null,
+    val tbContentSeasons: List<TbContentSeasonDto>? = null,
 
     @SerializedName("order")
     val order: String? = null

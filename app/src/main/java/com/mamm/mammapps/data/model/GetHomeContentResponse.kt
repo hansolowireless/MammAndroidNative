@@ -2,30 +2,29 @@ package com.mamm.mammapps.data.model
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import com.mamm.mammapps.data.extension.toZonedDateTimeEPG
-import com.mamm.mammapps.data.model.metadata.Metadata
-import com.mamm.mammapps.data.model.player.WatermarkInfo
-import com.mamm.mammapps.data.model.section.TbContentItem
+import com.mamm.mammapps.data.model.metadata.MetadataDto
+import com.mamm.mammapps.data.model.player.WatermarkInfoDto
+import com.mamm.mammapps.util.toZonedDateTimeEPG
 import kotlinx.parcelize.Parcelize
 import java.time.ZonedDateTime
 
-data class GetHomeContentResponse(
+data class GetHomeContentResponseDto(
     @SerializedName("timeGenerated") val timeGenerated: String? = null,
-    @SerializedName("featured") val featured: List<HomeFeatured>? = null,
-    @SerializedName("channels") val channels: List<Channel>? = null,
-    @SerializedName("contents") val contents: List<VoD>? = null,
-    @SerializedName("genres") val genres: List<Genre>? = null,
-    @SerializedName("categories") val categories: List<Category>? = null,
-    @SerializedName("events") val events: List<Event>? = null,
-    @SerializedName("series") val series: List<Serie>? = null
+    @SerializedName("featured") val featured: List<HomeFeaturedDto>? = null,
+    @SerializedName("channels") val channels: List<ChannelDto>? = null,
+    @SerializedName("contents") val contents: List<VoDDto>? = null,
+    @SerializedName("genres") val genres: List<GenreDto>? = null,
+    @SerializedName("categories") val categories: List<CategoryDto>? = null,
+    @SerializedName("events") val events: List<EventDto>? = null,
+    @SerializedName("series") val series: List<SerieDto>? = null
 )
 
 @Parcelize
-data class HomeFeatured(
+data class HomeFeaturedDto(
     @SerializedName("subgenreById") val subgenreById: Int? = null,
     @SerializedName("featured") val featured: Int? = null,
     @SerializedName("urlLoop") val urlLoop: String? = null,
-    @SerializedName("logoTransitions") val logoTransitions: List<LogoTransition>? = null,
+    @SerializedName("logoTransitions") val logoTransitions: List<LogoTransitionDto>? = null,
     @SerializedName("format") val format: String? = null,
     @SerializedName("description") val description: String? = null,
     @SerializedName("title") val title: String? = null,
@@ -45,17 +44,17 @@ data class HomeFeatured(
 ) : Parcelable
 
 @Parcelize
-data class LogoTransition(
+data class LogoTransitionDto(
     @SerializedName("url") val url: String? = null
 ) : Parcelable
 
 @Parcelize
-data class Channel(
+data class ChannelDto(
     @SerializedName("freeaccess") val freeaccess: Int? = null,
     @SerializedName("channel_position") val channelPosition: Int? = null,
     @SerializedName("featured") val featured: Int? = null,
     @SerializedName("timeshiftOffset") val timeshiftOffset: Int? = null,
-    @SerializedName("logoTransitions") val logoTransitions: List<LogoTransition>? = null,
+    @SerializedName("logoTransitions") val logoTransitions: List<LogoTransitionDto>? = null,
     @SerializedName("description") val description: String? = null,
     @SerializedName("drmUrl") val drmUrl: String? = null,
     @SerializedName("radio") val radio: Int? = null,
@@ -80,18 +79,18 @@ data class Channel(
     @SerializedName("name") val name: String? = null,
     @SerializedName("logoTitleURL") val logoTitleURL: String? = null,
     @SerializedName("fingerprintDuration") val fingerprintDuration: Int? = null,
-    @SerializedName("watermark") val watermark: WatermarkInfo? = null,
+    @SerializedName("watermark") val watermark: WatermarkInfoDto? = null,
     var position : Int = Int.MAX_VALUE,
     var fingerPrintText: String? = null
 ): Parcelable
 
 @Parcelize
-data class VoD(
+data class VoDDto(
     @SerializedName("content_logo") val contentLogo: String? = null,
     @SerializedName("content_logo_tilte") val contentLogoTilte: String? = null,
     @SerializedName("subgenreById") val subgenreById: Int? = null,
-    @SerializedName("tbContentItems") val tbContentItems: List<TbContentItem>? = null,
-    @SerializedName("logoTransitions") val logoTransitions: List<LogoTransition>? = null,
+    @SerializedName("tbContentItems") val tbContentItems: List<com.mamm.mammapps.data.model.section.TbContentItemDto>? = null,
+    @SerializedName("logoTransitions") val logoTransitions: List<LogoTransitionDto>? = null,
     @SerializedName("title") val title: String? = null,
     @SerializedName("logoURL") val logoURL: String? = null,
     @SerializedName("duration") val duration: Int? = null,
@@ -105,43 +104,43 @@ data class VoD(
     @SerializedName("longDesc") val longDesc: String? = null,
     @SerializedName("startDate") val startDate: String? = null,
     @SerializedName("parental") val parental: Int? = null,
-    var metadata: Metadata? = null
+    var metadata: MetadataDto? = null
 ): Parcelable
 
-data class Genre(
-    @SerializedName("subgenres") val subgenres: List<Subgenre>? = null,
-    @SerializedName("logo") val logo: Any? = null,
+data class GenreDto(
+    @SerializedName("subgenres") val subgenres: List<SubgenreDto>? = null,
+    @SerializedName("logo") val logo: String? = null,
     @SerializedName("id") val id: Int? = null,
     @SerializedName("ds") val ds: String? = null
 )
 
-data class Subgenre(
-    @SerializedName("descripcion") val descripcion: Any? = null,
-    @SerializedName("logo") val logo: Any? = null,
+data class SubgenreDto(
+    @SerializedName("descripcion") val descripcion: String? = null,
+    @SerializedName("logo") val logo: String? = null,
     @SerializedName("id") val id: Int? = null,
     @SerializedName("ds") val ds: String? = null
 )
 
-data class Category(
+data class CategoryDto(
     @SerializedName("catchup_row") val catchupRow: Boolean? = null,
     @SerializedName("pos") val pos: Int? = null,
     @SerializedName("name") val name: String? = null,
     @SerializedName("id") val id: Int? = null,
     @SerializedName("load_more") val loadMore: Boolean = false,
-    @SerializedName("order") val order: List<OrderItem>? = null
+    @SerializedName("order") val order: List<OrderItemDto>? = null
 )
 
-data class OrderItem(
+data class OrderItemDto(
     @SerializedName("pos") val pos: Int? = null,
     @SerializedName("id") val id: Int? = null,
     @SerializedName("type") val type: String? = null
 )
 
 @Parcelize
-data class Event(
+data class EventDto(
     @SerializedName("subgenreById") val subgenreById: Int? = null,
     @SerializedName("featured") val featured: Int? = null,
-    @SerializedName("logoTransitions") val logoTransitions: List<LogoTransition>? = null,
+    @SerializedName("logoTransitions") val logoTransitions: List<LogoTransitionDto>? = null,
     @SerializedName("description") val description: String? = null,
     @SerializedName("title") val title: String? = null,
     @SerializedName("fcIni") val fcIni: String? = null,
@@ -156,7 +155,6 @@ data class Event(
     @SerializedName("items") val items: String? = null,
     @SerializedName("parental") val parental: Int? = null
 ) : Parcelable {
-    // Propiedades calculadas para fechas
     val startDateTime: ZonedDateTime?
         get() = fcIni?.toZonedDateTimeEPG()
 
@@ -165,7 +163,7 @@ data class Event(
 }
 
 @Parcelize
-data class Serie(
+data class SerieDto(
     @SerializedName("subgenreById") val subgenreById: Int? = null,
     @SerializedName("featured") val featured: Int? = null,
     @SerializedName("serie_logo_url") val serieLogoUrl: String? = null,

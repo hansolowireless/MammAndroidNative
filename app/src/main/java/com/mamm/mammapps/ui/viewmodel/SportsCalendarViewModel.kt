@@ -2,7 +2,7 @@ package com.mamm.mammapps.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mamm.mammapps.data.model.Channel
+import com.mamm.mammapps.domain.model.entity.Channel
 import com.mamm.mammapps.domain.model.SportsEvent
 import com.mamm.mammapps.domain.usecases.content.GetSportsCalendarUseCase
 import com.mamm.mammapps.domain.usecases.content.FindChannelForMatchUseCase

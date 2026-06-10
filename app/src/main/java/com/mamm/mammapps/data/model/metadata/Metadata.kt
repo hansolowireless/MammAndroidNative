@@ -1,13 +1,13 @@
 package com.mamm.mammapps.data.model.metadata
 
 import android.os.Parcelable
-import com.mamm.mammapps.data.model.section.TbContentItem
-import com.mamm.mammapps.data.model.section.TbEventItem
+import com.mamm.mammapps.data.model.section.TbContentItemDto
+import com.mamm.mammapps.data.model.section.TbEventItemDto
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class Metadata(
-    val actors: List<Actor>,
+data class MetadataDto(
+    val actors: List<ActorDto>,
     val director: String,
     val year: String,
     val country: String,
@@ -17,15 +17,12 @@ data class Metadata(
     val originalTitle: String
 ) : Parcelable {
     companion object {
-        fun fromTbContentItems(items: List<TbContentItem>): Metadata {
-            // Agrupa los items por su itemDs, pero mantiene todos los valores para claves duplicadas.
+        fun fromTbContentItems(items: List<TbContentItemDto>): MetadataDto {
             val groupedItems = items.groupBy({ it.itemDs }, { it.itemValue })
-
-            // Une todos los valores de "cast" en un solo String, separados por "|".
             val allCastValues = groupedItems["cast"]?.joinToString(separator = ",")
 
-            return Metadata(
-                actors = allCastValues?.let { Actor.fromItemValue(it) } ?: emptyList(),
+            return MetadataDto(
+                actors = allCastValues?.let { ActorDto.fromItemValue(it) } ?: emptyList(),
                 director = groupedItems["director"]?.firstOrNull()?.split("|")?.firstOrNull() ?: "",
                 year = groupedItems["year"]?.firstOrNull() ?: "",
                 country = groupedItems["country"]?.firstOrNull() ?: "",
@@ -36,15 +33,12 @@ data class Metadata(
             )
         }
 
-        fun fromTbEventItems(items: List<TbEventItem>): Metadata {
-            // Agrupa los items por su itemDs para manejar valores duplicados como "cast".
+        fun fromTbEventItems(items: List<TbEventItemDto>): MetadataDto {
             val groupedItems = items.groupBy({ it.itemDs }, { it.itemValue })
-
-            // Une todos los valores de "cast" en un solo String, separados por "|".
             val allCastValues = groupedItems["cast"]?.joinToString(separator = ",")
 
-            return Metadata(
-                actors = allCastValues?.let { Actor.fromItemValue(it) } ?: emptyList(),
+            return MetadataDto(
+                actors = allCastValues?.let { ActorDto.fromItemValue(it) } ?: emptyList(),
                 director = groupedItems["director"]?.firstOrNull()?.split("|")?.firstOrNull() ?: "",
                 year = groupedItems["year"]?.firstOrNull() ?: "",
                 country = groupedItems["country"]?.firstOrNull() ?: "",

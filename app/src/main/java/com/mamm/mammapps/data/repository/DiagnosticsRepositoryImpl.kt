@@ -5,10 +5,10 @@ import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.datasource.session.SessionDatasource
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.mapper.toDomain
-import com.mamm.mammapps.domain.model.AboutInfo
-import com.mamm.mammapps.domain.model.DownloadSpeedResult
+import com.mamm.mammapps.domain.model.about.AboutInfo
+import com.mamm.mammapps.domain.model.about.DownloadSpeedResult
 import com.mamm.mammapps.domain.interfaces.DiagnosticsRepository
-import com.mamm.mammapps.domain.model.DiagnosticInfo
+import com.mamm.mammapps.domain.model.about.DiagnosticInfo
 import javax.inject.Inject
 
 class DiagnosticsRepositoryImpl @Inject constructor(

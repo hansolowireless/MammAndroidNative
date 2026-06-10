@@ -23,8 +23,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mamm.mammapps.data.model.GetBrandedContentResponse
-import com.mamm.mammapps.data.model.GetOtherContentResponse
+import com.mamm.mammapps.domain.model.BrandedContent
+import com.mamm.mammapps.domain.model.OtherContent
 import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
 import com.mamm.mammapps.ui.component.common.contententity.ContentEntity
@@ -90,8 +90,8 @@ fun ExpandCategoryScreen(
                     ) {
                         val responseData = state.data
                         val data = when (responseData) {
-                            is GetOtherContentResponse -> responseData.toContentEntityUIList()
-                            is GetBrandedContentResponse -> responseData.toContentEntityUIList()
+                            is OtherContent -> responseData.toContentEntityUIList()
+                            is BrandedContent -> responseData.toContentEntityUIList()
                             else -> emptyList()
                         }
 
@@ -102,13 +102,13 @@ fun ExpandCategoryScreen(
                                 contentEntityUI = item,
                                 onClick = {
                                     when (responseData) {
-                                        is GetOtherContentResponse -> {
+                                        is OtherContent -> {
                                             responseData.findContent(item.identifier)?.let {
                                                 onContentClick(it)
                                             }
                                         }
 
-                                        is GetBrandedContentResponse -> {
+                                        is BrandedContent -> {
                                             responseData.findContent(item.identifier)?.let {
                                                 onContentClick(it)
                                             }

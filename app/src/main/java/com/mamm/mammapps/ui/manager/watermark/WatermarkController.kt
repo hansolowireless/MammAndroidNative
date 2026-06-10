@@ -9,7 +9,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.mamm.mammapps.data.model.player.WatermarkInfo
+import com.mamm.mammapps.domain.model.player.WatermarkInfo
 import com.mamm.mammapps.ui.extension.loadWatermarkOrHide
 import com.mamm.mammapps.ui.model.player.FingerPrintInfoUI
 import java.text.SimpleDateFormat
@@ -71,7 +71,7 @@ class FingerprintController
         val playerFrameLayout = playerFrameLayout ?: return
 
         //Watermark de la liga
-        createAndShowWatermarkLogoImageView(playerFrameLayout, watermarkInfo = watermarkInfo ?: WatermarkInfo(hasInt =  0, url = null))
+        createAndShowWatermarkLogoImageView(playerFrameLayout, watermarkInfo = watermarkInfo ?: WatermarkInfo(has = false, url = null))
 
         if (fingerPrintInfo == null) {
             Log.d("WATERMARK", "Fingeprint info is null, fingeprint stopped and disabled")
