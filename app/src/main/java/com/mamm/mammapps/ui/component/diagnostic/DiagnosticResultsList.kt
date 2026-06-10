@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mamm.mammapps.R
-import com.mamm.mammapps.domain.model.DownloadSpeedResult
+import com.mamm.mammapps.domain.model.about.DownloadSpeedResult
 import com.mamm.mammapps.ui.extension.formatMbps
 import com.mamm.mammapps.ui.theme.TextPrimary
 

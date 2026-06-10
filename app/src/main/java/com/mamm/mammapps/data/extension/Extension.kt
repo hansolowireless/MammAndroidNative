@@ -1,24 +1,23 @@
 package com.mamm.mammapps.data.extension
 
-import com.mamm.mammapps.data.model.GetBrandedContentResponse
-import com.mamm.mammapps.data.model.GetHomeContentResponse
-import com.mamm.mammapps.data.model.metadata.Metadata
-import com.mamm.mammapps.data.model.section.EPGEvent
+import com.mamm.mammapps.data.model.GetBrandedContentResponseDto
+import com.mamm.mammapps.data.model.GetHomeContentResponseDto
+import com.mamm.mammapps.data.model.metadata.MetadataDto
+import com.mamm.mammapps.domain.model.entity.Event
 import com.mamm.mammapps.ui.extension.adult
+import com.mamm.mammapps.util.getCurrentDate
 import retrofit2.Response
-import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-fun GetHomeContentResponse.transformData(
+fun GetHomeContentResponseDto.transformData(
     channelOrder: Map<Int, Int>? = null,
     userId: String? = null
-): GetHomeContentResponse = run {
+): GetHomeContentResponseDto = run {
     val transformedContents = contents?.map { content ->
-        content.copy(metadata = Metadata.fromTbContentItems(content.tbContentItems ?: emptyList()))
+        content.copy(metadata = MetadataDto.fromTbContentItems(content.tbContentItems ?: emptyList()))
     }
 
     val transformedChannels = channels?.map { channel ->
@@ -38,8 +37,8 @@ fun GetHomeContentResponse.transformData(
     )
 }
 
-fun GetBrandedContentResponse.correctAdultImages(
-): GetBrandedContentResponse = run {
+fun GetBrandedContentResponseDto.correctAdultImages(
+): GetBrandedContentResponseDto = run {
     val transformedEvents = events?.map {
         it.copy(
             posterLogo = it.posterLogo?.adult(),
@@ -65,23 +64,11 @@ fun ZonedDateTime.toTSTVDateString(): String {
     return this.format(DateTimeFormatter.ofPattern("yyyy/MM/dd/HH/mm"))
 }
 
-fun getCurrentDate(): ZonedDateTime {
-    return ZonedDateTime.now()
-}
-
-fun String.toZonedDateTimeEPG(): ZonedDateTime? {
-    return runCatching {
-        val isoString = this.replace(" ", "T") + "Z"
-        val instant = Instant.parse(isoString)
-        instant.atZone(ZoneOffset.UTC)
-    }.getOrNull()
-}
-
 fun Response<*>.isRedirect(): Boolean {
     return code() in 300..399
 }
 
-fun EPGEvent.catchupIsAvailable(availableCatchupHours: Int): Boolean {
+fun Event.catchupIsAvailable(availableCatchupHours: Int): Boolean {
     val startInstant = startDateTime?.toInstant()
     val nowInstant = getCurrentDate().toInstant()
     val differenceInMinutes = ChronoUnit.MINUTES.between(startInstant, nowInstant)

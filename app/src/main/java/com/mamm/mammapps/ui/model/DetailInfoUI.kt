@@ -1,7 +1,7 @@
 package com.mamm.mammapps.ui.model
 
 import android.os.Parcelable
-import com.mamm.mammapps.data.model.metadata.Metadata
+import com.mamm.mammapps.domain.model.metadata.Metadata
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

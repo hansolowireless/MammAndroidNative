@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class WatermarkInfo(
+data class WatermarkInfoDto(
     @SerializedName("has")
     val hasInt: Int = 0,
     @SerializedName("url")

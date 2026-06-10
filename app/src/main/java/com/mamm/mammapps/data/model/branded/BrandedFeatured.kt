@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class BrandedFeatured(
+data class BrandedFeaturedDto(
     @SerializedName("subgenreById")
     val subgenreById: String? = null,
 
@@ -16,7 +16,7 @@ data class BrandedFeatured(
     val urlLoop: String? = null,
 
     @SerializedName("logoTransitions")
-    val logoTransitions: List<LogoTransition>? = null,
+    val logoTransitions: List<LogoTransitionDto>? = null,
 
     @SerializedName("format")
     val format: String? = null,

@@ -1,12 +1,12 @@
 package com.mamm.mammapps.data.model.recommended
 
 import com.google.gson.annotations.SerializedName
-import com.mamm.mammapps.data.model.bookmark.Recommended
+import com.mamm.mammapps.data.model.bookmark.RecommendedDto
 
-data class GetRecommendedResponse(
+data class GetRecommendedResponseDto(
     @SerializedName("vod")
-    val vods: List<Recommended>? = null,
+    val vods: List<RecommendedDto>? = null,
 
     @SerializedName("cutv")
-    val cutvs: List<Recommended>? = null
+    val cutvs: List<RecommendedDto>? = null
 )

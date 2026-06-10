@@ -1,8 +1,8 @@
 package com.mamm.mammapps.domain.usecases
 
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.section.EPGEvent
 import com.mamm.mammapps.domain.interfaces.EPGRepository
+import com.mamm.mammapps.domain.model.entity.Event
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -21,13 +21,13 @@ class FindLiveEventOnChannelUseCase @Inject constructor(
         private const val TAG = "FindLiveEventOnChannelUseCase"
     }
 
-    operator fun invoke (channelId: Int?) : EPGEvent? {
+    operator fun invoke (channelId: Int?) : Event? {
         if (channelId == null) return null
         return epgRepository.getLiveEventForChannel(channelId)
     }
 
-    fun observeLiveEvents(channelId: Int): Flow<EPGEvent?> = flow {
-        var currentEvent: EPGEvent? = null
+    fun observeLiveEvents(channelId: Int): Flow<Event?> = flow {
+        var currentEvent: Event? = null
 
         runCatching { invoke(channelId) }
             .onSuccess {

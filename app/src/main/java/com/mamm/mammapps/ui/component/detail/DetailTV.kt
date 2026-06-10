@@ -36,7 +36,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.mamm.mammapps.R
-import com.mamm.mammapps.data.model.bookmark.Recommended
+import com.mamm.mammapps.ui.mapper.getId
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.ui.component.common.PrimaryButton
 import com.mamm.mammapps.ui.component.metadata.ActorCard
@@ -55,7 +55,7 @@ import kotlinx.coroutines.launch
 fun DetailTV(
     modifier: Modifier = Modifier,
     content: ContentEntityUI,
-    similarContent: List<Recommended>?,
+    similarContent: List<Any>?,
     showPlayButton: Boolean = true,
     playButtonMode: PlayButtonModeUI,
     seasonInfoUIState: UIState<List<SeasonUI>>?,
@@ -203,7 +203,7 @@ fun DetailTV(
                         content = it.toSimilarContentRow(),
                         onContentClicked = { content ->
                             //Buscamos el contenido que mandamos a la siguiente vista detalle
-                            similarContent.find { it.id == content.identifier.id }?.let {
+                            similarContent.find { it.getId() == content.identifier.id }?.let {
                                 onSimilarContentClick(it)
                             }
                         }

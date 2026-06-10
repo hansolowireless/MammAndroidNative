@@ -1,7 +1,7 @@
 package com.mamm.mammapps.domain.usecases
 
-import com.mamm.mammapps.data.model.bookmark.Bookmark
 import com.mamm.mammapps.domain.interfaces.CustomContentRepository
+import com.mamm.mammapps.domain.model.bookmark.Bookmark
 import com.mamm.mammapps.ui.model.search.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

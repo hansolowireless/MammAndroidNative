@@ -43,7 +43,7 @@ import androidx.tv.material3.TabDefaults
 import androidx.tv.material3.TabRow
 import androidx.tv.material3.TabRowDefaults
 import com.mamm.mammapps.R
-import com.mamm.mammapps.data.model.Channel
+import com.mamm.mammapps.domain.model.entity.Channel
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.common.ContentEntityListItem
 import com.mamm.mammapps.ui.component.common.LoadingSpinner

@@ -1,10 +1,7 @@
 package com.mamm.mammapps.domain.usecases.player
 
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.player.GetTickersResponseDto
-import com.mamm.mammapps.data.model.player.TickerDto
 import com.mamm.mammapps.domain.interfaces.PlaybackRepository
-import com.mamm.mammapps.domain.model.player.Ticker
 import com.mamm.mammapps.domain.model.player.TickerInfo
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -51,8 +48,6 @@ class GetTickersUseCase @Inject constructor(
                 }
                 .onFailure {
                     logger.error(TAG, "Error getting list of Tickers, ${it.message}")
-                    // Optionally emit an empty list or handle the error in another way
-                    // emit(GetTickersResponse(emptyList(), "")) // Example: emit empty on error
                 }
             delay(CHECK_INTERVAL_MS)
         }

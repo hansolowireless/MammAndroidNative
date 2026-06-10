@@ -2,11 +2,11 @@ package com.mamm.mammapps.data.model.serie
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import com.mamm.mammapps.data.model.section.TbContentItem
+import com.mamm.mammapps.data.model.section.TbContentItemDto
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class Episode(
+data class EpisodeDto(
     @SerializedName("content_logo")
     val contentLogo: String? = null,
 
@@ -14,13 +14,13 @@ data class Episode(
     val contentLogoTitle: String? = null,
 
     @SerializedName("tbContentLanguages")
-    val tbContentLanguages: List<TbContentLanguage>? = null,
+    val tbContentLanguages: List<TbContentLanguageDto>? = null,
 
     @SerializedName("id_operator")
     val idOperator: String? = null,
 
     @SerializedName("tbContentItems")
-    val tbContentItems: List<TbContentItem>? = null,
+    val tbContentItems: List<TbContentItemDto>? = null,
 
     @SerializedName("expiry_date")
     val expiryDate: String? = null,

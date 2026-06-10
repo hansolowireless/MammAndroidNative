@@ -1,6 +1,6 @@
 package com.mamm.mammapps.ui.model.player
 
-import com.mamm.mammapps.data.model.player.WatermarkInfo
+import com.mamm.mammapps.domain.model.player.WatermarkInfo
 import com.mamm.mammapps.ui.model.ContentIdentifier
 
 data class ContentToPlayUI (

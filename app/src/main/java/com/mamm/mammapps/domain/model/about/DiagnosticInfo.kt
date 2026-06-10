@@ -1,4 +1,4 @@
-package com.mamm.mammapps.domain.model
+package com.mamm.mammapps.domain.model.about
 
 /**
  * Contiene las URLs ya limpias y listas para usar de los 4 nodos de diagnóstico.

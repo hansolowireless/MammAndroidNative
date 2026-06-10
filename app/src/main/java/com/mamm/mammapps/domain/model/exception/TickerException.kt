@@ -1,4 +1,4 @@
-package com.mamm.mammapps.data.model.exception
+package com.mamm.mammapps.domain.model.exception
 
 sealed class TickerException : Exception () {
     data object MissingData : TickerException()

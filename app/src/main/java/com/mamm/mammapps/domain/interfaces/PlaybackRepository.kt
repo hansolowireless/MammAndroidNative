@@ -1,7 +1,6 @@
 package com.mamm.mammapps.domain.interfaces
 
-import com.mamm.mammapps.data.model.player.GetTickersResponseDto
-import com.mamm.mammapps.data.model.player.QosData
+import com.mamm.mammapps.domain.model.player.QosData
 import com.mamm.mammapps.domain.model.player.TickerInfo
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import kotlinx.coroutines.flow.Flow

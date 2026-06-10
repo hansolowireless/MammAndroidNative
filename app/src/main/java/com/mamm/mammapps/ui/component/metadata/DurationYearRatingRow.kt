@@ -13,7 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.tv.material3.MaterialTheme
 import coil.compose.AsyncImage
 import com.mamm.mammapps.R
-import com.mamm.mammapps.data.model.metadata.Metadata
+import com.mamm.mammapps.domain.model.metadata.Metadata
 import com.mamm.mammapps.ui.theme.Dimensions
 
 @Composable

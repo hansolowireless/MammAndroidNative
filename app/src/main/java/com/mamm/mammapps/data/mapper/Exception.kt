@@ -1,10 +1,9 @@
 package com.mamm.mammapps.data.mapper
 
-import com.mamm.mammapps.data.model.exception.GetHomeContentException
-import com.mamm.mammapps.data.model.exception.GetMemoriesException
-import com.mamm.mammapps.data.model.exception.LoginException
-import com.mamm.mammapps.data.model.exception.SessionException
-import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
+import com.mamm.mammapps.domain.model.exception.GetHomeContentException
+import com.mamm.mammapps.domain.model.exception.GetMemoriesException
+import com.mamm.mammapps.domain.model.exception.LoginException
+import com.mamm.mammapps.domain.model.exception.SessionException
 import java.net.HttpURLConnection
 
 fun Int.toGetHomeContentException(): GetHomeContentException {

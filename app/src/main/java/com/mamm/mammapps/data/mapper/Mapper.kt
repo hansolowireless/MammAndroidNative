@@ -8,14 +8,13 @@ import com.mamm.mammapps.data.model.player.GetTickersResponseDto
 import com.mamm.mammapps.data.model.player.TickerDto
 import com.mamm.mammapps.data.model.sportsevent.SportsEventDto
 import com.mamm.mammapps.data.util.formatNodeUrl
-import com.mamm.mammapps.domain.model.DiagnosticInfo
+import com.mamm.mammapps.domain.model.about.DiagnosticInfo
 import com.mamm.mammapps.domain.model.SportsEvent
 import com.mamm.mammapps.domain.model.loginwithcode.LoginData
 import com.mamm.mammapps.domain.model.loginwithcode.Skin
 import com.mamm.mammapps.domain.model.loginwithcode.SkinLogo
 import com.mamm.mammapps.domain.model.player.Ticker
 import com.mamm.mammapps.domain.model.player.TickerInfo
-import com.mamm.mammapps.util.orRandom
 import com.mamm.mammapps.util.parseSportEventDate
 
 fun DiagResponseDto.toDomain(): DiagnosticInfo {

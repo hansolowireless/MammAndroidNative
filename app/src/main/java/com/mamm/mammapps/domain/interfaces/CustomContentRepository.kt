@@ -1,9 +1,7 @@
 package com.mamm.mammapps.domain.interfaces
 
-import com.mamm.mammapps.data.model.bookmark.Bookmark
-import com.mamm.mammapps.data.model.bookmark.Recommended
-import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
-import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
+import com.mamm.mammapps.domain.model.bookmark.Bookmark
+import com.mamm.mammapps.domain.model.recommended.RecommendedContent
 import com.mamm.mammapps.ui.model.CustomizedContent
 
 interface CustomContentRepository {
@@ -11,11 +9,11 @@ interface CustomContentRepository {
 
     suspend fun deleteBookmark(contentId: Int, contentType: String): Result<Unit>
 
-    suspend fun getMostWatched(): Result<List<MostWatchedContent>>
+    suspend fun getMostWatched(): Result<List<Any>>
 
-    suspend fun getRecommended(): Result<List<Recommended>>
+    suspend fun getRecommended(): Result<List<Any>>
 
-    suspend fun getSimilar(subgenreId: Int) : Result<GetRecommendedResponse>
+    suspend fun getSimilar(subgenreId: Int) : Result<RecommendedContent>
 
     fun findContent(
         contentId: Int,

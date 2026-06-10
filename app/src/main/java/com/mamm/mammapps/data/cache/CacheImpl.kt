@@ -1,13 +1,13 @@
 package com.mamm.mammapps.data.cache
 
-import com.mamm.mammapps.data.model.GetBrandedContentResponse
-import com.mamm.mammapps.data.model.GetHomeContentResponse
-import com.mamm.mammapps.data.model.GetOtherContentResponse
-import com.mamm.mammapps.data.model.Subgenre
-import com.mamm.mammapps.data.model.bookmark.Bookmark
-import com.mamm.mammapps.data.model.memories.GetMemoriesResponse
-import com.mamm.mammapps.data.model.mostwatched.MostWatchedContent
-import com.mamm.mammapps.data.model.recommended.GetRecommendedResponse
+import com.mamm.mammapps.data.model.GetBrandedContentResponseDto
+import com.mamm.mammapps.data.model.GetHomeContentResponseDto
+import com.mamm.mammapps.data.model.GetOtherContentResponseDto
+import com.mamm.mammapps.data.model.SubgenreDto
+import com.mamm.mammapps.data.model.bookmark.BookmarkDto
+import com.mamm.mammapps.data.model.memories.GetMemoriesResponseDto
+import com.mamm.mammapps.data.model.mostwatched.MostWatchedContentDto
+import com.mamm.mammapps.data.model.recommended.GetRecommendedResponseDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,46 +23,46 @@ class CacheImpl @Inject constructor() : Cache {
     private var showBrandedContentMenus: Boolean? = null
 
     @Volatile
-    private var cachedHomeContent: GetHomeContentResponse? = null
+    private var cachedHomeContent: GetHomeContentResponseDto? = null
 
     @Volatile
-    private var cachedSubgenreList: List<Subgenre>? = null
+    private var cachedSubgenreList: List<SubgenreDto>? = null
 
     @Volatile
-    private var cachedMoviesContent: GetOtherContentResponse? = null
+    private var cachedMoviesContent: GetOtherContentResponseDto? = null
 
     @Volatile
-    private var cachedDocumentariesContent: GetOtherContentResponse? = null
+    private var cachedDocumentariesContent: GetOtherContentResponseDto? = null
 
     @Volatile
-    private var cachedSportsContent: GetOtherContentResponse? = null
+    private var cachedSportsContent: GetOtherContentResponseDto? = null
 
     @Volatile
-    private var cachedAdultsContent: GetBrandedContentResponse? = null
+    private var cachedAdultsContent: GetBrandedContentResponseDto? = null
 
     @Volatile
-    private var cachedKidsContent: GetOtherContentResponse? = null
+    private var cachedKidsContent: GetOtherContentResponseDto? = null
 
     @Volatile
-    private var cachedWarnerContent: GetBrandedContentResponse? = null
+    private var cachedWarnerContent: GetBrandedContentResponseDto? = null
 
     @Volatile
-    private var cachedAcontraContent: GetBrandedContentResponse? = null
+    private var cachedAcontraContent: GetBrandedContentResponseDto? = null
 
     @Volatile
-    private var cachedAMCContent: GetBrandedContentResponse? = null
+    private var cachedAMCContent: GetBrandedContentResponseDto? = null
 
     @Volatile
-    private var cachedMyMemories: GetMemoriesResponse? = null
+    private var cachedMyMemories: GetMemoriesResponseDto? = null
 
     @Volatile
-    private var cachedBookmarks: List<Bookmark>? = null
+    private var cachedBookmarks: List<BookmarkDto>? = null
 
     @Volatile
-    private var cachedMostWatched: List<MostWatchedContent>? = null
+    private var cachedMostWatched: List<MostWatchedContentDto>? = null
 
     @Volatile
-    private var cachedRecommended: GetRecommendedResponse? = null
+    private var cachedRecommended: GetRecommendedResponseDto? = null
 
     @Volatile
     private var cachedLastTimePinWasCorrect: ZonedDateTime? = null
@@ -74,59 +74,59 @@ class CacheImpl @Inject constructor() : Cache {
         showBrandedContentMenus = show
     }
 
-    override fun setHomeContent(homeContent: GetHomeContentResponse) {
+    override fun setHomeContent(homeContent: GetHomeContentResponseDto) {
         cachedHomeContent = homeContent
     }
 
-    override fun setCachedSubgenreList(list: List<Subgenre>) {
+    override fun setCachedSubgenreList(list: List<SubgenreDto>) {
         cachedSubgenreList = list
     }
 
-    override fun setMoviesContent(moviesContent: GetOtherContentResponse) {
+    override fun setMoviesContent(moviesContent: GetOtherContentResponseDto) {
         cachedMoviesContent = moviesContent
     }
 
-    override fun setDocumentariesContent(documentariesContent: GetOtherContentResponse) {
+    override fun setDocumentariesContent(documentariesContent: GetOtherContentResponseDto) {
         cachedDocumentariesContent = documentariesContent
     }
 
-    override fun setSportsContent(sportsContent: GetOtherContentResponse) {
+    override fun setSportsContent(sportsContent: GetOtherContentResponseDto) {
         cachedSportsContent = sportsContent
     }
 
-    override fun setKidsContent(kidsContent: GetOtherContentResponse) {
+    override fun setKidsContent(kidsContent: GetOtherContentResponseDto) {
         cachedKidsContent = kidsContent
     }
 
-    override fun setAdultsContent(adultsContent: GetBrandedContentResponse) {
+    override fun setAdultsContent(adultsContent: GetBrandedContentResponseDto) {
         cachedAdultsContent = adultsContent
     }
 
-    override fun setWarnerContent(warnerContent: GetBrandedContentResponse) {
+    override fun setWarnerContent(warnerContent: GetBrandedContentResponseDto) {
         cachedWarnerContent = warnerContent
     }
 
-    override fun setAcontraContent(acontraContent: GetBrandedContentResponse) {
+    override fun setAcontraContent(acontraContent: GetBrandedContentResponseDto) {
         cachedAcontraContent = acontraContent
     }
 
-    override fun setAMCContent(amcContent: GetBrandedContentResponse) {
+    override fun setAMCContent(amcContent: GetBrandedContentResponseDto) {
         cachedAMCContent = amcContent
     }
 
-    override fun setMyMemories(memories: GetMemoriesResponse) {
+    override fun setMyMemories(memories: GetMemoriesResponseDto) {
         cachedMyMemories = memories
     }
 
-    override fun setBookmarks(bookmarks: List<Bookmark>) {
+    override fun setBookmarks(bookmarks: List<BookmarkDto>) {
         cachedBookmarks = bookmarks
     }
 
-    override fun setMostWatched(mostWatched: List<MostWatchedContent>) {
+    override fun setMostWatched(mostWatched: List<MostWatchedContentDto>) {
         cachedMostWatched = mostWatched
     }
 
-    override fun setRecommended(recommended: GetRecommendedResponse) {
+    override fun setRecommended(recommended: GetRecommendedResponseDto) {
         cachedRecommended = recommended
     }
 
@@ -140,33 +140,33 @@ class CacheImpl @Inject constructor() : Cache {
 
     override fun getShowBrandedContentMenus(): Boolean? = showBrandedContentMenus
 
-    override fun getHomeContent(): GetHomeContentResponse? = cachedHomeContent
+    override fun getHomeContent(): GetHomeContentResponseDto? = cachedHomeContent
 
-    override fun getCachedSubgenreList(): List<Subgenre>? = cachedSubgenreList
+    override fun getCachedSubgenreList(): List<SubgenreDto>? = cachedSubgenreList
 
-    override fun getMoviesContent(): GetOtherContentResponse? = cachedMoviesContent
+    override fun getMoviesContent(): GetOtherContentResponseDto? = cachedMoviesContent
 
-    override fun getDocumentariesContent(): GetOtherContentResponse? = cachedDocumentariesContent
+    override fun getDocumentariesContent(): GetOtherContentResponseDto? = cachedDocumentariesContent
 
-    override fun getSportsContent(): GetOtherContentResponse? = cachedSportsContent
+    override fun getSportsContent(): GetOtherContentResponseDto? = cachedSportsContent
 
-    override fun getKidsContent(): GetOtherContentResponse? = cachedKidsContent
+    override fun getKidsContent(): GetOtherContentResponseDto? = cachedKidsContent
 
-    override fun getAdultsContent(): GetBrandedContentResponse? = cachedAdultsContent
+    override fun getAdultsContent(): GetBrandedContentResponseDto? = cachedAdultsContent
 
-    override fun getWarnerContent(): GetBrandedContentResponse? = cachedWarnerContent
+    override fun getWarnerContent(): GetBrandedContentResponseDto? = cachedWarnerContent
 
-    override fun getAcontraContent(): GetBrandedContentResponse? = cachedAcontraContent
+    override fun getAcontraContent(): GetBrandedContentResponseDto? = cachedAcontraContent
 
-    override fun getAMCContent(): GetBrandedContentResponse? = cachedAMCContent
+    override fun getAMCContent(): GetBrandedContentResponseDto? = cachedAMCContent
 
-    override fun getMyMemories(): GetMemoriesResponse? = cachedMyMemories
+    override fun getMyMemories(): GetMemoriesResponseDto? = cachedMyMemories
 
-    override fun getBookmarks(): List<Bookmark>? = cachedBookmarks
+    override fun getBookmarks(): List<BookmarkDto>? = cachedBookmarks
 
-    override fun getMostWatched(): List<MostWatchedContent>? = cachedMostWatched
+    override fun getMostWatched(): List<MostWatchedContentDto>? = cachedMostWatched
 
-    override fun getRecommended(): GetRecommendedResponse? = cachedRecommended
+    override fun getRecommended(): GetRecommendedResponseDto? = cachedRecommended
 
     override fun getLastTimePinWasCorrect(): ZonedDateTime? = cachedLastTimePinWasCorrect
 

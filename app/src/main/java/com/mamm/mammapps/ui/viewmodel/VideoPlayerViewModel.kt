@@ -26,10 +26,10 @@ import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.util.MimeTypes
 import com.mamm.mammapps.R
-import com.mamm.mammapps.data.extension.getCurrentDate
+import com.mamm.mammapps.util.getCurrentDate
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.exception.SessionException
-import com.mamm.mammapps.data.model.player.QosData
+import com.mamm.mammapps.domain.model.exception.SessionException
+import com.mamm.mammapps.domain.model.player.QosData
 import com.mamm.mammapps.data.model.player.customdatasourcefactory.DynamicHttpMediaDrmCallback
 import com.mamm.mammapps.data.model.player.customdatasourcefactory.TokenParamDataSourceFactory
 import com.mamm.mammapps.domain.model.player.TickerInfo
@@ -337,7 +337,7 @@ class VideoPlayerViewModel @Inject constructor(
             getLiveEventInfoUseCase.observeLiveEvents((_content.value.identifier).getIdValue())
                 .onEach { event ->
                     // Nuevo evento iniciado o terminado
-                    logger.debug(TAG, "startObservingLiveEvents Event changed: ${event?.getTitle()}")
+                    logger.debug(TAG, "startObservingLiveEvents Event changed: ${event?.title}")
                     _liveEventInfo.value = event?.toLiveEventInfoUI()
                 }
                 .launchIn(viewModelScope)

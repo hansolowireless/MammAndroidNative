@@ -2,14 +2,14 @@ package com.mamm.mammapps.data.model.section
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import com.mamm.mammapps.data.extension.getCurrentDate
-import com.mamm.mammapps.data.extension.toZonedDateTimeEPG
-import com.mamm.mammapps.data.model.metadata.Metadata
+import com.mamm.mammapps.data.model.metadata.MetadataDto
+import com.mamm.mammapps.util.getCurrentDate
+import com.mamm.mammapps.util.toZonedDateTimeEPG
 import kotlinx.parcelize.Parcelize
 import java.time.ZonedDateTime
 
 @Parcelize
-data class EPGEvent(
+data class EPGEventDto(
     @SerializedName("featured")
     val featured: String? = null,
 
@@ -20,7 +20,7 @@ data class EPGEvent(
     val eventLogoUrl500: String? = null,
 
     @SerializedName("tbEventItems")
-    val tbEventItems: List<TbEventItem>? = null,
+    val tbEventItems: List<TbEventItemDto>? = null,
 
     @SerializedName("event_logo_title_url")
     val eventLogoTitleUrl: String? = null,
@@ -96,14 +96,11 @@ data class EPGEvent(
         val start = startDateTime ?: return false
         val end = endDateTime ?: return false
         val now = ZonedDateTime.now()
-
-        val isLive = (now.isAfter(start) || now.isEqual(start)) && now.isBefore(end)
-
         return (now.isAfter(start) || now.isEqual(start)) && now.isBefore(end)
     }
 
-    fun getMetadata(): Metadata {
-        return Metadata.fromTbEventItems(tbEventItems ?: emptyList())
+    fun getMetadata(): MetadataDto {
+        return MetadataDto.fromTbEventItems(tbEventItems ?: emptyList())
     }
 
     fun getTitle(): String {

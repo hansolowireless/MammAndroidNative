@@ -19,7 +19,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.mamm.mammapps.data.model.exception.GetHomeContentException
+import com.mamm.mammapps.domain.model.exception.GetHomeContentException
 import com.mamm.mammapps.ui.component.common.OperatorLogoImage
 import com.mamm.mammapps.ui.component.common.PrimaryButton
 import com.mamm.mammapps.ui.mapper.toResId

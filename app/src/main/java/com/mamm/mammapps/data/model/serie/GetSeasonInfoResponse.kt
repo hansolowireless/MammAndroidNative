@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class GetSeasonInfoResponse(
+data class GetSeasonInfoResponseDto(
     @SerializedName("featured")
     val featured: String? = null,
 
@@ -19,7 +19,7 @@ data class GetSeasonInfoResponse(
     val serieLogoTitleUrl: String? = null,
 
     @SerializedName("tbSeasons")
-    val tbSeasons: List<TbSeason>? = null,
+    val tbSeasons: List<TbSeasonDto>? = null,
 
     @SerializedName("id_operator")
     val idOperator: String? = null,
@@ -43,9 +43,8 @@ data class GetSeasonInfoResponse(
     val idSubgenre: String? = null
 ) : Parcelable
 
-
 @Parcelize
-data class TbContentLanguage(
+data class TbContentLanguageDto(
     @SerializedName("short_description")
     val shortDescription: String? = null,
 
@@ -64,4 +63,3 @@ data class TbContentLanguage(
     @SerializedName("title")
     val title: String? = null
 ) : Parcelable
-

@@ -35,7 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.mamm.mammapps.R
-import com.mamm.mammapps.data.model.bookmark.Recommended
+import com.mamm.mammapps.ui.mapper.getId
 import com.mamm.mammapps.ui.component.common.ContentEntityListItem
 import com.mamm.mammapps.ui.component.common.ExpandableText
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
@@ -55,7 +55,7 @@ import com.mamm.mammapps.ui.theme.Dimensions
 fun DetailMobile(
     modifier: Modifier = Modifier,
     content: ContentEntityUI,
-    similarContent: List<Recommended>?,
+    similarContent: List<Any>?,
     showPlayButton: Boolean = true,
     onClickPlay: () -> Unit,
     seasonInfoUIState: UIState<List<SeasonUI>>? = null,
@@ -169,7 +169,7 @@ fun DetailMobile(
                         content = it.toSimilarContentRow(),
                         onContentClicked = { content ->
                             //Buscamos el contenido que mandamos a la siguiente vista detalle
-                            similarContent.find { it.id == content.identifier.id }?.let {
+                            similarContent.find { it.getId() == content.identifier.id }?.let {
                                 onSimilarContentClick(it)
                             }
                         }
@@ -219,7 +219,7 @@ private fun DetailMobilePreview() {
         title = "Título de la Película de Ejemplo",
         detailInfo = DetailInfoUI(
             description = "Esta es una descripción larga de la película de ejemplo para demostrar cómo se ajusta el texto y cómo funciona el scroll dentro de la pantalla de detalle. El contenido debería poder desplazarse verticalmente si no cabe en la pantalla.",
-            metadata = com.mamm.mammapps.data.model.metadata.Metadata(
+            metadata = com.mamm.mammapps.domain.model.metadata.Metadata(
                 actors = emptyList(),
                 director = "Director de Ejemplo",
                 year = "2023",

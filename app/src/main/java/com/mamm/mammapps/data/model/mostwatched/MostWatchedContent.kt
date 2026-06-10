@@ -2,14 +2,14 @@ package com.mamm.mammapps.data.model.mostwatched
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import com.mamm.mammapps.data.extension.toZonedDateTimeEPG
-import com.mamm.mammapps.data.model.metadata.Metadata
-import com.mamm.mammapps.data.model.section.TbContentItem
+import com.mamm.mammapps.data.model.metadata.MetadataDto
+import com.mamm.mammapps.data.model.section.TbContentItemDto
+import com.mamm.mammapps.util.toZonedDateTimeEPG
 import kotlinx.parcelize.Parcelize
 import java.time.ZonedDateTime
 
 @Parcelize
-data class MostWatchedContent(
+data class MostWatchedContentDto(
     @SerializedName("type")
     val type: String? = null,
 
@@ -59,7 +59,7 @@ data class MostWatchedContent(
     val fcEnd: String? = null,
 
     @SerializedName("tbEventItems")
-    val tbEventItems: List<TbContentItem>? = null
+    val tbEventItems: List<TbContentItemDto>? = null
 ) : Parcelable {
 
     val startDateTime: ZonedDateTime?
@@ -68,8 +68,8 @@ data class MostWatchedContent(
     val endDateTime: ZonedDateTime?
         get() = fcEnd?.toZonedDateTimeEPG()
 
-    fun getMetadata(): Metadata {
-        return Metadata.fromTbContentItems(tbEventItems ?: emptyList())
+    fun getMetadata(): MetadataDto {
+        return MetadataDto.fromTbContentItems(tbEventItems ?: emptyList())
     }
 
 }

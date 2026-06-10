@@ -3,9 +3,8 @@ package com.mamm.mammapps.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.Channel
-import com.mamm.mammapps.data.model.bookmark.Recommended
-import com.mamm.mammapps.data.model.serie.TbSeason
+import com.mamm.mammapps.domain.model.entity.Channel
+import com.mamm.mammapps.domain.model.serie.Season
 import com.mamm.mammapps.domain.usecases.FindContentEntityUseCase
 import com.mamm.mammapps.domain.usecases.GetSeasonsInfoUseCase
 import com.mamm.mammapps.domain.usecases.GetSimilarContentUseCase
@@ -53,10 +52,10 @@ class DetailViewModel @Inject constructor(
     private val _seasonInfoUIState = MutableStateFlow<UIState<List<SeasonUI>>>(UIState.Idle)
     val seasonInfoUIState = _seasonInfoUIState.asStateFlow()
 
-    private var seasonListOriginal: List<TbSeason> = mutableListOf()
+    private var seasonListOriginal: List<Season> = mutableListOf()
 
-    private val _similarContent = MutableStateFlow<List<Recommended>?>(null)
-    val similarContent: StateFlow<List<Recommended>?> = _similarContent.asStateFlow()
+    private val _similarContent = MutableStateFlow<List<Any>?>(null)
+    val similarContent: StateFlow<List<Any>?> = _similarContent.asStateFlow()
 
     private val _playButtonMode = MutableStateFlow<PlayButtonModeUI>(PlayButtonModeUI.PLAY)
     val playButtonMode = _playButtonMode.asStateFlow()

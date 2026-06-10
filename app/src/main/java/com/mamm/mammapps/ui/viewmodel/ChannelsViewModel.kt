@@ -3,7 +3,7 @@ package com.mamm.mammapps.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.data.model.Channel
+import com.mamm.mammapps.domain.model.entity.Channel
 import com.mamm.mammapps.domain.usecases.FindContentEntityUseCase
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
 import com.mamm.mammapps.domain.usecases.content.GetChannelsUseCase
@@ -75,7 +75,7 @@ class ChannelsViewModel @Inject constructor(
                 .onEach { event ->
                     logger.debug(
                         TAG,
-                        "startObservingLiveEvents Event changed: ${event?.getTitle()}"
+                        "startObservingLiveEvents Event changed: ${event?.title}"
                     )
                     _liveEventInfo.value = event?.toContentEntityUI() ?: it
                 }

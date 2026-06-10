@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamm.mammapps.R
-import com.mamm.mammapps.data.model.bookmark.Bookmark
+import com.mamm.mammapps.domain.model.bookmark.Bookmark
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
 import com.mamm.mammapps.ui.component.common.TextInput
 import com.mamm.mammapps.ui.component.search.InitialPrompt

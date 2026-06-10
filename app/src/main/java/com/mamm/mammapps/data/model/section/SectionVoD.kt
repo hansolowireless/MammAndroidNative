@@ -2,12 +2,11 @@ package com.mamm.mammapps.data.model.section
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import com.mamm.mammapps.data.model.metadata.Metadata
+import com.mamm.mammapps.data.model.metadata.MetadataDto
 import kotlinx.parcelize.Parcelize
 
-// Assuming Vod has similar structure to Event, but you may need to adjust based on actual structure
 @Parcelize
-data class SectionVod(
+data class SectionVodDto(
     @SerializedName("id")
     val id: Int? = null,
 
@@ -57,16 +56,16 @@ data class SectionVod(
     val subgenreById: Int? = null,
 
     @SerializedName("tbContentItems")
-    val tbContentItems: List<TbContentItem>? = null,
+    val tbContentItems: List<TbContentItemDto>? = null,
 
     @SerializedName("logoTransitions")
-    val logoTransitions: List<LogoTransition>? = null
+    val logoTransitions: List<LogoTransitionDto>? = null
 ) : Parcelable {
 
     fun getId(): Int = id ?: 0
 
-    fun getMetadata(): Metadata {
-        return Metadata.fromTbContentItems(tbContentItems ?: emptyList())
+    fun getMetadata(): MetadataDto {
+        return MetadataDto.fromTbContentItems(tbContentItems ?: emptyList())
     }
 
     fun getDescription(): String {
@@ -76,7 +75,7 @@ data class SectionVod(
 }
 
 @Parcelize
-data class LogoTransition(
+data class LogoTransitionDto(
     @SerializedName("url")
     val url: String? = null
 ) : Parcelable
