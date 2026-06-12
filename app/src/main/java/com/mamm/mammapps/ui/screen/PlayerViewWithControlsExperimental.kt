@@ -59,6 +59,8 @@ import com.mamm.mammapps.R
 import com.mamm.mammapps.ui.component.player.ZappingScreen
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
+import com.mamm.mammapps.ui.model.player.setControlVisibility
+import com.mamm.mammapps.ui.model.player.setDialogButtonVisibility
 import com.mamm.mammapps.ui.constant.PlayerConstant
 import com.mamm.mammapps.ui.extension.buildThumbnailUrl
 import com.mamm.mammapps.ui.extension.findActivity
@@ -93,6 +95,7 @@ fun PlayerViewWithControls(
     val zappingNumberDisplay by viewModel.zappingNumberDisplay.collectAsStateWithLifecycle()
     val isTstvMode by viewModel.isTstvMode.collectAsStateWithLifecycle()
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
+    val liveEventInfo by viewModel.liveEventInfo.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val view = LocalView.current
@@ -403,8 +406,10 @@ fun PlayerViewWithControls(
                         }
                     }
 
-                    viewModel.setControlVisibility(styledPlayerView)
-                    viewModel.setDialogButtonVisibility(ccTracksButton, audioTracksButton)
+                    content?.let {
+                        setControlVisibility(styledPlayerView, it, liveEventInfo)
+                        setDialogButtonVisibility(player, ccTracksButton, audioTracksButton)
+                    } ?: return@AndroidView
 
                     //TODO: does not work well if it is created also on mobile, layout is wrong
                     if (videoResizeManager == null && isAndroidTV(context)) {

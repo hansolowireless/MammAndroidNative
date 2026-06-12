@@ -1,13 +1,8 @@
 package com.mamm.mammapps.ui.viewmodel
 
 import android.content.Context
-import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.appcompat.widget.AppCompatImageButton
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.ExoPlayer
@@ -22,10 +17,8 @@ import com.google.android.exoplayer2.drm.DrmSessionManagerProvider
 import com.google.android.exoplayer2.source.dash.DashMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.util.MimeTypes
-import com.mamm.mammapps.R
 import com.mamm.mammapps.util.getCurrentDate
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.model.exception.SessionException
@@ -48,7 +41,6 @@ import com.mamm.mammapps.domain.usecases.player.SendTickerQosUseCase
 import com.mamm.mammapps.domain.usecases.player.playprogresscache.GetPlayProgressUseCaseSync
 import com.mamm.mammapps.domain.usecases.player.playprogresscache.SavePlayProgressUseCase
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
-import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
 import com.mamm.mammapps.ui.constant.PlayerConstant
 import com.mamm.mammapps.ui.constant.PlayerConstant.M3U8_EXTENSION
 import com.mamm.mammapps.ui.constant.PlayerConstant.MILLISECONDS_TIMEBAR_KEYTIME_INCREMENT
@@ -101,7 +93,7 @@ class VideoPlayerViewModel @Inject constructor(
     private val getPlayProgressUseCase: GetPlayProgressUseCaseSync,
     private val logoutUseCase: LogoutUseCase,
     @ApplicationContext private val context: Context,
-    private val logger: Logger
+    val logger: Logger
 ) : ViewModel() {
 
     companion object {
@@ -475,138 +467,7 @@ class VideoPlayerViewModel @Inject constructor(
         )
     }
 
-    fun setControlVisibility(playerView: StyledPlayerView) {
-        val positionView: View = playerView.findViewById(R.id.exo_position)
-        val tstvHourBeginView: TextView = playerView.findViewById(R.id.tstv_hourbegin)
-        val tstvHourEndView: TextView = playerView.findViewById(R.id.tstv_hourend)
-        val exoDuration: TextView = playerView.findViewById(com.google.android.exoplayer2.ui.R.id.exo_duration)
-        val liveLabel: View = playerView.findViewById(R.id.live_indicator)
 
-        val goToLiveButton: AppCompatImageButton = playerView.findViewById(R.id.go_live_button)
-        val startOverButton: View = playerView.findViewById(R.id.go_beginning_button)
-
-        val jump10sback =
-            playerView.findViewById<AppCompatImageButton>(R.id.jump_10s_back)
-        val jump10sforward =
-            playerView.findViewById<AppCompatImageButton>(R.id.jump_10s_forward)
-
-        playerView.setShowNextButton(false)
-        playerView.setShowPreviousButton(false)
-
-        val previewBar = playerView.findViewById<CustomPreviewBar>(R.id.exo_progress)
-
-        configureTimeBar(previewBar)
-
-        if (_content.value.isTimeshift) {
-            jump10sback.visibility = View.GONE
-            jump10sforward.visibility = View.GONE
-            playerView.setShowRewindButton(false)
-            playerView.setShowFastForwardButton(false)
-
-            if (_liveEventInfo.value != null) {
-                tstvHourBeginView.visibility = View.VISIBLE
-                tstvHourEndView.visibility = View.VISIBLE
-                exoDuration.visibility = View.INVISIBLE
-                tstvHourBeginView.setHourText(_liveEventInfo.value?.eventStart)
-                tstvHourEndView.setHourText(_liveEventInfo.value?.eventEnd)
-
-                positionView.visibility = View.INVISIBLE
-                startOverButton.visibility = View.VISIBLE
-
-                if (previewBar?.isTstvMode == true) {
-                    liveLabel.visibility = View.GONE
-                    goToLiveButton.visibility = View.VISIBLE
-                } else {
-                    liveLabel.visibility = View.VISIBLE
-                    goToLiveButton.visibility = View.GONE
-                }
-
-            } else {
-                positionView.visibility = View.GONE
-                tstvHourBeginView.visibility = View.GONE
-                tstvHourEndView.visibility = View.GONE
-                liveLabel.visibility = View.VISIBLE
-                startOverButton.visibility = View.GONE
-            }
-        } else {
-            goToLiveButton.visibility = View.GONE
-            startOverButton.visibility = View.GONE
-
-            if (!_content.value.isLive) {
-                positionView.visibility = View.VISIBLE
-                tstvHourBeginView.visibility = View.GONE
-                tstvHourEndView.visibility = View.GONE
-                exoDuration.visibility = View.VISIBLE
-                liveLabel.visibility = View.GONE
-                jump10sback.visibility = View.VISIBLE
-                jump10sforward.visibility = View.VISIBLE
-                playerView.setShowRewindButton(true)
-                playerView.setShowFastForwardButton(true)
-            } else {
-                positionView.visibility = View.GONE
-                tstvHourBeginView.visibility = View.GONE
-                tstvHourEndView.visibility = View.GONE
-                exoDuration.visibility = View.INVISIBLE
-                liveLabel.visibility = View.VISIBLE
-                jump10sback.visibility = View.GONE
-                jump10sforward.visibility = View.GONE
-                playerView.setShowRewindButton(false)
-                playerView.setShowFastForwardButton(false)
-            }
-        }
-
-        val titleLabel: TextView = playerView.findViewById(R.id.channel_or_title_label)
-        val liveEventTitleLabel: TextView = playerView.findViewById(R.id.live_event_title_Label)
-        val contentImageView: ImageView = playerView.findViewById(R.id.contentImageView)
-
-        titleLabel.text = _content.value.title
-        liveEventTitleLabel.text = _liveEventInfo.value?.title
-        Glide.with(playerView)
-            .load(_content.value.imageUrl)
-            .into(contentImageView)
-
-    }
-
-    fun setDialogButtonVisibility(
-        ccTracksButton: AppCompatImageButton?,
-        audioTracksButton: AppCompatImageButton?
-    ) {
-        runCatching {
-            if (TrackSelectionDialog.willHaveCCContent(_player.value)) {
-                ccTracksButton?.visibility = View.VISIBLE
-            } else {
-                ccTracksButton?.visibility = View.GONE
-            }
-
-            if (TrackSelectionDialog.willHaveAudioContent(_player.value)) {
-                audioTracksButton?.visibility = View.VISIBLE
-            } else {
-                audioTracksButton?.visibility = View.GONE
-            }
-        }.onFailure {
-            logger.error(TAG, "setDialogButtonVisibility - Error setting button visibility: ${it.message}")
-        }
-    }
-
-    private fun configureTimeBar(previewBar: CustomPreviewBar?) {
-        previewBar?.setKeyTimeIncrement(MILLISECONDS_TIMEBAR_KEYTIME_INCREMENT)
-        if (_content.value.isLive) {
-            if (_liveEventInfo.value != null && _content.value.isTimeshift) {
-                previewBar?.setEventHourEnd(_liveEventInfo.value?.eventEnd?.toDate())
-                previewBar?.setEventHourBegin(_liveEventInfo.value?.eventStart?.toDate())
-                previewBar?.setIsTimeshift(_content.value.isTimeshift)
-                previewBar?.visibility = View.VISIBLE
-                logger.debug(TAG, "configureTimeBar - previewBar visibility: VISIBLE")
-            } else {
-                previewBar?.setIsTimeshift(false)
-                previewBar?.visibility = View.GONE
-                logger.debug(TAG, "configureTimeBar - previewBar visibility: GONE")
-            }
-        } else {
-            previewBar?.visibility = View.VISIBLE
-            logger.debug(TAG, "configureTimeBar - previewBar visibility: VISIBLE")
-        }
-    }
 
     fun triggerTSTVMode(previewBar: CustomPreviewBar?, forcePosition: Long? = null) {
         if (_content.value.isLive && _content.value.isTimeshift) {
