@@ -10,7 +10,6 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.MediaMetadata
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.analytics.PlaybackStatsListener
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManagerProvider
 import com.google.android.exoplayer2.drm.DrmSessionManagerProvider
@@ -22,41 +21,28 @@ import com.google.android.exoplayer2.util.MimeTypes
 import com.mamm.mammapps.util.getCurrentDate
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.model.exception.SessionException
-import com.mamm.mammapps.domain.model.player.QosData
 import com.mamm.mammapps.data.model.player.customdatasourcefactory.DynamicHttpMediaDrmCallback
 import com.mamm.mammapps.data.model.player.customdatasourcefactory.TokenParamDataSourceFactory
 import com.mamm.mammapps.domain.model.player.TickerInfo
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
-import com.mamm.mammapps.domain.usecases.content.GetChannelsUseCase
 import com.mamm.mammapps.domain.usecases.logout.LogoutUseCase
 import com.mamm.mammapps.domain.usecases.player.GetDRMUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.GetJwTokenUseCase
 import com.mamm.mammapps.domain.usecases.player.GetPlayableUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.GetTSTVUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.GetTickersUseCase
-import com.mamm.mammapps.domain.usecases.player.SendBookmarkUseCase
-import com.mamm.mammapps.domain.usecases.player.SendHeartBeatUseCase
-import com.mamm.mammapps.domain.usecases.player.SendQosUseCase
-import com.mamm.mammapps.domain.usecases.player.SendTickerQosUseCase
 import com.mamm.mammapps.domain.usecases.player.playprogresscache.GetPlayProgressUseCaseSync
 import com.mamm.mammapps.domain.usecases.player.playprogresscache.SavePlayProgressUseCase
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.constant.PlayerConstant
 import com.mamm.mammapps.ui.constant.PlayerConstant.M3U8_EXTENSION
-import com.mamm.mammapps.ui.constant.PlayerConstant.MILLISECONDS_TIMEBAR_KEYTIME_INCREMENT
-import com.mamm.mammapps.ui.extension.bitsToMegabits
 import com.mamm.mammapps.ui.extension.setHourText
 import com.mamm.mammapps.ui.extension.toDate
-import com.mamm.mammapps.ui.mapper.toContentEntityUI
-import com.mamm.mammapps.ui.mapper.toContentListUI
-import com.mamm.mammapps.ui.mapper.toContentToPlayUI
 import com.mamm.mammapps.ui.mapper.toLiveEventInfoUI
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
-import com.mamm.mammapps.ui.model.ContentListUI
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import com.mamm.mammapps.ui.model.player.LiveEventInfoUI
-import com.mamm.mammapps.ui.model.player.ZappingInfoUI
 import com.mamm.mammapps.ui.model.uistate.PlayerUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -82,16 +68,15 @@ class VideoPlayerViewModel @Inject constructor(
     private val getDRMUrlUseCase: GetDRMUrlUseCase,
     private val getTSTVUrlUseCase: GetTSTVUrlUseCase,
     private val getJwTokenUseCase: GetJwTokenUseCase,
-    private val sendQoSUseCase: SendQosUseCase,
-    private val sendTickerQosUseCase: SendTickerQosUseCase,
-    private val sendBookmarkUseCase: SendBookmarkUseCase,
-    private val sendHeartbeatUseCase: SendHeartBeatUseCase,
     private val getLiveEventInfoUseCase: FindLiveEventOnChannelUseCase,
-    private val getChannelsUseCase: GetChannelsUseCase,
     private val getTickersUseCase: GetTickersUseCase,
     private val savePlayProgressUseCase: SavePlayProgressUseCase,
     private val getPlayProgressUseCase: GetPlayProgressUseCaseSync,
     private val logoutUseCase: LogoutUseCase,
+    private val heartbeatTracker: HeartbeatTracker,
+    private val qosReporter: QosReporter,
+    private val bookmarkTracker: BookmarkTracker,
+    private val zappingController: ZappingController,
     @ApplicationContext private val context: Context,
     val logger: Logger
 ) : ViewModel() {
@@ -110,12 +95,10 @@ class VideoPlayerViewModel @Inject constructor(
     val content = _content.asStateFlow()
 
     //Mostrar el layer de zapping
-    private val _showZappingLayer = MutableStateFlow<Boolean>(false)
-    val showZappingLayer = _showZappingLayer.asStateFlow()
+    val showZappingLayer = zappingController.showZappingLayer
 
     //Lista de canales para zapping
-    private val _zappingInfo = MutableStateFlow<List<ZappingInfoUI>>(emptyList())
-    val zappingInfo = _zappingInfo.asStateFlow()
+    val zappingInfo = zappingController.zappingInfo
 
     //Información del evento en directo cuando se está reproduciendo un canal
     private val _liveEventInfo = MutableStateFlow<LiveEventInfoUI?>(null)
@@ -126,18 +109,10 @@ class VideoPlayerViewModel @Inject constructor(
     val tickerInfo = _tickerInfo.asStateFlow()
 
     //Display del número del canal para hacer zapping
-    private val _zappingNumberDisplay = MutableStateFlow<String>("")
-    val zappingNumberDisplay = _zappingNumberDisplay.asStateFlow()
+    val zappingNumberDisplay = zappingController.zappingNumberDisplay
 
     // ExoPlayer y componentes
     private var trackSelector: DefaultTrackSelector? = null
-    private val statsListener: PlaybackStatsListener by lazy { PlaybackStatsListener(false) { _, _ -> } }
-
-    // Jobs para handlers periódicos
-    private var qosJob: Job? = null
-    private var bookmarkJob: Job? = null
-    private var heartbeatJob: Job? = null
-    private var channelInputJob: Job? = null
 
     //Either the channel URL or the VOD/Catchup Event URL
     private var playableUrl: String = ""
@@ -216,7 +191,7 @@ class VideoPlayerViewModel @Inject constructor(
                 .build()
         }
 
-        _player.value?.addAnalyticsListener(statsListener)
+        _player.value?.let { qosReporter.registerPlayer(it) }
         _player.value?.addListener(object : Player.Listener {
             override fun onPlayerError(error: PlaybackException) {
                 handlePlayerError(error, context)
@@ -343,27 +318,9 @@ class VideoPlayerViewModel @Inject constructor(
     }
 
     private fun startPeriodicFunctions() {
-        startHeartbeat()
-        startQoSReporting()
-        startBookmarkReporting()
-    }
-
-    private fun startHeartbeat() {
-        heartbeatJob?.cancel()
-        heartbeatJob = viewModelScope.launch(Dispatchers.IO) {
-            logger.debug(TAG, "startHeartbeat Starting to send heartbeat...")
-            sendHeartbeatUseCase().onFailure {
-                handleSessionExpired(it)
-            }
-            while (true) {
-                delay(120000)
-
-                logger.debug(TAG, "startHeartbeat Sending another heartbeat...")
-                sendHeartbeatUseCase().onFailure {
-                    handleSessionExpired(it)
-                }
-            }
-        }
+        heartbeatTracker.startHeartbeat(viewModelScope) { handleSessionExpired(it) }
+        qosReporter.startReporting(viewModelScope, { _player.value }, { _content.value })
+        bookmarkTracker.startTracking(viewModelScope, { _player.value }, { _content.value })
     }
 
     private suspend fun handleSessionExpired(exception: Throwable) {
@@ -379,69 +336,11 @@ class VideoPlayerViewModel @Inject constructor(
         }
     }
 
-    private fun startQoSReporting() {
-        qosJob?.cancel()
-        qosJob = viewModelScope.launch {
-            while (true) {
-                delay(60000)
-                val qosData = createQosData()
-                logger.debug(TAG, "startQoSReporting Calling QoS...")
-                withContext(Dispatchers.IO) {
-                    sendQoSUseCase(qosData)
-                }
-            }
-        }
+    fun callQoSTicker() {
+        qosReporter.callQoSTicker(viewModelScope, _content.value.identifier)
     }
 
-    fun callQoSTicker () {
-        viewModelScope.launch (Dispatchers.IO) {
-            sendTickerQosUseCase(identifier = _content.value.identifier)
-        }
-    }
 
-    private fun createQosData(): QosData {
-        val player = _player.value
-        return QosData(
-            playerBw = statsListener.playbackStats?.meanBandwidth?.bitsToMegabits().toString(),
-            activeTrack = player?.videoFormat?.height?.toString() ?: "0",
-            videoBw = player?.videoFormat?.bitrate?.toString() ?: "0",
-            bufTime = statsListener.playbackStats?.rebufferRate?.toString() ?: "0",
-            loadLatency = statsListener.playbackStats?.meanJoinTimeMs?.toString() ?: "0",
-            playTime = "0.0",
-            primaryNode = player?.currentMediaItem?.localConfiguration?.uri?.host ?: "",
-            id = _content.value.identifier.id.toString(),
-            type = _content.value.identifier.getQoSString()
-        )
-    }
-
-    private fun startBookmarkReporting() {
-        if (_content.value.identifier is ContentIdentifier.VoD || _content.value.identifier is ContentIdentifier.Event) {
-            bookmarkJob?.cancel()
-            bookmarkJob = viewModelScope.launch {
-                logger.debug(TAG, "startBookmarkReporting in 2 minutes...")
-                delay(120000) // 2 minutos inicial
-                while (true) {
-                    sendBookmarkStamps()
-                    delay(60000)
-                }
-            }
-        } else {
-            logger.info(
-                TAG,
-                "startBookmarkReporting Content is not VOD or Event, won't start bookmark report"
-            )
-        }
-    }
-
-    private fun sendBookmarkStamps() {
-        val player = _player.value
-        viewModelScope.launch {
-            sendBookmarkUseCase(
-                content = _content.value,
-                time = player?.currentPosition ?: 0
-            )
-        }
-    }
 
     private fun handlePlayerError(exception: PlaybackException, context: Context) {
         when (exception.errorCode) {
@@ -516,128 +415,65 @@ class VideoPlayerViewModel @Inject constructor(
     }
 
     fun setLivePosition (previewBar: CustomPreviewBar?) {
+        logger.debug(TAG, "setLivePosition")
         val currentLivePosition = Duration.between(_liveEventInfo.value?.eventStart, getCurrentDate())
             .toMillis()
         triggerTSTVMode(previewBar, forcePosition = currentLivePosition)
     }
 
     fun showZappingLayer() {
-        if (_content.value.identifier is ContentIdentifier.Channel) {
-            _showZappingLayer.update { true }
-        }
+        logger.debug(TAG, "showZappingLayer")
+        zappingController.showZappingLayer(_content.value)
     }
 
     fun hideZappingLayer() {
-        _showZappingLayer.update { false }
+        logger.debug(TAG, "hideZappingLayer")
+        zappingController.hideZappingLayer()
     }
 
     fun showZappingNumberDisplay(newDigit: String) {
-        logger.debug(TAG, "showZappingNumberDisplay")
-        if (_zappingNumberDisplay.value.length < 3) {
-            _zappingNumberDisplay.update{ _zappingNumberDisplay.value + newDigit }
-        }
+        zappingController.showZappingNumberDisplay(newDigit)
     }
 
     fun updateChannelList() {
         logger.debug(TAG, "updateChannelList")
-        if (_content.value.identifier is ContentIdentifier.Channel) {
-            viewModelScope.launch(Dispatchers.IO) {
-                getChannelsUseCase().onSuccess { channels ->
-
-                    val currentIsPorn = channels.find { it.id == _content.value.identifier.id  }?.isPornChannel ?: false
-
-                    _zappingInfo.update {
-                        channels.filter{ it.isPornChannel == currentIsPorn }.map { channel ->
-                            ZappingInfoUI(
-                                channel = channel.toContentEntityUI(),
-                                liveEvent = getLiveEventInfoUseCase(channelId = channel.id)?.toContentListUI()
-                                    ?: ContentListUI(
-                                        identifier = ContentIdentifier.Event(0),
-                                        title = "",
-                                        imageUrl = ""
-                                    )
-                            )
-                        }
-                    }
-                }.onFailure {
-                    logger.error(TAG, "updateChannelList Error getting channels for Zapping List")
-                }
-            }
-        }
+        zappingController.updateChannelList(_content.value, viewModelScope)
     }
 
     fun findAndPlayChannel(content: ContentEntityUI) {
-        viewModelScope.launch(Dispatchers.IO) {
-            getChannelsUseCase().onSuccess { channels ->
-                val channel = channels.find { it.id == content.identifier.id }
-                channel?.let {
-                    initializeWithContent(it.toContentToPlayUI())
-                } ?: logger.error(TAG, "findAndPlayChannel - Channel not found")
-            }
+        zappingController.findAndPlayChannel(content, viewModelScope) {
+            initializeWithContent(it)
         }
     }
 
-    fun navigateToChannel (number: String) {
-        runCatching {
-            _zappingNumberDisplay.update { "" }
-            //Pulsar 1 en el mando tiene que ir al primer canal de la lista
-            findAndPlayChannel(content = _zappingInfo.value[number.toInt() - 1].channel)
-        }.onFailure {
-            logger.error(TAG, "navigateToChannel - Error navigating to channel: ${it.message}")
+    fun navigateToChannel(number: String) {
+        zappingController.navigateToChannel(number, viewModelScope) {
+            initializeWithContent(it)
         }
     }
 
     fun navigateToNextChannel() {
-        if (_content.value.identifier is ContentIdentifier.Channel) {
-            runCatching {
-                val currentList = _zappingInfo.value
-                if (currentList.isNotEmpty()) {
-                    val currentIndex = currentList.indexOfFirst { it.channel.identifier.id == _content.value.identifier.id }
-
-                    // Calculamos el siguiente índice (si es el último, vuelve al 0)
-                    val nextIndex = (currentIndex + 1) % currentList.size
-
-                    val nextChannel = currentList[nextIndex].channel
-                    findAndPlayChannel(content = nextChannel)
-                }
-            }.onFailure {
-                logger.error(TAG, "navigateToNextChannel - Error navigating to next channel: ${it.message}")
-            }
-        } else {
-            logger.error(TAG, "navigateToNextChannel - Content is not a channel")
+        zappingController.navigateToNextChannel(_content.value, viewModelScope) {
+            initializeWithContent(it)
         }
     }
 
     fun navigateToPreviousChannel() {
-        if (_content.value.identifier is ContentIdentifier.Channel) {
-            runCatching {
-                val currentList = _zappingInfo.value
-                if (currentList.isNotEmpty()) {
-                    val currentIndex = currentList.indexOfFirst { it.channel.identifier.id == _content.value.identifier.id }
-
-                    // Calculamos el índice anterior (si es 0, va al último)
-                    val prevIndex = if (currentIndex <= 0) currentList.size - 1 else currentIndex - 1
-
-                    val prevChannel = currentList[prevIndex].channel
-                    findAndPlayChannel(content = prevChannel)
-                }
-            }.onFailure {
-                logger.error(TAG, "navigateToPreviousChannel - Error navigating to previous channel: ${it.message}")
-            }
-        } else {
-            logger.error(TAG, "navigateToPreviousChannel - Content is not a channel")
+        zappingController.navigateToPreviousChannel(_content.value, viewModelScope) {
+            initializeWithContent(it)
         }
     }
 
     private fun stopPeriodicFunctions() {
-        qosJob?.cancel()
-        bookmarkJob?.cancel()
-        heartbeatJob?.cancel()
-        channelInputJob?.cancel()
+        logger.debug(TAG, "stopPeriodicFunctions")
+        qosReporter.stopReporting()
+        bookmarkTracker.stopTracking()
+        heartbeatTracker.stopHeartbeat()
     }
 
     private fun releasePlayer() {
-        _player.value?.removeAnalyticsListener(statsListener)
+        logger.debug(TAG, "releasePlayer")
+        _player.value?.let { qosReporter.unregisterPlayer(it) }
         _player.value?.release()
         _player.value = null
     }
