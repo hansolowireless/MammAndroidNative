@@ -1,4 +1,4 @@
-package com.mamm.mammapps.ui.viewmodel
+package com.mamm.mammapps.ui.model.player.helper
 
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase

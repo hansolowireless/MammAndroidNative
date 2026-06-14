@@ -1,4 +1,4 @@
-package com.mamm.mammapps.ui.model.player
+package com.mamm.mammapps.ui.model.player.helper
 
 import android.view.View
 import android.widget.ImageView
@@ -15,6 +15,8 @@ import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
 import com.mamm.mammapps.ui.constant.PlayerConstant.MILLISECONDS_TIMEBAR_KEYTIME_INCREMENT
 import com.mamm.mammapps.ui.extension.setHourText
 import com.mamm.mammapps.ui.extension.toDate
+import com.mamm.mammapps.ui.model.player.ContentToPlayUI
+import com.mamm.mammapps.ui.model.player.LiveEventInfoUI
 
 private const val TAG = "PlayerViewHelper"
 private val logger: Logger = SimpleLogger()
@@ -27,8 +29,8 @@ private val logger: Logger = SimpleLogger()
  * abstrayendo la lógica visual en base al estado del contenido actual y del evento en vivo.
  *
  * @param playerView La vista del reproductor [StyledPlayerView] cuyos controles se van a configurar.
- * @param content El modelo UI del contenido actual en reproducción [ContentToPlayUI].
- * @param liveEventInfo La información del evento en vivo actual [LiveEventInfoUI], o nulo si no aplica.
+ * @param content El modelo UI del contenido actual en reproducción [com.mamm.mammapps.ui.model.player.ContentToPlayUI].
+ * @param liveEventInfo La información del evento en vivo actual [com.mamm.mammapps.ui.model.player.LiveEventInfoUI], o nulo si no aplica.
  */
 fun setControlVisibility(
     playerView: StyledPlayerView,

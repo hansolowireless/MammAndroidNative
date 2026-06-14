@@ -59,8 +59,8 @@ import com.mamm.mammapps.R
 import com.mamm.mammapps.ui.component.player.ZappingScreen
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.component.player.dialogs.TrackSelectionDialog
-import com.mamm.mammapps.ui.model.player.setControlVisibility
-import com.mamm.mammapps.ui.model.player.setDialogButtonVisibility
+import com.mamm.mammapps.ui.model.player.helper.setControlVisibility
+import com.mamm.mammapps.ui.model.player.helper.setDialogButtonVisibility
 import com.mamm.mammapps.ui.constant.PlayerConstant
 import com.mamm.mammapps.ui.extension.buildThumbnailUrl
 import com.mamm.mammapps.ui.extension.findActivity

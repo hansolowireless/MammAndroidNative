@@ -1,4 +1,4 @@
-package com.mamm.mammapps.ui.viewmodel
+package com.mamm.mammapps.ui.model.player.helper
 
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.analytics.PlaybackStatsListener
@@ -6,6 +6,7 @@ import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.model.player.QosData
 import com.mamm.mammapps.domain.usecases.player.SendQosUseCase
 import com.mamm.mammapps.domain.usecases.player.SendTickerQosUseCase
+import com.mamm.mammapps.ui.constant.PlayerConstant
 import com.mamm.mammapps.ui.extension.bitsToMegabits
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
@@ -15,7 +16,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.mamm.mammapps.ui.constant.PlayerConstant
 import javax.inject.Inject
 
 class QosReporter @Inject constructor(
