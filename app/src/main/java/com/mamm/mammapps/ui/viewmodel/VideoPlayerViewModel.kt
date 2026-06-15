@@ -7,22 +7,19 @@ import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.MediaMetadata
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManagerProvider
 import com.google.android.exoplayer2.drm.DrmSessionManagerProvider
-import com.google.android.exoplayer2.source.dash.DashMediaSource
-import com.google.android.exoplayer2.source.hls.HlsMediaSource
+import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
+import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
-import com.google.android.exoplayer2.util.MimeTypes
-import com.mamm.mammapps.util.getCurrentDate
 import com.mamm.mammapps.data.logger.Logger
-import com.mamm.mammapps.domain.model.exception.SessionException
 import com.mamm.mammapps.data.model.player.customdatasourcefactory.DynamicHttpMediaDrmCallback
 import com.mamm.mammapps.data.model.player.customdatasourcefactory.TokenParamDataSourceFactory
+import com.mamm.mammapps.domain.model.exception.SessionException
 import com.mamm.mammapps.domain.model.player.TickerInfo
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
 import com.mamm.mammapps.domain.usecases.logout.LogoutUseCase
@@ -35,17 +32,19 @@ import com.mamm.mammapps.domain.usecases.player.playprogresscache.GetPlayProgres
 import com.mamm.mammapps.domain.usecases.player.playprogresscache.SavePlayProgressUseCase
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.constant.PlayerConstant
-import com.mamm.mammapps.ui.constant.PlayerConstant.M3U8_EXTENSION
+import com.mamm.mammapps.ui.extension.inferMimeType
 import com.mamm.mammapps.ui.extension.toDate
 import com.mamm.mammapps.ui.mapper.toLiveEventInfoUI
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
-import com.mamm.mammapps.ui.model.player.helper.HeartbeatTracker
 import com.mamm.mammapps.ui.model.player.LiveEventInfoUI
+import com.mamm.mammapps.ui.model.player.helper.BookmarkTracker
+import com.mamm.mammapps.ui.model.player.helper.HeartbeatTracker
 import com.mamm.mammapps.ui.model.player.helper.QosReporter
 import com.mamm.mammapps.ui.model.player.helper.ZappingController
 import com.mamm.mammapps.ui.model.uistate.PlayerUIState
+import com.mamm.mammapps.util.getCurrentDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -216,76 +215,79 @@ class VideoPlayerViewModel @Inject constructor(
 
     private suspend fun setPlayerUrls(videoUrl: String, drmUrl: String = "") {
         withContext(Dispatchers.Main) {
-            val player = _player.value
+            val player = _player.value ?: return@withContext
             val content = _content.value
 
-            val mimeType = if (videoUrl.contains(M3U8_EXTENSION)) {
-                MimeTypes.APPLICATION_M3U8
-            } else {
-                MimeTypes.APPLICATION_MPD
-            }
-
-            val mediaItemBuilder = MediaItem.Builder()
-                .setUri(videoUrl)
-                .setMediaMetadata(MediaMetadata.Builder().setTitle("").build())
-                .setMimeType(mimeType)
-
-            if (drmUrl.isNotEmpty()) {
-                mediaItemBuilder.setDrmConfiguration(
-                    MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
-                        .setLicenseUri(drmUrl)
-                        .setMultiSession(true)
-                        .build()
-                )
-            }
-
-            val mediaItem = mediaItemBuilder.build()
-
+            val mediaItem = buildMediaItem(videoUrl, drmUrl)
+            val drmProvider = buildDrmSessionManagerProvider(drmUrl)
             val dataSourceFactory = tokenParamDataSourceFactory.also { it.resetTokenMode() }
+            val mediaSource = buildMediaSource(mediaItem, drmProvider, dataSourceFactory)
 
-            // DRM con renovación dinámica del token por cada KeyRequest
-            val drmSessionManagerProvider = if (drmUrl.isNotEmpty()) {
-                DrmSessionManagerProvider { _ ->
-                    val drmCallback = DynamicHttpMediaDrmCallback(
-                        defaultLicenseUrl = drmUrl,
-                        dataSourceFactory = DefaultHttpDataSource.Factory(),
-                        tokenProvider = { runBlocking { getJwTokenUseCase(_content.value).getOrNull() } },
-                        logger = logger
-                    )
+            player.setMediaSource(mediaSource)
+            seekToCorrectPosition(player, content)
+            player.prepare()
+            player.playWhenReady = true
+        }
+    }
 
-                    DefaultDrmSessionManager.Builder()
-                        .setMultiSession(true)
-                        .setPlayClearSamplesWithoutKeys(true)
-                        .setUseDrmSessionsForClearContent(C.TRACK_TYPE_VIDEO, C.TRACK_TYPE_AUDIO)
-                        .build(drmCallback)
+    private fun buildMediaItem(videoUrl: String, drmUrl: String): MediaItem {
+        //TODO: asignar la metadata mediante setMediaMetadata?
+        val builder = MediaItem.Builder()
+            .setUri(videoUrl)
+            .setMimeType(videoUrl.inferMimeType())
+
+        if (drmUrl.isNotEmpty()) {
+            builder.setDrmConfiguration(
+                MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                    .setLicenseUri(drmUrl)
+                    .setMultiSession(true)
+                    .build()
+            )
+        }
+        return builder.build()
+    }
+
+    private fun buildDrmSessionManagerProvider(drmUrl: String): DrmSessionManagerProvider {
+        if (drmUrl.isEmpty()) return DefaultDrmSessionManagerProvider()
+
+        val drmCallback = DynamicHttpMediaDrmCallback(
+            defaultLicenseUrl = drmUrl,
+            dataSourceFactory = DefaultHttpDataSource.Factory(),
+            tokenProvider = {
+                runBlocking(Dispatchers.IO) {
+                    getJwTokenUseCase(_content.value).getOrNull()
                 }
-            } else {
-                DefaultDrmSessionManagerProvider()
-            }
+            },
+            logger = logger
+        )
 
-            val mediaSource = if (mimeType == MimeTypes.APPLICATION_M3U8) {
-                HlsMediaSource.Factory(dataSourceFactory)
-                    .setDrmSessionManagerProvider(drmSessionManagerProvider)
-                    .createMediaSource(mediaItem)
-            } else {
-                DashMediaSource.Factory(dataSourceFactory)
-                    .setDrmSessionManagerProvider(drmSessionManagerProvider)
-                    .createMediaSource(mediaItem)
-            }
+        val drmSessionManager = DefaultDrmSessionManager.Builder()
+            .setMultiSession(true)
+            .setPlayClearSamplesWithoutKeys(true)
+            .setUseDrmSessionsForClearContent(C.TRACK_TYPE_VIDEO, C.TRACK_TYPE_AUDIO)
+            .build(drmCallback)
 
-            player?.setMediaSource(mediaSource)
+        return DrmSessionManagerProvider { drmSessionManager }
+    }
 
-            if ((content.initialPlayPositionMs) > 0) {
-                player?.seekTo(content.initialPlayPositionMs ?: 0)
-            } else if (tstvInitialPlayPositionMs > 0) {
-                player?.seekTo(tstvInitialPlayPositionMs)
-                tstvInitialPlayPositionMs = 0
-            } else {
-                player?.seekTo(getPlayProgress())
-            }
+    private fun buildMediaSource(
+        mediaItem: MediaItem,
+        drmProvider: DrmSessionManagerProvider,
+        dataSourceFactory: TokenParamDataSourceFactory
+    ): MediaSource {
+        return DefaultMediaSourceFactory(dataSourceFactory)
+            .setDrmSessionManagerProvider(drmProvider)
+            .createMediaSource(mediaItem)
+    }
 
-            player?.prepare()
-            player?.playWhenReady = true
+    private fun seekToCorrectPosition(player: ExoPlayer, content: ContentToPlayUI) {
+        if (content.initialPlayPositionMs > 0) {
+            player.seekTo(content.initialPlayPositionMs)
+        } else if (tstvInitialPlayPositionMs > 0) {
+            player.seekTo(tstvInitialPlayPositionMs)
+            tstvInitialPlayPositionMs = 0
+        } else {
+            player.seekTo(getPlayProgress())
         }
     }
 
