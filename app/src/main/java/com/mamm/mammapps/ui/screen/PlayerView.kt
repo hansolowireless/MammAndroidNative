@@ -1,7 +1,6 @@
 package com.mamm.mammapps.ui.screen
 
 import android.content.Context
-import android.content.pm.ActivityInfo
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -38,11 +37,7 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
@@ -63,7 +58,6 @@ import com.mamm.mammapps.ui.model.player.helper.setControlVisibility
 import com.mamm.mammapps.ui.model.player.helper.setDialogButtonVisibility
 import com.mamm.mammapps.ui.constant.PlayerConstant
 import com.mamm.mammapps.ui.extension.buildThumbnailUrl
-import com.mamm.mammapps.ui.extension.findActivity
 import com.mamm.mammapps.ui.extension.insertThumbnail
 import com.mamm.mammapps.ui.extension.jump10sBack
 import com.mamm.mammapps.ui.extension.jump10sForward
@@ -83,7 +77,7 @@ private enum class TrackType { AUDIO, CC, VIDEO }
 
 //TODO dejar aqui solo la lógica onPressed y llevar el resto a VideoPlayer (la clase padre)
 @Composable
-fun PlayerViewWithControls(
+fun PlayerView(
     modifier: Modifier = Modifier,
     viewModel: VideoPlayerViewModel,
     player: ExoPlayer?,
@@ -98,7 +92,6 @@ fun PlayerViewWithControls(
     val liveEventInfo by viewModel.liveEventInfo.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
-    val view = LocalView.current
     val fragmentManager = (context as? FragmentActivity)?.supportFragmentManager
 
     val fingerprintController = remember { FingerprintController() }
@@ -112,27 +105,6 @@ fun PlayerViewWithControls(
     val tickerInfo by viewModel.tickerInfo.collectAsStateWithLifecycle()
     var videoResizeManager by remember { mutableStateOf<VideoResizeManagerWithTicker?>(null) }
     val lifecycleOwner = LocalLifecycleOwner.current
-
-    // --- EFECTOS DE PANTALLA COMPLETA Y ORIENTACIÓN ---
-    DisposableEffect(Unit) {
-        val window = context.findActivity().window
-        val insetsController = WindowCompat.getInsetsController(window, view)
-        insetsController.hide(WindowInsetsCompat.Type.systemBars())
-        insetsController.systemBarsBehavior =
-            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        onDispose {
-            insetsController.show(WindowInsetsCompat.Type.systemBars())
-        }
-    }
-
-    DisposableEffect(Unit) {
-        val activity = context.findActivity()
-        val originalOrientation = activity.requestedOrientation
-        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-        onDispose {
-            activity.requestedOrientation = originalOrientation
-        }
-    }
 
     // Gestiona el cambio de foco cuando aparece/desaparece el zapping
     LaunchedEffect(showZappingLayer) {
