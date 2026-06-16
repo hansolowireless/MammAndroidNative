@@ -40,11 +40,11 @@ import java.time.LocalDate
 import kotlin.collections.isNotEmpty
 import kotlin.collections.map
 
-fun Any.toContentEntityUI(): ContentEntityUI? {
+fun Any.toContentEntityUI(customContentType: CustomizedContent = CustomizedContent.None): ContentEntityUI? {
     return when (this) {
         is Channel -> this.toContentEntityUI()
-        is VoD -> this.toContentEntityUI()
-        is Event -> this.toContentEntityUI()
+        is VoD -> this.toContentEntityUI(customContentType)
+        is Event -> this.toContentEntityUI(customContentType)
         is Serie -> this.toContentEntityUI()
         is Bookmark -> this.toContentEntityUI()
         is Featured -> this.toContentEntityUI()
@@ -77,7 +77,7 @@ fun Channel.toContentEntityUI() = ContentEntityUI(
     ),
 )
 
-fun VoD.toContentEntityUI() = ContentEntityUI(
+fun VoD.toContentEntityUI(customContentType: CustomizedContent = CustomizedContent.None) = ContentEntityUI(
     identifier = ContentIdentifier.VoD(getId()),
     imageUrl = (posterURL?.takeIf { it.isNotBlank() } ?: logoURL).orEmpty(),
     horizontalImageUrl = (logoURL?.takeIf { it.isNotBlank() } ?: contentLogo).orEmpty(),
@@ -88,10 +88,11 @@ fun VoD.toContentEntityUI() = ContentEntityUI(
         metadata = metadata,
         description = getDescription(),
         subgenreId = subgenreById
-    )
+    ),
+    customContentType = customContentType
 )
 
-fun Event.toContentEntityUI() = ContentEntityUI(
+fun Event.toContentEntityUI(customContentType: CustomizedContent = CustomizedContent.None) = ContentEntityUI(
     identifier = ContentIdentifier.Event(getId()),
     imageUrl = (posterLogo?.takeIf { it.isNotBlank() } ?: eventLogoUrl500?.takeIf { it.isNotBlank() } ?: logoURL).orEmpty(),
     horizontalImageUrl = (eventLogoUrl?.takeIf { it.isNotBlank() } ?: logoURL).orEmpty(),
@@ -105,7 +106,8 @@ fun Event.toContentEntityUI() = ContentEntityUI(
         metadata = metadata,
         channelId = getChannelId()
     ),
-    liveEventInfo = this.toLiveEventInfoUI()
+    liveEventInfo = this.toLiveEventInfoUI(),
+    customContentType = customContentType
 )
 
 fun Serie.toContentEntityUI() = ContentEntityUI(
@@ -261,7 +263,8 @@ fun Bookmark.toContentToPlayUI(): ContentToPlayUI? {
         epgEventInfo = LiveEventInfoUI(
             title = this.title.orEmpty(),
             eventStart = this.startDateTime,
-            eventEnd = this.endDateTime
+            eventEnd = this.endDateTime,
+            fatherChannelId = this.channelId?.toIntOrNull()
         )
     )
 }
@@ -500,7 +503,7 @@ fun List<ContentRowUI>.insertRecommended(
         ContentRowUI(
             categoryId = getRandomHashCode(),
             categoryName = "Recomendado para ti",
-            items = recommended.mapNotNull { it.toContentEntityUI() }
+            items = recommended.mapNotNull { it.toContentEntityUI(CustomizedContent.RecommendedType) }
         ).let {
             return listOf(it) + this
         }
@@ -516,7 +519,7 @@ fun List<ContentRowUI>.insertMostWatched(
         ContentRowUI(
             categoryId = getRandomHashCode(),
             categoryName = "Más visto",
-            items = mostWatched.mapNotNull { it.toContentEntityUI() }
+            items = mostWatched.mapNotNull { it.toContentEntityUI(CustomizedContent.MostWatchedType) }
         ).let {
             return listOf(it) + this
         }
