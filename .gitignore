@@ -52,6 +52,10 @@ captures/
 .idea/Project.xml
 .idea/studiobot.xml
 
+# Claude Code
+.idea/claudeCodeTabState.xml
+.idea/claudeCodeEditorTabs.xml
+
 # Keystore files
 *.jks
 *.keystore

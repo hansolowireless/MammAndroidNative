@@ -12,9 +12,13 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManagerProvider
 import com.google.android.exoplayer2.drm.DrmSessionManagerProvider
+import com.google.android.exoplayer2.ext.ima.ImaAdsLoader
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import android.view.ViewGroup
+import com.google.android.exoplayer2.ui.AdOverlayInfo
+import com.google.android.exoplayer2.ui.AdViewProvider
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.player.customdatasourcefactory.DynamicHttpMediaDrmCallback
@@ -28,12 +32,13 @@ import com.mamm.mammapps.domain.usecases.player.GetJwTokenUseCase
 import com.mamm.mammapps.domain.usecases.player.GetPlayableUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.GetTSTVUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.GetTickersUseCase
+import com.mamm.mammapps.domain.usecases.player.GetVastAdUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.playprogresscache.GetPlayProgressUseCaseSync
 import com.mamm.mammapps.domain.usecases.player.playprogresscache.SavePlayProgressUseCase
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.constant.PlayerConstant
-import com.mamm.mammapps.ui.extension.inferMimeType
 import com.mamm.mammapps.ui.extension.toDate
+import com.mamm.mammapps.ui.extension.inferMimeType
 import com.mamm.mammapps.ui.mapper.toLiveEventInfoUI
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
@@ -49,6 +54,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -57,8 +63,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import java.lang.ref.WeakReference
 import java.time.Duration
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 @HiltViewModel
 class VideoPlayerViewModel @Inject constructor(
@@ -67,6 +75,7 @@ class VideoPlayerViewModel @Inject constructor(
     private val getDRMUrlUseCase: GetDRMUrlUseCase,
     private val getTSTVUrlUseCase: GetTSTVUrlUseCase,
     private val getJwTokenUseCase: GetJwTokenUseCase,
+    private val getVastAdUrlUseCase: GetVastAdUrlUseCase,
     private val getLiveEventInfoUseCase: FindLiveEventOnChannelUseCase,
     private val getTickersUseCase: GetTickersUseCase,
     private val savePlayProgressUseCase: SavePlayProgressUseCase,
@@ -113,6 +122,15 @@ class VideoPlayerViewModel @Inject constructor(
     // ExoPlayer y componentes
     private var trackSelector: DefaultTrackSelector? = null
 
+    private var adsLoader: ImaAdsLoader? = null
+    var adViewProvider: AdViewProvider? = null
+
+    private val adViewProviderProxy = object : AdViewProvider {
+        override fun getAdViewGroup(): ViewGroup? = adViewProvider?.adViewGroup
+        override fun getAdOverlayInfos(): List<AdOverlayInfo> =
+            adViewProvider?.adOverlayInfos ?: emptyList()
+    }
+
     //Either the channel URL or the VOD/Catchup Event URL
     private var playableUrl: String = ""
     private var playableLicenseUrl: String = ""
@@ -121,6 +139,7 @@ class VideoPlayerViewModel @Inject constructor(
     private var tstvInitialPlayPositionMs = 0L
     private val _isTstvMode = MutableStateFlow<Boolean>(false)
     val isTstvMode = _isTstvMode.asStateFlow()
+
 
     /**
      * Inicializar el player con contenido específico
@@ -185,9 +204,23 @@ class VideoPlayerViewModel @Inject constructor(
                 )
                 .build()
 
-            ExoPlayer.Builder(context)
+            val newPlayer = ExoPlayer.Builder(context)
                 .setTrackSelector(trackSelector!!)
                 .build()
+
+            if (adsLoader == null) {
+                adsLoader = ImaAdsLoader.Builder(context)
+                    .setAdEventListener { adEvent ->
+                        logger.debug(TAG, "IMA Ad Event: ${adEvent.type}")
+                    }
+                    .setAdErrorListener { adErrorEvent ->
+                        logger.error(TAG, "IMA Ad Error: ${adErrorEvent.error.message} (Code: ${adErrorEvent.error.errorCode})")
+                    }
+                    .build()
+            }
+            adsLoader?.setPlayer(newPlayer)
+
+            newPlayer
         }
 
         _player.value?.let { qosReporter.registerPlayer(it) }
@@ -218,10 +251,11 @@ class VideoPlayerViewModel @Inject constructor(
             val player = _player.value ?: return@withContext
             val content = _content.value
 
-            val mediaItem = buildMediaItem(videoUrl, drmUrl)
+            val adTagUrl = getVastAdUrlUseCase(content)
+            val mediaItem = buildMediaItem(videoUrl, drmUrl, adTagUrl)
             val drmProvider = buildDrmSessionManagerProvider(drmUrl)
             val dataSourceFactory = tokenParamDataSourceFactory.also { it.resetTokenMode() }
-            val mediaSource = buildMediaSource(mediaItem, drmProvider, dataSourceFactory)
+            val mediaSource = buildMediaSource(mediaItem, drmProvider, dataSourceFactory, adTagUrl)
 
             player.setMediaSource(mediaSource)
             seekToCorrectPosition(player, content)
@@ -230,11 +264,16 @@ class VideoPlayerViewModel @Inject constructor(
         }
     }
 
-    private fun buildMediaItem(videoUrl: String, drmUrl: String): MediaItem {
-        //TODO: asignar la metadata mediante setMediaMetadata?
+    private fun buildMediaItem(videoUrl: String, drmUrl: String, adTagUrl: String): MediaItem {
         val builder = MediaItem.Builder()
             .setUri(videoUrl)
             .setMimeType(videoUrl.inferMimeType())
+
+        if (adTagUrl.isNotEmpty()) {
+            builder.setAdsConfiguration(
+                MediaItem.AdsConfiguration.Builder(adTagUrl.toUri()).build()
+            )
+        }
 
         if (drmUrl.isNotEmpty()) {
             builder.setDrmConfiguration(
@@ -273,11 +312,21 @@ class VideoPlayerViewModel @Inject constructor(
     private fun buildMediaSource(
         mediaItem: MediaItem,
         drmProvider: DrmSessionManagerProvider,
-        dataSourceFactory: TokenParamDataSourceFactory
+        dataSourceFactory: TokenParamDataSourceFactory,
+        adTagUrl: String
     ): MediaSource {
-        return DefaultMediaSourceFactory(dataSourceFactory)
+        val factory = DefaultMediaSourceFactory(dataSourceFactory)
             .setDrmSessionManagerProvider(drmProvider)
-            .createMediaSource(mediaItem)
+
+        val adsLoaderInstance = adsLoader
+        if (adsLoaderInstance != null && adTagUrl.isNotEmpty()) {
+            factory.setLocalAdInsertionComponents(
+                { adsLoaderInstance },
+                adViewProviderProxy
+            )
+        }
+
+        return factory.createMediaSource(mediaItem)
     }
 
     private fun seekToCorrectPosition(player: ExoPlayer, content: ContentToPlayUI) {
@@ -394,7 +443,7 @@ class VideoPlayerViewModel @Inject constructor(
                             setPlayerUrls(videoUrl = url)
 
                         }.onFailure {
-                            logger.error(TAG, "handleScrubStop Failed to get TSTV url, defaulting to Live Url")
+                            logger.error(TAG, "handleScrubStop Failed to get VAST url, defaulting to Live Url")
 
                             previewBar?.isTstvMode = false
                             _isTstvMode.update { false }
@@ -475,6 +524,7 @@ class VideoPlayerViewModel @Inject constructor(
 
     private fun releasePlayer() {
         logger.debug(TAG, "releasePlayer")
+        adsLoader?.setPlayer(null)
         _player.value?.let { qosReporter.unregisterPlayer(it) }
         _player.value?.release()
         _player.value = null
@@ -502,6 +552,9 @@ class VideoPlayerViewModel @Inject constructor(
         savePlayProgress()
         stopPeriodicFunctions()
         releasePlayer()
+        adsLoader?.release()
+        adsLoader = null
+        adViewProvider = null
     }
 
 }

@@ -78,8 +78,10 @@ okhttp-logging-interceptor = { module = "com.squareup.okhttp3:logging-intercepto
 previewseekbar = { group = "com.github.rubensousa", name = "previewseekbar", version.ref = "previewseekbar" }
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 exoplayer = { group = "com.google.android.exoplayer", name = "exoplayer", version.ref = "exoplayer" }
+exoplayer-ima = { group = "com.google.android.exoplayer", name = "extension-ima", version.ref = "exoplayer" }
 play-services-cast-framework = { group = "com.google.android.gms", name = "play-services-cast-framework", version.ref = "playServicesCastFramework" }
 previewseekbar-exoplayer = { group = "com.github.rubensousa", name = "previewseekbar-exoplayer", version.ref = "previewseekbar-exoplayer" }
+interactivemedia = { group = "com.google.ads.interactivemedia.v3", name = "interactivemedia", version = "3.33.0" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -95,7 +97,9 @@ video-player = [
     "previewseekbar",
     "glide",
     "exoplayer",
-    "previewseekbar-exoplayer"
+    "previewseekbar-exoplayer",
+    "exoplayer-ima",
+    "interactivemedia"
 ]
 jwt = ["jjwt-api", "jjwt-impl", "jjwt-orgjson"]
 previewseekbar = ["previewseekbar", "previewseekbar-exoplayer"]

@@ -13,6 +13,7 @@ import com.mamm.mammapps.data.util.DrmAuthUtil
 import com.mamm.mammapps.domain.interfaces.PlaybackRepository
 import com.mamm.mammapps.domain.model.player.QosData
 import com.mamm.mammapps.domain.model.player.TickerInfo
+import com.mamm.mammapps.domain.model.player.VastAdParameters
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import kotlinx.coroutines.flow.Flow
 import java.time.Duration
@@ -100,9 +101,22 @@ class PlaybackRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getVastAdParameters(): Result<VastAdParameters> {
+        return runCatching {
+            VastAdParameters(
+                operator = sessionDatasource.loginData?.skin?.operator ?: Config.operatorNameDRM,
+                userId = sessionDatasource.loginData?.userId ?: 0,
+                device = localDatasource.getDeviceSerial(),
+                deviceType = localDatasource.getDeviceType()
+            )
+        }.onFailure { exception ->
+            logger.error(TAG, "error getting VAST ad parameters: ${exception.message}")
+        }
+    }
+
     override suspend fun getTickers(): Result<TickerInfo> {
         return runCatching {
-            sessionDatasource.loginData?.tickerUrl?.let {
+            sessionDatasource.tickerUrl?.let {
                 remoteDatasource.getTickers(url = it).toDomain()
             } ?: throw TickerException.MissingData
         }.onFailure {

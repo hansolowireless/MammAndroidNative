@@ -2,6 +2,7 @@ package com.mamm.mammapps.data.datasource.session
 
 import com.mamm.mammapps.data.local.SharedPreferencesManager
 import com.mamm.mammapps.data.model.login.LoginDataDto
+import com.mamm.mammapps.data.extension.toValidBaseUrl
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -27,6 +28,7 @@ class SessionDatasource @Inject constructor(
     val pinParental: String? get() = loginData?.pinparental
     val operatorLogoUrl : String? get() = skinImages[5001] ?: skinImages[1501]
     val refreshToken: String? get() = loginData?.refreshToken
+    val tickerUrl: String? get() = loginData?.tickerUrl
 
     init {
         val restoredData = sharedPreferencesManager.getLoginData()

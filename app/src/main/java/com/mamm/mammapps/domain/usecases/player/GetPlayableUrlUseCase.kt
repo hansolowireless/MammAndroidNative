@@ -103,7 +103,7 @@ class GetPlayableUrlUseCase @Inject constructor(
             }
 
             val catchupURL =
-                "${baseUri.scheme}://${baseUri.authority}${baseUri.path}playlist.mpd?$queryString"
+                "${baseUri.scheme}://${baseUri.authority}${baseUri.path}playlist.m3u8?$queryString"
             logger.debug(
                 TAG,
                 "tuneUrlToCatchupIfNeeded URL has been tuned to conform Catchup URL $catchupURL"

@@ -20,7 +20,7 @@ import com.mamm.mammapps.domain.model.topchannels.TopChannels
 import com.mamm.mammapps.ui.constant.UIConstant
 import com.mamm.mammapps.ui.extension.landscape
 import com.mamm.mammapps.ui.extension.squared
-import com.mamm.mammapps.ui.extension.toBookmarkStartTimeMs
+import com.mamm.mammapps.ui.extension.secondsToMs
 import com.mamm.mammapps.ui.model.ContentEPGUI
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
@@ -259,7 +259,7 @@ fun Bookmark.toContentToPlayUI(): ContentToPlayUI? {
         deliveryURL = this.deliveryURL.orEmpty(),
         title = this.title.orEmpty(),
         imageUrl = this.logoURL.orEmpty(),
-        initialPlayPositionMs = this.currentTime.toBookmarkStartTimeMs(),
+        initialPlayPositionMs = this.currentTime.secondsToMs(),
         epgEventInfo = LiveEventInfoUI(
             title = this.title.orEmpty(),
             eventStart = this.startDateTime,

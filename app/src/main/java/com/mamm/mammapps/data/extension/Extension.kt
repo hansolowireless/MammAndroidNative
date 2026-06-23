@@ -11,6 +11,7 @@ import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.net.URL
 
 fun GetHomeContentResponseDto.transformData(
     channelOrder: Map<Int, Int>? = null,
@@ -77,4 +78,13 @@ fun Event.catchupIsAvailable(availableCatchupHours: Int): Boolean {
     return availableCatchupHours > 0 &&
             differenceInHours > 0 &&
             differenceInHours < availableCatchupHours
+}
+
+fun String.toValidBaseUrl(): String {
+    val url = URL(this)
+    if ((url.protocol.equals("http", ignoreCase = true) || url.protocol.equals("https", ignoreCase = true)) && !url.host.isNullOrBlank()) {
+        return if (this.endsWith("/")) this else "$this/"
+    } else {
+        throw IllegalArgumentException("URL protocol must be HTTP or HTTPS, and host must not be blank")
+    }
 }
