@@ -12,12 +12,8 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManagerProvider
 import com.google.android.exoplayer2.drm.DrmSessionManagerProvider
-import com.google.android.exoplayer2.ext.ima.ImaAdsLoader
-import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import android.view.ViewGroup
-import com.google.android.exoplayer2.ui.AdOverlayInfo
 import com.google.android.exoplayer2.ui.AdViewProvider
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.mamm.mammapps.data.logger.Logger
@@ -44,6 +40,7 @@ import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import com.mamm.mammapps.ui.model.player.LiveEventInfoUI
+import com.mamm.mammapps.ui.model.player.helper.AdsManager
 import com.mamm.mammapps.ui.model.player.helper.BookmarkTracker
 import com.mamm.mammapps.ui.model.player.helper.HeartbeatTracker
 import com.mamm.mammapps.ui.model.player.helper.QosReporter
@@ -81,6 +78,7 @@ class VideoPlayerViewModel @Inject constructor(
     private val savePlayProgressUseCase: SavePlayProgressUseCase,
     private val getPlayProgressUseCase: GetPlayProgressUseCaseSync,
     private val logoutUseCase: LogoutUseCase,
+    private val adsManager: AdsManager,
     private val heartbeatTracker: HeartbeatTracker,
     private val qosReporter: QosReporter,
     private val bookmarkTracker: BookmarkTracker,
@@ -122,14 +120,8 @@ class VideoPlayerViewModel @Inject constructor(
     // ExoPlayer y componentes
     private var trackSelector: DefaultTrackSelector? = null
 
-    private var adsLoader: ImaAdsLoader? = null
-    var adViewProvider: AdViewProvider? = null
-
-    private val adViewProviderProxy = object : AdViewProvider {
-        override fun getAdViewGroup(): ViewGroup? = adViewProvider?.adViewGroup
-        override fun getAdOverlayInfos(): List<AdOverlayInfo> =
-            adViewProvider?.adOverlayInfos ?: emptyList()
-    }
+    // AdViewProvider temporal para los anuncios
+    private var currentAdViewProvider: AdViewProvider? = null
 
     //Either the channel URL or the VOD/Catchup Event URL
     private var playableUrl: String = ""
@@ -140,6 +132,13 @@ class VideoPlayerViewModel @Inject constructor(
     private val _isTstvMode = MutableStateFlow<Boolean>(false)
     val isTstvMode = _isTstvMode.asStateFlow()
 
+
+    /**
+     * Establece el AdViewProvider para renderizar los anuncios
+     */
+    fun setAdViewProvider(adViewProvider: AdViewProvider?) {
+        currentAdViewProvider = adViewProvider
+    }
 
     /**
      * Inicializar el player con contenido específico
@@ -170,7 +169,8 @@ class VideoPlayerViewModel @Inject constructor(
 
                     setPlayerUrls(
                         videoUrl = playableUrl,
-                        drmUrl = playableLicenseUrl
+                        drmUrl = playableLicenseUrl,
+                        adViewProvider = currentAdViewProvider
                     )
 
                 } else {
@@ -208,17 +208,7 @@ class VideoPlayerViewModel @Inject constructor(
                 .setTrackSelector(trackSelector!!)
                 .build()
 
-            if (adsLoader == null) {
-                adsLoader = ImaAdsLoader.Builder(context)
-                    .setAdEventListener { adEvent ->
-                        logger.debug(TAG, "IMA Ad Event: ${adEvent.type}")
-                    }
-                    .setAdErrorListener { adErrorEvent ->
-                        logger.error(TAG, "IMA Ad Error: ${adErrorEvent.error.message} (Code: ${adErrorEvent.error.errorCode})")
-                    }
-                    .build()
-            }
-            adsLoader?.setPlayer(newPlayer)
+            adsManager.setupAdsLoader(newPlayer)
 
             newPlayer
         }
@@ -246,7 +236,11 @@ class VideoPlayerViewModel @Inject constructor(
 
     }
 
-    private suspend fun setPlayerUrls(videoUrl: String, drmUrl: String = "") {
+    suspend fun setPlayerUrls(
+        videoUrl: String,
+        drmUrl: String = "",
+        adViewProvider: AdViewProvider? = null
+    ) {
         withContext(Dispatchers.Main) {
             val player = _player.value ?: return@withContext
             val content = _content.value
@@ -255,7 +249,14 @@ class VideoPlayerViewModel @Inject constructor(
             val mediaItem = buildMediaItem(videoUrl, drmUrl, adTagUrl)
             val drmProvider = buildDrmSessionManagerProvider(drmUrl)
             val dataSourceFactory = tokenParamDataSourceFactory.also { it.resetTokenMode() }
-            val mediaSource = buildMediaSource(mediaItem, drmProvider, dataSourceFactory, adTagUrl)
+
+            val mediaSource = adsManager.createMediaSourceWithAds(
+                mediaItem = mediaItem,
+                drmProvider = drmProvider,
+                dataSourceFactory = dataSourceFactory,
+                adTagUrl = adTagUrl,
+                adViewProvider = adViewProvider
+            )
 
             player.setMediaSource(mediaSource)
             seekToCorrectPosition(player, content)
@@ -307,26 +308,6 @@ class VideoPlayerViewModel @Inject constructor(
             .build(drmCallback)
 
         return DrmSessionManagerProvider { drmSessionManager }
-    }
-
-    private fun buildMediaSource(
-        mediaItem: MediaItem,
-        drmProvider: DrmSessionManagerProvider,
-        dataSourceFactory: TokenParamDataSourceFactory,
-        adTagUrl: String
-    ): MediaSource {
-        val factory = DefaultMediaSourceFactory(dataSourceFactory)
-            .setDrmSessionManagerProvider(drmProvider)
-
-        val adsLoaderInstance = adsLoader
-        if (adsLoaderInstance != null && adTagUrl.isNotEmpty()) {
-            factory.setLocalAdInsertionComponents(
-                { adsLoaderInstance },
-                adViewProviderProxy
-            )
-        }
-
-        return factory.createMediaSource(mediaItem)
     }
 
     private fun seekToCorrectPosition(player: ExoPlayer, content: ContentToPlayUI) {
@@ -440,7 +421,10 @@ class VideoPlayerViewModel @Inject constructor(
                             tstvInitialPlayPositionMs = progress
                             _isTstvMode.update { true }
 
-                            setPlayerUrls(videoUrl = url)
+                            setPlayerUrls(
+                                videoUrl = url,
+                                adViewProvider = currentAdViewProvider
+                            )
 
                         }.onFailure {
                             logger.error(TAG, "handleScrubStop Failed to get VAST url, defaulting to Live Url")
@@ -448,7 +432,11 @@ class VideoPlayerViewModel @Inject constructor(
                             previewBar?.isTstvMode = false
                             _isTstvMode.update { false }
 
-                            setPlayerUrls(videoUrl = playableUrl, drmUrl = playableLicenseUrl)
+                            setPlayerUrls(
+                                videoUrl = playableUrl,
+                                drmUrl = playableLicenseUrl,
+                                adViewProvider = currentAdViewProvider
+                            )
 
                         }
                 }
@@ -457,7 +445,11 @@ class VideoPlayerViewModel @Inject constructor(
                 previewBar?.isTstvMode = false
                 _isTstvMode.update { false }
                 viewModelScope.launch {
-                    setPlayerUrls(videoUrl = playableUrl, drmUrl = playableLicenseUrl)
+                    setPlayerUrls(
+                        videoUrl = playableUrl,
+                        drmUrl = playableLicenseUrl,
+                        adViewProvider = currentAdViewProvider
+                    )
                 }
             }
         } else {
@@ -524,7 +516,7 @@ class VideoPlayerViewModel @Inject constructor(
 
     private fun releasePlayer() {
         logger.debug(TAG, "releasePlayer")
-        adsLoader?.setPlayer(null)
+        adsManager.detachPlayer()
         _player.value?.let { qosReporter.unregisterPlayer(it) }
         _player.value?.release()
         _player.value = null
@@ -552,9 +544,8 @@ class VideoPlayerViewModel @Inject constructor(
         savePlayProgress()
         stopPeriodicFunctions()
         releasePlayer()
-        adsLoader?.release()
-        adsLoader = null
-        adViewProvider = null
+        adsManager.release()
+        currentAdViewProvider = null
     }
 
 }

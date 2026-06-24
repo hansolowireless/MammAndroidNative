@@ -138,7 +138,7 @@ fun PlayerView(
 
     DisposableEffect(Unit) {
         onDispose {
-            viewModel.adViewProvider = null
+            viewModel.setAdViewProvider(null)
             fingerprintController.stop()
             videoResizeManager?.release()
         }
@@ -330,7 +330,7 @@ fun PlayerView(
                 update = { parentView ->
                     val styledPlayerView =
                         parentView.findViewById<StyledPlayerView>(R.id.player_view)
-                    viewModel.adViewProvider = styledPlayerView
+                    viewModel.setAdViewProvider(styledPlayerView)
                     val audioTracksButton =
                         parentView.findViewById<AppCompatImageButton>(R.id.audio_tracks_button)
                     val ccTracksButton =
