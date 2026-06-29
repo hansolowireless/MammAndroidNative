@@ -23,7 +23,7 @@ fun SectionLogoTransitionDto.toDomain(): LogoTransition {
 
 fun BrandedFeaturedDto.toDomain(): Featured {
     return Featured(
-        id = this.formatId?.toIntOrNull() ?: this.id,
+        id = this.formatId ?: this.id?.toString(),
         title = this.title,
         description = this.description,
         format = this.format,

@@ -199,7 +199,7 @@ class MammRepositoryImpl @Inject constructor(
         }
 
         if (content == null) {
-            content = localDataSource.getHomeContent()?.featured?.find { it.id == identifier.id }?.toDomain()
+            content = localDataSource.getHomeContent()?.featured?.find { it.id == identifier.id.toString() }?.toDomain()
         }
 
         return content?.let { Result.success(it) }

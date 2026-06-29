@@ -21,12 +21,17 @@ sealed class ContentIdentifier : Parcelable {
             else -> throw IllegalArgumentException("Unknown type: $format")
         }
 
-        fun fromFeaturedFormat(format: String, id: Int, channelById: Int? = 0): ContentIdentifier = when (format.lowercase()) {
-            "live" -> Channel(channelById ?: 0)
-            "vod" -> VoD(id)
-            "cutv" -> Event(id)
-            "still" -> Serie(id)
-            else -> VoD(id)
+        fun fromFeaturedFormat(format: String, id: String, channelById: Int? = 0): ContentIdentifier {
+            // Convert String ID to Int, using hashCode as fallback for alphanumeric IDs
+            val numericId = id.toIntOrNull() ?: id.hashCode().let { if (it < 0) -it else it }
+
+            return when (format.lowercase()) {
+                "live" -> Channel(channelById ?: 0)
+                "vod" -> VoD(numericId)
+                "cutv" -> Event(numericId)
+                "still" -> Serie(numericId)
+                else -> VoD(numericId)
+            }
         }
     }
 

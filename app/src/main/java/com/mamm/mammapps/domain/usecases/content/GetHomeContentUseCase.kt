@@ -3,6 +3,7 @@ package com.mamm.mammapps.domain.usecases.content
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.interfaces.CustomContentRepository
 import com.mamm.mammapps.domain.interfaces.MammRepository
+import com.mamm.mammapps.domain.interfaces.PlaybackRepository
 import com.mamm.mammapps.ui.mapper.insertBookmarks
 import com.mamm.mammapps.ui.mapper.insertFeatured
 import com.mamm.mammapps.ui.mapper.insertMostWatched
@@ -18,6 +19,7 @@ import kotlin.coroutines.cancellation.CancellationException
 class GetHomeContentUseCase @Inject constructor(
     private val repository: MammRepository,
     private val customContentRepository: CustomContentRepository,
+    private val playbackRepository: PlaybackRepository,
     private val logger: Logger
 ) {
     companion object {
@@ -32,6 +34,7 @@ class GetHomeContentUseCase @Inject constructor(
                 val mostWatched = async { customContentRepository.getMostWatched() }
                 val recommended = async { customContentRepository.getRecommended() }
                 val topChannels = async { customContentRepository.getTopChannels() }
+                val operatorFeatured = async { playbackRepository.getTickers() }
 
                 //Wait for all to complete
                 val homeResult = homeContent.await()
@@ -39,6 +42,7 @@ class GetHomeContentUseCase @Inject constructor(
                 val mostWatchedResult = mostWatched.await()
                 val recommendedResult = recommended.await()
                 val topChannelsResult = topChannels.await()
+                val operatorFeaturedResult = operatorFeatured.await()
 
                 // Now check if home content succeeded (it's required)
                 if (homeResult.isFailure) {
@@ -48,6 +52,14 @@ class GetHomeContentUseCase @Inject constructor(
                     )
                 }
 
+                // Combine CMS featured with operator featured (operator first in array)
+                val cmsFeatured = homeResult.getOrThrow().featured ?: emptyList()
+                val operatorFeaturedList = operatorFeaturedResult.getOrNull()?.operatorFeatured ?: emptyList()
+                logger.debug(TAG, "operatorFeaturedList featured: ${operatorFeaturedList.size} total")
+                val allFeatured = operatorFeaturedList + cmsFeatured
+
+                logger.debug(TAG, "Combined featured: ${operatorFeaturedList.size} operator + ${cmsFeatured.size} CMS = ${allFeatured.size} total")
+
                 // Use successful results, fallback for optional content
                 // Bookmarks y recomendados tienen la misma estructura de json
                 val contentRows = homeResult.getOrThrow().toContentUIRows()
@@ -55,7 +67,7 @@ class GetHomeContentUseCase @Inject constructor(
                     .insertRecommended(recommendedResult.getOrElse { emptyList() })
                     .insertMostWatched(mostWatchedResult.getOrElse { emptyList() })
                     .insertTopChannels(topChannelsResult.getOrNull(), homeResult.getOrThrow().channels)
-                    .insertFeatured(homeResult.getOrThrow().featured)
+                    .insertFeatured(allFeatured)
 
                 Result.success(contentRows)
             }

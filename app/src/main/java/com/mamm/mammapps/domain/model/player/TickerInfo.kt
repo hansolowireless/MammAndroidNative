@@ -1,6 +1,7 @@
 package com.mamm.mammapps.domain.model.player
 
 import com.google.gson.annotations.SerializedName
+import com.mamm.mammapps.domain.model.entity.Featured
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -8,7 +9,8 @@ import java.util.Locale
 data class TickerInfo (
     val fechaGeneracion: String,
     val tickers: List<Ticker>,
-    val disabledChannels: List<Int> = emptyList()
+    val disabledChannels: List<Int> = emptyList(),
+    val operatorFeatured: List<Featured> = emptyList()
 )
 
 data class Ticker (
