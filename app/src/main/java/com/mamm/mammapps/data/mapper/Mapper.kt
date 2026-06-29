@@ -39,10 +39,16 @@ fun SportsEventDto.toDomain() : SportsEvent {
 }
 
 fun GetTickersResponseDto.toDomain() : TickerInfo {
+    // Filter operator featured by valid dates
+    val validOperatorFeatured = this.operatorFeatured?.mapNotNull { featuredDto ->
+        featuredDto.toDomain().takeIf { it.isValidByDate() }
+    } ?: emptyList()
+
     return TickerInfo(
         fechaGeneracion = this.fechaGeneracion,
         tickers = this.tickers.map {it.toDomain()},
-        disabledChannels = this.disabledChannels
+        disabledChannels = this.disabledChannels,
+        operatorFeatured = validOperatorFeatured
     )
 }
 

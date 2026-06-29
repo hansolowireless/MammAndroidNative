@@ -49,7 +49,9 @@ fun HomeFeaturedDto.toDomain(): Featured {
         channelById = this.channelById,
         logoTransitions = this.logoTransitions?.map { it.toDomain() },
         subgenreById = this.subgenreById,
-        duration = this.duration
+        duration = this.duration,
+        fcIni = this.fcIni,
+        fcEnd = this.fcEnd
     )
 }
 

@@ -1,6 +1,7 @@
 package com.mamm.mammapps.data.model.player
 
 import com.google.gson.annotations.SerializedName
+import com.mamm.mammapps.data.model.HomeFeaturedDto
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -13,7 +14,10 @@ data class GetTickersResponseDto(
     val tickers: List<TickerDto>,
 
     @SerializedName("disabled_channels")
-    val disabledChannels: List<Int> = emptyList()
+    val disabledChannels: List<Int> = emptyList(),
+
+    @SerializedName("operator_featured")
+    val operatorFeatured: List<HomeFeaturedDto>? = null
 )
 
 data class TickerDto(

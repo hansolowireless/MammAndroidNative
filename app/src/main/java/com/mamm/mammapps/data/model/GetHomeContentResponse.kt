@@ -38,7 +38,7 @@ data class HomeFeaturedDto(
     @SerializedName("subtitle") val subtitle: String? = null,
     @SerializedName("channelById") val channelById: Int? = null,
     @SerializedName("deliveryURL") val deliveryURL: String? = null,
-    @SerializedName("id") val id: Int? = null,
+    @SerializedName("id") val id: String? = null,
     @SerializedName("items") val items: String? = null,
     @SerializedName("parental") val parental: Int? = null
 ) : Parcelable
