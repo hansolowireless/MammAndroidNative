@@ -12,8 +12,9 @@ data class Featured(
     val id: String? = null,
     val title: String? = null,
     val description: String? = null,
-    val format: String? = null,
+    val type: FeaturedFormat = FeaturedFormat.UNKNOWN,
     val logoURL: String? = null,
+    val logoUrl3x1: String? = null,
     val deliveryURL: String? = null,
     val channelById: Int? = null,
     val logoTransitions: List<LogoTransition>? = null,
@@ -22,10 +23,7 @@ data class Featured(
     val fcIni: String? = null,
     val fcEnd: String? = null
 ) : Parcelable {
-    /**
-     * Validates if featured is within valid date range (fcIni <= now <= fcEnd)
-     * Returns true if no dates are provided (CMS featured) or if within range
-     */
+
     fun isValidByDate(): Boolean {
         // If no dates provided (CMS featured), always valid
         if (fcIni == null && fcEnd == null) return true

@@ -12,6 +12,7 @@ import com.mamm.mammapps.domain.model.entity.Serie
 import com.mamm.mammapps.domain.model.Subgenre
 import com.mamm.mammapps.domain.model.entity.VoD
 import com.mamm.mammapps.domain.model.bookmark.Bookmark
+import com.mamm.mammapps.domain.model.entity.FeaturedFormat
 import com.mamm.mammapps.domain.model.memories.Memories
 import com.mamm.mammapps.domain.model.memories.MemoryItem
 import com.mamm.mammapps.domain.model.serie.SerieInfo
@@ -28,6 +29,7 @@ import com.mamm.mammapps.ui.model.ContentListUI
 import com.mamm.mammapps.ui.model.ContentRowUI
 import com.mamm.mammapps.ui.model.CustomizedContent
 import com.mamm.mammapps.ui.model.DetailInfoUI
+import com.mamm.mammapps.ui.model.FeaturedType
 import com.mamm.mammapps.ui.model.SeasonUI
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import com.mamm.mammapps.ui.model.player.FingerPrintInfoUI
@@ -123,23 +125,24 @@ fun Serie.toContentEntityUI() = ContentEntityUI(
 )
 
 fun Featured.toContentEntityUI(): ContentEntityUI? {
-    val format = format ?: return null
     val id = id ?: return null
+    if (type == FeaturedFormat.UNKNOWN) return null
     val imageUrl = logoTransitions?.first()?.url ?: logoURL.orEmpty()
 
     return ContentEntityUI(
         identifier = ContentIdentifier.fromFeaturedFormat(
-            format = format,
+            type = type,
             id = id,
             channelById = channelById
         ),
         imageUrl = logoURL.orEmpty(),
         horizontalImageUrl = imageUrl,
         title = title.orEmpty(),
-        isFeatured = true,
+        featuredType = if (type == FeaturedFormat.BANNER) FeaturedType.BANNER else FeaturedType.FEATURED,
         aspectRatio = Ratios.HORIZONTAL,
         height = Dimensions.channelEntityHeight,
         detailInfo = DetailInfoUI(
+            bannerImageUrl = logoUrl3x1,
             description = description.orEmpty()
         )
     )
@@ -240,11 +243,12 @@ fun Event.toContentToPlayUI() = ContentToPlayUI(
 )
 
 fun Featured.toContentToPlayUI(): ContentToPlayUI? {
-    val format = format ?: return null
     val id = id ?: return null
+    if (type == com.mamm.mammapps.domain.model.entity.FeaturedFormat.UNKNOWN) return null
+    if (type == com.mamm.mammapps.domain.model.entity.FeaturedFormat.BANNER) return null
 
     return ContentToPlayUI(
-        identifier = ContentIdentifier.fromFeaturedFormat(format = format, id = id),
+        identifier = ContentIdentifier.fromFeaturedFormat(type = type, id = id, channelById = channelById),
         deliveryURL = this.deliveryURL.orEmpty(),
         title = this.title.orEmpty(),
         imageUrl = this.logoURL.orEmpty(),

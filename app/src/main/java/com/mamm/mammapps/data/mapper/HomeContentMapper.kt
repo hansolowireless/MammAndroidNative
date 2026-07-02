@@ -18,6 +18,7 @@ import com.mamm.mammapps.domain.model.entity.Event
 import com.mamm.mammapps.domain.model.Genre
 import com.mamm.mammapps.domain.model.HomeContent
 import com.mamm.mammapps.domain.model.entity.Featured
+import com.mamm.mammapps.domain.model.entity.FeaturedFormat
 import com.mamm.mammapps.domain.model.LogoTransition
 import com.mamm.mammapps.domain.model.OrderItem
 import com.mamm.mammapps.domain.model.entity.Serie
@@ -43,8 +44,9 @@ fun HomeFeaturedDto.toDomain(): Featured {
         id = this.id,
         title = this.title,
         description = this.description,
-        format = this.format,
+        type = FeaturedFormat.from(this.format),
         logoURL = this.logoURL,
+        logoUrl3x1 = this.logoURL3x1,
         deliveryURL = this.deliveryURL,
         channelById = this.channelById,
         logoTransitions = this.logoTransitions?.map { it.toDomain() },

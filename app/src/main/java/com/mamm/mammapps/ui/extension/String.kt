@@ -55,3 +55,6 @@ fun String.inferMimeType(): String {
         MimeTypes.APPLICATION_MPD
     }
 }
+
+fun String?.ifNullOrBlank(default: () -> String): String =
+    if (isNullOrBlank()) default() else this!!

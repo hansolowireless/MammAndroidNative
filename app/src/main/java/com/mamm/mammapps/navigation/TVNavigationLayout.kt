@@ -36,6 +36,7 @@ import com.mamm.mammapps.navigation.model.AppRoute
 import com.mamm.mammapps.navigation.viewModel.NavigationViewModel
 import com.mamm.mammapps.ui.component.common.OperatorLogoImage
 import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
+import com.mamm.mammapps.ui.theme.Dimensions
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -56,7 +57,7 @@ fun TVNavigationLayout(
     var canFocusAfterRecompose by remember { mutableStateOf(false) }
 
     val railWidth by animateDpAsState(
-        targetValue = if (isNavRailFocused && canFocusAfterRecompose) 200.dp else 60.dp,
+        targetValue = if (isNavRailFocused && canFocusAfterRecompose) Dimensions.tvNavRailWidthExpanded else Dimensions.tvNavRailWidth,
         animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
         label = "NavRailWidthAnimation"
     )

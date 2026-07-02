@@ -30,6 +30,7 @@ data class HomeFeaturedDto(
     @SerializedName("title") val title: String? = null,
     @SerializedName("fcIni") val fcIni: String? = null,
     @SerializedName("logoURL") val logoURL: String? = null,
+    @SerializedName("logoURL_3_1") val logoURL3x1: String? = null,
     @SerializedName("duration") val duration: Int? = null,
     @SerializedName("idPpal") val idPpal: Int? = null,
     @SerializedName("urlLoopMpd") val urlLoopMpd: String? = null,

@@ -13,6 +13,8 @@ object Dimensions {
     val channelEntityHeight = 140.dp
     val cornerRadius = 10.dp
     val buttonBorder = 2.dp
+    val tvNavRailWidth = 60.dp
+    val tvNavRailWidthExpanded = 200.dp
 }
 
 object Ratios{

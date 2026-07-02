@@ -30,6 +30,7 @@ import com.mamm.mammapps.ui.mapper.toContentEntityUI
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.ContentRowUI
+import com.mamm.mammapps.ui.model.FeaturedType
 import com.mamm.mammapps.ui.model.uistate.HomeContentUIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -186,7 +187,7 @@ class HomeViewModel @Inject constructor(
 
     fun setFocusedContent(content: ContentEntityUI) {
 
-        if (content.isFeatured) {
+        if (content.featuredType != FeaturedType.NONE) {
             _focusedContent.update { content }
             return
         }

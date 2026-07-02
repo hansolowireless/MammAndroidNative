@@ -1,6 +1,7 @@
 package com.mamm.mammapps.ui.model
 
 import android.os.Parcelable
+import com.mamm.mammapps.domain.model.entity.FeaturedFormat
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -21,16 +22,15 @@ sealed class ContentIdentifier : Parcelable {
             else -> throw IllegalArgumentException("Unknown type: $format")
         }
 
-        fun fromFeaturedFormat(format: String, id: String, channelById: Int? = 0): ContentIdentifier {
-            // Convert String ID to Int, using hashCode as fallback for alphanumeric IDs
+        fun fromFeaturedFormat(type: FeaturedFormat, id: String, channelById: Int? = 0): ContentIdentifier {
             val numericId = id.toIntOrNull() ?: id.hashCode().let { if (it < 0) -it else it }
-
-            return when (format.lowercase()) {
-                "live" -> Channel(channelById ?: 0)
-                "vod" -> VoD(numericId)
-                "cutv" -> Event(numericId)
-                "still" -> Serie(numericId)
-                else -> VoD(numericId)
+            return when (type) {
+                FeaturedFormat.LIVE -> Channel(channelById ?: 0)
+                FeaturedFormat.VOD -> VoD(numericId)
+                FeaturedFormat.CUTV -> Event(numericId)
+                FeaturedFormat.STILL -> Serie(numericId)
+                FeaturedFormat.BANNER -> Serie(numericId)
+                FeaturedFormat.UNKNOWN -> VoD(numericId)
             }
         }
     }

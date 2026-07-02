@@ -9,6 +9,7 @@ import com.mamm.mammapps.domain.model.BrandedContent
 import com.mamm.mammapps.domain.model.LogoTransition
 import com.mamm.mammapps.domain.model.OtherContent
 import com.mamm.mammapps.domain.model.entity.Featured
+import com.mamm.mammapps.domain.model.entity.FeaturedFormat
 import com.mamm.mammapps.domain.model.entity.VoD
 import com.mamm.mammapps.data.model.branded.LogoTransitionDto as BrandedLogoTransitionDto
 import com.mamm.mammapps.data.model.section.LogoTransitionDto as SectionLogoTransitionDto
@@ -26,7 +27,7 @@ fun BrandedFeaturedDto.toDomain(): Featured {
         id = this.formatId ?: this.id?.toString(),
         title = this.title,
         description = this.description,
-        format = this.format,
+        type = FeaturedFormat.from(this.format),
         logoURL = this.logoUrl,
         deliveryURL = this.deliveryUrl,
         channelById = this.channelById,

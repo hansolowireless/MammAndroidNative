@@ -28,9 +28,11 @@ import coil.compose.AsyncImage
 import com.mamm.mammapps.domain.model.metadata.Metadata
 import com.mamm.mammapps.ui.component.metadata.DurationYearRatingRow
 import com.mamm.mammapps.ui.constant.UIConstant
+import com.mamm.mammapps.ui.extension.ifNullOrBlank
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.DetailInfoUI
+import com.mamm.mammapps.ui.model.FeaturedType
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.HomeGridTopColor
 
@@ -39,123 +41,127 @@ fun HomeGridTop(
     modifier: Modifier = Modifier,
     content: ContentEntityUI
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-    ) {
-
+    if (content.featuredType == FeaturedType.BANNER) {
         Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .fillMaxWidth(0.86f)
-                .align(Alignment.CenterEnd)
+            modifier = modifier.fillMaxWidth()
         ) {
             AsyncImage(
-                model = content.horizontalImageUrl,
+                model = content.detailInfo?.bannerImageUrl.ifNullOrBlank { content.horizontalImageUrl },
                 contentDescription = content.title,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop,
-                alignment = BiasAlignment(horizontalBias = 0f, verticalBias = -0.5f)
+                modifier = Modifier.fillMaxWidth(),
+                contentScale = ContentScale.FillWidth
             )
         }
-
+    } else {
         Box(
-            modifier = Modifier
-                .fillMaxHeight(0.5f)
+            modifier = modifier
                 .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .clip(RectangleShape)
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Transparent,
-                            MaterialTheme.colorScheme.background.copy(alpha = 0.1f),
-                            MaterialTheme.colorScheme.background.copy(alpha = 0.5f),
-                            MaterialTheme.colorScheme.background
-                        )
-                    )
-                )
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .fillMaxWidth()
-                .align(Alignment.CenterEnd)
-                .clip(RectangleShape)
-                .background(
-                    Brush.horizontalGradient(
-                        colorStops = arrayOf(
-                            // 0.0f (inicio) a 0.2f (20%) es negro sólido
-                            0.0f to MaterialTheme.colorScheme.background,
-                            0.17f to MaterialTheme.colorScheme.background.copy(alpha = 0.95f),
-                            0.25f to MaterialTheme.colorScheme.background.copy(alpha = 0.9f),
-
-                            // Transición rápida de negro a transparente entre el 20% y el 35%
-                            0.35f to Color.Transparent,
-
-                            // El resto (35% al 100%) es transparente
-                            1.0f to Color.Transparent
-                        )
-                    )
-                )
-        )
-
-        // Content overlay - Left side only (transparent background)
-        Box(
-            modifier = Modifier
-                .height(260.dp)
-                .fillMaxWidth(0.35f)
-                .padding(Dimensions.paddingMedium),
-            contentAlignment = Alignment.TopStart
         ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(Dimensions.paddingXSmall)
+
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(0.86f)
+                    .align(Alignment.CenterEnd)
             ) {
-                // Event title from ContentEntityUI
-                if (content.title.isNotBlank()) {
-                    Text(
-                        text = content.title,
-                        color = HomeGridTopColor.eventitle,
-                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
+                AsyncImage(
+                    model = content.horizontalImageUrl,
+                    contentDescription = content.title,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                    alignment = BiasAlignment(horizontalBias = 0f, verticalBias = -0.5f)
+                )
+            }
 
-                // Separator line (only if title exists)
-                if (content.detailInfo?.description?.isNotBlank() == true) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(0.7f)
-                            .height(1.dp)
-                            .background(HomeGridTopColor.eventitle)
-                    )
-                }
-
-                if (content.isLive()) {
-                    EventStartEndDuration(
-                        liveEventInfo = content.liveEventInfo,
-                        duration = content.detailInfo?.metadata?.durationMin,
-                    )
-                } else {
-                    content.detailInfo?.metadata?.let { metadata ->
-                        DurationYearRatingRow(
-                            metadata = metadata,
-                            textcolor = HomeGridTopColor.metadata
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight(0.5f)
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .clip(RectangleShape)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                MaterialTheme.colorScheme.background.copy(alpha = 0.1f),
+                                MaterialTheme.colorScheme.background.copy(alpha = 0.5f),
+                                MaterialTheme.colorScheme.background
+                            )
                         )
-                    }
-                }
+                    )
+            )
 
-                // Event description from ContentEntityUI subtitle
-                content.detailInfo?.description?.let { description ->
-                    if (description.isNotBlank()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth()
+                    .align(Alignment.CenterEnd)
+                    .clip(RectangleShape)
+                    .background(
+                        Brush.horizontalGradient(
+                            colorStops = arrayOf(
+                                0.0f to MaterialTheme.colorScheme.background,
+                                0.17f to MaterialTheme.colorScheme.background.copy(alpha = 0.95f),
+                                0.25f to MaterialTheme.colorScheme.background.copy(alpha = 0.9f),
+                                0.35f to Color.Transparent,
+                                1.0f to Color.Transparent
+                            )
+                        )
+                    )
+            )
+
+            Box(
+                modifier = Modifier
+                    .height(260.dp)
+                    .fillMaxWidth(0.35f)
+                    .padding(Dimensions.paddingMedium),
+                contentAlignment = Alignment.TopStart
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(Dimensions.paddingXSmall)
+                ) {
+                    if (content.title.isNotBlank()) {
                         Text(
-                            text = description,
-                            color = HomeGridTopColor.description,
-                            style = MaterialTheme.typography.bodyMedium,
+                            text = content.title,
+                            color = HomeGridTopColor.eventitle,
+                            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                            maxLines = 2,
                             overflow = TextOverflow.Ellipsis
                         )
+                    }
+
+                    if (content.detailInfo?.description?.isNotBlank() == true) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(0.7f)
+                                .height(1.dp)
+                                .background(HomeGridTopColor.eventitle)
+                        )
+                    }
+
+                    if (content.isLive()) {
+                        EventStartEndDuration(
+                            liveEventInfo = content.liveEventInfo,
+                            duration = content.detailInfo?.metadata?.durationMin,
+                        )
+                    } else {
+                        content.detailInfo?.metadata?.let { metadata ->
+                            DurationYearRatingRow(
+                                metadata = metadata,
+                                textcolor = HomeGridTopColor.metadata
+                            )
+                        }
+                    }
+
+                    content.detailInfo?.description?.let { description ->
+                        if (description.isNotBlank()) {
+                            Text(
+                                text = description,
+                                color = HomeGridTopColor.description,
+                                style = MaterialTheme.typography.bodyMedium,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
                 }
             }
