@@ -9,8 +9,8 @@ data class LoginData(
     val refreshToken: String?,
     val skin: Skin?,
     val channelOrder: String?,
-    val tickerUrl: String? = null,
-    val loginUser: String? = null
+    val loginUser: String? = null,
+    val operator: String? = null
 )
 
 data class Skin (

@@ -10,6 +10,7 @@ import com.mamm.mammapps.data.model.login.LoginResponse
 import com.mamm.mammapps.data.model.session.RefreshTokenRequest
 import com.mamm.mammapps.data.datasource.session.SessionDatasource
 import com.mamm.mammapps.domain.interfaces.LoginRepository
+import com.mamm.mammapps.domain.model.loginwithcode.LocatorOrigin
 import com.mamm.mammapps.domain.model.loginwithcode.LoginCodeGenerate
 import com.mamm.mammapps.domain.model.loginwithcode.LoginCodeStatus
 import javax.inject.Inject
@@ -120,7 +121,7 @@ class LoginRepositoryImpl @Inject constructor(
                 val locatorResponse = remoteDataSource.checkLocator(username)
                 logger.debug(TAG, "updateLocatorConfiguration Received locator response: $locatorResponse")
                 Config.updateDynamicUrls(locatorResponse)
-                setShowBrandedContentMenus(false)
+                setShowBrandedContentMenus(LocatorOrigin.from(locatorResponse.data.origin) != LocatorOrigin.COLOMBIA)
             } catch (e: Exception) {
                 logger.error(TAG, "updateLocatorConfiguration Locator request failed: ${e.message}")
                 Config.resetDynamicUrls()

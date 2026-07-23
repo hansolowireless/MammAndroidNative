@@ -24,10 +24,10 @@ data class LoginDataDto(
     val skin: SkinDto?,
     @SerializedName("channel_order")
     val channelOrder: String?,
-    @SerializedName("ticker_url")
-    val tickerUrl: String? = null,
     @SerializedName("login_user")
-    val loginUser: String? = null
+    val loginUser: String? = null,
+    @SerializedName("operator")
+    val operator: String? = null
 )
 
 data class SkinDto(

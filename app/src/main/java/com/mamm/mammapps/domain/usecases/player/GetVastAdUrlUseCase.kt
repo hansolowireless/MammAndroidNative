@@ -1,15 +1,14 @@
 package com.mamm.mammapps.domain.usecases.player
 
-import android.content.Context
 import androidx.core.net.toUri
+import com.mamm.mammapps.data.config.Config
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.interfaces.PlaybackRepository
+import com.mamm.mammapps.domain.model.exception.TickerException
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
-import com.mamm.mammapps.util.isAndroidTV
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 class GetVastAdUrlUseCase @Inject constructor(
     private val playbackRepository: PlaybackRepository,
@@ -18,7 +17,6 @@ class GetVastAdUrlUseCase @Inject constructor(
 
     companion object {
         private const val TAG = "GetVastAdUrlUseCase"
-        private const val VAST_URL = "https://tickersapp.masmediatv.es/"
         private const val VAST_PATH = "vast"
         private const val TYPE_LIVE = "live"
         private const val TYPE_CATCHUP = "catchup"
@@ -44,7 +42,8 @@ class GetVastAdUrlUseCase @Inject constructor(
                 playbackRepository.getVastAdParameters().getOrThrow()
             }
 
-            val baseAdUrl = "$VAST_URL$VAST_PATH"
+            val tickerUrl = Config.tickerUrl ?: throw TickerException.MissingData
+            val baseAdUrl = "$tickerUrl/$VAST_PATH"
 
             val type = when (content.identifier) {
                 is ContentIdentifier.Channel -> TYPE_LIVE

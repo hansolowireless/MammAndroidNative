@@ -1,7 +1,7 @@
 package com.mamm.mammapps.domain.interfaces
 
 import com.mamm.mammapps.domain.model.player.QosData
-import com.mamm.mammapps.domain.model.player.TickerInfo
+import com.mamm.mammapps.domain.model.player.Ticker
 import com.mamm.mammapps.domain.model.player.VastAdParameters
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +19,7 @@ interface PlaybackRepository {
 
     suspend fun getVastAdParameters() : Result<VastAdParameters>
 
-    suspend fun getTickers () : Result<TickerInfo>
+    suspend fun getChannelTicker(channel: Int, type: String): Result<Ticker?>
 
     suspend fun getTickerQoSData(contentId: Int) : Result<QosData>
 

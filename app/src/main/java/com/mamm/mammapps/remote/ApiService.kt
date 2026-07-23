@@ -13,6 +13,7 @@ import com.mamm.mammapps.data.model.login.LoginResponse
 import com.mamm.mammapps.data.model.memories.GetMemoriesResponseDto
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContentDto
 import com.mamm.mammapps.data.model.player.GetTickersResponseDto
+import com.mamm.mammapps.data.model.player.TickerDto
 import com.mamm.mammapps.data.model.player.QosDataDto
 import com.mamm.mammapps.data.model.player.heartbeat.HeartBeatRequest
 import com.mamm.mammapps.data.model.player.streamvx.StreamVxTokenRequest
@@ -297,6 +298,15 @@ interface ApiService {
     suspend fun getTickers(
         @Url url: String
     ): Response<GetTickersResponseDto>
+
+    @GET
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    suspend fun getChannelTicker(
+        @Url url: String
+    ): Response<TickerDto>
 
     // ---------- Memories ----------
     @GET

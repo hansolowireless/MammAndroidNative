@@ -42,6 +42,7 @@ import com.mamm.mammapps.data.model.loginwithcode.AuthLoginCodeRequest
 import com.mamm.mammapps.data.model.memories.GetMemoriesResponseDto
 import com.mamm.mammapps.data.model.mostwatched.MostWatchedContentDto
 import com.mamm.mammapps.data.model.player.GetTickersResponseDto
+import com.mamm.mammapps.data.model.player.TickerDto
 import com.mamm.mammapps.data.model.player.QosDataDto
 import com.mamm.mammapps.data.model.player.heartbeat.HeartBeatRequest
 import com.mamm.mammapps.data.model.player.playback.CLMRequest
@@ -327,7 +328,7 @@ class RemoteDatasource @Inject constructor(
         chromecast: Boolean = false
     ): String? {
         require(
-            sessionManager.loginData?.skin?.operator != null
+            sessionManager.operator != null
                     && sessionManager.jwToken != null
                     && securePreferencesManager.getCredentials().first != null
         ) {
@@ -339,7 +340,7 @@ class RemoteDatasource @Inject constructor(
             typeOfContentString = typeOfContentString,
             model = deviceModel,
             deviceType = if (chromecast) ccastDeviceType else deviceType,
-            operator = sessionManager.loginData?.skin?.operator!!
+            operator = sessionManager.operator!!
         )
 
         var fullUrl = if (deliveryURL.endsWith("/")) {
@@ -444,6 +445,18 @@ class RemoteDatasource @Inject constructor(
             }
 
             response.body() ?: throw IllegalStateException("Response body is null")
+        }
+    }
+
+    suspend fun getChannelTicker(url: String): TickerDto? {
+        return withContext(Dispatchers.IO) {
+            val response = noBaseUrlApi.getChannelTicker(url)
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()?.string()?.toResponseBody()
+                throw HttpException(Response.error<Any>(response.code(), errorBody))
+            }
+            val body = response.body()
+            if (body?.campaignId == null) null else body
         }
     }
 

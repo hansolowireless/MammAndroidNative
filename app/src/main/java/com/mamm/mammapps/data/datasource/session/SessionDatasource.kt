@@ -28,7 +28,7 @@ class SessionDatasource @Inject constructor(
     val pinParental: String? get() = loginData?.pinparental
     val operatorLogoUrl : String? get() = skinImages[5001] ?: skinImages[1501]
     val refreshToken: String? get() = loginData?.refreshToken
-    val tickerUrl: String? get() = loginData?.tickerUrl
+    val operator: String? get() = loginData?.operator
 
     init {
         val restoredData = sharedPreferencesManager.getLoginData()

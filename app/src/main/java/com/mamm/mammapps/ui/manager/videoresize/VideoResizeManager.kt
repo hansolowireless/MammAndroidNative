@@ -46,6 +46,7 @@ open class VideoResizeManager(
     private var autoResizeEnabled = false
     private var autoResizeIntervalMs = 30000L
     private var smallSizeDurationMs = 10000L
+    private var cycleEnabled = false
 
     private val mainHandler = Handler(Looper.getMainLooper())
 
@@ -65,7 +66,9 @@ open class VideoResizeManager(
             if (autoResizeEnabled && currentSize != VideoSize.FULL_SIZE) {
                 Log.d("VideoResizeManager", "Volviendo a tamaño completo automáticamente")
                 resizeTo(VideoSize.FULL_SIZE)
-                mainHandler.postDelayed(resizeToSmallRunnable, autoResizeIntervalMs)
+                if (cycleEnabled) {
+                    mainHandler.postDelayed(resizeToSmallRunnable, autoResizeIntervalMs)
+                }
             }
         }
     }
@@ -263,57 +266,54 @@ open class VideoResizeManager(
     }
 
     /**
-     * Activa o desactiva el redimensionamiento automático analizando la información del TickerInfo
+     * Activa o desactiva el redimensionamiento automático basándose en si hay tickers disponibles.
+     * El filtrado de tickers por canal, estado live y canales deshabilitados ya se realiza
+     * en el ViewModel antes de llamar a este método.
      *
-     * @param tickerInfo Objeto que contiene la lista de tickers y canales deshabilitados
-     * @param currentChannelId ID del canal actual para verificar restricciones
+     * @param tickerInfo Objeto que contiene la lista de tickers ya filtrados
      */
-    fun setAutoResize(tickerInfo: TickerInfo?, currentChannelId: Int?) {
+    // Campaña del ticker actualmente mostrado en SMALL_SIZE, para no reprogramar el timer
+    // de vuelta a FULL_SIZE si sigue siendo el mismo ticker (p.ej. reemisiones del polling).
+    private var activeCampaignId: String? = null
+
+    fun setAutoResize(tickerInfo: TickerInfo?) {
 
         if (tickerInfo == null) {
+            activeCampaignId = null
             Log.d("VideoResizeManager", "TickerInfo nulo, desactivando AutoResize")
             stopAutoResize()
             return
         }
 
-        // 1. Definir si debe estar habilitado: lista no vacía Y canal no bloqueado
         val hasTickers = tickerInfo.tickers.isNotEmpty()
-        val isChannelDisabled = tickerInfo.disabledChannels.contains(currentChannelId)
+        val firstTicker = tickerInfo.tickers.firstOrNull()
 
-        val shouldEnable = hasTickers && !isChannelDisabled
+        if (hasTickers && currentSize == VideoSize.SMALL_SIZE && firstTicker?.campaignId == activeCampaignId) {
+            Log.d("VideoResizeManager", "Mismo ticker ya en curso, no se reprograma el timer")
+            return
+        }
 
-        Log.d("VideoResizeManager", "Configurando AutoResize: hasTickers=$hasTickers, channelDisabled=$isChannelDisabled")
+        Log.d("VideoResizeManager", "Configurando AutoResize: hasTickers=$hasTickers")
 
         // Detener cualquier ejecución previa
         mainHandler.removeCallbacks(resizeToSmallRunnable)
         mainHandler.removeCallbacks(resizeToFullRunnable)
 
-        autoResizeEnabled = shouldEnable
+        autoResizeEnabled = hasTickers
+        cycleEnabled = false
+        activeCampaignId = firstTicker?.campaignId
 
-        if (shouldEnable) {
-            // 2. Extraer tiempos del primer ticker disponible
-            val firstTicker = tickerInfo.tickers.first()
-
-            if (firstTicker.tiempoEntreApariciones > 0) {
-                autoResizeIntervalMs = firstTicker.tiempoEntreApariciones.toLong() * 1000
-            }
-
+        if (hasTickers && firstTicker != null) {
             if (firstTicker.tiempoDuracion > 0) {
                 smallSizeDurationMs = firstTicker.tiempoDuracion.toLong() * 1000
             }
 
-            Log.d("VideoResizeManager", "AutoResize activado: Intervalo ${autoResizeIntervalMs}ms, Duración ${smallSizeDurationMs}ms")
+            Log.d("VideoResizeManager", "AutoResize activado: Duración ${smallSizeDurationMs}ms")
 
-            // Si el video no está en tamaño completo, lo restauramos para iniciar el ciclo limpio
-            if (currentSize != VideoSize.FULL_SIZE) {
-                resizeTo(VideoSize.FULL_SIZE)
-            }
-
-            // Iniciar el ciclo de redimensionamiento
-            mainHandler.postDelayed(resizeToSmallRunnable, autoResizeIntervalMs)
+            resizeTo(VideoSize.SMALL_SIZE)
+            mainHandler.postDelayed(resizeToFullRunnable, smallSizeDurationMs)
         } else {
-            Log.d("VideoResizeManager", "AutoResize desactivado (Lista vacía o canal bloqueado)")
-            // stopAutoResize() se encarga de parar el handler, poner enabled a false y restaurar el tamaño
+            Log.d("VideoResizeManager", "AutoResize desactivado")
             stopAutoResize()
         }
     }
@@ -325,6 +325,7 @@ open class VideoResizeManager(
         mainHandler.removeCallbacks(resizeToSmallRunnable)
         mainHandler.removeCallbacks(resizeToFullRunnable)
         autoResizeEnabled = false
+        activeCampaignId = null
 
         // Restaurar tamaño original
         if (currentSize != VideoSize.FULL_SIZE && originalHeight > 0) {

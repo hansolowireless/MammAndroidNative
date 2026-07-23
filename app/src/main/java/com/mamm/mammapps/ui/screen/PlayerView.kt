@@ -62,6 +62,7 @@ import com.mamm.mammapps.ui.extension.insertThumbnail
 import com.mamm.mammapps.ui.extension.jump10sBack
 import com.mamm.mammapps.ui.extension.jump10sForward
 import com.mamm.mammapps.ui.extension.toDigitString
+import com.mamm.mammapps.domain.model.player.TickerInfo
 import com.mamm.mammapps.ui.manager.videoresize.VideoResizeManagerWithTicker
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
@@ -102,9 +103,14 @@ fun PlayerView(
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     //--------------TICKERS-------------------------
-    val tickerInfo by viewModel.tickerInfo.collectAsStateWithLifecycle()
     var videoResizeManager by remember { mutableStateOf<VideoResizeManagerWithTicker?>(null) }
     val lifecycleOwner = LocalLifecycleOwner.current
+
+    // Al cambiar de canal (zapping), forzar tamaño completo de inmediato, sin esperar
+    // a que el ticker del canal nuevo se resuelva y dispare el reset de forma indirecta.
+    LaunchedEffect(content) {
+        videoResizeManager?.stopAutoResize()
+    }
 
     // Gestiona el cambio de foco cuando aparece/desaparece el zapping
     LaunchedEffect(showZappingLayer) {
@@ -115,24 +121,19 @@ fun PlayerView(
         }
     }
 
-    LaunchedEffect(tickerInfo, content, playerState) {
-        when (playerState) {
-            PlayerUIState.Playing -> {
-                Log.d("PlayerViewWithControls", "TickerList ha cambiado, comenzamos autoresize $tickerInfo")
-                videoResizeManager?.replaceTickers(tickerInfo?.tickers)
-                videoResizeManager?.setAutoResize(
-                    tickerInfo = tickerInfo,
-                    currentChannelId = content?.identifier?.id
-                )
+    LaunchedEffect(playerState) {
+        if (playerState == PlayerUIState.Playing) {
+            // Cada emisión es una orden del servicio: se aplica aunque sea el mismo ticker que la anterior
+            viewModel.tickerEvents.collect { ticker ->
+                val info = ticker?.let { TickerInfo(tickers = listOf(it)) }
+                Log.d("PlayerViewWithControls", "Evento de ticker recibido: $info")
+                videoResizeManager?.replaceTickers(info?.tickers)
+                videoResizeManager?.setAutoResize(info)
             }
-            else -> {
-                Log.d("PlayerViewWithControls", "PlayerState no es Playing, paramos autoresize")
-                videoResizeManager?.replaceTickers(null)
-                videoResizeManager?.setAutoResize(
-                    tickerInfo = null,
-                    currentChannelId = content?.identifier?.id
-                )
-            }
+        } else {
+            Log.d("PlayerViewWithControls", "PlayerState no es Playing, paramos autoresize")
+            videoResizeManager?.replaceTickers(null)
+            videoResizeManager?.setAutoResize(null)
         }
     }
 

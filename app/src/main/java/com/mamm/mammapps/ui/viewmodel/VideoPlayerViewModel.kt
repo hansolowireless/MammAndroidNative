@@ -20,14 +20,14 @@ import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.player.customdatasourcefactory.DynamicHttpMediaDrmCallback
 import com.mamm.mammapps.data.model.player.customdatasourcefactory.TokenParamDataSourceFactory
 import com.mamm.mammapps.domain.model.exception.SessionException
-import com.mamm.mammapps.domain.model.player.TickerInfo
+import com.mamm.mammapps.domain.model.player.Ticker
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
 import com.mamm.mammapps.domain.usecases.logout.LogoutUseCase
 import com.mamm.mammapps.domain.usecases.player.GetDRMUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.GetJwTokenUseCase
 import com.mamm.mammapps.domain.usecases.player.GetPlayableUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.GetTSTVUrlUseCase
-import com.mamm.mammapps.domain.usecases.player.GetTickersUseCase
+import com.mamm.mammapps.domain.usecases.player.ObserveChannelTickerUseCase
 import com.mamm.mammapps.domain.usecases.player.GetVastAdUrlUseCase
 import com.mamm.mammapps.domain.usecases.player.playprogresscache.GetPlayProgressUseCaseSync
 import com.mamm.mammapps.domain.usecases.player.playprogresscache.SavePlayProgressUseCase
@@ -50,12 +50,18 @@ import com.mamm.mammapps.util.getCurrentDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -74,7 +80,7 @@ class VideoPlayerViewModel @Inject constructor(
     private val getJwTokenUseCase: GetJwTokenUseCase,
     private val getVastAdUrlUseCase: GetVastAdUrlUseCase,
     private val getLiveEventInfoUseCase: FindLiveEventOnChannelUseCase,
-    private val getTickersUseCase: GetTickersUseCase,
+    private val observeChannelTickerUseCase: ObserveChannelTickerUseCase,
     private val savePlayProgressUseCase: SavePlayProgressUseCase,
     private val getPlayProgressUseCase: GetPlayProgressUseCaseSync,
     private val logoutUseCase: LogoutUseCase,
@@ -110,9 +116,9 @@ class VideoPlayerViewModel @Inject constructor(
     private val _liveEventInfo = MutableStateFlow<LiveEventInfoUI?>(null)
     val liveEventInfo = _liveEventInfo.asStateFlow()
 
-    //Tickers
-    private val _tickerInfo = MutableStateFlow<TickerInfo?>(null)
-    val tickerInfo = _tickerInfo.asStateFlow()
+    //Tickers: cada emisión es una orden del servicio ("muestra este ticker" / null = "nada")
+    private val _tickerEvents = MutableSharedFlow<Ticker?>()
+    val tickerEvents = _tickerEvents.asSharedFlow()
 
     //Display del número del canal para hacer zapping
     val zappingNumberDisplay = zappingController.zappingNumberDisplay
@@ -205,6 +211,7 @@ class VideoPlayerViewModel @Inject constructor(
                 .build()
 
             val newPlayer = ExoPlayer.Builder(context)
+                .setLoadControl(loadControl)
                 .setTrackSelector(trackSelector!!)
                 .build()
 
@@ -331,9 +338,13 @@ class VideoPlayerViewModel @Inject constructor(
         _player.value?.play()
     }
 
+    private var liveEventsJob: Job? = null
+
     fun observeLiveEvents() {
+        liveEventsJob?.cancel()
+        _liveEventInfo.value = null
         if (_content.value.isLive)
-            getLiveEventInfoUseCase.observeLiveEvents((_content.value.identifier).getIdValue())
+            liveEventsJob = getLiveEventInfoUseCase.observeLiveEvents((_content.value.identifier).getIdValue())
                 .onEach { event ->
                     // Nuevo evento iniciado o terminado
                     logger.debug(TAG, "startObservingLiveEvents Event changed: ${event?.title}")
@@ -343,10 +354,24 @@ class VideoPlayerViewModel @Inject constructor(
         else logger.info(TAG, "startObservingLiveEvents Content is not channel")
     }
 
+    private var tickerJob: Job? = null
+
     fun observeTickers() {
-        getTickersUseCase.observeTickers().onEach { tickers ->
-            _tickerInfo.value = tickers
-        }.launchIn(viewModelScope)
+        tickerJob?.cancel()
+        tickerJob = viewModelScope.launch {
+            _content.flatMapLatest { content ->
+                if (content.isLive) {
+                    observeChannelTickerUseCase(
+                        channelId = content.identifier.id,
+                        type = content.identifier.getQoSString()
+                    ).onStart { emit(null) } // al conmutar de canal, limpiar el ticker anterior de inmediato
+                } else {
+                    flowOf(null)
+                }
+            }.collect { ticker ->
+                _tickerEvents.emit(ticker) // sin dedupe: el mismo ticker en polls sucesivos se re-emite
+            }
+        }
     }
 
     private fun startPeriodicFunctions() {
