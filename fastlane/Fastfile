@@ -58,11 +58,14 @@ platform :android do
       aab: File.join(project_root, config[:aab_path]),
       json_key: File.join(project_root, config[:service_account]),
       package_name: config[:package_name],
+      # Notas de "Novedades": se reutiliza el default.txt de cada flavor
+      # ("Correcciones y mejoras") para cualquier versionCode.
+      metadata_path: File.join(project_root, "fastlane/metadata/#{target}/android"),
       skip_upload_apk: true,
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
-      skip_upload_changelogs: true
+      skip_upload_changelogs: false
     )
 
     pct = completed ? "100%" : "#{(rollout.to_f * 100).round}%"
@@ -89,6 +92,31 @@ platform :android do
     deploy_masmedia(options)
     deploy_fibrazo(options)
     deploy_eligetv(options)
+  end
+
+  desc "Fija las notas de 'Novedades' (Correcciones y mejoras) en una versión ya subida"
+  desc "Opciones: target:, version_code:, track: (production por defecto)"
+  lane :update_notes do |options|
+    target = options[:target] || UI.user_error!("Falta target: fastlane update_notes target:masmedia version_code:564")
+    vc     = options[:version_code] || UI.user_error!("Falta version_code")
+    track  = options[:track] || 'production'
+    config = target_config(target)
+
+    upload_to_play_store(
+      track: track,
+      version_code: vc.to_i,
+      json_key: File.join(project_root, config[:service_account]),
+      package_name: config[:package_name],
+      metadata_path: File.join(project_root, "fastlane/metadata/#{target}/android"),
+      skip_upload_aab: true,
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: false
+    )
+
+    UI.success("✅ Notas actualizadas para #{target} #{vc} en la pista '#{track}'")
   end
 
   desc "Valida credenciales y acceso a Google Play sin subir nada"
