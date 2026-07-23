@@ -1,0 +1,102 @@
+# fastlane para MammApps (Android nativo, Gradle).
+# Ejecutar desde la raíz del proyecto, p.ej.:
+#   fastlane deploy target:masmedia            # sube AAB con rollout progresivo al 20%
+#   fastlane deploy_fibrazo track:internal     # a la pista interna
+#   fastlane deploy target:eligetv rollout:0.5 # rollout al 50%
+#   fastlane deploy target:masmedia rollout:1  # rollout completo (100%)
+#
+# Publicación:
+#   La subida crea/actualiza la release con rollout progresivo (por defecto 20%),
+#   pero NO la publica automáticamente: en Play Console está activada la
+#   "publicación gestionada" (managed publishing), así que los cambios quedan
+#   retenidos como "listos para publicar" hasta que se confirman a mano en la
+#   consola. Ahí también se avanza el rollout (20% -> 50% -> 100%).
+#
+# Documentación: https://docs.fastlane.tools
+
+default_platform(:android)
+
+# fastlane ejecuta los lanes con el cwd dentro de fastlane/, así que anclamos
+# todas las rutas (config, claves, AAB, gradlew) a la raíz del proyecto.
+def project_root
+  File.expand_path("..")
+end
+
+def target_config(target)
+  configs = JSON.parse(File.read("fastlane-target-config.json"), symbolize_names: true)
+  configs[target.to_sym] || UI.user_error!("Target desconocido: #{target}")
+end
+
+platform :android do
+
+  desc "Compila y sube el AAB de un flavor a Google Play con rollout progresivo"
+  desc "Opciones: target: (masmedia|fibrazo|eligetv), track: (production por defecto), rollout: (0.2 = 20% por defecto)"
+  lane :deploy do |options|
+    target  = options[:target] || UI.user_error!("Falta target: fastlane deploy target:masmedia")
+    track   = options[:track] || 'production'
+    # Rollout progresivo: por defecto al 20% de los usuarios.
+    rollout = (options[:rollout] || '0.2').to_s
+    completed = rollout.to_f >= 1.0
+
+    config = target_config(target)
+
+    # Build del bundle release firmado del flavor
+    gradle(
+      task: "bundle",
+      flavor: config[:flavor],
+      build_type: "Release",
+      project_dir: project_root
+    )
+
+    # Subida a Google Play (solo el AAB, sin tocar metadatos/imágenes/changelogs).
+    # release_status 'inProgress' + rollout crea la release al 20%; la publicación
+    # queda retenida por la "publicación gestionada" de Play Console (manual).
+    upload_to_play_store(
+      track: track,
+      rollout: completed ? nil : rollout,
+      release_status: completed ? 'completed' : 'inProgress',
+      aab: File.join(project_root, config[:aab_path]),
+      json_key: File.join(project_root, config[:service_account]),
+      package_name: config[:package_name],
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: true
+    )
+
+    pct = completed ? "100%" : "#{(rollout.to_f * 100).round}%"
+    UI.success("✅ #{target} subido a la pista '#{track}' con rollout #{pct} (pendiente de publicación manual en Play Console)")
+  end
+
+  desc "Deploy Masmedia"
+  lane :deploy_masmedia do |options|
+    deploy(target: "masmedia", rollout: options[:rollout], track: options[:track])
+  end
+
+  desc "Deploy Fibrazo"
+  lane :deploy_fibrazo do |options|
+    deploy(target: "fibrazo", rollout: options[:rollout], track: options[:track])
+  end
+
+  desc "Deploy Eligetv"
+  lane :deploy_eligetv do |options|
+    deploy(target: "eligetv", rollout: options[:rollout], track: options[:track])
+  end
+
+  desc "Deploy de los tres flavors a Google Play"
+  lane :deploy_all do |options|
+    deploy_masmedia(options)
+    deploy_fibrazo(options)
+    deploy_eligetv(options)
+  end
+
+  desc "Valida credenciales y acceso a Google Play sin subir nada"
+  lane :validate do |options|
+    target = options[:target] || "masmedia"
+    config = target_config(target)
+    validate_play_store_json_key(json_key: File.join(project_root, config[:service_account]))
+    UI.success("✅ Credenciales válidas para el proyecto de Google Play")
+  end
+
+end

@@ -79,6 +79,11 @@ fastlane/screenshots
 fastlane/test_output
 fastlane/readme.md
 
+# Claves de cuenta de servicio de Google Play (NO subir a git)
+fastlane-keys/
+*-fastlane-supply*.json
+fastlane-project-*.json
+
 # Version control
 vcs.xml
 

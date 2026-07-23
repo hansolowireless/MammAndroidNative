@@ -1,0 +1,4 @@
+# Cuenta de servicio de Google Play (fastlane-supply@fastlane-project-421216).
+# El package_name real se define por flavor en fastlane-target-config.json y se
+# pasa explícitamente en cada lane; aquí solo dejamos la clave por defecto.
+json_key_file("fastlane-keys/fastlane-project-421216-597050ff9e2a.json")

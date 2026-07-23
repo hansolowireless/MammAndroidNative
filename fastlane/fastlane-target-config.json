@@ -1,0 +1,20 @@
+{
+  "masmedia": {
+    "package_name": "masmedia.openstream.com",
+    "flavor": "masmedia",
+    "service_account": "fastlane-keys/fastlane-project-421216-597050ff9e2a.json",
+    "aab_path": "app/build/outputs/bundle/masmediaRelease/app-masmedia-release.aab"
+  },
+  "fibrazo": {
+    "package_name": "app.fibrazo.com",
+    "flavor": "fibrazo",
+    "service_account": "fastlane-keys/fastlane-project-421216-597050ff9e2a.json",
+    "aab_path": "app/build/outputs/bundle/fibrazoRelease/app-fibrazo-release.aab"
+  },
+  "eligetv": {
+    "package_name": "app.openstream.com",
+    "flavor": "eligetv",
+    "service_account": "fastlane-keys/fastlane-project-421216-597050ff9e2a.json",
+    "aab_path": "app/build/outputs/bundle/eligetvRelease/app-eligetv-release.aab"
+  }
+}
