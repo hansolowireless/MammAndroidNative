@@ -10,11 +10,11 @@ import com.mamm.mammapps.data.model.sportsevent.SportsEventDto
 import com.mamm.mammapps.data.util.formatNodeUrl
 import com.mamm.mammapps.domain.model.about.DiagnosticInfo
 import com.mamm.mammapps.domain.model.SportsEvent
+import com.mamm.mammapps.domain.model.entity.Featured
 import com.mamm.mammapps.domain.model.loginwithcode.LoginData
 import com.mamm.mammapps.domain.model.loginwithcode.Skin
 import com.mamm.mammapps.domain.model.loginwithcode.SkinLogo
 import com.mamm.mammapps.domain.model.player.Ticker
-import com.mamm.mammapps.domain.model.player.TickerInfo
 import com.mamm.mammapps.util.parseSportEventDate
 
 fun DiagResponseDto.toDomain(): DiagnosticInfo {
@@ -38,27 +38,16 @@ fun SportsEventDto.toDomain() : SportsEvent {
     )
 }
 
-fun GetTickersResponseDto.toDomain() : TickerInfo {
-    // Filter operator featured by valid dates
-    val validOperatorFeatured = this.operatorFeatured?.mapNotNull { featuredDto ->
+fun GetTickersResponseDto.toDomain() : List<Featured> {
+    return this.operatorFeatured?.mapNotNull { featuredDto ->
         featuredDto.toDomain().takeIf { it.isValidByDate() }
     } ?: emptyList()
-
-    return TickerInfo(
-        fechaGeneracion = this.fechaGeneracion,
-        tickers = this.tickers.map {it.toDomain()},
-        disabledChannels = this.disabledChannels,
-        operatorFeatured = validOperatorFeatured
-    )
 }
 
 fun TickerDto.toDomain() : Ticker {
     return Ticker(
-        activo = this.activo,
-        fechaDesde = this.fechaDesde,
-        fechaHasta = this.fechaHasta,
+        campaignId = this.campaignId,
         tiempoDuracion = this.tiempoDuracion,
-        tiempoEntreApariciones = this.tiempoEntreApariciones,
         htmlUrl = this.htmlUrl
     )
 }
@@ -88,8 +77,8 @@ fun LoginDataDto.toDomain() : LoginData {
         refreshToken = this.refreshToken,
         skin = this.skin?.toDomain(),
         channelOrder = this.channelOrder,
-        tickerUrl = this.tickerUrl,
-        loginUser = this.loginUser
+        loginUser = this.loginUser,
+        operator = this.operator
     )
 }
 

@@ -1,6 +1,7 @@
 package com.mamm.mammapps.data.repository
 
 import androidx.core.net.toUri
+import com.mamm.mammapps.data.config.Config
 import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.remote.RemoteDatasource
 import com.mamm.mammapps.data.logger.Logger
@@ -10,10 +11,12 @@ import com.mamm.mammapps.data.datasource.session.SessionDatasource
 import com.mamm.mammapps.domain.interfaces.MammRepository
 import com.mamm.mammapps.domain.model.BrandedContent
 import com.mamm.mammapps.domain.model.entity.Channel
+import com.mamm.mammapps.domain.model.entity.Featured
 import com.mamm.mammapps.domain.model.Genre
 import com.mamm.mammapps.domain.model.HomeContent
 import com.mamm.mammapps.domain.model.OtherContent
 import com.mamm.mammapps.domain.model.Subgenre
+import com.mamm.mammapps.domain.model.exception.TickerException
 import com.mamm.mammapps.domain.model.memories.Memories
 import com.mamm.mammapps.domain.model.serie.SerieInfo
 import com.mamm.mammapps.ui.model.ContentIdentifier
@@ -25,7 +28,7 @@ import javax.inject.Inject
 class MammRepositoryImpl @Inject constructor(
     private val remoteDatasource: RemoteDatasource,
     private val localDataSource: LocalDataSource,
-    private val sessionManager: SessionDatasource,
+    private val sessionDatasource: SessionDatasource,
     private val logger: Logger
 ) : MammRepository {
 
@@ -51,8 +54,19 @@ class MammRepositoryImpl @Inject constructor(
         }
     }
 
+    // Destacados de operador / banners: JSON estático servido desde la CDN del ticker app
+    override suspend fun getOperatorFeatured(): Result<List<Featured>> {
+        return runCatching {
+            val cdnUrl = Config.tickerCdnUrl ?: throw TickerException.MissingData
+            val operator = sessionDatasource.operator ?: throw TickerException.MissingData
+            remoteDatasource.getTickers(url = "$cdnUrl/$operator.json").toDomain()
+        }.onFailure {
+            logger.error(TAG, "getOperatorFeatured error: $it")
+        }
+    }
+
     override suspend fun getMovies(): Result<OtherContent> {
-        val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
+        val jsonParam = sessionDatasource.jsonFile?.toUri()?.pathSegments?.lastOrNull()
             ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
 
         return runCatching {
@@ -66,7 +80,7 @@ class MammRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getDocumentaries(): Result<OtherContent> {
-        val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
+        val jsonParam = sessionDatasource.jsonFile?.toUri()?.pathSegments?.lastOrNull()
             ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
 
         return runCatching {
@@ -80,7 +94,7 @@ class MammRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getAdults(): Result<BrandedContent> {
-        val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
+        val jsonParam = sessionDatasource.jsonFile?.toUri()?.pathSegments?.lastOrNull()
             ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
 
         return runCatching {
@@ -94,7 +108,7 @@ class MammRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getKids(): Result<OtherContent> {
-        val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
+        val jsonParam = sessionDatasource.jsonFile?.toUri()?.pathSegments?.lastOrNull()
             ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
 
         return runCatching {
@@ -108,7 +122,7 @@ class MammRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getSports(): Result<OtherContent> {
-        val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
+        val jsonParam = sessionDatasource.jsonFile?.toUri()?.pathSegments?.lastOrNull()
             ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
 
         return runCatching {
@@ -122,7 +136,7 @@ class MammRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getWarner(): Result<BrandedContent> {
-        val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
+        val jsonParam = sessionDatasource.jsonFile?.toUri()?.pathSegments?.lastOrNull()
             ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
         return runCatching {
             localDataSource.getWarnerContent()?.let { return@runCatching it.toDomain() }
@@ -135,7 +149,7 @@ class MammRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getAcontra(): Result<BrandedContent> {
-        val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
+        val jsonParam = sessionDatasource.jsonFile?.toUri()?.pathSegments?.lastOrNull()
             ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
         return runCatching {
             localDataSource.getAcontraContent()?.let { return@runCatching it.toDomain() }
@@ -148,7 +162,7 @@ class MammRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getAMC(): Result<BrandedContent> {
-        val jsonParam = sessionManager.jsonFile?.toUri()?.pathSegments?.lastOrNull()
+        val jsonParam = sessionDatasource.jsonFile?.toUri()?.pathSegments?.lastOrNull()
             ?: return Result.failure(IllegalStateException("No valid path segment found in session file"))
         return runCatching {
             localDataSource.getAMCContent()?.let { return@runCatching it.toDomain() }
@@ -328,7 +342,7 @@ class MammRepositoryImpl @Inject constructor(
     }
 
     override fun shouldRequestPin(): Boolean {
-        if (sessionManager.pinParental.isNullOrBlank()) {
+        if (sessionDatasource.pinParental.isNullOrBlank()) {
             logger.info(TAG, "No PIN found for User, No PIN request is needed.")
             return false
         }
@@ -354,7 +368,7 @@ class MammRepositoryImpl @Inject constructor(
     }
 
     override fun validatePin(pin: String): Boolean {
-        val correctPin = sessionManager.pinParental
+        val correctPin = sessionDatasource.pinParental
         val isCorrect = pin == correctPin
 
         if (isCorrect) {

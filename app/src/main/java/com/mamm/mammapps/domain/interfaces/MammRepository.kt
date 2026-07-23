@@ -6,6 +6,7 @@ import com.mamm.mammapps.domain.model.BrandedContent
 import com.mamm.mammapps.domain.model.HomeContent
 import com.mamm.mammapps.domain.model.OtherContent
 import com.mamm.mammapps.domain.model.Subgenre
+import com.mamm.mammapps.domain.model.entity.Featured
 import com.mamm.mammapps.domain.model.memories.Memories
 import com.mamm.mammapps.domain.model.serie.SerieInfo
 import com.mamm.mammapps.ui.model.ContentIdentifier
@@ -13,6 +14,8 @@ import com.mamm.mammapps.ui.model.ContentIdentifier
 interface MammRepository {
 
     suspend fun getHomeContent() : Result<HomeContent>
+
+    suspend fun getOperatorFeatured() : Result<List<Featured>>
     suspend fun getMovies(): Result<OtherContent>
     suspend fun getAdults(): Result<BrandedContent>
     suspend fun getDocumentaries(): Result<OtherContent>

@@ -12,7 +12,7 @@ import com.mamm.mammapps.data.datasource.session.SessionDatasource
 import com.mamm.mammapps.data.util.DrmAuthUtil
 import com.mamm.mammapps.domain.interfaces.PlaybackRepository
 import com.mamm.mammapps.domain.model.player.QosData
-import com.mamm.mammapps.domain.model.player.TickerInfo
+import com.mamm.mammapps.domain.model.player.Ticker
 import com.mamm.mammapps.domain.model.player.VastAdParameters
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import kotlinx.coroutines.flow.Flow
@@ -104,7 +104,7 @@ class PlaybackRepositoryImpl @Inject constructor(
     override suspend fun getVastAdParameters(): Result<VastAdParameters> {
         return runCatching {
             VastAdParameters(
-                operator = sessionDatasource.loginData?.skin?.operator ?: Config.operatorNameDRM,
+                operator = sessionDatasource.operator ?: Config.operatorNameDRM,
                 userId = sessionDatasource.loginData?.userId ?: 0,
                 device = localDatasource.getDeviceSerial(),
                 deviceType = localDatasource.getDeviceType()
@@ -114,14 +114,26 @@ class PlaybackRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getTickers(): Result<TickerInfo> {
+    // Ticker en tiempo real por canal: endpoint dinámico del ticker app
+    override suspend fun getChannelTicker(channel: Int, type: String): Result<Ticker?> {
         return runCatching {
-            sessionDatasource.tickerUrl?.let {
-                remoteDatasource.getTickers(url = it).toDomain()
-            } ?: throw TickerException.MissingData
+            val tickerUrl = Config.tickerUrl ?: throw TickerException.MissingData
+            val url = buildChannelTickerUrl(tickerUrl, channel, type)
+            remoteDatasource.getChannelTicker(url)?.toDomain()
         }.onFailure {
-            logger.error(TAG, "error getting tickers $it.message")
+            logger.error(TAG, "error getting channel ticker: ${it.message}")
         }
+    }
+
+    private fun buildChannelTickerUrl(tickerUrl: String, channel: Int, type: String): String {
+        val user = sessionDatasource.loginData?.loginUser.orEmpty()
+        val op = sessionDatasource.operator.orEmpty()
+
+        return "$tickerUrl/ticker?user=$user&op=$op" +
+                "&channel=$channel" +
+                "&device=${localDatasource.getDeviceSerial()}" +
+                "&type=$type" +
+                "&dt=${localDatasource.getDeviceType()}"
     }
 
     override suspend fun getTickerQoSData(contentId: Int): Result<QosData> {

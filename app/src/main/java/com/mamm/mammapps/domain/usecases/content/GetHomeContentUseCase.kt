@@ -3,7 +3,6 @@ package com.mamm.mammapps.domain.usecases.content
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.interfaces.CustomContentRepository
 import com.mamm.mammapps.domain.interfaces.MammRepository
-import com.mamm.mammapps.domain.interfaces.PlaybackRepository
 import com.mamm.mammapps.ui.mapper.insertBookmarks
 import com.mamm.mammapps.ui.mapper.insertFeatured
 import com.mamm.mammapps.ui.mapper.insertMostWatched
@@ -19,7 +18,6 @@ import kotlin.coroutines.cancellation.CancellationException
 class GetHomeContentUseCase @Inject constructor(
     private val repository: MammRepository,
     private val customContentRepository: CustomContentRepository,
-    private val playbackRepository: PlaybackRepository,
     private val logger: Logger
 ) {
     companion object {
@@ -34,7 +32,7 @@ class GetHomeContentUseCase @Inject constructor(
                 val mostWatched = async { customContentRepository.getMostWatched() }
                 val recommended = async { customContentRepository.getRecommended() }
                 val topChannels = async { customContentRepository.getTopChannels() }
-                val operatorFeatured = async { playbackRepository.getTickers() }
+                val operatorFeatured = async { repository.getOperatorFeatured() }
 
                 //Wait for all to complete
                 val homeResult = homeContent.await()
@@ -54,7 +52,7 @@ class GetHomeContentUseCase @Inject constructor(
 
                 // Combine CMS featured with operator featured (operator first in array)
                 val cmsFeatured = homeResult.getOrThrow().featured ?: emptyList()
-                val operatorFeaturedList = operatorFeaturedResult.getOrNull()?.operatorFeatured ?: emptyList()
+                val operatorFeaturedList = operatorFeaturedResult.getOrNull() ?: emptyList()
                 logger.debug(TAG, "operatorFeaturedList featured: ${operatorFeaturedList.size} total")
                 val allFeatured = operatorFeaturedList + cmsFeatured
 

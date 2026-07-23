@@ -33,5 +33,14 @@ data class EndpointData(
     val endpointQos: String? = null,
 
     @SerializedName("endpoint_proxybuyer")
-    val endpointProxybuyer: String? = null
+    val endpointProxybuyer: String? = null,
+
+    @SerializedName("ticker_url")
+    val tickerUrl: String? = null,
+
+    @SerializedName("ticker_url_cdn")
+    val tickerUrlCdn: String? = null,
+
+    @SerializedName("origin")
+    val origin: String? = null
 )

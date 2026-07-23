@@ -56,11 +56,12 @@ fun VideoPlayerScreen(
 
     LaunchedEffect(Unit) {
         viewModel.initializeWithContent(content = playedContent)
+        // Se llama una sola vez: la conmutación por canal la gestiona el flatMapLatest interno
+        viewModel.observeTickers()
     }
 
     LaunchedEffect(content) {
         viewModel.observeLiveEvents()
-        viewModel.observeTickers()
         viewModel.updateChannelList()
     }
 

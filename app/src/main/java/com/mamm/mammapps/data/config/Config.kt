@@ -14,6 +14,8 @@ object Config {
     private var dynamicIdmUrl: String? = null
     private var dynamicSearchUrl: String? = null
     private var dynamicPasswordRecUrl: String? = null
+    private var dynamicTickerUrl: String? = null
+    private var dynamicTickerCdnUrl: String? = null
 
     // valores fijos desde BuildConfig
     val locatorUrl: String get() = BuildConfig.LOCATOR_URL
@@ -50,6 +52,14 @@ object Config {
             BuildConfig.PASSWORD_REC_URL
         }
 
+    // Base para el preroll VAST y el ticker por canal (endpoint dinámico del "ticker app")
+    val tickerUrl: String?
+        get() = dynamicTickerUrl
+
+    // Base para el JSON estático de tickers/destacados de operador/banners (CDN)
+    val tickerCdnUrl: String?
+        get() = dynamicTickerCdnUrl
+
     val operatorNameDRM: String
         get() = BuildConfig.OPERATORNAME_DRM
 
@@ -76,6 +86,8 @@ object Config {
         dynamicIdmUrl = locatorResponse.data.endpointIdm ?: dynamicIdmUrl
         dynamicSearchUrl = locatorResponse.data.endpointSearch ?: dynamicSearchUrl
         dynamicPasswordRecUrl = locatorResponse.data.endpointManager ?: dynamicPasswordRecUrl
+        dynamicTickerUrl = locatorResponse.data.tickerUrl ?: dynamicTickerUrl
+        dynamicTickerCdnUrl = locatorResponse.data.tickerUrlCdn ?: dynamicTickerCdnUrl
     }
 
     fun resetDynamicUrls () {
@@ -84,5 +96,7 @@ object Config {
         dynamicIdmUrl = null
         dynamicSearchUrl = null
         dynamicPasswordRecUrl = null
+        dynamicTickerUrl = null
+        dynamicTickerCdnUrl = null
     }
 }

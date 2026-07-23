@@ -64,8 +64,8 @@ class VideoResizeManagerWithTicker(
     }
 
     override fun resizeTo(targetSize: VideoSize) {
-        val hasValidTickers = tickerList.any { it.isValid() }
-        Log.d(TAG, "resizeTo llamado con: $targetSize. ¿Tiene tickers válidos?: $hasValidTickers")
+        val hasValidTickers = tickerList.isNotEmpty()
+        Log.d(TAG, "resizeTo llamado con: $targetSize. ¿Tiene tickers?: $hasValidTickers")
 
         val finalSize = if (targetSize == VideoSize.SMALL_SIZE && !hasValidTickers) {
             VideoSize.FULL_SIZE
@@ -97,8 +97,7 @@ class VideoResizeManagerWithTicker(
         tickerList = newTickerList
         currentTickerIndex = 0
 
-        if (tickerList.any { it.isValid() }) {
-            // Si el ticker ya está visible, actualizamos el contenido inmediatamente
+        if (tickerList.isNotEmpty()) {
             if (currentSize == VideoSize.SMALL_SIZE) {
                 showTicker()
             }
@@ -121,18 +120,8 @@ class VideoResizeManagerWithTicker(
 
     private fun advanceToNextValidTicker() {
         if (tickerList.isEmpty()) return
-
-        // Buscamos el siguiente ticker válido (por si hay nulos o vacíos en la lista)
-        var attempts = 0
-        do {
-            currentTickerIndex = (currentTickerIndex + 1) % tickerList.size
-            attempts++
-            if (attempts >= tickerList.size) break
-        } while (!tickerList[currentTickerIndex].isValid())
-
+        currentTickerIndex = (currentTickerIndex + 1) % tickerList.size
         _ticker = tickerList[currentTickerIndex]
-
-
     }
 
     private fun loadRemoteTicker() {
