@@ -144,5 +144,13 @@
     <string name="accessibility_play_icon_content_description">Play icon</string>
     <!--endregion Accessibility-->
 
+    <!--region Player errors-->
+    <string name="player_error_transient">Problema de conexión.</string>
+    <string name="player_error_drm">No se pudo reproducir el contenido protegido.</string>
+    <string name="player_error_decoder">Este dispositivo no puede reproducir este contenido.</string>
+    <string name="player_error_unavailable">El contenido no está disponible.</string>
+    <string name="player_error_generic">No se pudo reproducir el contenido.</string>
+    <string name="player_error_retrying"><xliff:g id="message">%1$s</xliff:g> Reintentando en <xliff:g id="seconds">%2$d</xliff:g> s…</string>
+    <!--endregion Player errors-->
 
 </resources>

@@ -33,6 +33,8 @@ import com.mamm.mammapps.domain.usecases.player.playprogresscache.GetPlayProgres
 import com.mamm.mammapps.domain.usecases.player.playprogresscache.SavePlayProgressUseCase
 import com.mamm.mammapps.ui.component.player.custompreviewbar.CustomPreviewBar
 import com.mamm.mammapps.ui.constant.PlayerConstant
+import com.mamm.mammapps.ui.mapper.PlayerErrorMapper
+import com.mamm.mammapps.ui.model.player.PlayerErrorType
 import com.mamm.mammapps.ui.extension.toDate
 import com.mamm.mammapps.ui.extension.inferMimeType
 import com.mamm.mammapps.ui.mapper.toLiveEventInfoUI
@@ -89,6 +91,7 @@ class VideoPlayerViewModel @Inject constructor(
     private val qosReporter: QosReporter,
     private val bookmarkTracker: BookmarkTracker,
     private val zappingController: ZappingController,
+    private val playerErrorMapper: PlayerErrorMapper,
     @ApplicationContext private val context: Context,
     val logger: Logger
 ) : ViewModel() {
@@ -138,6 +141,10 @@ class VideoPlayerViewModel @Inject constructor(
     private val _isTstvMode = MutableStateFlow<Boolean>(false)
     val isTstvMode = _isTstvMode.asStateFlow()
 
+    // Reintentos ante errores transitorios (backoff exponencial)
+    private var retryCount = 0
+    private var retryJob: Job? = null
+
 
     /**
      * Establece el AdViewProvider para renderizar los anuncios
@@ -151,6 +158,9 @@ class VideoPlayerViewModel @Inject constructor(
      */
     fun initializeWithContent(content: ContentToPlayUI) {
         _content.update { content }
+        // Contenido nuevo: reiniciar la estrategia de reintentos
+        retryJob?.cancel()
+        retryCount = 0
         viewModelScope.launch {
             createPlayer()
 
@@ -223,11 +233,14 @@ class VideoPlayerViewModel @Inject constructor(
         _player.value?.let { qosReporter.registerPlayer(it) }
         _player.value?.addListener(object : Player.Listener {
             override fun onPlayerError(error: PlaybackException) {
-                handlePlayerError(error, context)
+                handlePlayerError(error)
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 if (isPlaying) {
+                    // La reproducción se ha recuperado: limpiar la estrategia de reintentos
+                    retryJob?.cancel()
+                    retryCount = 0
                     startPeriodicFunctions()
                     _playerState.update { PlayerUIState.Playing }
                 } else {
@@ -399,15 +412,42 @@ class VideoPlayerViewModel @Inject constructor(
 
 
 
-    private fun handlePlayerError(exception: PlaybackException, context: Context) {
-        when (exception.errorCode) {
-            PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW -> {
-                logger.error(TAG, "handlePlayerError - ERROR_CODE_BEHIND_LIVE_WINDOW")
-                _player.value?.seekToDefaultPosition()
-                _player.value?.prepare()
+    private fun handlePlayerError(exception: PlaybackException) {
+        if (exception.errorCode == PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW) {
+            logger.error(TAG, "handlePlayerError - ERROR_CODE_BEHIND_LIVE_WINDOW")
+            _player.value?.seekToDefaultPosition()
+            _player.value?.prepare()
+            return
+        }
+
+        val type = playerErrorMapper.map(exception)
+        if (playerErrorMapper.isTransient(exception) && retryCount < PlayerConstant.PLAYER_MAX_RETRIES) {
+            scheduleRetry(type, exception)
+        } else {
+            retryJob?.cancel()
+            logger.error(TAG, "handlePlayerError - error no recuperable (o reintentos agotados): code=${exception.errorCode}, type=$type")
+            _playerState.update { PlayerUIState.Error(type = type) }
+        }
+    }
+
+    /**
+     * Programa un reintento con backoff exponencial (2s, 4s, 8s…) y va emitiendo el
+     * contador para que la UI lo muestre en el snackbar. Al agotar el tiempo, re-prepara
+     * el player para volver a cargar la fuente.
+     */
+    private fun scheduleRetry(type: PlayerErrorType, exception: PlaybackException) {
+        retryJob?.cancel()
+        retryCount++
+        val waitSeconds = PlayerConstant.PLAYER_RETRY_BASE_DELAY_SECONDS shl (retryCount - 1)
+        logger.warn(TAG, "handlePlayerError - error transitorio (code=${exception.errorCode}), reintento $retryCount/${PlayerConstant.PLAYER_MAX_RETRIES} en ${waitSeconds}s")
+
+        retryJob = viewModelScope.launch {
+            for (remaining in waitSeconds downTo 1) {
+                _playerState.update { PlayerUIState.Error(type = type, retrySecondsRemaining = remaining) }
+                delay(1000)
             }
-            else -> {
-                _playerState.update { PlayerUIState.Error(exception.localizedMessage.orEmpty() + ": " + exception.errorCode) }
+            withContext(Dispatchers.Main) {
+                _player.value?.prepare()
             }
         }
     }
@@ -567,6 +607,7 @@ class VideoPlayerViewModel @Inject constructor(
 
     fun releaseVariables() {
         savePlayProgress()
+        retryJob?.cancel()
         stopPeriodicFunctions()
         releasePlayer()
         adsManager.release()
