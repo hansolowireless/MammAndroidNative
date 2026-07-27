@@ -143,4 +143,13 @@
     <string name="accessibility_play_icon_content_description">Icona riproduci</string>
     <!--endregion Accessibility-->
 
+    <!--region Player errors-->
+    <string name="player_error_transient">Problema di connessione.</string>
+    <string name="player_error_drm">Impossibile riprodurre il contenuto protetto.</string>
+    <string name="player_error_decoder">Questo dispositivo non può riprodurre questo contenuto.</string>
+    <string name="player_error_unavailable">Il contenuto non è disponibile.</string>
+    <string name="player_error_generic">Impossibile riprodurre il contenuto.</string>
+    <string name="player_error_retrying"><xliff:g id="message">%1$s</xliff:g> Nuovo tentativo tra <xliff:g id="seconds">%2$d</xliff:g> s…</string>
+    <!--endregion Player errors-->
+
 </resources>

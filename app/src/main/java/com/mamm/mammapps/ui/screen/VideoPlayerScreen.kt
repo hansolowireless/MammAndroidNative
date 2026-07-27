@@ -6,19 +6,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -28,13 +26,14 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mamm.mammapps.R
 import com.mamm.mammapps.ui.component.dialog.SessionExpiredDialog
 import com.mamm.mammapps.ui.extension.findActivity
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
+import com.mamm.mammapps.ui.model.player.PlayerErrorType
 import com.mamm.mammapps.ui.model.uistate.PlayerUIState
 import com.mamm.mammapps.ui.theme.SnackbarColor
 import com.mamm.mammapps.ui.viewmodel.VideoPlayerViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun VideoPlayerScreen(
@@ -51,9 +50,6 @@ fun VideoPlayerScreen(
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-
     LaunchedEffect(Unit) {
         viewModel.initializeWithContent(content = playedContent)
         // Se llama una sola vez: la conmutación por canal la gestiona el flatMapLatest interno
@@ -63,20 +59,6 @@ fun VideoPlayerScreen(
     LaunchedEffect(content) {
         viewModel.observeLiveEvents()
         viewModel.updateChannelList()
-    }
-
-    LaunchedEffect(playerState) {
-        when (val state = playerState) {
-            is PlayerUIState.Error -> {
-                scope.launch {
-                    snackbarHostState.showSnackbar(
-                        message = state.message
-                    )
-                }
-            }
-            else -> {
-            }
-        }
     }
 
     // --- EFECTOS DE PANTALLA COMPLETA Y ORIENTACIÓN ---
@@ -139,27 +121,41 @@ fun VideoPlayerScreen(
             content = content
         )
 
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp),
-            snackbar = { snackbarData ->
-                Snackbar(
-                    snackbarData = snackbarData,
-                    containerColor = SnackbarColor.containerColor,
-                    contentColor = SnackbarColor.contentColor,
-                    actionColor = SnackbarColor.actionColor,
-                    dismissActionContentColor = SnackbarColor.dismissActionContentColor
-                )
+        (playerState as? PlayerUIState.Error)?.let { errorState ->
+            Snackbar(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 16.dp),
+                containerColor = SnackbarColor.containerColor,
+                contentColor = SnackbarColor.contentColor,
+            ) {
+                Text(text = playerErrorMessage(errorState))
             }
-        )
-        
+        }
+
         if (playerState is PlayerUIState.Session) {
             SessionExpiredDialog(
                 onConfirm = onSessionExpired
             )
         }
     }
+}
+
+/**
+ * Mapea el tipo de error a un mensaje localizado. En errores transitorios que se
+ * están reintentando, añade el contador con los segundos que faltan.
+ */
+@Composable
+private fun playerErrorMessage(error: PlayerUIState.Error): String {
+    val baseMessage = when (error.type) {
+        PlayerErrorType.TRANSIENT -> stringResource(R.string.player_error_transient)
+        PlayerErrorType.DRM -> stringResource(R.string.player_error_drm)
+        PlayerErrorType.DECODER -> stringResource(R.string.player_error_decoder)
+        PlayerErrorType.UNAVAILABLE -> stringResource(R.string.player_error_unavailable)
+        PlayerErrorType.GENERIC -> stringResource(R.string.player_error_generic)
+    }
+    return error.retrySecondsRemaining?.let { seconds ->
+        stringResource(R.string.player_error_retrying, baseMessage, seconds)
+    } ?: baseMessage
 }
 
