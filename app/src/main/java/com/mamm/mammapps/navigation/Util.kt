@@ -168,6 +168,21 @@ object MenuItems {
             }
         }
 
+        // Como fibrazo, pero tvhotel sí ofrece el buscador y no tiene grabaciones
+        "tvhotel" -> {
+            masterList.filter {
+                it != AppRoute.MOVIES &&
+                        it != AppRoute.DOCUMENTARIES &&
+                        it != AppRoute.SPORTS &&
+                        it != AppRoute.KIDS &&
+                        it != AppRoute.SERIES &&
+                        it != AppRoute.WARNER &&
+                        it != AppRoute.ACONTRA &&
+                        it != AppRoute.AMC &&
+                        it != AppRoute.MEMORIES
+            }
+        }
+
         else -> {
             masterList
         }
@@ -194,7 +209,7 @@ object MenuItems {
         }
     }
 
-    fun showLogoOnMenu(): Boolean {
+    fun showLogoOnMenuBottom(): Boolean {
         return when (BuildConfig.FLAVOR) {
             "fibrazo" -> {
                 true

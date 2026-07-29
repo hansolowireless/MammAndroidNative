@@ -30,7 +30,7 @@ end
 platform :android do
 
   desc "Compila y sube el AAB de un flavor a Google Play con rollout progresivo"
-  desc "Opciones: target: (masmedia|fibrazo|eligetv), track: (production por defecto), rollout: (0.2 = 20% por defecto)"
+  desc "Opciones: target: (masmedia|fibrazo|eligetv|tvhotel), track: (production por defecto), rollout: (0.2 = 20% por defecto)"
   lane :deploy do |options|
     target  = options[:target] || UI.user_error!("Falta target: fastlane deploy target:masmedia")
     track   = options[:track] || 'production'
@@ -87,11 +87,17 @@ platform :android do
     deploy(target: "eligetv", rollout: options[:rollout], track: options[:track])
   end
 
-  desc "Deploy de los tres flavors a Google Play"
+  desc "Deploy TV Hotel"
+  lane :deploy_tvhotel do |options|
+    deploy(target: "tvhotel", rollout: options[:rollout], track: options[:track])
+  end
+
+  desc "Deploy de todos los flavors a Google Play"
   lane :deploy_all do |options|
     deploy_masmedia(options)
     deploy_fibrazo(options)
     deploy_eligetv(options)
+    deploy_tvhotel(options)
   end
 
   desc "Fija las notas de 'Novedades' (Correcciones y mejoras) en una versión ya subida"
