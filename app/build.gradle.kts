@@ -211,6 +211,17 @@ android {
             signingConfig = signingConfigs.getByName("keystoreMamm")
         )
 
+        configureFlavorWithMasmediaUrls(
+            flavors = this,
+            name = "tvhotel",
+            appId = "tvhotel.openstream.com",
+            icon = "@mipmap/ic_launcher_tvhotel",
+            iconMobile = "@mipmap/ic_launcher_tvhotel",
+            iconRound = "@mipmap/ic_launcher_tvhotel_round",
+            banner = "@drawable/banner_tvhotel",
+            signingConfig = signingConfigs.getByName("keystoreMamm")
+        )
+
         configureCustomFlavor(
             flavors = this,
             name = "eligetv",

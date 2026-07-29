@@ -141,7 +141,7 @@ fun TVNavigationLayout(
                         )
 
                         // Imagen fija en la parte inferior
-                        if (MenuItems.showLogoOnMenu() && isNavRailFocused) {
+                        if (MenuItems.showLogoOnMenuBottom() && isNavRailFocused) {
                             OperatorLogoImage(
                                 logoUrl = operatorLogo,
                                 modifier = Modifier

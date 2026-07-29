@@ -1,6 +1,6 @@
 ---
 description: Flujo completo de release a Google Play (sube versión, commit propio, push develop, fastlane deploy al 20%)
-argument-hint: <flavor> [flavor...]   (masmedia | fibrazo | eligetv)
+argument-hint: <flavor> [flavor...]   (masmedia | fibrazo | eligetv | tvhotel)
 ---
 
 Despliega a Google Play los flavors indicados en: **$ARGUMENTS**
@@ -15,6 +15,6 @@ Flujo:
 5. Al terminar, recuerda al usuario que la release queda **pendiente de publicación manual** en Play Console (publicación gestionada) y que allí se confirma y se avanza el rollout (20% → 50% → 100%).
 
 Notas importantes:
-- Las notas de "Novedades" se toman de `fastlane/metadata/<flavor>/...` automáticamente. **No las cambies**: masmedia/fibrazo usan "Correcciones y mejoras" y **eligetv usa un texto de marketing propio**.
+- Las notas de "Novedades" se toman de `fastlane/metadata/<flavor>/...` automáticamente. **No las cambies**: masmedia/fibrazo/tvhotel usan "Correcciones y mejoras" y **eligetv usa un texto de marketing propio**.
 - Si es la primera vez que un flavor sube un build con anuncios (IMA SDK), Play puede rechazar por la declaración de **Advertising ID**: hay que declararlo en Play Console → Contenido de la app → ID de publicidad. Ver la memoria `release-fastlane`.
 - **No publiques ni avances el rollout automáticamente**: eso es manual en la consola. Un deploy sube binario a producción, así que confirma el/los flavor(s) con el usuario antes de lanzarlo si hay ambigüedad.

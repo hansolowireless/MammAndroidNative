@@ -16,5 +16,11 @@
     "flavor": "eligetv",
     "service_account": "fastlane-keys/fastlane-project-421216-597050ff9e2a.json",
     "aab_path": "app/build/outputs/bundle/eligetvRelease/app-eligetv-release.aab"
+  },
+  "tvhotel": {
+    "package_name": "tvhotel.openstream.com",
+    "flavor": "tvhotel",
+    "service_account": "fastlane-keys/fastlane-project-421216-597050ff9e2a.json",
+    "aab_path": "app/build/outputs/bundle/tvhotelRelease/app-tvhotel-release.aab"
   }
 }

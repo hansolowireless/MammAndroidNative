@@ -1,0 +1,40 @@
+<!--
+La splash screen de Android 12+ trata este drawable como el foreground de un icono
+adaptativo: lo amplía 1,5x y lo recorta con una máscara circular, con lo que solo se
+ve el ~44% central del lienzo. Por eso el lienzo es cuadrado y el logotipo, que es muy
+apaisado, va inscrito en el centro ocupando un 35% del ancho: así entra entero en el
+círculo en vez de que se corten la "T" y la "L".
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="288dp"
+    android:height="288dp"
+    android:viewportWidth="2880"
+    android:viewportHeight="2880">
+  <group
+      android:scaleX="0.6"
+      android:scaleY="0.6"
+      android:translateX="840"
+      android:translateY="840">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M229.2,1164.3v-200.2h-71.5v-47h201.6v47h-71.5v200.2h-58.7Z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M466.6,1164.3l-95.5,-247.2h60.5l61.6,181.9 60.9,-181.9h60.2l-94.8,247.2h-52.9Z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M877.9,1164.3v-100.3h-96.6v100.3h-58.7v-247.2h58.7v96.6h96.6v-96.6h58.7v247.2h-58.7Z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M1164.9,918.3h-39.1l58.4,-58.4 -24.3,-24.3 -69.9,69.9 -30.9,-45.3 -29.8,20.3 25.8,37.8h-23c-31.3,0 -56.7,25.4 -56.7,56.7v132.8c0,31.3 25.4,56.7 56.7,56.7h132.8c31.3,0 56.7,-25.4 56.7,-56.7v-132.8c0,-31.3 -25.4,-56.7 -56.7,-56.7ZM1162.3,1077.5c0,15.5 -12.6,28.1 -28.1,28.1h-71.5c-15.5,0 -28.1,-12.6 -28.1,-28.1v-72.3c0,-15.5 12.6,-28.1 28.1,-28.1h71.5c15.5,0 28.1,12.6 28.1,28.1v72.3Z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M1323,1164.3v-200.2h-71.5v-47h201.6v47h-71.5v200.2h-58.7Z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M1484.6,1164.3v-247.2h153.5v46.7h-94.8v53.2h87.9v44.1h-87.9v55.8h101v47.4h-159.7Z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M1684.7,1164.3v-247.2h58.7v199.8h98.8v47.4h-157.5Z"/>
+  </group>
+</vector>
