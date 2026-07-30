@@ -124,6 +124,8 @@
     <string name="error_content_generic">Nessun contenuto da mostrare</string>
     <string name="error_invalid_credentials">Nome utente o password non validi</string>
     <string name="error_memories_no_content">Non hai ancora nessun ricordo caricato sul tuo account!\n\nAccedi con il tuo utente a misrecuerdos.masmediatv.es per caricare i video e le foto che desideri archiviare e visualizzare in streaming. Da lì potrai convertirli in formato video streaming, per guardarli quando vuoi da qualsiasi dispositivo tramite l\'App +MEDIA\n\nRichiedi maggiori informazioni su questo servizio al tuo operatore e inizia subito a goderti e condividere i tuoi ricordi preferiti!</string>
+    <string name="error_session_expired">La tua sessione è scaduta. Devi accedere di nuovo</string>
+    <string name="ok">Ok</string>
     <!--endregion Error-->
 
     <!--region PIN DIALOG-->
