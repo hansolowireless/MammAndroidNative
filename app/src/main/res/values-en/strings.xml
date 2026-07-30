@@ -1,0 +1,155 @@
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <!--region common-->
+    <string name="empty"></string>
+    <string name="exit">Exit</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="do_you_want_exit">Do you want to close the app?</string>
+    <!--region common-->
+
+    <!--region Login-->
+    <string name="type_credentials">Enter your login details</string>
+    <string name="email">E-mail</string>
+    <string name="password">Password</string>
+    <string name="login">Sign in</string>
+    <string name="logout">Sign out</string>
+    <string name="forgot_password">Forgot your password?</string>
+    <string name="tv_code">TV code</string>
+    <string name="tv_code_instructions">Open the \"About\" section in your mobile app and enter this code.</string>
+    <string name="tv_code_expiration">The code will expire in %d seconds.</string>
+    <string name="tv_code_expired">The code has expired</string>
+    <string name="request_new_code">Request a new code</string>
+    <string name="auth_tv_code_button">Authenticate TV device</string>
+    <string name="auth_tv_code_dialog_title">Authenticate TV</string>
+    <string name="auth_tv_code_dialog_message">Enter the code shown on the TV.</string>
+    <string name="auth_tv_code_success">Device authenticated successfully.</string>
+    <!--endregion Login-->
+
+    <!--region Home-->
+    <string name="expand_category_content_title">Press to see more content</string>
+    <!--endregion Home-->
+
+    <!--region Channels-->
+    <string name="search_channel_placeholder">Search channel…</string>
+    <string name="filter_by_genre_action">Filter by genre</string>
+    <string name="filter_by_genre_title">Filter by Genre</string>
+    <string name="all">All</string>
+    <!--endregion Channels-->
+
+    <!--Details-->
+    <string name="duration_minutes">%1$s min.</string>
+    <string name="separator">|</string>
+    <string name="director_label">Director: %1$s</string>
+    <string name="original_title_label">Original title: %1$s</string>
+    <string name="available_until_label">Available until: %1$s</string>
+    <string name="play">Play</string>
+    <string name="continue_watching">Continue</string>
+    <string name="cast">Cast</string>
+    <string name="show_less">Show less</string>
+    <string name="show_more">Show more</string>
+    <!--endregion Details-->
+
+    <!--region EPG-->
+    <string name="no_title">No title</string>
+    <string name="day_before_yesterday">2 days ago</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="day_after_tomorrow">In 2 days</string>
+    <string name="live">Live</string>
+    <string name="days_ago">%d days ago</string>
+    <string name="in_days">In %d days</string>
+    <!--endregion EPG-->
+
+    <!-- region SEARCH -->
+    <string name="search_field_label">Search movies, series and more…</string>
+    <string name="search_initial_prompt">Find your favorite content.</string>
+    <string name="search_no_results">No results found for \"%1$s\"</string>
+    <!--endregion SEARCH-->
+
+    <!-- region ABOUT -->
+    <string name="username">User: </string>
+    <string name="application_version">App version: </string>
+    <string name="start_diagnostic">Run diagnostics</string>
+    <string name="loading_diagnostic">Running diagnostics</string>
+    <string name="node">Node</string>
+    <!-- endregion ABOUT -->
+
+    <!--Track selector Strings!-->
+    <string name="track_selection_title">Video Quality</string>
+    <string name="subtitle_selection_title">Subtitles</string>
+    <string name="audiotrack_selection_title">Audio</string>
+
+    <string name="error_no_decoder">This device does not provide a decoder for <xliff:g id="mime_type">%1$s</xliff:g></string>
+    <string name="error_no_secure_decoder">This device does not provide a secure decoder for <xliff:g id="mime_type">%1$s</xliff:g></string>
+    <string name="error_querying_decoders">Unable to query device decoders</string>
+    <string name="error_instantiating_decoder">Unable to instantiate decoder <xliff:g id="decoder_name">%1$s</xliff:g></string>
+    <string name="error_generic">Playback failed</string>
+
+    <!--region Player-->
+    <string name="live_content">Live</string>
+    <string name="no_event_info">No event information</string>
+    <!--endregion Player-->
+
+    <!-- Navigation Labels -->
+    <string name="nav_home">Home</string>
+    <string name="nav_epg">Guide</string>
+    <string name="nav_channels">Channels</string>
+    <string name="nav_movies">Movies</string>
+    <string name="nav_documentaries">Documentaries</string>
+    <string name="nav_series">Series</string>
+    <string name="nav_sports">Sports</string>
+    <string name="nav_adults">Adults</string>
+    <string name="nav_sport_calendar">Sports Cal.</string>
+    <string name="nav_kids">Kids</string>
+    <string name="nav_warner">Warner</string>
+    <string name="nav_acontra">Acontra+</string>
+    <string name="nav_amc">AMC</string>
+    <string name="nav_movies_amc">AMC Movies</string>
+    <string name="nav_series_amc">AMC Series</string>
+    <string name="nav_my_memories">My memories</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_diagnostics">About</string>
+    <string name="nav_change_user">Switch user</string>
+    <string name="nav_exit">Exit</string>
+    <!--endregion Navigation Labels-->
+
+    <!--Error-->
+    <string name="generic_error">Error</string>
+    <string name="error_loading_epg">Error loading the Guide</string>
+    <string name="error_subscription_in_process">Your subscription is being processed. Please contact your provider</string>
+    <string name="error_content_generic">No content to display</string>
+    <string name="error_invalid_credentials">Invalid username or password</string>
+    <string name="error_memories_no_content">You don\'t have any memories uploaded to your account yet!\n\nSign in at misrecuerdos.masmediatv.es to upload the videos and photos you want to store and watch by streaming. From there you can convert them to a streaming video format and watch them whenever you like, on any device, through the +MEDIA app.\n\nAsk your provider for more information about this service and start enjoying and sharing your favorite memories!</string>
+    <string name="error_session_expired">Your session has expired. Please sign in again</string>
+    <string name="ok">Ok</string>
+    <!--endregion Error-->
+
+    <!--region PIN DIALOG-->
+    <string name="parental_pin_dialog_title">Restricted Access</string>
+    <string name="parental_pin_dialog_message">Please enter your PIN to continue.</string>
+    <string name="pin_field_label">PIN</string>
+    <string name="confirm_button_label">Confirm</string>
+    <string name="cancel_button_label">Cancel</string>
+    <!--endregion PIN DIALOG-->
+
+    <!--region Accessibility-->
+    <string name="accessibility_clear_search_action">Clear search</string>
+    <string name="accessibility_close">Close</string>
+    <string name="accessibility_expandcategory">Expand category</string>
+    <string name="accessibility_toggle_drawer">Open navigation drawer</string>
+    <string name="accessibility_rating_content_description">Rating</string>
+    <string name="accessibility_play_icon_content_description">Play icon</string>
+    <!--endregion Accessibility-->
+
+    <!--region Player errors-->
+    <string name="player_error_transient">Connection problem.</string>
+    <string name="player_error_drm">The protected content could not be played.</string>
+    <string name="player_error_decoder">This device cannot play this content.</string>
+    <string name="player_error_unavailable">The content is not available.</string>
+    <string name="player_error_generic">The content could not be played.</string>
+    <string name="player_error_retrying"><xliff:g id="message">%1$s</xliff:g> Retrying in <xliff:g id="seconds">%2$d</xliff:g> s…</string>
+    <!--endregion Player errors-->
+
+</resources>
