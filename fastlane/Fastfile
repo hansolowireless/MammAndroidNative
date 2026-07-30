@@ -1,16 +1,20 @@
 # fastlane para MammApps (Android nativo, Gradle).
 # Ejecutar desde la raíz del proyecto, p.ej.:
 #   fastlane deploy target:masmedia            # sube AAB con rollout progresivo al 20%
+#   fastlane deploy target:eligetv             # sube AAB al 100% (default de no-masmedia)
 #   fastlane deploy_fibrazo track:internal     # a la pista interna
-#   fastlane deploy target:eligetv rollout:0.5 # rollout al 50%
-#   fastlane deploy target:masmedia rollout:1  # rollout completo (100%)
+#   fastlane deploy target:eligetv rollout:0.5 # forzar rollout al 50%
+#   fastlane deploy target:masmedia rollout:1  # forzar rollout completo (100%)
+#
+# Rollout por defecto:
+#   masmedia sale al 20% (es el de mayor base instalada, conviene ir por fases);
+#   el resto de flavors sale directo al 100%. Se puede forzar con rollout:.
 #
 # Publicación:
-#   La subida crea/actualiza la release con rollout progresivo (por defecto 20%),
-#   pero NO la publica automáticamente: en Play Console está activada la
-#   "publicación gestionada" (managed publishing), así que los cambios quedan
-#   retenidos como "listos para publicar" hasta que se confirman a mano en la
-#   consola. Ahí también se avanza el rollout (20% -> 50% -> 100%).
+#   La subida crea/actualiza la release, pero NO la publica automáticamente: en
+#   Play Console está activada la "publicación gestionada" (managed publishing),
+#   así que los cambios quedan retenidos como "listos para publicar" hasta que se
+#   confirman a mano en la consola. Ahí también se avanza el rollout si lo hay.
 #
 # Documentación: https://docs.fastlane.tools
 
@@ -29,13 +33,16 @@ end
 
 platform :android do
 
-  desc "Compila y sube el AAB de un flavor a Google Play con rollout progresivo"
-  desc "Opciones: target: (masmedia|fibrazo|eligetv|tvhotel), track: (production por defecto), rollout: (0.2 = 20% por defecto)"
+  desc "Compila y sube el AAB de un flavor a Google Play"
+  desc "Opciones: target: (masmedia|fibrazo|eligetv|tvhotel), track: (production por defecto), rollout: (masmedia 0.2 = 20%, resto 1 = 100%)"
   lane :deploy do |options|
     target  = options[:target] || UI.user_error!("Falta target: fastlane deploy target:masmedia")
     track   = options[:track] || 'production'
-    # Rollout progresivo: por defecto al 20% de los usuarios.
-    rollout = (options[:rollout] || '0.2').to_s
+    # Rollout por defecto según el target: masmedia va progresivo al 20% porque
+    # es el de mayor base instalada; el resto sale directo al 100%.
+    # Se puede forzar siempre con rollout: (p.ej. rollout:0.2).
+    default_rollout = target.to_s == 'masmedia' ? '0.2' : '1'
+    rollout = (options[:rollout] || default_rollout).to_s
     completed = rollout.to_f >= 1.0
 
     config = target_config(target)
