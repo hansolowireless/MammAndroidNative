@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+    Pese al nombre, colorPrimaryDark es el color de ACENTO: tiñe el botón de Chromecast
+    (mediaRouteButtonTint), los iconos de los controles del player (exoplayer_controls.xml),
+    colorAccent y textColorSecondary. Va el lima de marca, no el negro de fondo.
+    -->
+    <color name="colorPrimaryDark">#D4FF3B</color>
+</resources>

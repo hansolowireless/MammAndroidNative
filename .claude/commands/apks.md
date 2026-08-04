@@ -2,12 +2,12 @@
 description: Compila los APK de release de todos los flavors y los deja listos para enviar a testers
 ---
 
-Genera los APK de **release firmados de TODOS los flavors** (masmedia, fibrazo, eligetv, tvhotel) para enviar a probar.
+Genera los APK de **release firmados de TODOS los flavors** (masmedia, fibrazo, eligetv, tvhotel, fanplaytv) para enviar a probar.
 
 Pasos:
 
 1. Desde la raíz del proyecto, compílalos todos a la vez:
-   `./gradlew assembleMasmediaRelease assembleFibrazoRelease assembleEligetvRelease assembleTvhotelRelease`
+   `./gradlew assembleMasmediaRelease assembleFibrazoRelease assembleEligetvRelease assembleTvhotelRelease assembleFanplaytvRelease`
 2. Localiza los APK en `app/build/outputs/apk/<flavor>/release/`. El nombre es `<flavor>-release-<versionName>-<versionCode>.apk` (definido en `app/build.gradle.kts`).
 3. Cópialos a una carpeta nueva `~/Desktop/MammApps-APKs-<versionName>/` (crea la carpeta; usa el versionName actual del build.gradle.kts).
 4. Reporta la ruta final y el tamaño de cada APK.

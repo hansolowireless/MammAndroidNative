@@ -150,7 +150,7 @@ object MenuItems {
     )
 
     val list: List<AppRoute> = when (BuildConfig.FLAVOR) {
-        "eligetv" -> {
+        "eligetv", "fanplaytv" -> {
             masterList.filter { it != AppRoute.AMC }
         }
 

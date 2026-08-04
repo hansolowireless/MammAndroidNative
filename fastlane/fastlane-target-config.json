@@ -22,5 +22,11 @@
     "flavor": "tvhotel",
     "service_account": "fastlane-keys/fastlane-project-421216-597050ff9e2a.json",
     "aab_path": "app/build/outputs/bundle/tvhotelRelease/app-tvhotel-release.aab"
+  },
+  "fanplaytv": {
+    "package_name": "fanplaytv.openstream.com",
+    "flavor": "fanplaytv",
+    "service_account": "fastlane-keys/fastlane-project-421216-597050ff9e2a.json",
+    "aab_path": "app/build/outputs/bundle/fanplaytvRelease/app-fanplaytv-release.aab"
   }
 }
