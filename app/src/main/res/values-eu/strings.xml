@@ -1,0 +1,155 @@
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <!--region common-->
+    <string name="empty"></string>
+    <string name="exit">Irten</string>
+    <string name="yes">Bai</string>
+    <string name="no">Ez</string>
+    <string name="do_you_want_exit">Aplikazioa itxi nahi duzu?</string>
+    <!--region common-->
+
+    <!--region Login-->
+    <string name="type_credentials">Sartu zure sarbide-datuak</string>
+    <string name="email">E-mail</string>
+    <string name="password">Pasahitza</string>
+    <string name="login">Saioa hasi</string>
+    <string name="logout">Saioa itxi</string>
+    <string name="forgot_password">Pasahitza ahaztu duzu?</string>
+    <string name="tv_code">TB kodea</string>
+    <string name="tv_code_instructions">Sartu mugikorreko aplikazioan "Honi buruz" atalera eta idatzi kode hau.</string>
+    <string name="tv_code_expiration">Kodea %d segundotan iraungiko da.</string>
+    <string name="tv_code_expired">Kodea iraungi da</string>
+    <string name="request_new_code">Eskatu kode berria</string>
+    <string name="auth_tv_code_button">Autentifikatu TB gailua</string>
+    <string name="auth_tv_code_dialog_title">Autentifikatu TB</string>
+    <string name="auth_tv_code_dialog_message">Idatzi telebistak erakusten duen kodea.</string>
+    <string name="auth_tv_code_success">Gailua behar bezala autentifikatu da.</string>
+    <!--endregion Login-->
+
+    <!--region Home-->
+    <string name="expand_category_content_title">Sakatu eduki gehiago ikusteko</string>
+    <!--endregion Home-->
+
+    <!--region Channels-->
+    <string name="search_channel_placeholder">Bilatu katea…</string>
+    <string name="filter_by_genre_action">Iragazi generoaren arabera</string>
+    <string name="filter_by_genre_title">Iragazi Generoaren arabera</string>
+    <string name="all">Guztiak</string>
+    <!--endregion Channels-->
+
+    <!--Details-->
+    <string name="duration_minutes">%1$s min.</string>
+    <string name="separator">|</string>
+    <string name="director_label">Zuzendaria: %1$s</string>
+    <string name="original_title_label">Jatorrizko izenburua: %1$s</string>
+    <string name="available_until_label">Noiz arte erabilgarri: %1$s</string>
+    <string name="play">Erreproduzitu</string>
+    <string name="continue_watching">Jarraitu</string>
+    <string name="cast">Aktoreak</string>
+    <string name="show_less">Erakutsi gutxiago</string>
+    <string name="show_more">Erakutsi gehiago</string>
+    <!--endregion Details-->
+
+    <!--region EPG-->
+    <string name="no_title">Izenbururik gabe</string>
+    <string name="day_before_yesterday">Herenegun</string>
+    <string name="yesterday">Atzo</string>
+    <string name="today">Gaur</string>
+    <string name="tomorrow">Bihar</string>
+    <string name="day_after_tomorrow">Etzi</string>
+    <string name="live">Zuzenean</string>
+    <string name="days_ago">Duela %d egun</string>
+    <string name="in_days">%d egun barru</string>
+    <!--endregion EPG-->
+
+    <!-- region SEARCH -->
+    <string name="search_field_label">Bilatu filmak, serieak eta gehiago…</string>
+    <string name="search_initial_prompt">Aurkitu zure eduki gogokoena.</string>
+    <string name="search_no_results">Ez da emaitzarik aurkitu \"%1$s\" bilaketarako</string>
+    <!--endregion SEARCH-->
+
+    <!-- region ABOUT -->
+    <string name="username">Erabiltzailea: </string>
+    <string name="application_version">Aplikazioaren bertsioa: </string>
+    <string name="start_diagnostic">Hasi diagnostikoa</string>
+    <string name="loading_diagnostic">Diagnostikoa egiten</string>
+    <string name="node">Nodoa</string>
+    <!-- endregion ABOUT -->
+
+    <!--Track selector Strings!-->
+    <string name="track_selection_title">Bideo-kalitatea</string>
+    <string name="subtitle_selection_title">Azpitituluak</string>
+    <string name="audiotrack_selection_title">Audioa</string>
+
+    <string name="error_no_decoder">Gailu honek ez du deskodetzailerik <xliff:g id="mime_type">%1$s</xliff:g> formaturako</string>
+    <string name="error_no_secure_decoder">Gailu honek ez du deskodetzaile segururik <xliff:g id="mime_type">%1$s</xliff:g> formaturako</string>
+    <string name="error_querying_decoders">Ezin izan dira gailuaren deskodetzaileak kontsultatu</string>
+    <string name="error_instantiating_decoder">Ezin izan da <xliff:g id="decoder_name">%1$s</xliff:g> deskodetzailea sortu</string>
+    <string name="error_generic">Erreprodukzioak huts egin du</string>
+
+    <!--region Player-->
+    <string name="live_content">Live</string>
+    <string name="no_event_info">Ez dago ekitaldiaren informaziorik</string>
+    <!--endregion Player-->
+
+    <!-- Navigation Labels -->
+    <string name="nav_home">Hasiera</string>
+    <string name="nav_epg">Gida</string>
+    <string name="nav_channels">Kateak</string>
+    <string name="nav_movies">Zinema</string>
+    <string name="nav_documentaries">Dokumentalak</string>
+    <string name="nav_series">Serieak</string>
+    <string name="nav_sports">Kirolak</string>
+    <string name="nav_adults">Helduak</string>
+    <string name="nav_sport_calendar">Kirol egut.</string>
+    <string name="nav_kids">Haurrak</string>
+    <string name="nav_warner">Warner</string>
+    <string name="nav_acontra">Acontra+</string>
+    <string name="nav_amc">AMC</string>
+    <string name="nav_movies_amc">AMC zinema</string>
+    <string name="nav_series_amc">AMC serieak</string>
+    <string name="nav_my_memories">Nire oroitzapenak</string>
+    <string name="nav_search">Bilatu</string>
+    <string name="nav_diagnostics">Honi buruz</string>
+    <string name="nav_change_user">Aldatu erabiltzailea</string>
+    <string name="nav_exit">Irten</string>
+    <!--endregion Navigation Labels-->
+
+    <!--Error-->
+    <string name="generic_error">Errorea</string>
+    <string name="error_loading_epg">Errorea Gida kargatzean</string>
+    <string name="error_subscription_in_process">Zure harpidetza izapidetzen ari da. Galdetu zure operadoreari</string>
+    <string name="error_content_generic">Ez dago edukirik erakusteko</string>
+    <string name="error_invalid_credentials">Erabiltzaile-izena edo pasahitza ez dira baliozkoak</string>
+    <string name="error_memories_no_content">Oraindik ez duzu oroitzapenik kargatu zure kontuan!\n\nSartu zure erabiltzailearekin misrecuerdos.masmediatv.es helbidean, gorde eta streaming bidez ikusi nahi dituzun bideoak eta argazkiak kargatzeko. Handik streaming bideo-formatura bihur ditzakezu, nahi duzunean edozein gailutatik +MEDIA aplikazioaren bidez ikusteko\n\nEskatu zerbitzu honi buruzko informazio gehiago zure operadoreari eta hasi zaitez zure oroitzapen gogokoenak gozatzen eta partekatzen!</string>
+    <string name="error_session_expired">Zure saioa iraungi da. Saioa berriro hasi behar duzu</string>
+    <string name="ok">Ok</string>
+    <!--endregion Error-->
+
+    <!--region PIN DIALOG-->
+    <string name="parental_pin_dialog_title">Sarbide mugatua</string>
+    <string name="parental_pin_dialog_message">Mesedez, idatzi zure PINa jarraitzeko.</string>
+    <string name="pin_field_label">PIN</string>
+    <string name="confirm_button_label">Berretsi</string>
+    <string name="cancel_button_label">Utzi</string>
+    <!--endregion PIN DIALOG-->
+
+    <!--region Accessibility-->
+    <string name="accessibility_clear_search_action">Garbitu bilaketa</string>
+    <string name="accessibility_close">Itxi</string>
+    <string name="accessibility_expandcategory">Zabaldu kategoria</string>
+    <string name="accessibility_toggle_drawer">Ireki nabigazio-tiradera</string>
+    <string name="accessibility_rating_content_description">Balorazioa</string>
+    <string name="accessibility_play_icon_content_description">Erreproduzitzeko ikonoa</string>
+    <!--endregion Accessibility-->
+
+    <!--region Player errors-->
+    <string name="player_error_transient">Konexio-arazoa.</string>
+    <string name="player_error_drm">Ezin izan da eduki babestua erreproduzitu.</string>
+    <string name="player_error_decoder">Gailu honek ezin du eduki hau erreproduzitu.</string>
+    <string name="player_error_unavailable">Edukia ez dago erabilgarri.</string>
+    <string name="player_error_generic">Ezin izan da edukia erreproduzitu.</string>
+    <string name="player_error_retrying"><xliff:g id="message">%1$s</xliff:g> <xliff:g id="seconds">%2$d</xliff:g> s barru berriro saiatzen…</string>
+    <!--endregion Player errors-->
+
+</resources>
