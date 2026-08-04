@@ -99,12 +99,18 @@ platform :android do
     deploy(target: "tvhotel", rollout: options[:rollout], track: options[:track])
   end
 
+  desc "Deploy Fanplay TV"
+  lane :deploy_fanplaytv do |options|
+    deploy(target: "fanplaytv", rollout: options[:rollout], track: options[:track])
+  end
+
   desc "Deploy de todos los flavors a Google Play"
   lane :deploy_all do |options|
     deploy_masmedia(options)
     deploy_fibrazo(options)
     deploy_eligetv(options)
     deploy_tvhotel(options)
+    deploy_fanplaytv(options)
   end
 
   desc "Fija las notas de 'Novedades' (Correcciones y mejoras) en una versión ya subida"

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+    El tamaño y el encuadre los define ya el propio vector, que es cuadrado y lleva
+    el isotipo inscrito en el círculo que deja ver la máscara de la splash screen.
+    -->
+    <item
+        android:drawable="@drawable/ic_splash_foreground"
+        android:gravity="center" />
+
+</layer-list>

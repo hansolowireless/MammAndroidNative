@@ -1,0 +1,34 @@
+<!--
+La splash screen de Android 12+ trata este drawable como el foreground de un icono
+adaptativo: lo amplía y lo recorta con una máscara circular, con lo que solo se ve el
+~44% central del lienzo (radio 634 sobre este viewport de 2880).
+
+El isotipo es apaisado (1,565:1), así que lo que tiene que caber en el círculo no es
+su ancho sino su DIAGONAL: a partir de scale 4,264 las esquinas del badge ya se salen.
+Con scale 3,6 el badge mide 901x576 y su semidiagonal es 535, un 16% por dentro del
+borde de la máscara.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="288dp"
+    android:height="288dp"
+    android:viewportWidth="2880"
+    android:viewportHeight="2880">
+
+    <group
+        android:scaleX="3.6"
+        android:scaleY="3.6"
+        android:translateX="989"
+        android:translateY="1152">
+
+        <!-- Badge redondeado -->
+        <path
+            android:fillColor="#D4FF3B"
+            android:pathData="M40,0 H210.399 A40,40 0 0 1 250.399,40 V119.999 A40,40 0 0 1 210.399,159.999 H40 A40,40 0 0 1 0,119.999 V40 A40,40 0 0 1 40,0 Z" />
+
+        <!-- Letras "TV" -->
+        <path
+            android:fillColor="#0B0A0A"
+            android:pathData="M73.772927,112.5260505V59.4195735H54.172997V47.4729495H106.812809V59.4195735H87.306212V112.5260505Z M147.505997,112.5260505 121.372757,47.4729495H136.119371L154.692638,96.0994425H150.39932L168.599255,47.4729495H183.439202L157.399295,112.5260505Z" />
+
+    </group>
+</vector>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+    Fondo del icono adaptativo de Fanplay. Va el lima de marca porque el foreground
+    (drawable-*/ic_launcher_fanplaytv_foreground.png) es el lockup FANPLAY + TV en
+    negro, el mismo dibujo que el banner de Android TV.
+
+    Las letras "TV" del lockup son transparentes en el foreground, así que es este
+    color el que las rellena: si se cambia, hay que regenerar también el foreground.
+    -->
+    <color name="ic_launcher_fanplaytv_background">#D4FF3B</color>
+</resources>

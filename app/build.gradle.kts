@@ -103,7 +103,7 @@ android {
         applicationId = "com.mamm.mammapps"
         minSdk = 21
         targetSdk = 35
-        versionCode = 566
+        versionCode = 569
         versionName = "4.8.037"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -219,6 +219,17 @@ android {
             iconMobile = "@mipmap/ic_launcher_tvhotel",
             iconRound = "@mipmap/ic_launcher_tvhotel_round",
             banner = "@drawable/banner_tvhotel",
+            signingConfig = signingConfigs.getByName("keystoreMamm")
+        )
+
+        configureFlavorWithMasmediaUrls(
+            flavors = this,
+            name = "fanplaytv",
+            appId = "fanplaytv.openstream.com",
+            icon = "@mipmap/ic_launcher_fanplaytv",
+            iconMobile = "@mipmap/ic_launcher_fanplaytv",
+            iconRound = "@mipmap/ic_launcher_fanplaytv_round",
+            banner = "@drawable/banner_fanplaytv",
             signingConfig = signingConfigs.getByName("keystoreMamm")
         )
 
