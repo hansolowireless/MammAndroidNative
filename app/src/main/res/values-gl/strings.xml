@@ -1,0 +1,155 @@
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <!--region common-->
+    <string name="empty"></string>
+    <string name="exit">Saír</string>
+    <string name="yes">Si</string>
+    <string name="no">Non</string>
+    <string name="do_you_want_exit">Queres pechar a aplicación?</string>
+    <!--region common-->
+
+    <!--region Login-->
+    <string name="type_credentials">Introduce os teus datos de acceso</string>
+    <string name="email">E-mail</string>
+    <string name="password">Contrasinal</string>
+    <string name="login">Iniciar sesión</string>
+    <string name="logout">Pechar sesión</string>
+    <string name="forgot_password">Esqueciches o contrasinal?</string>
+    <string name="tv_code">Código TV</string>
+    <string name="tv_code_instructions">Accede coa aplicación móbil á sección "Acerca de" e introduce este código.</string>
+    <string name="tv_code_expiration">O código caducará en %d segundos.</string>
+    <string name="tv_code_expired">O código caducou</string>
+    <string name="request_new_code">Solicitar un novo código</string>
+    <string name="auth_tv_code_button">Autenticar dispositivo TV</string>
+    <string name="auth_tv_code_dialog_title">Autenticar TV</string>
+    <string name="auth_tv_code_dialog_message">Insire o código que mostra a TV.</string>
+    <string name="auth_tv_code_success">Dispositivo autenticado correctamente.</string>
+    <!--endregion Login-->
+
+    <!--region Home-->
+    <string name="expand_category_content_title">Preme para ver máis contido</string>
+    <!--endregion Home-->
+
+    <!--region Channels-->
+    <string name="search_channel_placeholder">Buscar canle…</string>
+    <string name="filter_by_genre_action">Filtrar por xénero</string>
+    <string name="filter_by_genre_title">Filtrar por Xénero</string>
+    <string name="all">Todos</string>
+    <!--endregion Channels-->
+
+    <!--Details-->
+    <string name="duration_minutes">%1$s min.</string>
+    <string name="separator">|</string>
+    <string name="director_label">Director: %1$s</string>
+    <string name="original_title_label">Título orixinal: %1$s</string>
+    <string name="available_until_label">Dispoñible ata: %1$s</string>
+    <string name="play">Reproducir</string>
+    <string name="continue_watching">Continuar</string>
+    <string name="cast">Reparto</string>
+    <string name="show_less">Amosar menos</string>
+    <string name="show_more">Amosar máis</string>
+    <!--endregion Details-->
+
+    <!--region EPG-->
+    <string name="no_title">Sen título</string>
+    <string name="day_before_yesterday">Antonte</string>
+    <string name="yesterday">Onte</string>
+    <string name="today">Hoxe</string>
+    <string name="tomorrow">Mañá</string>
+    <string name="day_after_tomorrow">Pasadomañá</string>
+    <string name="live">Directo</string>
+    <string name="days_ago">Hai %d días</string>
+    <string name="in_days">En %d días</string>
+    <!--endregion EPG-->
+
+    <!-- region SEARCH -->
+    <string name="search_field_label">Buscar películas, series e máis…</string>
+    <string name="search_initial_prompt">Atopa o teu contido favorito.</string>
+    <string name="search_no_results">Non se atoparon resultados para \"%1$s\"</string>
+    <!--endregion SEARCH-->
+
+    <!-- region ABOUT -->
+    <string name="username">Usuario: </string>
+    <string name="application_version">Versión da aplicación: </string>
+    <string name="start_diagnostic">Iniciar diagnóstico</string>
+    <string name="loading_diagnostic">Realizando o diagnóstico</string>
+    <string name="node">Nodo</string>
+    <!-- endregion ABOUT -->
+
+    <!--Track selector Strings!-->
+    <string name="track_selection_title">Calidade de vídeo</string>
+    <string name="subtitle_selection_title">Subtítulos</string>
+    <string name="audiotrack_selection_title">Audio</string>
+
+    <string name="error_no_decoder">Este dispositivo non fornece un descodificador para <xliff:g id="mime_type">%1$s</xliff:g></string>
+    <string name="error_no_secure_decoder">Este dispositivo non fornece un descodificador seguro para <xliff:g id="mime_type">%1$s</xliff:g></string>
+    <string name="error_querying_decoders">Non foi posible consultar os descodificadores do dispositivo</string>
+    <string name="error_instantiating_decoder">Non foi posible instanciar o descodificador <xliff:g id="decoder_name">%1$s</xliff:g></string>
+    <string name="error_generic">Fallou a reprodución</string>
+
+    <!--region Player-->
+    <string name="live_content">Live</string>
+    <string name="no_event_info">Non hai información do evento</string>
+    <!--endregion Player-->
+
+    <!-- Navigation Labels -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_epg">Guía</string>
+    <string name="nav_channels">Canles</string>
+    <string name="nav_movies">Cine</string>
+    <string name="nav_documentaries">Documentais</string>
+    <string name="nav_series">Series</string>
+    <string name="nav_sports">Deportes</string>
+    <string name="nav_adults">Adultos</string>
+    <string name="nav_sport_calendar">Cal. Deportivo</string>
+    <string name="nav_kids">Infantil</string>
+    <string name="nav_warner">Warner</string>
+    <string name="nav_acontra">Acontra+</string>
+    <string name="nav_amc">AMC</string>
+    <string name="nav_movies_amc">Cine AMC</string>
+    <string name="nav_series_amc">Series AMC</string>
+    <string name="nav_my_memories">Os meus recordos</string>
+    <string name="nav_search">Buscar</string>
+    <string name="nav_diagnostics">Acerca de</string>
+    <string name="nav_change_user">Cambiar de usuario</string>
+    <string name="nav_exit">Saír</string>
+    <!--endregion Navigation Labels-->
+
+    <!--Error-->
+    <string name="generic_error">Erro</string>
+    <string name="error_loading_epg">Erro ao cargar a Guía</string>
+    <string name="error_subscription_in_process">A túa subscrición está en proceso. Consulta co teu operador</string>
+    <string name="error_content_generic">Non hai contido para amosar</string>
+    <string name="error_invalid_credentials">Nome de usuario ou contrasinal non válidos</string>
+    <string name="error_memories_no_content">Aínda non tes ningún recordo cargado na túa conta!\n\nAccede co teu usuario a misrecuerdos.masmediatv.es para cargar os vídeos e fotos que desexes almacenar e ver por streaming. Desde alí poderás convertelos a formato de vídeo en streaming, para velos cando queiras desde calquera dispositivo a través da App +MEDIA\n\nPide máis información sobre este servizo ao teu operador e comeza xa a gozar e a compartir os teus recordos favoritos!</string>
+    <string name="error_session_expired">A túa sesión caducou. Debes iniciar sesión de novo</string>
+    <string name="ok">Ok</string>
+    <!--endregion Error-->
+
+    <!--region PIN DIALOG-->
+    <string name="parental_pin_dialog_title">Acceso restrinxido</string>
+    <string name="parental_pin_dialog_message">Por favor, introduce o teu PIN para continuar.</string>
+    <string name="pin_field_label">PIN</string>
+    <string name="confirm_button_label">Confirmar</string>
+    <string name="cancel_button_label">Cancelar</string>
+    <!--endregion PIN DIALOG-->
+
+    <!--region Accessibility-->
+    <string name="accessibility_clear_search_action">Limpar a busca</string>
+    <string name="accessibility_close">Pechar</string>
+    <string name="accessibility_expandcategory">Expandir a categoría</string>
+    <string name="accessibility_toggle_drawer">Abrir o caixón de navegación</string>
+    <string name="accessibility_rating_content_description">Valoración</string>
+    <string name="accessibility_play_icon_content_description">Icona de reprodución</string>
+    <!--endregion Accessibility-->
+
+    <!--region Player errors-->
+    <string name="player_error_transient">Problema de conexión.</string>
+    <string name="player_error_drm">Non foi posible reproducir o contido protexido.</string>
+    <string name="player_error_decoder">Este dispositivo non pode reproducir este contido.</string>
+    <string name="player_error_unavailable">O contido non está dispoñible.</string>
+    <string name="player_error_generic">Non foi posible reproducir o contido.</string>
+    <string name="player_error_retrying"><xliff:g id="message">%1$s</xliff:g> Tentando de novo en <xliff:g id="seconds">%2$d</xliff:g> s…</string>
+    <!--endregion Player errors-->
+
+</resources>
