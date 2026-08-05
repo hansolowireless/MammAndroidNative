@@ -339,6 +339,8 @@ fun PlayerView(
                     val previewTimeBar =
                         parentView.findViewById<CustomPreviewBar>(R.id.exo_progress)
 
+                    previewTimeBar.isTstvMode = isTstvMode
+
                     Log.d("AndroidViewUpdate", "Update ejecutado. isTstvMode = $isTstvMode")
                     Log.d("AndroidViewUpdate", "PlayerState ha cambiado = $playerState")
 

@@ -141,6 +141,8 @@ class VideoPlayerViewModel @Inject constructor(
     private val _isTstvMode = MutableStateFlow<Boolean>(false)
     val isTstvMode = _isTstvMode.asStateFlow()
 
+    private var shouldRequestPreroll = true
+
     // Reintentos ante errores transitorios (backoff exponencial)
     private var retryCount = 0
     private var retryJob: Job? = null
@@ -161,6 +163,8 @@ class VideoPlayerViewModel @Inject constructor(
         // Contenido nuevo: reiniciar la estrategia de reintentos
         retryJob?.cancel()
         retryCount = 0
+        shouldRequestPreroll = true
+        _isTstvMode.update { false }
         viewModelScope.launch {
             createPlayer()
 
@@ -265,7 +269,7 @@ class VideoPlayerViewModel @Inject constructor(
             val player = _player.value ?: return@withContext
             val content = _content.value
 
-            val adTagUrl = getVastAdUrlUseCase(content)
+            val adTagUrl = if (shouldRequestPreroll) getVastAdUrlUseCase(content) else ""
             val mediaItem = buildMediaItem(videoUrl, drmUrl, adTagUrl)
             val drmProvider = buildDrmSessionManagerProvider(drmUrl)
             val dataSourceFactory = tokenParamDataSourceFactory.also { it.resetTokenMode() }
@@ -467,6 +471,7 @@ class VideoPlayerViewModel @Inject constructor(
 
     fun triggerTSTVMode(previewBar: CustomPreviewBar?, forcePosition: Long? = null) {
         if (_content.value.isLive && _content.value.isTimeshift) {
+            shouldRequestPreroll = false
             val progress = forcePosition ?: previewBar?.progress?.toLong() ?: 0
             val timeToJump =
                 _liveEventInfo.value?.eventStart?.plusSeconds(progress / 1000)
