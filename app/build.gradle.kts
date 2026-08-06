@@ -103,7 +103,7 @@ android {
         applicationId = "com.mamm.mammapps"
         minSdk = 21
         targetSdk = 35
-        versionCode = 572
+        versionCode = 573
         versionName = "4.8.037"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

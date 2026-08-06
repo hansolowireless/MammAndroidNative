@@ -1,6 +1,10 @@
 package com.mamm.mammapps.ui.screen
 
 import android.content.pm.ActivityInfo
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +32,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamm.mammapps.R
 import com.mamm.mammapps.ui.component.dialog.SessionExpiredDialog
+import com.mamm.mammapps.ui.component.player.PlayerLoadErrorOverlay
+import com.mamm.mammapps.ui.component.player.PlayerLoadingOverlay
 import com.mamm.mammapps.ui.extension.findActivity
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import com.mamm.mammapps.ui.model.player.PlayerErrorType
@@ -44,6 +50,7 @@ fun VideoPlayerScreen(
 
     val context = LocalContext.current
     val view = LocalView.current
+    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     val player by viewModel.player.collectAsStateWithLifecycle()
     val content by viewModel.content.collectAsStateWithLifecycle()
@@ -120,6 +127,29 @@ fun VideoPlayerScreen(
             player = player,
             content = content
         )
+
+        // Carga de URLs (CLM/DRM) en curso: póster difuminado + spinner en vez de pantalla negra
+        AnimatedVisibility(
+            visible = playerState is PlayerUIState.Idle || playerState is PlayerUIState.Loading,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            PlayerLoadingOverlay(
+                modifier = Modifier.fillMaxSize(),
+                imageUrl = content.imageUrl,
+                title = content.title
+            )
+        }
+
+        // Fallo al obtener las URLs (CLM/DRM): el player no arranca, error a pantalla completa
+        if (playerState is PlayerUIState.LoadError) {
+            PlayerLoadErrorOverlay(
+                modifier = Modifier.fillMaxSize(),
+                onRetry = { viewModel.retryLoad() },
+                onClose = { backDispatcher?.onBackPressed() }
+            )
+        }
 
         (playerState as? PlayerUIState.Error)?.let { errorState ->
             Snackbar(

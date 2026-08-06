@@ -4,8 +4,15 @@ import com.mamm.mammapps.ui.model.player.PlayerErrorType
 
 sealed class PlayerUIState : UIState<Nothing>() {
     data object Idle : PlayerUIState()
+
+    /** Obteniendo las URLs de reproducción (CLM/DRM) antes de poder arrancar el player. */
+    data object Loading : PlayerUIState()
+
     data object Playing : PlayerUIState()
     data object Paused : PlayerUIState()
+
+    /** Fallo al obtener las URLs de reproducción (CLM/DRM): el player no llega a arrancar. */
+    data object LoadError : PlayerUIState()
 
     /**
      * Error de reproducción.

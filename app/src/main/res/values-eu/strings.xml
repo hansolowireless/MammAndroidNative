@@ -150,6 +150,9 @@
     <string name="player_error_unavailable">Edukia ez dago erabilgarri.</string>
     <string name="player_error_generic">Ezin izan da edukia erreproduzitu.</string>
     <string name="player_error_retrying"><xliff:g id="message">%1$s</xliff:g> <xliff:g id="seconds">%2$d</xliff:g> s barru berriro saiatzen…</string>
+    <string name="player_error_load">Ezin izan da edukia kargatu. Egiaztatu konexioa eta saiatu berriro.</string>
+    <string name="player_error_retry">Saiatu berriro</string>
+    <string name="player_error_close">Itxi</string>
     <!--endregion Player errors-->
 
 </resources>
