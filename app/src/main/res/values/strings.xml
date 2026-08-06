@@ -151,6 +151,9 @@
     <string name="player_error_unavailable">El contenido no está disponible.</string>
     <string name="player_error_generic">No se pudo reproducir el contenido.</string>
     <string name="player_error_retrying"><xliff:g id="message">%1$s</xliff:g> Reintentando en <xliff:g id="seconds">%2$d</xliff:g> s…</string>
+    <string name="player_error_load">No se ha podido cargar el contenido. Comprueba tu conexión e inténtalo de nuevo.</string>
+    <string name="player_error_retry">Reintentar</string>
+    <string name="player_error_close">Cerrar</string>
     <!--endregion Player errors-->
 
 </resources>

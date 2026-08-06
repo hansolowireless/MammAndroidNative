@@ -150,6 +150,9 @@
     <string name="player_error_unavailable">El contingut no està disponible.</string>
     <string name="player_error_generic">No s\'ha pogut reproduir el contingut.</string>
     <string name="player_error_retrying"><xliff:g id="message">%1$s</xliff:g> Es tornarà a provar d\'aquí a <xliff:g id="seconds">%2$d</xliff:g> s…</string>
+    <string name="player_error_load">No s\'ha pogut carregar el contingut. Comprova la connexió i torna-ho a provar.</string>
+    <string name="player_error_retry">Torna-ho a provar</string>
+    <string name="player_error_close">Tanca</string>
     <!--endregion Player errors-->
 
 </resources>

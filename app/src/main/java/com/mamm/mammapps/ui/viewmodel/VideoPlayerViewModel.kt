@@ -165,6 +165,7 @@ class VideoPlayerViewModel @Inject constructor(
         retryCount = 0
         shouldRequestPreroll = true
         _isTstvMode.update { false }
+        _playerState.update { PlayerUIState.Loading }
         viewModelScope.launch {
             createPlayer()
 
@@ -197,11 +198,10 @@ class VideoPlayerViewModel @Inject constructor(
                     val error =
                         playableUrlResult.exceptionOrNull() ?: drmInfoResult.exceptionOrNull()
                     logger.error(TAG, "initializeWithContent getPlayableUrlUseCase error = ${error?.message}")
-                    //TODO SHOW ERROR
+                    handleLoadError(error)
                 }
             }.onFailure {
-                //TODO SHOW ERROR
-                handleSessionExpired(it)
+                handleLoadError(it)
             }
         }
     }
@@ -249,7 +249,12 @@ class VideoPlayerViewModel @Inject constructor(
                     _playerState.update { PlayerUIState.Playing }
                 } else {
                     stopPeriodicFunctions()
-                    _playerState.update { PlayerUIState.Paused }
+                    // Un player antiguo al liberarse puede emitir isPlaying=false: no debe
+                    // pisar la carga o el error de carga en curso del contenido nuevo
+                    _playerState.update { current ->
+                        if (current is PlayerUIState.Loading || current is PlayerUIState.LoadError) current
+                        else PlayerUIState.Paused
+                    }
                 }
             }
 
@@ -395,6 +400,29 @@ class VideoPlayerViewModel @Inject constructor(
         heartbeatTracker.startHeartbeat(viewModelScope) { handleSessionExpired(it) }
         qosReporter.startReporting(viewModelScope, { _player.value }, { _content.value })
         bookmarkTracker.startTracking(viewModelScope, { _player.value }, { _content.value })
+    }
+
+    /**
+     * Error al obtener las URLs de reproducción (CLM/DRM). Los errores de sesión siguen
+     * el flujo de sesión expirada; el resto muestran el overlay de error de carga.
+     */
+    private suspend fun handleLoadError(exception: Throwable?) {
+        if (exception is SessionException) {
+            handleSessionExpired(exception)
+        } else {
+            logger.error(TAG, "handleLoadError - ${exception?.message}")
+            withContext(Dispatchers.Main) {
+                _playerState.update { PlayerUIState.LoadError }
+            }
+        }
+    }
+
+    /**
+     * Reintenta la carga del contenido actual tras un error de carga (overlay de error).
+     */
+    fun retryLoad() {
+        logger.debug(TAG, "retryLoad")
+        initializeWithContent(_content.value)
     }
 
     private suspend fun handleSessionExpired(exception: Throwable) {
