@@ -18,6 +18,10 @@
 #
 # Documentación: https://docs.fastlane.tools
 
+require 'net/http'
+require 'json'
+require 'uri'
+
 default_platform(:android)
 
 # fastlane ejecuta los lanes con el cwd dentro de fastlane/, así que anclamos
@@ -30,6 +34,65 @@ def target_config(target)
   configs = JSON.parse(File.read("fastlane-target-config.json"), symbolize_names: true)
   configs[target.to_sym] || UI.user_error!("Target desconocido: #{target}")
 end
+
+#region Amazon Appstore (App Submission API)
+# Amazon solo admite APK (no AAB), y el flujo es de tipo "edit" como el de Play:
+# crear edit -> reemplazar el APK -> commit. Las mutaciones exigen mandar en
+# If-Match el ETag que devolvió el GET del propio recurso.
+AMAZON_BASE = 'https://developer.amazon.com/api/appstore'.freeze
+
+def amazon_credentials
+  path = File.join(project_root, 'fastlane-keys/amazon-credentials.json')
+  UI.user_error!("No existe #{path}") unless File.exist?(path)
+  JSON.parse(File.read(path))
+end
+
+def amazon_token(creds)
+  res = Net::HTTP.post_form(
+    URI('https://api.amazon.com/auth/o2/token'),
+    'grant_type' => 'client_credentials',
+    'client_id' => creds['client_id'],
+    'client_secret' => creds['client_secret'],
+    'scope' => 'appstore::apps:readwrite'
+  )
+  body = JSON.parse(res.body) rescue {}
+  unless res.code == '200' && body['access_token']
+    UI.user_error!("Amazon: no se pudo obtener el token (HTTP #{res.code}): #{body['error_description'] || body['error']}")
+  end
+  body['access_token']
+end
+
+# Devuelve [codigo_http, cuerpo_parseado, etag].
+# +body_io+ manda el APK binario; +json+ manda un cuerpo JSON.
+def amazon_request(method, path, token, etag: nil, body_io: nil, json: nil)
+  uri = URI("#{AMAZON_BASE}#{path}")
+  klass = { get: Net::HTTP::Get, post: Net::HTTP::Post, put: Net::HTTP::Put }[method]
+  req = klass.new(uri)
+  req['Authorization'] = "Bearer #{token}"
+  req['If-Match'] = etag if etag
+  if body_io
+    req['Content-Type'] = 'application/vnd.android.package-archive'
+    req.body = body_io
+  else
+    req['Content-Type'] = 'application/json'
+    req.body = json ? JSON.generate(json) : ('' if method != :get)
+  end
+  res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true, read_timeout: 600) { |h| h.request(req) }
+  parsed = (JSON.parse(res.body) rescue res.body)
+  [res.code, parsed, res['ETag']]
+end
+
+# Notas de "Recent changes" por idioma, desde fastlane/metadata/<target>/amazon/<idioma>.txt
+def amazon_release_notes(target, language)
+  path = File.join(project_root, "fastlane/metadata/#{target}/amazon/#{language}.txt")
+  File.exist?(path) ? File.read(path).strip : nil
+end
+
+def amazon_check!(code, body, step)
+  return if %w[200 201 204].include?(code)
+  UI.user_error!("Amazon: fallo en #{step} (HTTP #{code}): #{body.is_a?(String) ? body[0, 300] : body.inspect}")
+end
+#endregion
 
 platform :android do
 
@@ -136,6 +199,96 @@ platform :android do
     )
 
     UI.success("✅ Notas actualizadas para #{target} #{vc} en la pista '#{track}'")
+  end
+
+  desc "Compila el APK de un flavor y reemplaza el de producción en Amazon Appstore"
+  desc "Opciones: target: (masmedia|eligetv|...), skip_build: (true para reutilizar el APK ya compilado), commit: (false para dejar el edit sin enviar)"
+  lane :amazon_deploy do |options|
+    target = options[:target] || UI.user_error!("Falta target: fastlane amazon_deploy target:masmedia")
+    do_commit = options[:commit].to_s != 'false'
+
+    creds = amazon_credentials
+    app_id = creds.dig('apps', target.to_s) ||
+             UI.user_error!("No hay App ID de Amazon para '#{target}' en amazon-credentials.json")
+    flavor = target_config(target)[:flavor]
+
+    unless options[:skip_build].to_s == 'true'
+      gradle(task: "assemble", flavor: flavor, build_type: "Release", project_dir: project_root)
+    end
+
+    apk_glob = File.join(project_root, "app/build/outputs/apk/#{flavor}/release/*.apk")
+    apk_path = Dir[apk_glob].max_by { |f| File.mtime(f) } ||
+               UI.user_error!("No se encontró ningún APK en #{apk_glob}")
+    UI.message("APK a subir: #{File.basename(apk_path)}")
+
+    token = amazon_token(creds)
+
+    # Reutiliza el edit abierto si lo hay: Amazon solo permite uno por app.
+    code, body, = amazon_request(:get, "/v1/applications/#{app_id}/edits", token)
+    amazon_check!(code, body, "consultar edits abiertos")
+    edit_id = body.is_a?(Hash) ? body['id'] : nil
+
+    if edit_id
+      UI.important("Reutilizando el edit abierto #{edit_id}")
+    else
+      code, body, = amazon_request(:post, "/v1/applications/#{app_id}/edits", token)
+      amazon_check!(code, body, "crear el edit")
+      edit_id = body['id']
+      UI.message("Edit creado: #{edit_id}")
+    end
+
+    # APK actual en la ficha: se reemplaza para conservar el targeting de dispositivos.
+    code, apks, = amazon_request(:get, "/v1/applications/#{app_id}/edits/#{edit_id}/apks", token)
+    amazon_check!(code, apks, "listar los APK")
+    UI.user_error!("Amazon: la app no tiene ningún APK que reemplazar") if apks.nil? || apks.empty?
+
+    current = apks.first
+    apk_id = current['id']
+    UI.message("APK actual en Amazon: id=#{apk_id} versionCode=#{current['versionCode']}")
+
+    code, _, etag = amazon_request(:get, "/v1/applications/#{app_id}/edits/#{edit_id}/apks/#{apk_id}", token)
+    amazon_check!(code, nil, "obtener el ETag del APK")
+
+    code, body, = amazon_request(
+      :put,
+      "/v1/applications/#{app_id}/edits/#{edit_id}/apks/#{apk_id}/replace",
+      token,
+      etag: etag,
+      body_io: File.binread(apk_path)
+    )
+    amazon_check!(code, body, "reemplazar el APK")
+    UI.success("APK reemplazado en el edit #{edit_id}")
+
+    # Amazon no deja hacer commit sin "Recent changes" en cada idioma de la ficha.
+    code, listings, = amazon_request(:get, "/v1/applications/#{app_id}/edits/#{edit_id}/listings", token)
+    amazon_check!(code, listings, "listar los idiomas de la ficha")
+    (listings['listings'] || {}).each_key do |language|
+      notes = amazon_release_notes(target, language)
+      if notes.nil?
+        UI.important("Sin notas para #{language} (falta fastlane/metadata/#{target}/amazon/#{language}.txt)")
+        next
+      end
+      path = "/v1/applications/#{app_id}/edits/#{edit_id}/listings/#{language}"
+      code, listing, etag = amazon_request(:get, path, token)
+      amazon_check!(code, listing, "obtener la ficha #{language}")
+      listing['recentChanges'] = notes
+      code, body, = amazon_request(:put, path, token, etag: etag, json: listing)
+      amazon_check!(code, body, "actualizar las notas de #{language}")
+      UI.message("Notas actualizadas en #{language}")
+    end
+
+    unless do_commit
+      UI.important("Edit #{edit_id} sin enviar (commit:false). Revísalo en la consola de Amazon.")
+      next
+    end
+
+    code, _, edit_etag = amazon_request(:get, "/v1/applications/#{app_id}/edits/#{edit_id}", token)
+    amazon_check!(code, nil, "obtener el ETag del edit")
+
+    code, body, = amazon_request(:post, "/v1/applications/#{app_id}/edits/#{edit_id}/commit", token, etag: edit_etag)
+    amazon_check!(code, body, "hacer commit del edit")
+
+    UI.success("✅ #{target} enviado a Amazon Appstore (#{File.basename(apk_path)}). Queda en revisión de Amazon.")
   end
 
   desc "Valida credenciales y acceso a Google Play sin subir nada"
