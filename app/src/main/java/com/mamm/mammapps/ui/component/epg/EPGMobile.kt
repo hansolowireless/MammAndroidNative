@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -38,6 +37,7 @@ import eu.wewox.programguide.ProgramGuide
 import eu.wewox.programguide.ProgramGuideDefaults
 import eu.wewox.programguide.ProgramGuideItem
 import eu.wewox.programguide.rememberSaveableProgramGuideState
+import java.time.Duration
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -49,7 +49,6 @@ fun EPGMobile(
     content: List<EPGChannelContent>,
     onEventClicked: (Event) -> Unit,
     selectedDate: LocalDate,
-    onDateSelected: (LocalDate) -> Unit,
 ) {
     val programsWithChannelIndex = remember(content) {
         content.flatMapIndexed { channelIndex, channelContent ->
@@ -71,17 +70,12 @@ fun EPGMobile(
         state.snapToCurrentTime()
     }
 
-    Column {
-
-        DateSelector(
-            selectedDate = selectedDate,
-            onDateSelected = onDateSelected
-        )
-
-        ProgramGuide(
-            state = state,
-            modifier = modifier.fillMaxSize()
-        ) {
+    // El selector de fechas lo pinta EPGScreen, por encima de este componente: así se
+    // mantiene en pantalla mientras se carga el día nuevo en vez de irse con el spinner.
+    ProgramGuide(
+        state = state,
+        modifier = modifier.fillMaxSize()
+    ) {
             channels(
                 count = content.size,
                 layoutInfo = { channelIndex ->
@@ -100,24 +94,19 @@ fun EPGMobile(
                     val localStartTime = program.startDateTime!!.withZoneSameInstant(localZoneId)
                     val localEndTime = program.endDateTime!!.withZoneSameInstant(localZoneId)
 
-                    var startHour = localStartTime.hour + localStartTime.minute / 60f
-                    var endHour = localEndTime.hour + localEndTime.minute / 60f
-
-                    // CASO 1: El programa empezó el día anterior.
-                    // Lo ajustamos para que empiece al inicio del día actual (00:00).
-                    if (localStartTime.dayOfYear < localEndTime.dayOfYear && localEndTime.dayOfYear == now.dayOfYear) {
-                        startHour = 0.0f
-                    }
-                    // CASO 2: El programa termina el día siguiente.
-                    // Lo cortamos al final del día actual (24:00).
-                    else if (localEndTime.dayOfYear > localStartTime.dayOfYear && localStartTime.dayOfYear == now.dayOfYear) {
-                        endHour = 24.0f
-                    }
+                    // La rejilla va de las 00:00 a las 24:00 del día seleccionado. Cada programa
+                    // se mide desde ese arranque y se recorta si se sale por algún extremo: el que
+                    // viene de anoche se pega a las 00:00 y el que sigue de madrugada, a las 24:00.
+                    //
+                    // Se mide en horas transcurridas y no comparando fechas porque un programa que
+                    // acaba a las 00:00 del día siguiente tiene que valer 24, no 0. Además así la
+                    // noche del cambio de año y la del cambio de hora salen bien.
+                    val dayStart = selectedDate.atStartOfDay(localZoneId)
 
                     ProgramGuideItem.Program(
                         channelIndex = channelIndex,
-                        startHour = startHour,
-                        endHour = endHour,
+                        startHour = hoursFrom(dayStart, localStartTime),
+                        endHour = hoursFrom(dayStart, localEndTime),
                     )
                 },
                 itemContent = { (program, _) ->
@@ -160,7 +149,6 @@ fun EPGMobile(
                         )
                     }
                 )
-        }
     }
 }
 
@@ -255,3 +243,10 @@ private fun TimelineCell(hour: Int, modifier: Modifier = Modifier) {
         )
     }
 }
+
+/**
+ * Posición de [moment] en la rejilla, en horas transcurridas desde [dayStart],
+ * recortada a los bordes del día. Un instante anterior al día vale 0 y uno posterior, 24.
+ */
+private fun hoursFrom(dayStart: ZonedDateTime, moment: ZonedDateTime): Float =
+    (Duration.between(dayStart, moment).toMinutes() / 60f).coerceIn(0f, 24f)

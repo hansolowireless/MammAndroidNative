@@ -564,6 +564,9 @@ class VideoPlayerViewModel @Inject constructor(
 
     fun showZappingLayer() {
         logger.debug(TAG, "showZappingLayer")
+        // La lista guarda una foto de lo que se emitía al construirla. Se rehace al abrirla
+        // para que no muestre programas que ya han acabado si se lleva rato en el mismo canal.
+        zappingController.updateChannelList(_content.value, viewModelScope)
         zappingController.showZappingLayer(_content.value)
     }
 

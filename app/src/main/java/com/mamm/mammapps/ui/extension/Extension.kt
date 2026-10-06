@@ -131,10 +131,9 @@ fun Player?.jump10sBack() {
     this?.seekTo(this.currentPosition - 10_000L)
 }
 
-fun ZonedDateTime.toHHmmString(): String {
-    val formatter = DateTimeFormatter.ofPattern("HH:mm")
-    return this.format(formatter)
-}
+fun ZonedDateTime.toHHmmString(): String =
+    withZoneSameInstant(ZoneId.systemDefault()) // a la hora del dispositivo, como setHourText
+        .format(DateTimeFormatter.ofPattern("HH:mm"))
 
 fun ImageView.insertThumbnail(url: String?, position: Long, onError: (() -> Unit)? = null) {
     Glide.with(this)
