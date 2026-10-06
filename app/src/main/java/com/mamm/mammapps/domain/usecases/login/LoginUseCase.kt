@@ -23,8 +23,8 @@ class LoginUseCase @Inject constructor(
             onSuccess = { _ ->
                 logger.debug(TAG, "invoke Login successful")
 
-                //Limpiar datos de EPG
-                epgRepository.clearCache()
+                //Limpiar EPG en memoria; la de disco solo si ha entrado otro usuario
+                epgRepository.onUserLoggedIn()
 
                 Result.success(Unit)
             },

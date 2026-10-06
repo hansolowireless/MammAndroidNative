@@ -6,6 +6,8 @@ import com.mamm.mammapps.data.datasource.local.LocalDataSource
 import com.mamm.mammapps.data.datasource.local.LocalDataSourceImpl
 import com.mamm.mammapps.data.repository.CustomContentRepositoryImpl
 import com.mamm.mammapps.data.repository.DiagnosticsRepositoryImpl
+import com.mamm.mammapps.data.datasource.local.EPGLocalDataSource
+import com.mamm.mammapps.data.datasource.local.EPGLocalDataSourceImpl
 import com.mamm.mammapps.data.repository.EPGRepositoryImpl
 import com.mamm.mammapps.data.repository.LoginRepositoryImpl
 import com.mamm.mammapps.data.repository.MammRepositoryImpl
@@ -51,6 +53,12 @@ abstract class DataModule {
     abstract fun bindEPGRepository(
         impl: EPGRepositoryImpl
     ): EPGRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindEPGLocalDataSource(
+        impl: EPGLocalDataSourceImpl
+    ): EPGLocalDataSource
 
     @Binds
     @Singleton

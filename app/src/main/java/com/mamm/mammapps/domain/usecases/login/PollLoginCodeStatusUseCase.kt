@@ -12,7 +12,7 @@ class PollLoginCodeStatusUseCase @Inject constructor(
     suspend operator fun invoke(code: String): Result<LoginCodeStatus> {
         return repository.checkLoginCodeStatus(code).onSuccess { status ->
             if (status.data != null) {
-                epgRepository.clearCache()
+                epgRepository.onUserLoggedIn()
             }
         }
     }
