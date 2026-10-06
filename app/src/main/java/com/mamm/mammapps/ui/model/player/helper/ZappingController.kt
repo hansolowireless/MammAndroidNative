@@ -73,19 +73,20 @@ class ZappingController @Inject constructor(
                 getChannelsUseCase().onSuccess { channels ->
                     val currentIsPorn = channels.find { it.id == currentContent.identifier.id }?.isPornChannel ?: false
 
-                    _zappingInfo.update {
-                        channels.filter { it.isPornChannel == currentIsPorn }.map { channel ->
-                            ZappingInfoUI(
-                                channel = channel.toContentEntityUI(),
-                                liveEvent = getLiveEventInfoUseCase(channelId = channel.id)?.toContentListUI()
-                                    ?: ContentListUI(
-                                        identifier = ContentIdentifier.Event(0),
-                                        title = "",
-                                        imageUrl = ""
-                                    )
-                            )
-                        }
+                    // Se calcula fuera de update: su lambda puede reejecutarse si hay escrituras
+                    // concurrentes, y la consulta del directo puede suspenderse para descargar.
+                    val info = channels.filter { it.isPornChannel == currentIsPorn }.map { channel ->
+                        ZappingInfoUI(
+                            channel = channel.toContentEntityUI(),
+                            liveEvent = getLiveEventInfoUseCase(channelId = channel.id)?.toContentListUI()
+                                ?: ContentListUI(
+                                    identifier = ContentIdentifier.Event(0),
+                                    title = "",
+                                    imageUrl = ""
+                                )
+                        )
                     }
+                    _zappingInfo.update { info }
                 }.onFailure {
                     logger.error(TAG, "updateChannelList Error getting channels for Zapping List")
                 }

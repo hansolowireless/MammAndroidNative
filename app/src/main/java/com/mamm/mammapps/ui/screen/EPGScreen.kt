@@ -1,6 +1,7 @@
 package com.mamm.mammapps.ui.screen
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,6 +19,7 @@ import com.mamm.mammapps.domain.model.epg.EPGChannelContent
 import com.mamm.mammapps.domain.model.entity.Event
 import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
+import com.mamm.mammapps.ui.component.epg.DateSelector
 import com.mamm.mammapps.ui.component.epg.EPGMobile
 import com.mamm.mammapps.ui.component.epg.EPGTV
 import com.mamm.mammapps.ui.mapper.toContentToPlayUI
@@ -25,7 +27,6 @@ import com.mamm.mammapps.ui.model.uistate.CastState
 import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.viewmodel.CastViewModel
 import com.mamm.mammapps.ui.viewmodel.EPGViewModel
-import java.time.LocalDate
 
 @Composable
 fun EPGScreen(
@@ -43,8 +44,11 @@ fun EPGScreen(
     val selectedChannel by viewModel.selectedChannel.collectAsStateWithLifecycle()
     val playedChannel by viewModel.playedChannel.collectAsStateWithLifecycle()
 
+    // El día seleccionado vive en el ViewModel, que sobrevive a ir al detalle y volver.
+    // Si aquí se pidiera LocalDate.now() se recargaría hoy mientras el selector sigue
+    // marcando otro día, y la parrilla saldría colocada contra el día equivocado.
     LaunchedEffect(Unit) {
-        viewModel.getEPGContent(LocalDate.now())
+        viewModel.getEPGContent(selectedDate)
     }
 
     LaunchedEffect(Unit) {
@@ -67,63 +71,75 @@ fun EPGScreen(
         }
     }
 
-    when (val state = uiState) {
-        is UIState.Loading -> {
-            LoadingSpinner(modifier = Modifier.fillMaxSize())
+    Column {
+
+        // Fuera del when a propósito: el selector tiene que seguir en pantalla mientras
+        // se carga el día nuevo, en vez de desaparecer con el spinner. En TV no, porque
+        // allí es una de las tres columnas de la propia rejilla.
+        if (!isTV) {
+            DateSelector(
+                selectedDate = selectedDate,
+                onDateSelected = { date ->
+                    viewModel.setSelectedDate(date)
+                    viewModel.getEPGContent(date)
+                }
+            )
         }
 
-        is UIState.Success<List<EPGChannelContent>> -> {
-            if (isTV) {
-                EPGTV(
-                    epgContent = state.data,
-                    selectedDate = selectedDate,
-                    onDateSelected = { date ->
-                        viewModel.setSelectedDate(date)
-                        viewModel.getEPGContent(date)
-                    },
-                    selectedChannel = selectedChannel,
-                    onChannelSelected = { channel ->
-                        viewModel.setSelectedChannel(channel)
-                    },
-                    onEventClicked = { event ->
-                        if (event.isLive()) {
-                            viewModel.findChannel(event)
-                        } else {
-                            onShowDetails(event)
-                        }
-                    }
-                )
-            } else {
-                EPGMobile(
-                    content = state.data,
-                    selectedDate = selectedDate,
-                    onDateSelected = { date ->
-                        viewModel.setSelectedDate(date)
-                        viewModel.getEPGContent(date)
-                    },
-                    onEventClicked = {
-                        if (it.isLive()) {
-                            viewModel.findChannel(it)
-                        } else {
-                            onShowDetails(it)
-                        }
-                    }
-                )
+        when (val state = uiState) {
+            is UIState.Loading -> {
+                LoadingSpinner(modifier = Modifier.fillMaxSize())
             }
-        }
 
-        is UIState.Error -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.error_loading_epg),
-                    style = MaterialTheme.typography.bodyLarge
-                )
+            is UIState.Success<List<EPGChannelContent>> -> {
+                if (isTV) {
+                    EPGTV(
+                        epgContent = state.data,
+                        selectedDate = selectedDate,
+                        onDateSelected = { date ->
+                            viewModel.setSelectedDate(date)
+                            viewModel.getEPGContent(date)
+                        },
+                        selectedChannel = selectedChannel,
+                        onChannelSelected = { channel ->
+                            viewModel.setSelectedChannel(channel)
+                        },
+                        onEventClicked = { event ->
+                            if (event.isLive()) {
+                                viewModel.findChannel(event)
+                            } else {
+                                onShowDetails(event)
+                            }
+                        }
+                    )
+                } else {
+                    EPGMobile(
+                        content = state.data,
+                        selectedDate = selectedDate,
+                        onEventClicked = {
+                            if (it.isLive()) {
+                                viewModel.findChannel(it)
+                            } else {
+                                onShowDetails(it)
+                            }
+                        }
+                    )
+                }
             }
-        }
 
-        UIState.Idle -> TODO()
+            is UIState.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.error_loading_epg),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+
+            UIState.Idle -> TODO()
+        }
     }
 }

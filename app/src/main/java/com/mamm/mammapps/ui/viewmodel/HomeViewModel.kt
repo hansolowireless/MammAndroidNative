@@ -131,6 +131,9 @@ class HomeViewModel @Inject constructor(
             AppRoute.HOME -> loadContent {
                 getHomeContentUseCase().onSuccess {
                     viewModelScope.launch(Dispatchers.IO) {
+                        // Basta pedir hoy: el repositorio ya se trae el fichero vecino que
+                        // haga falta para cubrir el día local completo. Lo que esté en disco
+                        // no se vuelve a descargar.
                         getEPGContentUseCase(LocalDate.now())
                     }
                 }
@@ -193,9 +196,21 @@ class HomeViewModel @Inject constructor(
         }
 
         when (content.identifier) {
-            is ContentIdentifier.Channel -> _focusedContent.update {
-                findLiveEventOnChannelUseCase(content.identifier.id)?.toContentEntityUI()
-                    ?: content
+            is ContentIdentifier.Channel -> {
+                // Se enfoca el canal al momento y, en cuanto llega, se sustituye por su programa
+                // en directo. Si mientras tanto el usuario ha movido el foco, la respuesta se
+                // descarta para no pisar la ficha de otro canal.
+                //
+                // No se cancela la consulta al cambiar de foco a propósito: si al cambiar de día
+                // hay que descargar el fichero, recorrer canales deprisa lo cancelaría una y otra
+                // vez sin que llegara a completarse nunca.
+                _focusedContent.update { content }
+                viewModelScope.launch {
+                    val live = findLiveEventOnChannelUseCase(content.identifier.id) ?: return@launch
+                    _focusedContent.update { current ->
+                        if (current?.identifier == content.identifier) live.toContentEntityUI() else current
+                    }
+                }
             }
 
             else -> _focusedContent.update { content }
