@@ -23,7 +23,7 @@ fun ChannelGridMobile(
     onChannelFocus: (ContentEntityUI) -> Unit = {}
 ) {
     LazyVerticalGrid(
-        columns = GridCells.FixedSize(180.dp),
+        columns = GridCells.Adaptive(minSize = 140.dp),
         modifier = modifier.fillMaxWidth(),
         contentPadding = PaddingValues(
             horizontal = Dimensions.paddingMedium,
