@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.mamm.mammapps.R
+import com.mamm.mammapps.ui.component.LocalIsTV
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.Primary
 
@@ -84,19 +85,22 @@ fun PlayerLoadingOverlay(
             }
         }
 
+        // Solo en móvil: en TV no se llega con el mando y se sale con el botón Atrás.
         // Mismo icono y esquina que el close_button de exoplayer_controls.xml
-        IconButton(
-            onClick = onClose,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(Dimensions.paddingMedium)
-                .size(50.dp)
-        ) {
-            Icon(
-                painter = painterResource(android.R.drawable.ic_menu_close_clear_cancel),
-                contentDescription = stringResource(R.string.accessibility_close),
-                tint = Color.White
-            )
+        if (!LocalIsTV.current) {
+            IconButton(
+                onClick = onClose,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(Dimensions.paddingMedium)
+                    .size(50.dp)
+            ) {
+                Icon(
+                    painter = painterResource(android.R.drawable.ic_menu_close_clear_cancel),
+                    contentDescription = stringResource(R.string.accessibility_close),
+                    tint = Color.White
+                )
+            }
         }
     }
 }
