@@ -1,7 +1,9 @@
 package com.mamm.mammapps
 
 import android.content.pm.ActivityInfo
+import android.graphics.Color
 import android.os.Bundle
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,7 +39,11 @@ class MainActivity : FragmentActivity() {
             ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         }
 
-        enableEdgeToEdge()
+        // Todos los flavors usan tema oscuro: iconos de las barras del sistema siempre claros
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT)
+        )
         setContent {
             MammAppsTheme {
                 Surface(
