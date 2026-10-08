@@ -50,6 +50,8 @@ fun ContentEntityListItem(
     showLiveIndicator: Boolean = false,
     showCatchupIndicator: Boolean = false,
     showDescription: Boolean = false,
+    showFullTitle: Boolean = false,
+    descriptionMaxLines: Int = 3,
     orderIndex: Int? = null,
     onClick: () -> Unit = {}
 ) {
@@ -88,7 +90,11 @@ fun ContentEntityListItem(
                         )
                     },
                     style = MaterialTheme.typography.titleSmall,
-                    maxLines = if (isFocused) 2 else 1,
+                    maxLines = when {
+                        showFullTitle -> Int.MAX_VALUE
+                        isFocused -> 2
+                        else -> 1
+                    },
                     overflow = TextOverflow.Ellipsis
                 )
                 if (showLiveIndicator) {
@@ -121,7 +127,7 @@ fun ContentEntityListItem(
                         Text(
                             text = description,
                             style = MaterialTheme.typography.bodySmall,
-                            maxLines = 3,
+                            maxLines = descriptionMaxLines,
                             overflow = TextOverflow.Ellipsis
                         )
                     }
