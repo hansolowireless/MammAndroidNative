@@ -138,7 +138,8 @@ fun VideoPlayerScreen(
             PlayerLoadingOverlay(
                 modifier = Modifier.fillMaxSize(),
                 imageUrl = content.imageUrl,
-                title = content.title
+                title = content.title,
+                onClose = { backDispatcher?.onBackPressed() }
             )
         }
 

@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,9 +20,12 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.mamm.mammapps.R
 import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.Primary
 
@@ -27,12 +33,14 @@ import com.mamm.mammapps.ui.theme.Primary
  * Overlay de carga del player: póster del contenido difuminado y oscurecido de fondo,
  * spinner y título del contenido, mientras se resuelven las URLs de reproducción (CLM/DRM).
  * En dispositivos sin soporte de blur (API < 31) se muestra la imagen solo atenuada.
+ * Incluye un botón de cerrar para poder salir si la carga se demora.
  */
 @Composable
 fun PlayerLoadingOverlay(
     modifier: Modifier = Modifier,
     imageUrl: String? = null,
-    title: String? = null
+    title: String? = null,
+    onClose: () -> Unit
 ) {
     Box(
         modifier = modifier.background(Color.Black),
@@ -74,6 +82,21 @@ fun PlayerLoadingOverlay(
                     modifier = Modifier.padding(horizontal = Dimensions.paddingLarge)
                 )
             }
+        }
+
+        // Mismo icono y esquina que el close_button de exoplayer_controls.xml
+        IconButton(
+            onClick = onClose,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(Dimensions.paddingMedium)
+                .size(50.dp)
+        ) {
+            Icon(
+                painter = painterResource(android.R.drawable.ic_menu_close_clear_cancel),
+                contentDescription = stringResource(R.string.accessibility_close),
+                tint = Color.White
+            )
         }
     }
 }
