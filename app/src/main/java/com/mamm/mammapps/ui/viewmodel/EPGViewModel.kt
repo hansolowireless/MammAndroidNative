@@ -13,7 +13,9 @@ import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.uistate.UIState
 import com.mamm.mammapps.ui.viewmodel.ChannelsViewModel.Companion.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -41,16 +43,35 @@ class EPGViewModel @Inject constructor(
     private val _selectedDate = MutableStateFlow<LocalDate>(LocalDate.now())
     val selectedDate: StateFlow<LocalDate> = _selectedDate.asStateFlow()
 
+    // Día de la parrilla que hay ahora en epgUIState (null si no hay ninguna cargada)
+    private var loadedDate: LocalDate? = null
+    private var loadJob: Job? = null
+
+    /**
+     * Carga la parrilla de [date]. Si ya se está mostrando ese día (p. ej. al volver del
+     * player o del detalle) se refresca por debajo sin pasar por Loading: la parrilla
+     * sigue en pantalla, sin spinner y sin perder el scroll.
+     */
     fun getEPGContent(date: LocalDate) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _epgUIState.update { UIState.Loading }
+        val isRefresh = loadedDate == date && _epgUIState.value is UIState.Success
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch(Dispatchers.IO) {
+            if (!isRefresh) {
+                loadedDate = null
+                _epgUIState.update { UIState.Loading }
+            }
 
             getEPGContentUseCase(date)
                 .onSuccess { epgData ->
                     val filteredData = epgData.filter { it.channel.isPornChannel == false }
+                    loadedDate = date
                     _epgUIState.update { UIState.Success(filteredData) }
                 }
                 .onFailure { exception ->
+                    // El repositorio usa runCatching: una carga cancelada (cambio de día) llega aquí
+                    if (exception is CancellationException) return@onFailure
+                    // Si falla un refresco se deja la parrilla que ya había
+                    if (isRefresh) return@onFailure
                     _epgUIState.update {
                         UIState.Error(exception.message ?: "Unknown error occurred")
                     }

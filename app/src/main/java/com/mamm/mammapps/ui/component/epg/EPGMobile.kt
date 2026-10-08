@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -63,12 +63,11 @@ fun EPGMobile(
     }
 
     val now = remember { ZonedDateTime.now() }
-    val state = rememberSaveableProgramGuideState()
-
-    // Tu corrección, que es la forma idónea de hacerlo.
-    LaunchedEffect(Unit) {
-        state.snapToCurrentTime()
-    }
+    // La hora actual es solo la posición inicial: la librería la usa cuando no hay una
+    // guardada. Al volver del player o del detalle se restaura donde estaba el scroll.
+    val state = rememberSaveableProgramGuideState(
+        initialOffset = { Offset(getCurrentTimePosition(), 0f) }
+    )
 
     // El selector de fechas lo pinta EPGScreen, por encima de este componente: así se
     // mantiene en pantalla mientras se carga el día nuevo en vez de irse con el spinner.
