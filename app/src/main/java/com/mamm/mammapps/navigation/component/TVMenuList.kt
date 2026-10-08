@@ -101,12 +101,14 @@ fun TVMenuList(
  */
 private fun handleNavigation(navController: NavHostController, item: AppRoute) {
     if (item.route == AppRoute.HOME.route) {
+        // Se vuelve al Home que ya está en la pila. No se usa startDestinationId (es LOGIN, que
+        // ya no está en la pila) ni restoreState: el estado que navigateToTopLevel guarda queda
+        // asociado a HOME, y restaurarlo devolvía la sección anterior en vez de ir a Home.
         navController.navigate(item.route) {
-            popUpTo(navController.graph.startDestinationId) {
+            popUpTo(AppRoute.HOME.route) {
                 saveState = true
             }
             launchSingleTop = true
-            restoreState = true
         }
     } else {
         navController.navigateToTopLevel(item.route)
