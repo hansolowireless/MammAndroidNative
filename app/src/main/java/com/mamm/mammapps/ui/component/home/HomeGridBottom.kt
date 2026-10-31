@@ -3,6 +3,7 @@ package com.mamm.mammapps.ui.component.home
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -108,12 +109,10 @@ fun HomeGridBottom(
                 }
 
                 Column(
-                    modifier = Modifier.padding(
-                        horizontal = Dimensions.paddingLarge,
-                    ),
                     verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
                 ) {
                     Row(
+                        modifier = Modifier.padding(horizontal = Dimensions.paddingLarge),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
@@ -140,8 +139,14 @@ fun HomeGridBottom(
                     }
 
                     RowOfContent(
-                        modifier = Modifier.focusRequester(rowFocusRequester),
+                        modifier = Modifier
+                            .padding(end = Dimensions.paddingLarge)
+                            .focusRequester(rowFocusRequester),
                         row = contentRow,
+                        contentPadding = PaddingValues(
+                            start = Dimensions.paddingLarge + Dimensions.paddingXSmall,
+                            end = Dimensions.paddingXSmall
+                        ),
                         lazyListState =  rowState,
                         showExpandCategory = LocalIsTV.current && contentRow.loadMore,
                         onContentClick = { content ->

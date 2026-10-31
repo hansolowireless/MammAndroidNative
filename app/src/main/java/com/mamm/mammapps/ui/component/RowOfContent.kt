@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -18,6 +19,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mamm.mammapps.ui.component.common.contententity.ContentEntity
@@ -39,21 +41,24 @@ fun RowOfContent(
     onExpandCategoryClick : () -> Unit = {},
     onFocus: (ContentEntityUI) -> Unit = {},
     onFocusExpandCategory: () -> Unit = {},
-    showExpandCategory: Boolean = false
+    showExpandCategory: Boolean = false,
+    contentPadding: PaddingValues = PaddingValues(horizontal = Dimensions.paddingXSmall)
 ) {
     val contentList = row.items
     if (contentList.isEmpty()) {
         return
     }
 
-    ProvideLazyListPivotOffset(parentFraction = 0.01f) {
+    val startPadding = contentPadding.calculateStartPadding(LocalLayoutDirection.current)
+
+    ProvideLazyListPivotOffset(parentOffset = startPadding) {
         LazyRow(
             modifier = modifier
                 .fillMaxWidth()
                 .wrapContentHeight(),
             state = lazyListState,
             verticalAlignment = Alignment.CenterVertically,
-            contentPadding = PaddingValues(horizontal = Dimensions.paddingXSmall),
+            contentPadding = contentPadding,
             horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall)
         ) {
             itemsIndexed(
