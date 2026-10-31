@@ -72,7 +72,7 @@ fun ChannelGridTV(
         }
     }
 
-    ProvideLazyListPivotOffset(parentFraction = 0.1f) {
+    ProvideLazyListPivotOffset(parentOffset = 20.dp) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(4),
             state = lazyGridState,
@@ -82,7 +82,7 @@ fun ChannelGridTV(
                 vertical = Dimensions.paddingSmall
             ),
             horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium),
-            verticalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall)
+            verticalArrangement = Arrangement.spacedBy(Dimensions.paddingXLarge)
         ) {
             itemsIndexed(
                 channels,
@@ -104,7 +104,8 @@ fun ChannelGridTV(
                             if (focusState.isFocused) {
                                 lastFocusedIndex.intValue = index
                             }
-                        },
+                        }
+                        .fillMaxWidth(),
                     contentEntityUI = channel,
                     onClick = { onChannelClick(channel) },
                     onFocus = { onChannelFocus(channel) }

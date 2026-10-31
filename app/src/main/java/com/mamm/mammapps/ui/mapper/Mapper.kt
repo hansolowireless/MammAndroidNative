@@ -34,7 +34,6 @@ import com.mamm.mammapps.ui.model.SeasonUI
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
 import com.mamm.mammapps.ui.model.player.FingerPrintInfoUI
 import com.mamm.mammapps.ui.model.player.LiveEventInfoUI
-import com.mamm.mammapps.ui.theme.Dimensions
 import com.mamm.mammapps.ui.theme.Ratios
 import com.mamm.mammapps.util.getRandomHashCode
 import com.mamm.mammapps.util.orRandom
@@ -85,7 +84,6 @@ fun VoD.toContentEntityUI(customContentType: CustomizedContent = CustomizedConte
     horizontalImageUrl = (logoURL?.takeIf { it.isNotBlank() } ?: contentLogo).orEmpty(),
     title = title,
     aspectRatio = Ratios.VERTICAL,
-    height = Dimensions.contentEntityHeight,
     detailInfo = DetailInfoUI(
         metadata = metadata,
         description = getDescription(),
@@ -100,7 +98,6 @@ fun Event.toContentEntityUI(customContentType: CustomizedContent = CustomizedCon
     horizontalImageUrl = (eventLogoUrl?.takeIf { it.isNotBlank() } ?: logoURL).orEmpty(),
     title = title,
     aspectRatio = Ratios.VERTICAL,
-    height = Dimensions.contentEntityHeight,
     detailInfo = DetailInfoUI(
         subtitle = subtitle,
         description = description,
@@ -121,13 +118,12 @@ fun Serie.toContentEntityUI() = ContentEntityUI(
         description = longDesc.orEmpty()
     ),
     aspectRatio = Ratios.HORIZONTAL,
-    height = Dimensions.channelEntityHeight,
 )
 
 fun Featured.toContentEntityUI(): ContentEntityUI? {
     val id = id ?: return null
     if (type == FeaturedFormat.UNKNOWN) return null
-    val imageUrl = logoTransitions?.first()?.url ?: logoURL.orEmpty()
+    val imageUrl = logoTransitions?.firstOrNull()?.url ?: logoURL.orEmpty()
 
     return ContentEntityUI(
         identifier = ContentIdentifier.fromFeaturedFormat(
@@ -140,7 +136,6 @@ fun Featured.toContentEntityUI(): ContentEntityUI? {
         title = title.orEmpty(),
         featuredType = if (type == FeaturedFormat.BANNER) FeaturedType.BANNER else FeaturedType.FEATURED,
         aspectRatio = Ratios.HORIZONTAL,
-        height = Dimensions.channelEntityHeight,
         detailInfo = DetailInfoUI(
             bannerImageUrl = logoUrl3x1,
             description = description.orEmpty()
@@ -161,7 +156,6 @@ fun Bookmark.toContentEntityUI(): ContentEntityUI? {
             metadata = metadata
         ),
         aspectRatio = Ratios.VERTICAL,
-        height = Dimensions.contentEntityHeight,
         customContentType = CustomizedContent.BookmarkType
     )
 }

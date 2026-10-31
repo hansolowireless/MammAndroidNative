@@ -26,13 +26,14 @@ import com.mamm.mammapps.ui.component.common.ProvideLazyListPivotOffset
 import com.mamm.mammapps.ui.constant.UIConstant
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
+import com.mamm.mammapps.ui.model.ContentRowUI
 import com.mamm.mammapps.ui.model.CustomizedContent
 import com.mamm.mammapps.ui.theme.Dimensions
 
 @Composable
 fun RowOfContent(
     modifier: Modifier = Modifier,
-    contentList: List<ContentEntityUI>,
+    row: ContentRowUI,
     lazyListState: LazyListState = rememberLazyListState(),
     onContentClick: (ContentEntityUI) -> Unit,
     onExpandCategoryClick : () -> Unit = {},
@@ -40,6 +41,7 @@ fun RowOfContent(
     onFocusExpandCategory: () -> Unit = {},
     showExpandCategory: Boolean = false
 ) {
+    val contentList = row.items
     if (contentList.isEmpty()) {
         return
     }
@@ -58,6 +60,7 @@ fun RowOfContent(
                 contentList
             ) { index, contentEntity ->
                 ContentEntity(
+                    modifier = Modifier.height(Dimensions.rowCardHeight(contentEntity.aspectRatio)),
                     contentEntityUI = contentEntity,
                     onClick = { onContentClick(contentEntity) },
                     onFocus = { onFocus(contentEntity) },
@@ -68,8 +71,8 @@ fun RowOfContent(
                 item {
                     ExpandCategoryItemTV(
                         modifier = Modifier
-                            .height(contentList.first().height)
-                            .aspectRatio(contentList.first().aspectRatio),
+                            .height(Dimensions.rowCardHeight(row.expandCategoryAspectRatio))
+                            .aspectRatio(row.expandCategoryAspectRatio),
                         onClick = { onExpandCategoryClick() },
                         onFocus = { onFocusExpandCategory() }
                     )
@@ -80,6 +83,7 @@ fun RowOfContent(
                     contentList
                 ) { index, contentEntity ->
                     ContentEntity(
+                        modifier = Modifier.height(Dimensions.rowCardHeight(contentEntity.aspectRatio)),
                         contentEntityUI = contentEntity,
                         onClick = { onContentClick(contentEntity) },
                         onFocus = { onFocus(contentEntity) },
@@ -132,7 +136,7 @@ fun RowOfContentPreview() {
     CompositionLocalProvider {
         Column {
             RowOfContent(
-                contentList = sampleContent,
+                row = ContentRowUI(categoryName = "Preview", items = sampleContent),
                 onContentClick = { contentEntity ->
                     println("Clicked on: ${contentEntity.title}")
                 }

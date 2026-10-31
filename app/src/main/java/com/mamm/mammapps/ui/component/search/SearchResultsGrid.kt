@@ -35,6 +35,7 @@ fun SearchResultsGrid(
                 contentAlignment = Alignment.Center
             ) {
                 ContentEntity(
+                    modifier = Modifier.fillMaxWidth(),
                     contentEntityUI = content,
                     onClick = { onContentClick(content) }
                 )

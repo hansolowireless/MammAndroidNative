@@ -5,6 +5,8 @@ import androidx.compose.foundation.gestures.BringIntoViewSpec
 import androidx.compose.foundation.gestures.LocalBringIntoViewSpec
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 
 /**
  * Provides a [BringIntoViewSpec] that calculates the scroll offset for a child item in a LazyList
@@ -14,6 +16,8 @@ import androidx.compose.runtime.CompositionLocalProvider
  *
  * @param parentFraction The fraction of the parent container that should be visible above the child item.
  * @param childFraction The fraction of the child item that should be visible below the parent container.
+ * @param parentOffset Fixed distance from the leading edge of the container; when set it replaces
+ * [parentFraction], so the pivot does not move if the container changes size.
  * @param content The content to be placed inside containing the LazyList.
  */
 @OptIn(ExperimentalFoundationApi::class)
@@ -21,8 +25,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 fun ProvideLazyListPivotOffset(
     parentFraction: Float = 0.3f,
     childFraction: Float = 0f,
+    parentOffset: Dp? = null,
     content: @Composable () -> Unit,
 ) {
+    val parentOffsetPx = parentOffset?.let { with(LocalDensity.current) { it.toPx() } }
     val bringIntoViewSpec = object : BringIntoViewSpec {
         override fun calculateScrollDistance(
             offset: Float,
@@ -31,6 +37,7 @@ fun ProvideLazyListPivotOffset(
         ): Float = calculatePivotOffset(
             parentFraction = parentFraction,
             childFraction = childFraction,
+            parentOffsetPx = parentOffsetPx,
             offset = offset,
             size = size,
             containerSize = containerSize
@@ -55,13 +62,14 @@ fun ProvideLazyListPivotOffset(
 private fun calculatePivotOffset(
     parentFraction: Float,
     childFraction: Float,
+    parentOffsetPx: Float?,
     offset: Float,
     size: Float,
     containerSize: Float
 ): Float {
     val childSmallerThanParent = size <= containerSize
     val initialTargetForLeadingEdge =
-        parentFraction * containerSize - (childFraction * size)
+        (parentOffsetPx ?: (parentFraction * containerSize)) - (childFraction * size)
     val spaceAvailableToShowItem = containerSize - initialTargetForLeadingEdge
 
     val targetForLeadingEdge =

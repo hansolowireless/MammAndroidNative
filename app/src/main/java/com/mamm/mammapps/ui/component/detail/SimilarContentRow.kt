@@ -32,7 +32,7 @@ fun SimilarContentRow(
         }
 
         RowOfContent(
-            contentList = content.items,
+            row = content,
             onContentClick = { content ->
                 onContentClicked(content)
             }

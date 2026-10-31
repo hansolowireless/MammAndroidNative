@@ -56,8 +56,8 @@ fun SharedContentEntity(
                     .fillMaxSize()
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
-                            startY = contentEntityUI.height.value * 0.5f // Gradiente relativo
+                            0.5f to Color.Transparent,
+                            1f to Color.Black.copy(alpha = 0.7f)
                         )
                     )
             )
