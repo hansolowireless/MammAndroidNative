@@ -64,7 +64,7 @@ fun FeaturedCarousel(
             val item = remember(itemIndex) { content[itemIndex] }
 
             ContentEntity(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxSize(),
                 contentEntityUI = item,
                 onClick = { onItemClick(item) }
             )

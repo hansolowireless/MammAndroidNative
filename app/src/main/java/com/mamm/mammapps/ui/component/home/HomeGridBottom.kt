@@ -141,7 +141,7 @@ fun HomeGridBottom(
 
                     RowOfContent(
                         modifier = Modifier.focusRequester(rowFocusRequester),
-                        contentList = contentRow.items,
+                        row = contentRow,
                         lazyListState =  rowState,
                         showExpandCategory = LocalIsTV.current && contentRow.loadMore,
                         onContentClick = { content ->

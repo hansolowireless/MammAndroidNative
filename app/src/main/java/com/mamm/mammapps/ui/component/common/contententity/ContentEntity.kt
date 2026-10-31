@@ -31,7 +31,11 @@ import com.mamm.mammapps.ui.extension.glow
 import com.mamm.mammapps.ui.model.ContentEntityUI
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.theme.Dimensions
+import com.mamm.mammapps.ui.theme.Ratios
 
+/*La tarjeta solo aplica su proporción: el llamador tiene que fijar una dimensión,
+* la altura en filas (Dimensions.rowCardHeight) o el ancho en grids (fillMaxWidth)
+*/
 @Composable
 fun ContentEntity(
     modifier: Modifier = Modifier,
@@ -82,7 +86,6 @@ private fun ContentEntityTV(
     TvSurface(
         onClick = onClick,
         modifier = modifier
-            .height(contentEntityUI.height)
             .aspectRatio(contentEntityUI.aspectRatio)
             .graphicsLayer {
                 scaleX = scale
@@ -122,10 +125,7 @@ private fun ContentEntityMobile(
 ) {
     Card(
         onClick = onClick,
-        modifier = modifier
-            .height(contentEntityUI.height)
-            .aspectRatio(contentEntityUI.aspectRatio)
-            .then(modifier),
+        modifier = modifier.aspectRatio(contentEntityUI.aspectRatio),
         shape = RoundedCornerShape(Dimensions.cornerRadius),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Black) // Fondo mientras carga la imagen
@@ -141,8 +141,8 @@ fun ContentEntityHorizontalPreviewMobile() {
     CompositionLocalProvider(LocalIsTV provides false) {
         ContentEntity(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+                .padding(16.dp)
+                .fillMaxWidth(),
             contentEntityUI = ContentEntityUI(
                 title = "Título en Móvil",
                 imageUrl = "https://picsum.photos/400/300",
@@ -159,8 +159,8 @@ fun ContentEntityHorizontalPreviewTV() {
     CompositionLocalProvider(LocalIsTV provides true) {
         ContentEntity(
             modifier = Modifier
-                .height(200.dp) // Damos una altura fija para el preview de TV
-                .padding(16.dp),
+                .padding(16.dp)
+                .height(Dimensions.rowCardHeight(Ratios.HORIZONTAL)),
             contentEntityUI = ContentEntityUI(
                 title = "Título en TV",
                 imageUrl = "https://picsum.photos/400/300",
