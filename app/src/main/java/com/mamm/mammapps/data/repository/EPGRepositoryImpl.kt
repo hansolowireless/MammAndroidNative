@@ -111,8 +111,14 @@ class EPGRepositoryImpl @Inject constructor(
         cachedMultiDayEPG?.multiDayEPG?.get(date)?.let { return it }
 
         epgLocalDataSource.getEPG(date)?.let { cached ->
-            logger.debug(TAG, "loadDay - fichero de $date recuperado de disco")
-            return cached.toDomainContent().also { putInMemory(date, it) }
+            val domain = cached.toDomainContent()
+            // Un fichero que se lee pero no se puede mapear (formato de una versión anterior)
+            // no vale como caché: se vuelve a pedir y la descarga lo sobrescribe.
+            if (domain.isNotEmpty()) {
+                logger.debug(TAG, "loadDay - fichero de $date recuperado de disco")
+                return domain.also { putInMemory(date, it) }
+            }
+            logger.warn(TAG, "loadDay - fichero de $date en disco sin canales válidos, se vuelve a pedir")
         }
 
         return fetchFromApi(date)
