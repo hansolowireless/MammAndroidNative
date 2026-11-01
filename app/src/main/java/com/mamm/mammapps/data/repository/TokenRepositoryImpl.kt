@@ -85,12 +85,16 @@ class TokenRepositoryImpl @Inject constructor(
      * Refresca la IP desde la red y actualiza cache
      */
     override suspend fun refreshIp(): Result<Unit> {
-        return runCatching {
-            remoteDatasource.getCurrentUserIp().also {
-                cachedIp = it
+        return runCatching<Unit> {
+            remoteDatasource.getPublicIp()?.also { ip ->
+                if (cachedIp != null && cachedIp != ip) logger.debug(TAG, "refreshIp la IP pública ha cambiado")
+                cachedIp = ip
                 ipCacheTime = System.currentTimeMillis()
+                logger.debug(TAG, "refreshIp IP refrescada con éxito")
+            } ?: run {
+                if (cachedIp == null) throw Exception("No se pudo obtener la IP pública")
+                logger.warn(TAG, "refreshIp no se pudo obtener la IP pública, se mantiene la anterior")
             }
-            logger.debug(TAG, "refreshIp IP refrescada con éxito")
         }.onFailure { excp ->
             logger.debug(TAG, "refreshIp ❌ No se pudo refrescar la IP")
             Result.failure<Unit>(excp)
