@@ -88,6 +88,7 @@ class RemoteDatasource @Inject constructor(
     companion object {
         private const val TAG = "RemoteDatasource"
         private const val BUFFER_SIZE = 8192
+        private const val PUBLIC_IP_TIMEOUT_MS = 5_000
     }
 
     //----------region LOGIN---------//
@@ -423,15 +424,20 @@ class RemoteDatasource @Inject constructor(
         }
     }
 
-    private suspend fun getPublicIp(): String? {
-        return try {
-            withContext(Dispatchers.IO) {
-                val url = URL("https://ips.service.openstream.es/?format=text")
-                url.readText().trim()
-            }
-        } catch (e: Exception) {
-            null
-        }
+    suspend fun getPublicIp(): String? = withContext(Dispatchers.IO) {
+        runCatching {
+            URL("https://ips.service.openstream.es/?format=text")
+                .openConnection()
+                .apply {
+                    connectTimeout = PUBLIC_IP_TIMEOUT_MS
+                    readTimeout = PUBLIC_IP_TIMEOUT_MS
+                }
+                .getInputStream()
+                .bufferedReader()
+                .use { it.readText() }
+                .trim()
+                .ifEmpty { null }
+        }.getOrNull()
     }
 
     //----------TICKERS---------//

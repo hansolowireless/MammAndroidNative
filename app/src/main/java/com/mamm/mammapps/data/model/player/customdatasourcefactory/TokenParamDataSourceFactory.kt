@@ -7,6 +7,7 @@ import com.google.android.exoplayer2.upstream.HttpDataSource
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.interfaces.TokenRepository
 import com.mamm.mammapps.util.replaceQueryParameter
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 enum class TokenMode {
@@ -39,6 +40,7 @@ class TokenParamDataSourceFactory @Inject constructor (
             override fun open(dataSpec: DataSpec): Long {
                 var modifiedUri: Uri = dataSpec.uri
                 var attempts = 0
+                var ipRefreshed = false
 
                 // Determina el modo una vez (basado en la URI inicial)
                 if (tokenMode == TokenMode.NONE) {
@@ -82,8 +84,13 @@ class TokenParamDataSourceFactory @Inject constructor (
                         if (e is HttpDataSource.InvalidResponseCodeException &&
                             (e.responseCode == 401 || e.responseCode == 403)
                         ) {
-                            logger.error(TAG,"Error de token expirado (${e.responseCode}), reintentando ($attempts/$MAX_RETRIES)")
                             attempts++
+                            logger.error(TAG, "Token rechazado (${e.responseCode}), intento $attempts/$MAX_RETRIES")
+                            // El stoken lleva la IP pública firmada: si ha cambiado la red, el CDN lo rechaza
+                            if (tokenMode == TokenMode.STOKEN && !ipRefreshed) {
+                                ipRefreshed = true
+                                runBlocking { tokenRepository.refreshIp() }
+                            }
                             // Para STOKEN, se refrescará en la siguiente iteración
                             // Para RTOKEN, si necesita refresco, agrega lógica aquí (ej. refresca rtoken)
                             if (tokenMode == TokenMode.RTOKEN) {
@@ -98,7 +105,7 @@ class TokenParamDataSourceFactory @Inject constructor (
                 }
 
                 throw HttpDataSource.HttpDataSourceException(
-                    "Máximos reintentos alcanzados por token expirado",
+                    "Máximos reintentos alcanzados por token rechazado",
                     dataSpec,
                     HttpDataSource.HttpDataSourceException.TYPE_OPEN
                 )
