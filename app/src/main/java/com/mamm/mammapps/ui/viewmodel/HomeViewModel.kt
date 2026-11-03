@@ -227,6 +227,8 @@ class HomeViewModel @Inject constructor(
 
     fun setLastClickedIndexToZero() {
         _lastClickedItemIndex.update { 0 }
+        // Si no, la fila 0 restauraría el scroll horizontal guardado de la última fila pulsada
+        _rememberedRowState.value = null
     }
 
 }
