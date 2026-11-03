@@ -22,6 +22,12 @@ class ExpandCategoryViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<UIState<Any>>(UIState.Loading)
     val uiState: StateFlow<UIState<Any>> = _uiState.asStateFlow()
 
+    // Para restaurar el foco al volver de Detail
+    var lastClickedIndex: Int? = null
+        private set
+
+    private var loadedCategoryId: Int? = null
+
     fun getContent(
         categoryId: Int?,
         route: AppRoute?
@@ -30,6 +36,11 @@ class ExpandCategoryViewModel @Inject constructor(
             _uiState.value = UIState.Error()
             return
         }
+
+        // Al volver de Detail la pantalla se recompone: no recargar para no perder scroll ni foco
+        if (categoryId == loadedCategoryId && _uiState.value is UIState.Success) return
+        loadedCategoryId = categoryId
+        lastClickedIndex = null
 
         _uiState.value = UIState.Loading
 
@@ -45,6 +56,10 @@ class ExpandCategoryViewModel @Inject constructor(
             }
         }
 
+    }
+
+    fun setLastClickedIndex(index: Int) {
+        lastClickedIndex = index
     }
 
 }
