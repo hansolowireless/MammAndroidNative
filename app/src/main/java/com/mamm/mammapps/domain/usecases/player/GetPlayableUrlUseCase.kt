@@ -6,6 +6,8 @@ import com.mamm.mammapps.domain.interfaces.PlaybackRepository
 import com.mamm.mammapps.domain.interfaces.TokenRepository
 import com.mamm.mammapps.ui.model.ContentIdentifier
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import java.net.URI
 import javax.inject.Inject
 
@@ -30,31 +32,22 @@ class GetPlayableUrlUseCase @Inject constructor(
         }
 
         return runCatching {
-            val playableURL = playbackRepository.getVideoUrlFromCLM(
-                deliveryURL = content.deliveryURL,
-                typeOfContentString = content.getCLMString(),
-                chromecast = chromecast
-            ).getOrThrow().let { url ->
+            coroutineScope {
+                val ipRefresh = async { tokenRepository.refreshIp() }
 
                 val finalPlayableURL = modifyUrlToCatchupIfNeeded(
                     content = content,
-                    playableUrl = url
+                    playableUrl = playbackRepository.getVideoUrlFromCLM(
+                        deliveryURL = content.deliveryURL,
+                        typeOfContentString = content.getCLMString(),
+                        chromecast = chromecast
+                    ).getOrThrow()
                 )
 
-                tokenRepository.refreshIp().onFailure { exception ->
-                    throw exception
-                }
-                tokenRepository.storeK1KeyEncrypted(finalPlayableURL).onFailure { exception ->
-                    throw exception
-                }
+                ipRefresh.await().getOrThrow()
+                tokenRepository.storeK1KeyEncrypted(finalPlayableURL).getOrThrow()
                 finalPlayableURL
             }
-
-            playableURL
-        }.onSuccess {
-            Result.success(it)
-        }.onFailure {
-            Result.success(it)
         }
     }
 
