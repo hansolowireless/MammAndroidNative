@@ -5,6 +5,8 @@ import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.domain.interfaces.PlaybackRepository
 import com.mamm.mammapps.domain.interfaces.TokenRepository
 import com.mamm.mammapps.ui.model.player.LiveEventInfoUI
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import java.net.URI
 import java.time.ZonedDateTime
 import javax.inject.Inject
@@ -25,20 +27,24 @@ class GetTSTVUrlUseCase @Inject constructor(
         }
 
         return runCatching {
-            val url = playbackRepository.getVideoUrlFromCLM(
-                deliveryURL = liveEventInfo.deliveryURL,
-                typeOfContentString = "VOD"
-            ).getOrThrow()
+            coroutineScope {
+                val ipRefresh = async { tokenRepository.refreshIp() }
 
-            val finalUrl = modifyUrlToTSTV(
-                eventStart = liveEventInfo.eventStart,
-                playableUrl = url
-            )
+                val url = playbackRepository.getVideoUrlFromCLM(
+                    deliveryURL = liveEventInfo.deliveryURL,
+                    typeOfContentString = "VOD"
+                ).getOrThrow()
 
-            tokenRepository.refreshIp().getOrThrow()
-            tokenRepository.storeK1KeyEncrypted(finalUrl).getOrThrow()
+                val finalUrl = modifyUrlToTSTV(
+                    eventStart = liveEventInfo.eventStart,
+                    playableUrl = url
+                )
 
-            finalUrl
+                ipRefresh.await().getOrThrow()
+                tokenRepository.storeK1KeyEncrypted(finalUrl).getOrThrow()
+
+                finalUrl
+            }
         }
     }
 
