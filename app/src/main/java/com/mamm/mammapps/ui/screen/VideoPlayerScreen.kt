@@ -31,8 +31,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamm.mammapps.R
+import com.mamm.mammapps.ui.component.dialog.PlayerErrorDialog
 import com.mamm.mammapps.ui.component.dialog.SessionExpiredDialog
-import com.mamm.mammapps.ui.component.player.PlayerLoadErrorOverlay
 import com.mamm.mammapps.ui.component.player.PlayerLoadingOverlay
 import com.mamm.mammapps.ui.extension.findActivity
 import com.mamm.mammapps.ui.model.player.ContentToPlayUI
@@ -55,6 +55,8 @@ fun VideoPlayerScreen(
     val player by viewModel.player.collectAsStateWithLifecycle()
     val content by viewModel.content.collectAsStateWithLifecycle()
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
+    val showZappingLayer by viewModel.showZappingLayer.collectAsStateWithLifecycle()
+    val isZappingAvailable by viewModel.isZappingAvailable.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(Unit) {
@@ -143,16 +145,34 @@ fun VideoPlayerScreen(
             )
         }
 
-        // Fallo al obtener las URLs (CLM/DRM): el player no arranca, error a pantalla completa
-        if (playerState is PlayerUIState.LoadError) {
-            PlayerLoadErrorOverlay(
-                modifier = Modifier.fillMaxSize(),
-                onRetry = { viewModel.retryLoad() },
-                onClose = { backDispatcher?.onBackPressed() }
-            )
+        // Los diálogos van en su propia ventana y taparían el zapping: se ocultan mientras está
+        // abierto. Si se cierra sin elegir canal, el estado sigue en error y vuelven a salir
+        if (!showZappingLayer) {
+            val onShowChannels = if (isZappingAvailable) ({ viewModel.showZappingLayer() }) else null
+
+            // Fallo al obtener las URLs (CLM/DRM): el player no arranca, diálogo de error
+            if (playerState is PlayerUIState.LoadError) {
+                PlayerErrorDialog(
+                    onRetry = { viewModel.retryLoad() },
+                    onShowChannels = onShowChannels,
+                    onClose = { backDispatcher?.onBackPressed() }
+                )
+            }
+
+            // Error definitivo (sin reintento automático en curso): diálogo con
+            // reintento manual, salvo si el contenido no está disponible
+            (playerState as? PlayerUIState.Error)?.takeIf { it.retrySecondsRemaining == null }?.let { errorState ->
+                PlayerErrorDialog(
+                    message = playerErrorMessage(errorState),
+                    onRetry = if (errorState.type == PlayerErrorType.UNAVAILABLE) null else ({ viewModel.retryPlaybackManually() }),
+                    onShowChannels = onShowChannels,
+                    onClose = { backDispatcher?.onBackPressed() }
+                )
+            }
         }
 
-        (playerState as? PlayerUIState.Error)?.let { errorState ->
+        // Reintento automático en curso: snackbar informativo con la cuenta atrás
+        (playerState as? PlayerUIState.Error)?.takeIf { it.retrySecondsRemaining != null }?.let { errorState ->
             Snackbar(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -174,7 +194,8 @@ fun VideoPlayerScreen(
 
 /**
  * Mapea el tipo de error a un mensaje localizado. En errores transitorios que se
- * están reintentando, añade el contador con los segundos que faltan.
+ * están reintentando, añade el contador con los segundos que faltan; en el error
+ * definitivo, el código de ExoPlayer entre paréntesis como referencia de soporte.
  */
 @Composable
 private fun playerErrorMessage(error: PlayerUIState.Error): String {
@@ -185,8 +206,12 @@ private fun playerErrorMessage(error: PlayerUIState.Error): String {
         PlayerErrorType.UNAVAILABLE -> stringResource(R.string.player_error_unavailable)
         PlayerErrorType.GENERIC -> stringResource(R.string.player_error_generic)
     }
-    return error.retrySecondsRemaining?.let { seconds ->
-        stringResource(R.string.player_error_retrying, baseMessage, seconds)
+    error.retrySecondsRemaining?.let { seconds ->
+        return stringResource(R.string.player_error_retrying, baseMessage, seconds)
+    }
+    // El formato pone el punto final tras el paréntesis: «Problema de conexión (2002).»
+    return error.errorCode?.let { code ->
+        stringResource(R.string.player_error_with_code, baseMessage.removeSuffix("."), code)
     } ?: baseMessage
 }
 

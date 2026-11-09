@@ -5,7 +5,10 @@ import com.mamm.mammapps.ui.model.player.PlayerErrorType
 sealed class PlayerUIState : UIState<Nothing>() {
     data object Idle : PlayerUIState()
 
-    /** Obteniendo las URLs de reproducción (CLM/DRM) antes de poder arrancar el player. */
+    /**
+     * Obteniendo las URLs de reproducción (CLM/DRM) antes de poder arrancar el player,
+     * o re-preparando el player tras un error transitorio.
+     */
     data object Loading : PlayerUIState()
 
     data object Playing : PlayerUIState()
@@ -19,10 +22,13 @@ sealed class PlayerUIState : UIState<Nothing>() {
      * @param type tipo de error para mostrar el mensaje localizado adecuado.
      * @param retrySecondsRemaining segundos que faltan para el próximo reintento
      *   (solo en errores transitorios mientras se reintenta); null si no hay reintento en curso.
+     * @param errorCode código de ExoPlayer (PlaybackException.errorCode) del error definitivo,
+     *   para mostrarlo como referencia de soporte; null mientras se reintenta.
      */
     data class Error(
         val type: PlayerErrorType,
         val retrySecondsRemaining: Int? = null,
+        val errorCode: Int? = null,
     ) : PlayerUIState()
 
     data object Session: PlayerUIState()
