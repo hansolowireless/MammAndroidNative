@@ -38,10 +38,16 @@ class ZappingController @Inject constructor(
     val zappingNumberDisplay = _zappingNumberDisplay.asStateFlow()
 
     /**
+     * El zapping solo tiene sentido si lo que se reproduce es un Canal de TV.
+     */
+    fun isZappingAvailable(content: ContentToPlayUI): Boolean =
+        content.identifier is ContentIdentifier.Channel
+
+    /**
      * Muestra la capa de zapping si el contenido actual en reproducción es un Canal de TV.
      */
     fun showZappingLayer(currentContent: ContentToPlayUI) {
-        if (currentContent.identifier is ContentIdentifier.Channel) {
+        if (isZappingAvailable(currentContent)) {
             _showZappingLayer.update { true }
         }
     }

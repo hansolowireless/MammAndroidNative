@@ -57,13 +57,16 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -111,6 +114,11 @@ class VideoPlayerViewModel @Inject constructor(
 
     //Mostrar el layer de zapping
     val showZappingLayer = zappingController.showZappingLayer
+
+    // Permite ofrecer el acceso al zapping fuera de los gestos del player (p. ej. al fallar)
+    val isZappingAvailable = _content
+        .map(zappingController::isZappingAvailable)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, zappingController.isZappingAvailable(_content.value))
 
     //Lista de canales para zapping
     val zappingInfo = zappingController.zappingInfo
@@ -425,6 +433,19 @@ class VideoPlayerViewModel @Inject constructor(
         initializeWithContent(_content.value)
     }
 
+    /**
+     * Reintento manual tras agotar los automáticos: re-prepara el player sin recrearlo
+     * (conserva posición, modo TSTV y no vuelve a pedir preroll) y reinicia el contador
+     * para que, si vuelve a fallar, se repita el ciclo de reintentos automáticos.
+     */
+    fun retryPlaybackManually() {
+        logger.debug(TAG, "retryPlaybackManually")
+        retryJob?.cancel()
+        retryCount = 0
+        _playerState.update { PlayerUIState.Loading }
+        _player.value?.prepare()
+    }
+
     private suspend fun handleSessionExpired(exception: Throwable) {
         withContext(Dispatchers.Main) {
             if (exception is SessionException) {
@@ -458,14 +479,15 @@ class VideoPlayerViewModel @Inject constructor(
         } else {
             retryJob?.cancel()
             logger.error(TAG, "handlePlayerError - error no recuperable (o reintentos agotados): code=${exception.errorCode}, type=$type")
-            _playerState.update { PlayerUIState.Error(type = type) }
+            _playerState.update { PlayerUIState.Error(type = type, errorCode = exception.errorCode) }
         }
     }
 
     /**
-     * Programa un reintento con backoff exponencial (2s, 4s, 8s…) y va emitiendo el
-     * contador para que la UI lo muestre en el snackbar. Al agotar el tiempo, re-prepara
-     * el player para volver a cargar la fuente.
+     * Programa un reintento con backoff exponencial a partir de
+     * PLAYER_RETRY_BASE_DELAY_SECONDS (5s, 10s, 20s…) y va emitiendo el contador para que
+     * la UI lo muestre en el snackbar. Al agotar el tiempo, pasa a Loading (oculta el
+     * snackbar y muestra la carga) y re-prepara el player para volver a cargar la fuente.
      */
     private fun scheduleRetry(type: PlayerErrorType, exception: PlaybackException) {
         retryJob?.cancel()
@@ -478,6 +500,7 @@ class VideoPlayerViewModel @Inject constructor(
                 _playerState.update { PlayerUIState.Error(type = type, retrySecondsRemaining = remaining) }
                 delay(1000)
             }
+            _playerState.update { PlayerUIState.Loading }
             withContext(Dispatchers.Main) {
                 _player.value?.prepare()
             }

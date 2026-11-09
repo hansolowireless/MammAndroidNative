@@ -152,6 +152,8 @@
     <string name="player_error_retrying"><xliff:g id="message">%1$s</xliff:g> Retrying in <xliff:g id="seconds">%2$d</xliff:g> s…</string>
     <string name="player_error_load">The content could not be loaded. Check your connection and try again.</string>
     <string name="player_error_retry">Retry</string>
+    <string name="player_error_channels">Channels</string>
+    <string name="player_error_with_code"><xliff:g id="message">%1$s</xliff:g> (<xliff:g id="code">%2$d</xliff:g>).</string>
     <string name="player_error_close">Close</string>
     <!--endregion Player errors-->
 

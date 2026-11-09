@@ -153,6 +153,8 @@
     <string name="player_error_retrying"><xliff:g id="message">%1$s</xliff:g> Nuovo tentativo tra <xliff:g id="seconds">%2$d</xliff:g> s…</string>
     <string name="player_error_load">Impossibile caricare il contenuto. Controlla la connessione e riprova.</string>
     <string name="player_error_retry">Riprova</string>
+    <string name="player_error_channels">Canali</string>
+    <string name="player_error_with_code"><xliff:g id="message">%1$s</xliff:g> (<xliff:g id="code">%2$d</xliff:g>).</string>
     <string name="player_error_close">Chiudi</string>
     <!--endregion Player errors-->
 

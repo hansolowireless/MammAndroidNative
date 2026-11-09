@@ -152,6 +152,8 @@
     <string name="player_error_retrying"><xliff:g id="message">%1$s</xliff:g> <xliff:g id="seconds">%2$d</xliff:g> s barru berriro saiatzen…</string>
     <string name="player_error_load">Ezin izan da edukia kargatu. Egiaztatu konexioa eta saiatu berriro.</string>
     <string name="player_error_retry">Saiatu berriro</string>
+    <string name="player_error_channels">Kanalak</string>
+    <string name="player_error_with_code"><xliff:g id="message">%1$s</xliff:g> (<xliff:g id="code">%2$d</xliff:g>).</string>
     <string name="player_error_close">Itxi</string>
     <!--endregion Player errors-->
 

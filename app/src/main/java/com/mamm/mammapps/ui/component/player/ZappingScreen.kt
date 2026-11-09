@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onInterceptKeyBeforeSoftKeyboard
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 import com.mamm.mammapps.ui.component.common.ContentEntityListItem
 import com.mamm.mammapps.ui.component.common.LoadingSpinner
@@ -57,6 +58,7 @@ fun ZappingScreen(
     // La lista puede llegar después de abrir la capa (mientras se ve el spinner)
     val hasData = zappingInfo.isNotEmpty()
     val openedEmpty = remember { zappingInfo.isEmpty() }
+    val windowInfo = LocalWindowInfo.current
 
     // La cuenta atrás sobrevive a las recomposiciones: tiene que usar los valores más recientes
     val latestZappingInfo by rememberUpdatedState(zappingInfo)
@@ -89,6 +91,11 @@ fun ZappingScreen(
         // Esperamos a que el elemento esté compuesto: pedir foco antes lanzaría una excepción
         snapshotFlow { listState.layoutInfo.visibleItemsInfo.any { it.index == initialIndex } }
             .first { it }
+
+        // Si se abre desde un diálogo (p. ej. el de error del player), la ventana del diálogo
+        // aún tiene el foco: pedirlo antes de recuperarlo no tendría efecto y las teclas
+        // (incluido Atrás) no llegarían al zapping
+        snapshotFlow { windowInfo.isWindowFocused }.first { it }
 
         // Pedimos el foco.
         focusRequesters.getOrNull(initialIndex)?.requestFocus()
