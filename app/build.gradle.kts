@@ -233,6 +233,17 @@ android {
             signingConfig = signingConfigs.getByName("keystoreMamm")
         )
 
+        configureFlavorWithMasmediaUrls(
+            flavors = this,
+            name = "chevere",
+            appId = "darna.openstream.com",
+            icon = "@mipmap/ic_launcher_chevere",
+            iconMobile = "@mipmap/ic_launcher_chevere",
+            iconRound = "@mipmap/ic_launcher_chevere_round",
+            banner = "@drawable/banner_chevere",
+            signingConfig = signingConfigs.getByName("keystoreMamm")
+        )
+
         configureCustomFlavor(
             flavors = this,
             name = "eligetv",

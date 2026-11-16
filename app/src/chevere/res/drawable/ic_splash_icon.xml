@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+    El encuadre lo define ya el propio ic_splash_foreground, que es un lienzo cuadrado
+    con el logotipo inscrito en el centro para que entre entero en la máscara circular
+    que aplica la splash screen de Android 12+.
+
+    El PNG (1152 px) va en drawable-xxxhdpi para que su tamaño intrínseco sea 288 dp:
+    con gravity="center" el layer-list no lo escala, y en drawable/ se trataría como
+    mdpi (1152 dp) y se vería enorme, recortado y pixelado.
+    -->
+    <item
+        android:drawable="@drawable/ic_splash_foreground"
+        android:gravity="center" />
+
+</layer-list>

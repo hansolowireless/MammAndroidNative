@@ -167,6 +167,11 @@ platform :android do
     deploy(target: "fanplaytv", rollout: options[:rollout], track: options[:track])
   end
 
+  desc "Deploy Chévere Mobile TV"
+  lane :deploy_chevere do |options|
+    deploy(target: "chevere", rollout: options[:rollout], track: options[:track])
+  end
+
   desc "Deploy de todos los flavors a Google Play"
   lane :deploy_all do |options|
     deploy_masmedia(options)
@@ -174,6 +179,7 @@ platform :android do
     deploy_eligetv(options)
     deploy_tvhotel(options)
     deploy_fanplaytv(options)
+    deploy_chevere(options)
   end
 
   desc "Fija las notas de 'Novedades' (Correcciones y mejoras) en una versión ya subida"
