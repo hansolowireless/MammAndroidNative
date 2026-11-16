@@ -28,5 +28,11 @@
     "flavor": "fanplaytv",
     "service_account": "fastlane-keys/fastlane-project-421216-597050ff9e2a.json",
     "aab_path": "app/build/outputs/bundle/fanplaytvRelease/app-fanplaytv-release.aab"
+  },
+  "chevere": {
+    "package_name": "darna.openstream.com",
+    "flavor": "chevere",
+    "service_account": "fastlane-keys/fastlane-project-421216-597050ff9e2a.json",
+    "aab_path": "app/build/outputs/bundle/chevereRelease/app-chevere-release.aab"
   }
 }
