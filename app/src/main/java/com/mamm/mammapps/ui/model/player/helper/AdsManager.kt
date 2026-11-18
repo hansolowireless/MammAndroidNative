@@ -10,6 +10,7 @@ import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.ui.AdViewProvider
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.player.customdatasourcefactory.TokenParamDataSourceFactory
+import com.mamm.mammapps.data.model.player.customdatasourcefactory.TokenRejectedLoadErrorHandlingPolicy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -56,6 +57,7 @@ class AdsManager @Inject constructor(
     ): MediaSource {
         val factory = DefaultMediaSourceFactory(dataSourceFactory)
             .setDrmSessionManagerProvider(drmProvider)
+            .setLoadErrorHandlingPolicy(TokenRejectedLoadErrorHandlingPolicy())
 
         val adsLoaderInstance = adsLoader
         if (adsLoaderInstance != null && adTagUrl.isNotEmpty() && adViewProvider != null) {

@@ -19,6 +19,7 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.mamm.mammapps.data.logger.Logger
 import com.mamm.mammapps.data.model.player.customdatasourcefactory.DynamicHttpMediaDrmCallback
 import com.mamm.mammapps.data.model.player.customdatasourcefactory.TokenParamDataSourceFactory
+import com.mamm.mammapps.data.model.player.customdatasourcefactory.TokenRejectedException
 import com.mamm.mammapps.domain.model.exception.SessionException
 import com.mamm.mammapps.domain.model.player.Ticker
 import com.mamm.mammapps.domain.usecases.FindLiveEventOnChannelUseCase
@@ -443,7 +444,7 @@ class VideoPlayerViewModel @Inject constructor(
         retryJob?.cancel()
         retryCount = 0
         _playerState.update { PlayerUIState.Loading }
-        _player.value?.prepare()
+        retryJob = viewModelScope.launch { preparePlayerForRetry() }
     }
 
     private suspend fun handleSessionExpired(exception: Throwable) {
@@ -470,6 +471,17 @@ class VideoPlayerViewModel @Inject constructor(
             logger.error(TAG, "handlePlayerError - ERROR_CODE_BEHIND_LIVE_WINDOW")
             _player.value?.seekToDefaultPosition()
             _player.value?.prepare()
+            return
+        }
+
+        if (exception.cause is TokenRejectedException && retryCount == 0) {
+            // Lo más probable es que backend haya rotado la clave de firma del stoken: se renueva
+            // al momento, sin mostrar el error; si vuelve a fallar sigue la estrategia normal
+            logger.warn(TAG, "handlePlayerError - token rechazado por la CDN, renovando la clave")
+            retryJob?.cancel()
+            retryCount++
+            _playerState.update { PlayerUIState.Loading }
+            retryJob = viewModelScope.launch { preparePlayerForRetry() }
             return
         }
 
@@ -501,9 +513,31 @@ class VideoPlayerViewModel @Inject constructor(
                 delay(1000)
             }
             _playerState.update { PlayerUIState.Loading }
-            withContext(Dispatchers.Main) {
-                _player.value?.prepare()
+            preparePlayerForRetry()
+        }
+    }
+
+    /**
+     * Re-prepara el player tras un error. Si fue un token rechazado, antes vuelve a pedir la URL
+     * al CLM para renovar la clave con la que se firma el stoken (si no, se reintentaría con la
+     * clave antigua y fallaría siempre). Se re-prepara la misma fuente: el stoken se genera en
+     * cada petición, así que basta con la clave nueva y se conservan posición y modo TSTV.
+     */
+    private suspend fun preparePlayerForRetry() {
+        // El player conserva el último error hasta el siguiente prepare()
+        val tokenRejected = _player.value?.playerError?.cause is TokenRejectedException
+        if (tokenRejected) {
+            val result = if (_isTstvMode.value) {
+                getTSTVUrlUseCase(liveEventInfo = _liveEventInfo.value)
+            } else {
+                getPlayableUrlUseCase(_content.value)
             }
+            result
+                .onSuccess { logger.debug(TAG, "preparePlayerForRetry clave del stoken renovada") }
+                .onFailure { logger.error(TAG, "preparePlayerForRetry no se pudo renovar la clave: ${it.message}") }
+        }
+        withContext(Dispatchers.Main) {
+            _player.value?.prepare()
         }
     }
 
