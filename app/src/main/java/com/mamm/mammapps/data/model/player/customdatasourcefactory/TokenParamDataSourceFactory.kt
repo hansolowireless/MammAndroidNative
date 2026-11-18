@@ -54,7 +54,7 @@ class TokenParamDataSourceFactory @Inject constructor (
                     }
                 }
 
-                while (attempts < MAX_RETRIES) {
+                while (true) {
                     // Inserta o refresca el token según el modo
                     if (tokenMode == TokenMode.RTOKEN && rtoken.isNotEmpty() && !modifiedUri.queryParameterNames.contains(
                             RTOKEN
@@ -86,6 +86,9 @@ class TokenParamDataSourceFactory @Inject constructor (
                         ) {
                             attempts++
                             logger.error(TAG, "Token rechazado (${e.responseCode}), intento $attempts/$MAX_RETRIES")
+                            // Agotados los reintentos: el player no debe insistir con el mismo token
+                            // (TokenRejectedLoadErrorHandlingPolicy) y el ViewModel renovará la clave
+                            if (attempts >= MAX_RETRIES) throw TokenRejectedException(e, dataSpec)
                             // El stoken lleva la IP pública firmada: si ha cambiado la red, el CDN lo rechaza
                             if (tokenMode == TokenMode.STOKEN && !ipRefreshed) {
                                 ipRefreshed = true
@@ -103,12 +106,6 @@ class TokenParamDataSourceFactory @Inject constructor (
                         }
                     }
                 }
-
-                throw HttpDataSource.HttpDataSourceException(
-                    "Máximos reintentos alcanzados por token rechazado",
-                    dataSpec,
-                    HttpDataSource.HttpDataSourceException.TYPE_OPEN
-                )
             }
         }
     }
